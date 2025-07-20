@@ -1,0 +1,19 @@
+﻿# Node dependencies
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Angular build artifacts
+dist
+out-tsc
+
+# IDE and system files
+*.swp
+.DS_Store
+.vscode
+.idea
+
+# Environment files
+.env
+.env.*
