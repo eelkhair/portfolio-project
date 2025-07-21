@@ -24,7 +24,7 @@
       <Folder Include="Application\Commands\" />
       <Folder Include="Application\Queries\" />
       <Folder Include="Infrastructure\" />
-      <Folder Include="Persistence\" />
+      <Folder Include="Data\" />
       <Folder Include="Presentation\Endpoints\" />
     </ItemGroup>
 

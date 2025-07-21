@@ -10,7 +10,7 @@ EXPOSE 8081
 
 # This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
+ARG BUILD_CONFIGURATION=Development
 WORKDIR /src
 COPY ["JobApi.Service/JobApi.Service.csproj", "JobApi.Service/"]
 COPY ["Elkhair.Dev.Common/Elkhair.Dev.Common.csproj", "Elkhair.Dev.Common/"]
