@@ -15,7 +15,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Register FastEndpoints + Swagger
 builder.Services.AddFastEndpoints();
-builder.Services.SwaggerDocument();
+builder.Services.SwaggerDocument(options =>
+{
+    options.DocumentSettings = s =>
+    {
+        s.Title = "Job Service API";
+        s.Version = "v1.0.0";
+        s.Description = "API for managing job-related operations";
+    };
+});
 
 // Add Authorization support (even if not using yet)
 
@@ -32,7 +40,7 @@ app.UseAuthentication();
 app.UseAuthorization();     
 app.UseFastEndpoints();     
 app.UseSwaggerGen();        
-app.MapGet("/", (HttpContext ctx) => ctx.Response.Redirect("/swagger"));
+app.MapGet("/", (HttpContext ctx) => ctx.Response.Redirect("/swagger")).ExcludeFromDescription();
 app.Run();
 
 public class DummyAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>

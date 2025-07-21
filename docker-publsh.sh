@@ -29,4 +29,4 @@ for name in "${!services[@]}"; do
 done
 
 echo "🚀 Starting containers using docker-compose.registry.yml..."
-docker compose -f docker-compose.registry.yml up -d
+docker compose -f docker-compose.registry.yml -p job-board up -d
