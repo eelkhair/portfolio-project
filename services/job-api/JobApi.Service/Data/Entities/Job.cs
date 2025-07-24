@@ -13,7 +13,7 @@ public class Job : BaseAuditableEntity
     public string? PostedAt { get; set; }
     public string? AboutCompany { get; set; }
     public string? EEO { get; set; }  
-    public List<string> Responsibilities { get; set; } = [];
-    public List<string> Qualifications { get; set; } = [];
+    public ICollection<Responsibility> Responsibilities { get; set; } = [];
+    public ICollection<Qualification> Qualifications { get; set; } = [];
     public Company? Company { get; set; }
 }

@@ -1,8 +1,8 @@
 ﻿using Elkhair.Dev.Common.Application.Abstractions.Dispatcher;
 using FastEndpoints;
 using JobApi.Application.Commands.Job;
-using JobAPI.Contracts.Job.Responses;
 using JobAPI.Contracts.Jobs.Requests;
+using JobAPI.Contracts.Jobs.Responses;
 
 namespace JobApi.Presentation.Endpoints.Jobs.Create;
 

@@ -12,6 +12,10 @@
     <ItemGroup>
       <PackageReference Include="FastEndpoints" Version="6.2.0" />
       <PackageReference Include="FastEndpoints.Swagger" Version="6.2.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.7">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
       <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
     </ItemGroup>
 
@@ -23,8 +27,8 @@
     <ItemGroup>
       <Folder Include="Application\Commands\" />
       <Folder Include="Application\Queries\" />
+      <Folder Include="Data\Migrations\" />
       <Folder Include="Infrastructure\" />
-      <Folder Include="Data\" />
       <Folder Include="Presentation\Endpoints\" />
     </ItemGroup>
 

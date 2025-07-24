@@ -1,3 +1,3 @@
-﻿namespace JobAPI.Contracts.Job.Responses;
+﻿namespace JobAPI.Contracts.Jobs.Responses;
 
 public record JobResponse(int Id, Guid JobId, string Title = "", string Description = "");

@@ -4,9 +4,12 @@ using System.Threading.Tasks;
 using Elkhair.Dev.Common.Application.Abstractions.Dispatcher;
 using FastEndpoints;
 using FastEndpoints.Swagger;
+using JobApi.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -24,7 +27,18 @@ builder.Services.SwaggerDocument(options =>
         s.Description = "API for managing job-related operations";
     };
 });
-
+builder.Services.AddDbContext<JobDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("JobDbContext"),
+        sqlServerOptionsAction: sqlOptions =>
+        {
+            sqlOptions.MigrationsHistoryTable(HistoryRepository.DefaultTableName, "Jobs");
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 10,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorNumbersToAdd: null);
+        });
+});
 // Add Authorization support (even if not using yet)
 
 builder.Services.AddAuthorization();
