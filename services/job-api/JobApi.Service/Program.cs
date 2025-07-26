@@ -17,6 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Register FastEndpoints + Swagger
 builder.Services.AddFastEndpoints();
+builder.Services.AddCors();
 builder.Services.AddScoped<IValidator<CreateJobRequest>, CreateJobValidator>();
 builder.Services.SwaggerDocument(options =>
 {
@@ -52,6 +53,11 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.User ?? new ClaimsPrincipal());
 
 var app = builder.Build();
+app.UseCors(policy => policy.AllowAnyHeader()
+    .AllowAnyMethod()
+    .WithOrigins("http://localhost:4200")
+    .WithOrigins("https://job-admin.eelkhair.net")
+);
 
 app.UseAuthentication();    
 app.UseAuthorization();     

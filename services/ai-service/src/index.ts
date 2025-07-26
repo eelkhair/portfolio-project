@@ -63,4 +63,4 @@ const port = Number(process.env.PORT) || 6082;
 app.listen(port, '0.0.0.0', () => {
     console.log(`AI service running on port ${port}`);
 });
-()=>
+
