@@ -2,7 +2,7 @@
 
 namespace Elkhair.Dev.Common.Application.Abstractions.Dispatcher;
 
-public class Mediator
+public class Mediator: IMediator
 {
     private readonly IServiceProvider _provider;
 
@@ -18,4 +18,10 @@ public class Mediator
         dynamic handler = _provider.GetRequiredService(handlerType);
         return handler.HandleAsync((dynamic)request, cancellationToken);
     }
+}
+
+public interface IMediator
+{
+    Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request,
+        CancellationToken cancellationToken = default);
 }

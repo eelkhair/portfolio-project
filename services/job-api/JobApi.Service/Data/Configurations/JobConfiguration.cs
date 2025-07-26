@@ -18,6 +18,7 @@ public class JobConfiguration: IEntityTypeConfiguration<Job>
             .HasMaxLength(150);
 
         builder.Property(j => j.JobType)
+            .HasConversion<string>()
             .IsRequired()
             .HasMaxLength(100);
 
@@ -27,16 +28,6 @@ public class JobConfiguration: IEntityTypeConfiguration<Job>
 
         builder.Property(j => j.SalaryRange)
             .HasMaxLength(100);
-
-        builder.Property(j => j.PostedAt)
-            .HasMaxLength(100);
-
-        builder.Property(j => j.AboutCompany)
-            .HasMaxLength(2000);
-
-        builder.Property(j => j.EEO)
-            .HasMaxLength(500);
         
-
     }
 }

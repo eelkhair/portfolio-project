@@ -2,20 +2,22 @@ using System.Security.Claims;
 using Elkhair.Dev.Common.Application;
 using Elkhair.Dev.Common.Domain.Constants;
 using Elkhair.Dev.Common.Domain.Entities;
+using JobApi.Application.Interfaces;
 using JobApi.Data.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace JobApi.Data;
 
 public partial class JobDbContext
 {
-    DbSet<Company> Companies { get; set; }
-    DbSet<Job> Jobs { get; set; }
-    DbSet<Qualification> Qualifications { get; set; }
-    DbSet<Responsibility> Responsibilities { get; set; }
+    public DbSet<Company> Companies { get; set; }
+    public DbSet<Job> Jobs { get; set; }
+    public DbSet<Qualification> Qualifications { get; set; }
+    public DbSet<Responsibility> Responsibilities { get; set; }
 }
 
-public partial class JobDbContext : DbContext
+public partial class JobDbContext : DbContext, IJobDbContext
 {
     public JobDbContext()
     {
@@ -44,6 +46,7 @@ public partial class JobDbContext : DbContext
         //modelBuilder.SeedData();
     }
     
+
     public Task<int> SaveChangesAsync(ClaimsPrincipal user, CancellationToken cancellationToken)
     {
         var now = DateTime.UtcNow;

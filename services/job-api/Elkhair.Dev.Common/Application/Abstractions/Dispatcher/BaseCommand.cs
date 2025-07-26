@@ -1,5 +1,14 @@
-﻿namespace Elkhair.Dev.Common.Application.Abstractions.Dispatcher;
+﻿using System.Security.Claims;
+using System.Text.Json.Serialization;
+using Microsoft.Extensions.Logging;
 
-public class BaseCommand
+namespace Elkhair.Dev.Common.Application.Abstractions.Dispatcher;
+
+public abstract class BaseCommand<TResponse>(ClaimsPrincipal user, ILogger logger) : IRequest<TResponse>
 {
+    [JsonIgnore]
+    public ClaimsPrincipal User { get; } = user;
+
+    [JsonIgnore]
+    public ILogger Logger { get; } = logger;
 }

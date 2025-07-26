@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Security.Claims;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Elkhair.Dev.Common.Application.Abstractions.Dispatcher;
@@ -7,7 +8,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddApplicationDispatcher(this IServiceCollection services, Assembly assembly)
     {
-        services.AddSingleton<Mediator>();
+        services.AddScoped<IMediator,Mediator>();
 
         var handlerTypes = assembly
             .GetTypes()
@@ -21,6 +22,7 @@ public static class ServiceCollectionExtensions
         {
             services.AddTransient(handler.Interface, handler.Type);
         }
+        services.AddScoped<IRequestFactory, RequestFactory>();
 
         return services;
     }

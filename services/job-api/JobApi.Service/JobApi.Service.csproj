@@ -25,11 +25,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Application\Commands\" />
-      <Folder Include="Application\Queries\" />
       <Folder Include="Data\Migrations\" />
       <Folder Include="Infrastructure\" />
-      <Folder Include="Presentation\Endpoints\" />
     </ItemGroup>
 
     <ItemGroup>

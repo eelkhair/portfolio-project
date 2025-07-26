@@ -1,23 +1,23 @@
 using System.Security.Claims;
 using System.Text.Encodings.Web;
-using System.Threading.Tasks;
 using Elkhair.Dev.Common.Application.Abstractions.Dispatcher;
 using FastEndpoints;
 using FastEndpoints.Swagger;
+using FluentValidation;
+using JobApi.Application.Interfaces;
+using JobAPI.Contracts.Models.Jobs.Requests;
 using JobApi.Data;
+using JobApi.Presentation.Endpoints.Jobs.Create;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Register FastEndpoints + Swagger
 builder.Services.AddFastEndpoints();
+builder.Services.AddScoped<IValidator<CreateJobRequest>, CreateJobValidator>();
 builder.Services.SwaggerDocument(options =>
 {
     options.DocumentSettings = s =>
@@ -39,6 +39,7 @@ builder.Services.AddDbContext<JobDbContext>(options =>
                 errorNumbersToAdd: null);
         });
 });
+builder.Services.AddScoped<IJobDbContext, JobDbContext>();
 // Add Authorization support (even if not using yet)
 
 builder.Services.AddAuthorization();
@@ -47,6 +48,8 @@ builder.Services.AddAuthentication("Fake")
 
 
 builder.Services.AddApplicationDispatcher(typeof(Program).Assembly);
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.User ?? new ClaimsPrincipal());
 
 var app = builder.Build();
 
