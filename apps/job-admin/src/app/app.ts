@@ -1,21 +1,22 @@
-import {Component, inject, OnInit, signal} from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import {HttpClient} from '@angular/common/http';
-import {AuthButtonComponent} from './AuthButton';
+import {Component, inject} from '@angular/core';
+import {Header} from './layout/header/header';
+import {Footer} from './layout/footer/footer';
+import {RouterOutlet} from '@angular/router';
+import {Nav} from './layout/nav/nav';
+import {AccountService} from './core/services/account.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, AuthButtonComponent],
+  imports: [
+    Header,
+    Footer,
+    RouterOutlet,
+    Nav,
+  ],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App implements OnInit {
-  protected readonly title = signal('job-admin');
-  protected http = inject(HttpClient);
+export class App {
+  accountService = inject(AccountService);
 
-  ngOnInit() {
-    this.http.get('https://job-api.eelkhair.net/companies').subscribe({
-      next: data => { console.log(data); },
-    })
-  }
 }

@@ -1,3 +1,22 @@
-<h1>{{title()}}</h1>
+@if(accountService.isAuthenticated()){
+  <div class="flex flex-col min-h-dvh overflow-hidden bg-gray-100">
+    <header class="bg-surface-900 text-surface-0 p-5">
+      <app-header></app-header>
+    </header>
 
-<app-auth-button></app-auth-button>
+    <main class="flex flex-1 overflow-auto" style="min-height:0;">
+      <aside class="flex w-1/8 bg-surface-900 p-6">
+        <app-nav class="w-full"/>
+      </aside>
+      <section class="flex w-7/8 px-5 pt-4 overflow-scroll">
+        <router-outlet></router-outlet>
+      </section>
+
+
+    </main>
+
+    <footer class="bg-surface-900 text-surface-0 p-4 text-center">
+      <app-footer></app-footer>
+    </footer>
+  </div>
+}
