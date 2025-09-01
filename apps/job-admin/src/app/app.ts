@@ -16,7 +16,7 @@ import {AccountService} from './core/services/account.service';
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App {
+export class App{
   accountService = inject(AccountService);
 
 }

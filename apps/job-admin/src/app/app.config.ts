@@ -2,27 +2,33 @@ import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessC
 import {provideRouter, withComponentInputBinding, withViewTransitions} from '@angular/router';
 import Aura from '@primeng/themes/aura';
 import { routes } from './app.routes';
-import {provideHttpClient, withFetch, withInterceptors} from '@angular/common/http';
+import {
+
+  provideHttpClient,
+  withFetch,
+  withInterceptors,
+} from '@angular/common/http';
 import {provideAuth0} from '@auth0/auth0-angular';
 import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
 import {providePrimeNG} from 'primeng/config';
+import {authInterceptor} from './core/interceptores/auth.interceptor';
+
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
-    provideHttpClient(withFetch(), withInterceptors([])),
+    provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
     provideRouter(routes, withComponentInputBinding(), withViewTransitions()),
     provideAnimationsAsync(),
-
 
     providePrimeNG({
       ripple: true,
       theme: {
-        preset: Aura,                       // or Aura
+        preset: Aura,
         options: {
-          darkModeSelector: '.app-dark',    // optional
-          cssLayer: {                       // ✅ correct place (no double 'options')
+          darkModeSelector: '.app-dark',
+          cssLayer: {
             name: 'primeng',
             order: 'theme, base, primeng'
           }
@@ -30,11 +36,17 @@ export const appConfig: ApplicationConfig = {
       }
     }),
     provideAuth0({
-      domain: 'elkhair-dev.us.auth0.com',           // e.g., dev-abc123.us.auth0.com
-      clientId: 'YXnqj0gOfZJD8Ypje7mdZqdoenCHNzWA',      // from Auth0 dashboard
-      authorizationParams: { redirect_uri: window.location.origin },
-      cacheLocation: 'localstorage',          // helps with Safari/3rd-party cookies
+      domain: 'elkhair-dev.us.auth0.com',
+      clientId: 'YXnqj0gOfZJD8Ypje7mdZqdoenCHNzWA',
+      authorizationParams: {
+        audience: 'https://job-board.eelkhair.net',      // << crucial
+        redirect_uri: window.location.origin,
+        scope: 'openid profile email offline_access'
+      },
+      cacheLocation: 'localstorage',
       useRefreshTokens: true
-    }),
+    })
+
+
   ]
 };

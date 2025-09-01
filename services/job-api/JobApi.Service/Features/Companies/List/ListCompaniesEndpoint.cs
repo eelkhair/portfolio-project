@@ -11,7 +11,7 @@ public class ListCompaniesEndpoint(IJobDbContext dbContext) : EndpointWithoutReq
     public override void Configure()
     {
         Get("/companies");
-        AllowAnonymous();
+        Permissions("read:companies");
     }
 
     public override async Task HandleAsync(CancellationToken ct)

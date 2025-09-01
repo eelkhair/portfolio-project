@@ -8,11 +8,8 @@ import {toSignal} from '@angular/core/rxjs-interop';
 export class AccountService {
   auth = inject(AuthService);
   isAuthenticated = toSignal(this.auth.isAuthenticated$, { initialValue: false });
-  user = toSignal(this.auth.user$, { initialValue: null });
-
-  login() {
-    this.auth.loginWithRedirect();
-  }
+  accessToken = toSignal(this.auth.getAccessTokenSilently());
+  user = toSignal(this.auth.user$);
 
   logout() {
     this.auth.logout({

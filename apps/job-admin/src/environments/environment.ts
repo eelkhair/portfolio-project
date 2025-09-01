@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://localhost:5282/',
+  apiUrl: 'https://job-api.eelkhair.net/',
 };

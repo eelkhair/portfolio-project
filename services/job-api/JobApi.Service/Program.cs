@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using System.Text.Encodings.Web;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using FluentValidation;
@@ -7,26 +6,51 @@ using JobAPI.Contracts.Models.Jobs.Requests;
 using JobApi.Data;
 using JobApi.Infrastructure.Data;
 using JobApi.Presentation.Endpoints.Jobs.Create;
-using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.Extensions.Options;
+
+using Microsoft.IdentityModel.Tokens;
+using NSwag;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var cfg = builder.Configuration;
 // Register FastEndpoints + Swagger
-builder.Services.AddFastEndpoints();
+builder.Services.AddFastEndpoints()
+    .SwaggerDocument(o =>
+    {
+        o.DocumentSettings = s =>
+        {
+            s.Title = "Job API";
+            s.Version = "v1";
+
+            // OAuth2 (Auth Code + PKCE) for Swagger UI via Auth0
+            s.AddAuth("oauth2", new NSwag.OpenApiSecurityScheme
+            {
+                Type = OpenApiSecuritySchemeType.OAuth2,
+                Description = "Auth0 (Authorization Code + PKCE)",
+                Flows = new NSwag.OpenApiOAuthFlows
+                {
+                    AuthorizationCode = new NSwag.OpenApiOAuthFlow
+                    {
+                        AuthorizationUrl = $"https://{builder.Configuration["Auth0:Domain"]}/authorize",
+                        TokenUrl = $"https://{builder.Configuration["Auth0:Domain"]}/oauth/token",
+                        Scopes = new Dictionary<string, string>
+                        {
+                            ["read:jobs"]  = "Read jobs",
+                            ["write:jobs"] = "Create/Update jobs",
+                            ["read:companies"]  = "Read companies",
+                            ["write:companies"] = "Create/Update companies"
+                        }
+                    }
+                }
+            });
+        };
+    });
 builder.Services.AddCors();
 builder.Services.AddScoped<IValidator<CreateJobRequest>, CreateJobValidator>();
-builder.Services.SwaggerDocument(options =>
-{
-    options.DocumentSettings = s =>
-    {
-        s.Title = "Job Service API";
-        s.Version = "v1.0.0";
-        s.Description = "API for managing job-related operations";
-    };
-});
+
 builder.Services.AddDbContext<JobDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("JobDbContext"),
@@ -42,9 +66,25 @@ builder.Services.AddDbContext<JobDbContext>(options =>
 builder.Services.AddScoped<IJobDbContext, JobDbContext>();
 // Add Authorization support (even if not using yet)
 
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.Authority = $"https://{cfg["Auth0:Domain"]}/";
+        options.Audience = cfg["Auth0:Audience"];
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = $"https://{cfg["Auth0:Domain"]}/",
+            ValidateAudience = true,
+            ValidAudience = cfg["Auth0:Audience"],
+            ValidateLifetime = true
+        };
+    });
 builder.Services.AddAuthorization();
-builder.Services.AddAuthentication("Fake") 
-    .AddScheme<AuthenticationSchemeOptions, DummyAuthHandler>("Fake", null);
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.User ?? new ClaimsPrincipal());
@@ -58,22 +98,26 @@ app.UseCors(policy => policy.AllowAnyHeader()
 
 app.UseAuthentication();    
 app.UseAuthorization();     
-app.UseFastEndpoints();     
+app.UseFastEndpoints()
+    .UseSwaggerGen(
+        uiConfig: ui =>
+        {
+            ui.DocumentTitle = "Job API Docs";
+            ui.OAuth2Client = new()
+            {
+                ClientId = cfg["Auth0:SwaggerClientId"],
+                ClientSecret = cfg["Auth0:SwaggerClientSecret"],
+                AppName = "Job API Swagger",
+                UsePkceWithAuthorizationCodeGrant = true,
+                AdditionalQueryStringParameters =
+                {
+                    ["audience"] = cfg["Auth0:Audience"]!
+                }
+            };
+            // optional if you need to force it:
+            // ui.OAuth2RedirectUrl = "https://localhost:5001/swagger/oauth2-redirect.html";
+        });
 app.UseSwaggerGen();        
 app.MapGet("/", (HttpContext ctx) => ctx.Response.Redirect("/swagger")).ExcludeFromDescription();
 app.Run();
 
-public class DummyAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
-{
-    public DummyAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options,
-        ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock)
-        : base(options, logger, encoder, clock) {}
-
-    protected override Task<AuthenticateResult> HandleAuthenticateAsync()
-    {
-        var identity = new ClaimsIdentity(); // empty identity
-        var principal = new ClaimsPrincipal(identity);
-        var ticket = new AuthenticationTicket(principal, "Fake");
-        return Task.FromResult(AuthenticateResult.Success(ticket));
-    }
-}
