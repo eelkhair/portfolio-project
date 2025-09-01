@@ -8,7 +8,7 @@ export const NAV_ITEMS: MenuItem[] = [
   {
     label: 'Jobs', icon: 'pi pi-briefcase',
     items: [
-      { label: 'All Jobs', icon: 'pi pi-list', routerLink: '/jobs' },
+      { label: 'All Jobs', icon: 'pi pi-list', routerLink: '/jobs', routerLinkActiveOptions: {exact: true} },
       { label: 'Create Job', icon: 'pi pi-plus', routerLink: '/jobs/new' },
       { label: 'Drafts', icon: 'pi pi-file', routerLink: '/jobs/drafts' },
     ]
@@ -17,7 +17,7 @@ export const NAV_ITEMS: MenuItem[] = [
   {
     label: 'Companies', icon: 'pi pi-building',
     items: [
-      { label: 'All Companies', icon: 'pi pi-list', routerLink: '/companies' },
+      { label: 'All Companies', icon: 'pi pi-list', routerLink: '/companies', routerLinkActiveOptions: {exact: true} },
       { label: 'Create Company', icon: 'pi pi-plus', routerLink: '/companies/new' },
     ]
   },

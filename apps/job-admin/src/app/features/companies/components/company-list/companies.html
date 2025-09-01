@@ -1,0 +1,23 @@
+
+<p-table [value]="companies()" [tableStyle]="{ 'min-width': '50rem','width' : 'screen'}"  >
+  <ng-template #header>
+    <tr>
+      <th pSortableColumn="uId">uid</th>
+      <th pSortableColumn="name">Name</th>
+      <th pSortableColumn="eeo">EEO</th>
+      <th pSortableColumn="about">About</th>
+      <th pSortableColumn="createdAt">Created At</th>
+      <th pSortableColumn="updatedAt">Updated At</th>
+    </tr>
+  </ng-template>
+  <ng-template #body let-company>
+    <tr>
+      <td>{{ company.uId }}</td>
+      <td>{{ company.name }}</td>
+      <td>{{ company.eeo }}</td>
+      <td>{{ company.about }}</td>
+      <td>{{ company.createdAt | date: 'short' }}</td>
+      <td>{{ company.updatedAt | date: 'short'}}</td>
+    </tr>
+  </ng-template>
+</p-table>

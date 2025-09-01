@@ -1,12 +1,11 @@
 using System.Security.Claims;
 using System.Text.Encodings.Web;
-using Elkhair.Dev.Common.Application.Abstractions.Dispatcher;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using FluentValidation;
-using JobApi.Application.Interfaces;
 using JobAPI.Contracts.Models.Jobs.Requests;
 using JobApi.Data;
+using JobApi.Infrastructure.Data;
 using JobApi.Presentation.Endpoints.Jobs.Create;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
@@ -47,8 +46,6 @@ builder.Services.AddAuthorization();
 builder.Services.AddAuthentication("Fake") 
     .AddScheme<AuthenticationSchemeOptions, DummyAuthHandler>("Fake", null);
 
-
-builder.Services.AddApplicationDispatcher(typeof(Program).Assembly);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.User ?? new ClaimsPrincipal());
 
