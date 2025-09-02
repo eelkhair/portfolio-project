@@ -2,9 +2,9 @@
 using JobAPI.Contracts.Models.Companies.Responses;
 using JobAPI.Contracts.Models.Jobs.Requests;
 using JobAPI.Contracts.Models.Jobs.Responses;
-using JobApi.Data.Entities;
+using JobApi.Infrastructure.Data.Entities;
 
-namespace JobApi.Presentation.Endpoints.Jobs.Create;
+namespace JobApi.Features.Jobs.Create;
 
 public class CreateJobMapper : Mapper<CreateJobRequest, JobResponse, Job>
 {

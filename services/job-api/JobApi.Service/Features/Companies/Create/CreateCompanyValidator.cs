@@ -4,8 +4,7 @@ using JobAPI.Contracts.Models.Companies.Requests;
 using JobApi.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-
-namespace JobApi.Presentation.Endpoints.Companies.Create;
+namespace JobApi.Features.Companies.Create;
 
 public class CreateCompanyValidator: Validator<CreateCompanyRequest>
 {

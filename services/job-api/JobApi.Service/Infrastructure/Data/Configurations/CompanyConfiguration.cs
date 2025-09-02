@@ -1,9 +1,9 @@
 using Elkhair.Dev.Common.Data;
-using JobApi.Data.Entities;
+using JobApi.Infrastructure.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace JobApi.Data.Configurations;
+namespace JobApi.Infrastructure.Data.Configurations;
 
 public class CompanyConfiguration : IEntityTypeConfiguration<Company>
 {

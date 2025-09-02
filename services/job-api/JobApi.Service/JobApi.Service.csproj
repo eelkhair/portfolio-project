@@ -10,6 +10,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+
       <PackageReference Include="FastEndpoints" Version="6.2.0" />
       <PackageReference Include="FastEndpoints.Security" Version="6.2.0" />
       <PackageReference Include="FastEndpoints.Swagger" Version="6.2.0" />
@@ -22,7 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Elkhair.Dev.Common\Elkhair.Dev.Common.csproj" />
+      <ProjectReference Include="..\..\Elkhair.Dev.Common\Elkhair.Dev.Common.csproj" />
       <ProjectReference Include="..\JobAPI.Contracts\JobAPI.Contracts.csproj" />
     </ItemGroup>
 

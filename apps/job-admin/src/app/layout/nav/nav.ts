@@ -1,8 +1,9 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {PanelMenu} from 'primeng/panelmenu';
-import {NAV_ITEMS} from './menuItems';
+
 import {NavigationEnd, Router} from '@angular/router';
 import {filter} from 'rxjs';
+import {NavItems} from './menuItems';
 
 @Component({
   selector: 'app-nav',
@@ -14,7 +15,7 @@ import {filter} from 'rxjs';
   styleUrl: './nav.css'
 })
 export class Nav implements OnInit {
-  items = NAV_ITEMS.map(i => ({ ...i, expanded: true }))
+  items = new NavItems().getNavItems().map(i => ({ ...i, expanded: true }))
   router = inject(Router)
   ngOnInit(): void {
     const apply = () => {

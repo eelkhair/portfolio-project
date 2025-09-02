@@ -4,16 +4,12 @@ using JobAPI.Contracts.Models.Jobs.Requests;
 using JobApi.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace JobApi.Presentation.Endpoints.Jobs.Create;
+namespace JobApi.Features.Jobs.Create;
 
 public class CreateJobValidator : Validator<CreateJobRequest>
 {
-
-
     public CreateJobValidator()
     {
-
-
         RuleFor(c => c.Title).NotEmpty();
 
         RuleFor(c => c.CompanyUId)

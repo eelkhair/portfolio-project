@@ -1,11 +1,11 @@
+using System.Diagnostics;
 using System.Security.Claims;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using FluentValidation;
 using JobAPI.Contracts.Models.Jobs.Requests;
-using JobApi.Data;
+using JobApi.Features.Jobs.Create;
 using JobApi.Infrastructure.Data;
-using JobApi.Presentation.Endpoints.Jobs.Create;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -17,6 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var cfg = builder.Configuration;
 // Register FastEndpoints + Swagger
+
 builder.Services.AddFastEndpoints()
     .SwaggerDocument(o =>
     {
@@ -64,6 +65,7 @@ builder.Services.AddDbContext<JobDbContext>(options =>
         });
 });
 builder.Services.AddScoped<IJobDbContext, JobDbContext>();
+
 // Add Authorization support (even if not using yet)
 
 builder.Services.AddAuthentication(options =>
@@ -88,8 +90,9 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.User ?? new ClaimsPrincipal());
-
+builder.Services.AddDaprClient();
 var app = builder.Build();
+
 app.UseCors(policy => policy.AllowAnyHeader()
     .AllowAnyMethod()
     .WithOrigins("http://localhost:4200")
@@ -97,7 +100,9 @@ app.UseCors(policy => policy.AllowAnyHeader()
 );
 
 app.UseAuthentication();    
-app.UseAuthorization();     
+app.UseAuthorization();  
+app.UseCloudEvents();
+app.MapSubscribeHandler();
 app.UseFastEndpoints()
     .UseSwaggerGen(
         uiConfig: ui =>
@@ -119,5 +124,21 @@ app.UseFastEndpoints()
         });
 app.UseSwaggerGen();        
 app.MapGet("/", (HttpContext ctx) => ctx.Response.Redirect("/swagger")).ExcludeFromDescription();
+#if DEBUG
+Debugger.Launch();
+#endif
+
+app.Use(async (context, next) =>
+{
+    // Get the current span and its traceid
+    var span = Activity.Current;
+    var traceId = span?.TraceId.ToString();
+
+    // Add the traceid to the response headers
+    context.Response.Headers.Append("trace-id", traceId);
+
+    // Call the next middleware in the pipeline
+    await next();
+});
 app.Run();
 

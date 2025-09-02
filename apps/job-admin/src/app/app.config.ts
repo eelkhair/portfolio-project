@@ -12,6 +12,7 @@ import {provideAuth0} from '@auth0/auth0-angular';
 import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
 import {providePrimeNG} from 'primeng/config';
 import {authInterceptor} from './core/interceptores/auth.interceptor';
+import {AllCommunityModule} from 'ag-grid-community';
 
 
 export const appConfig: ApplicationConfig = {
@@ -21,7 +22,6 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
     provideRouter(routes, withComponentInputBinding(), withViewTransitions()),
     provideAnimationsAsync(),
-
     providePrimeNG({
       ripple: true,
       theme: {

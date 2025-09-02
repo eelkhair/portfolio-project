@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using JobApi.Data.Entities;
+using JobApi.Infrastructure.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 

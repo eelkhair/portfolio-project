@@ -1,6 +1,6 @@
 using Elkhair.Dev.Common.Domain.Entities;
 
-namespace JobApi.Data.Entities;
+namespace JobApi.Infrastructure.Data.Entities;
 
 public class Company : BaseAuditableEntity
 {

@@ -1,7 +1,6 @@
 ﻿using FastEndpoints;
 using JobAPI.Contracts.Models.Jobs.Requests;
 using JobAPI.Contracts.Models.Jobs.Responses;
-using JobApi.Presentation.Endpoints.Jobs.Create;
 
 namespace JobApi.Features.Jobs.Create;
 

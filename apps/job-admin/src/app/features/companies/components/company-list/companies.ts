@@ -1,13 +1,13 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {CompanyStore} from '../../company.store';
-import {TableModule} from 'primeng/table';
-import {DatePipe} from '@angular/common';
+import {AgGridAngular} from 'ag-grid-angular';
+import {ColDef, themeQuartz} from 'ag-grid-community';
 
 @Component({
   selector: 'app-org',
   imports: [
-    TableModule,
-    DatePipe
+
+    AgGridAngular
   ],
   templateUrl: './companies.html',
   styleUrl: './companies.css'
@@ -16,7 +16,18 @@ export class Companies implements OnInit {
   store = inject(CompanyStore);
   companies = this.store.companies;
 
-  ngOnInit() {
-    this.store.load()
+  theme = themeQuartz; // new theming API
+  colDefs: ColDef[] = [
+    { field: 'uId' },
+    { field: 'name' },
+    { field: 'eeo' },
+    { field: 'about' },
+    { field: 'createdAt', type: 'date' },
+    { field: 'updatedAt', type: 'date' },
+
+  ];
+
+  ngOnInit(): void {
+    this.store.load();
   }
 }

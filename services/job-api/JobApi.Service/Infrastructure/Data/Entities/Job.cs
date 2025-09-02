@@ -1,8 +1,7 @@
-using Elkhair.Dev.Common.Domain;
 using Elkhair.Dev.Common.Domain.Entities;
 using JobAPI.Contracts.Enums;
 
-namespace JobApi.Data.Entities;
+namespace JobApi.Infrastructure.Data.Entities;
 
 public class Job : BaseAuditableEntity
 {

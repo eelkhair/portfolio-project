@@ -1,9 +1,9 @@
 using FastEndpoints;
 using JobAPI.Contracts.Models.Companies.Requests;
 using JobAPI.Contracts.Models.Companies.Responses;
-using JobApi.Data.Entities;
+using JobApi.Infrastructure.Data.Entities;
 
-namespace JobApi.Presentation.Endpoints.Companies.Create;
+namespace JobApi.Features.Companies.Create;
 
 public class CompanyMapper: Mapper<CreateCompanyRequest, CompanyResponse, Company>
 {

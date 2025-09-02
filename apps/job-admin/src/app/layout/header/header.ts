@@ -25,7 +25,7 @@ export class Header implements OnInit {
   ngOnInit() {
     this.accountService.auth.user$.subscribe(u => {
       if (u) {
-        this.displayName.set(u.nickname || u.name || u.email || 'User');
+        this.displayName.set(u.name || u.nickname || u.email || 'User');
         this.menuItems.set([
           {
             label: 'Profile',

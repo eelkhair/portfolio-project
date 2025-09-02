@@ -10,7 +10,7 @@
       <p-menu #userMenu [model]="menuItems()" [popup]="true"></p-menu>
 
       <p-button
-              [label]="'Welcome, ' + displayName() | titlecase"
+              [label]="'Welcome, ' + (displayName() | titlecase)"
               icon="pi pi-user"
               iconPos="left"
               (click)="userMenu.toggle($event)">

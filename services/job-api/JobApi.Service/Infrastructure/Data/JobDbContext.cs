@@ -2,12 +2,10 @@ using System.Security.Claims;
 using Elkhair.Dev.Common.Application;
 using Elkhair.Dev.Common.Domain.Constants;
 using Elkhair.Dev.Common.Domain.Entities;
-using JobApi.Data.Entities;
-using JobApi.Infrastructure.Data;
+using JobApi.Infrastructure.Data.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace JobApi.Data;
+namespace JobApi.Infrastructure.Data;
 
 public partial class JobDbContext
 {
