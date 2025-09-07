@@ -11,9 +11,13 @@
 
     <ItemGroup>
 
+      <PackageReference Include="Elkhair.Dev.Common" Version="1.0.0" />
+
       <PackageReference Include="FastEndpoints" Version="6.2.0" />
       <PackageReference Include="FastEndpoints.Security" Version="6.2.0" />
       <PackageReference Include="FastEndpoints.Swagger" Version="6.2.0" />
+      <PackageReference Include="Mapster" Version="7.4.0" />
+      <PackageReference Include="Mapster.Core" Version="1.2.1" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.19" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.7">
         <PrivateAssets>all</PrivateAssets>
@@ -23,7 +27,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Elkhair.Dev.Common\Elkhair.Dev.Common.csproj" />
       <ProjectReference Include="..\JobAPI.Contracts\JobAPI.Contracts.csproj" />
     </ItemGroup>
 

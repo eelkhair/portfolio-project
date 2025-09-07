@@ -2,12 +2,16 @@ import {Component, inject, OnInit} from '@angular/core';
 import {CompanyStore} from '../../company.store';
 import {AgGridAngular} from 'ag-grid-angular';
 import {ColDef, themeQuartz} from 'ag-grid-community';
+import {Button} from 'primeng/button';
+import {CompanyCreate} from '../company-create/company-create';
 
 @Component({
   selector: 'app-org',
   imports: [
 
-    AgGridAngular
+    AgGridAngular,
+    Button,
+    CompanyCreate
   ],
   templateUrl: './companies.html',
   styleUrl: './companies.css'
@@ -22,8 +26,40 @@ export class Companies implements OnInit {
     { field: 'name' },
     { field: 'eeo' },
     { field: 'about' },
-    { field: 'createdAt', type: 'date' },
-    { field: 'updatedAt', type: 'date' },
+    {
+      field: 'createdAt',
+      valueFormatter: ({ value }) =>
+        value
+          ? new Date(value).toLocaleString(undefined, {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+          })
+          : '',
+      filter: 'agDateColumnFilter'
+    },
+    {
+      field: 'updatedAt',
+      valueFormatter: ({ value }) =>
+        value
+          ? new Date(value).toLocaleString(undefined, {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+          })
+          : '',
+      filter: 'agDateColumnFilter'
+    },
+
+
 
   ];
 

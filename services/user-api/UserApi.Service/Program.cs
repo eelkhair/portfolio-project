@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Security.Claims;
+using Elkhair.Dev.Common.Application;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 
@@ -21,7 +22,7 @@ builder.Services.AddFastEndpoints()
     {
         o.DocumentSettings = s =>
         {
-            s.Title = "Job API";
+            s.Title = "User API";
             s.Version = "v1";
 
             // OAuth2 (Auth Code + PKCE) for Swagger UI via Auth0
@@ -89,6 +90,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.User ?? new ClaimsPrincipal());
 builder.Services.AddDaprClient();
+builder.ConfigureLoggingAndTracing("user-api");
 var app = builder.Build();
 app.UseCors(policy => policy.AllowAnyHeader()
     .AllowAnyMethod()

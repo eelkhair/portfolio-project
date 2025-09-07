@@ -1,0 +1,72 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35021.124
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobAPI.Contracts", "services\job-api\JobAPI.Contracts\JobAPI.Contracts.csproj", "{FEB5E1E6-3211-489F-B08E-64BD4B6C3825}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobApi.Service", "services\job-api\JobApi.Service\JobApi.Service.csproj", "{EC73AD0D-E9E0-4232-A67A-1094E1E3C09C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "services", "services", "{6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "job-api", "job-api", "{34F29689-4830-4406-B6E6-A36922FFAA5B}"
+	ProjectSection(SolutionItems) = preProject
+		services\job-api\Dockerfile = services\job-api\Dockerfile
+		services\job-api\.dockerignore = services\job-api\.dockerignore
+		services\job-api\Nuget.Config = services\job-api\Nuget.Config
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompanyAPI.Contracts", "services\company-api\CompanyAPI.Contracts\CompanyAPI.Contracts.csproj", "{F4901292-135E-4E36-93E7-C02762BA6116}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompanyApi.Service", "services\company-api\CompanyApi.Service\CompanyApi.Service.csproj", "{391F1325-33CC-4414-B0C5-05395FF006F2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "company-api", "company-api", "{45755CDE-8322-42B4-ADC0-A0126A3997A4}"
+	ProjectSection(SolutionItems) = preProject
+		services\company-api\Dockerfile = services\company-api\Dockerfile
+		services\company-api\.dockerignore = services\company-api\.dockerignore
+		services\company-api\Nuget.Config = services\company-api\Nuget.Config
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{97DBD6A3-512E-4CD4-AE68-6EC565FBC253}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\docker-compose.registry.yml = scripts\docker-compose.registry.yml
+		scripts\docker-publsh.sh = scripts\docker-publsh.sh
+	EndProjectSection
+EndProject
+Global
+				GlobalSection(SolutionConfigurationPlatforms) = preSolution
+								Debug|Any CPU = Debug|Any CPU
+								Release|Any CPU = Release|Any CPU
+				EndGlobalSection
+				GlobalSection(ProjectConfigurationPlatforms) = postSolution
+								{FEB5E1E6-3211-489F-B08E-64BD4B6C3825}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+								{FEB5E1E6-3211-489F-B08E-64BD4B6C3825}.Debug|Any CPU.Build.0 = Debug|Any CPU
+								{FEB5E1E6-3211-489F-B08E-64BD4B6C3825}.Release|Any CPU.ActiveCfg = Release|Any CPU
+								{FEB5E1E6-3211-489F-B08E-64BD4B6C3825}.Release|Any CPU.Build.0 = Release|Any CPU
+								{EC73AD0D-E9E0-4232-A67A-1094E1E3C09C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+								{EC73AD0D-E9E0-4232-A67A-1094E1E3C09C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+								{EC73AD0D-E9E0-4232-A67A-1094E1E3C09C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+								{EC73AD0D-E9E0-4232-A67A-1094E1E3C09C}.Release|Any CPU.Build.0 = Release|Any CPU
+					{F4901292-135E-4E36-93E7-C02762BA6116}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{F4901292-135E-4E36-93E7-C02762BA6116}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{F4901292-135E-4E36-93E7-C02762BA6116}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{F4901292-135E-4E36-93E7-C02762BA6116}.Release|Any CPU.Build.0 = Release|Any CPU
+					{391F1325-33CC-4414-B0C5-05395FF006F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{391F1325-33CC-4414-B0C5-05395FF006F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{391F1325-33CC-4414-B0C5-05395FF006F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{391F1325-33CC-4414-B0C5-05395FF006F2}.Release|Any CPU.Build.0 = Release|Any CPU
+				EndGlobalSection
+				GlobalSection(SolutionProperties) = preSolution
+								HideSolutionNode = FALSE
+				EndGlobalSection
+				GlobalSection(ExtensibilityGlobals) = postSolution
+								SolutionGuid = {A1C2D3E4-F5A6-47B8-9C0D-E1F2A3B4C5D6}
+				EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{34F29689-4830-4406-B6E6-A36922FFAA5B} = {6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}
+		{FEB5E1E6-3211-489F-B08E-64BD4B6C3825} = {34F29689-4830-4406-B6E6-A36922FFAA5B}
+		{EC73AD0D-E9E0-4232-A67A-1094E1E3C09C} = {34F29689-4830-4406-B6E6-A36922FFAA5B}
+		{45755CDE-8322-42B4-ADC0-A0126A3997A4} = {6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}
+		{F4901292-135E-4E36-93E7-C02762BA6116} = {45755CDE-8322-42B4-ADC0-A0126A3997A4}
+		{391F1325-33CC-4414-B0C5-05395FF006F2} = {45755CDE-8322-42B4-ADC0-A0126A3997A4}
+	EndGlobalSection
+EndGlobal

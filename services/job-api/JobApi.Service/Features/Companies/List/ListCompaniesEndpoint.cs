@@ -1,5 +1,5 @@
-using Elkhair.Dev.Common.Application;
 using FastEndpoints;
+using JobApi.Application.Queries.Interfaces;
 using JobAPI.Contracts.Models.Companies.Responses;
 using JobApi.Features.Companies.Create;
 using JobApi.Infrastructure.Data;
@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace JobApi.Features.Companies.List;
 
-public class ListCompaniesEndpoint(IJobDbContext dbContext) : EndpointWithoutRequest<List<CompanyResponse>, CompanyMapper>
+public class ListCompaniesEndpoint(ICompanyQueryService service) : EndpointWithoutRequest<List<CompanyResponse>>
 {
     public override void Configure()
     {
@@ -17,11 +17,7 @@ public class ListCompaniesEndpoint(IJobDbContext dbContext) : EndpointWithoutReq
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var httpClient = DaprExtensions.GetHttpClient("user-api", HttpContext);
-
-        var response = await httpClient.GetAsync("users", ct);
-        response.EnsureSuccessStatusCode();
-        var companies = await dbContext.Companies.AsNoTracking().ToListAsync(cancellationToken: ct);
-        await SendAsync(  companies.Select(Map.FromEntity).ToList(), cancellation: ct);
+        var companies = await service.ListAsync( HttpContext, ct);
+        await SendAsync( companies , cancellation: ct);
     }
 }

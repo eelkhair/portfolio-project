@@ -1,0 +1,162 @@
+﻿version: '3.9'
+
+services:
+  job-admin:
+    image: registry.eelkhair.net/job-admin:latest
+    ports:
+      - "6080:80"
+    restart: unless-stopped
+    networks:
+      - ai-job-board-net
+
+  job-public:
+    image: registry.eelkhair.net/job-public:latest
+    ports:
+      - "6081:3000"
+    restart: unless-stopped
+    networks:
+      - ai-job-board-net
+
+  ai-service:
+    image: registry.eelkhair.net/ai-service:latest
+    container_name: ai-service
+    ports:
+      - "6082:6082"  # AI service itself
+      - "6083:6083"  # Dapr HTTP API port
+    environment:
+      - PORT=6082
+    networks:
+      - ai-job-board-net
+
+  ai-service-sidecar:
+    image: "daprio/daprd:1.15.8"
+    container_name: ai-services-sidecar
+    depends_on:
+      - ai-service
+    network_mode: "service:ai-service"
+    command: [
+      "./daprd",
+      "--app-id", "ai-service",
+      "--app-port", "6082",
+      "--dapr-http-port", "6083",
+      "--log-level", "debug"
+    ]
+
+  job-api:
+    build:
+      context: ./services/job-api/
+    image: registry.eelkhair.net/job-api:latest
+    ports:
+      - "6084:8080"   # app
+      - "6085:6085"   # dapr http (shared ns)
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - DAPR_HTTP_PORT=6085
+    networks:
+      - ai-job-board-net
+
+  job-api-sidecar:
+    image: daprio/daprd:1.15.8
+    container_name: job-api-side-car
+    depends_on:
+      - job-api
+    network_mode: "service:job-api"
+    volumes:
+      - "./Config/:/Config"
+      - "./Components/:/Components"
+      - "./services/job-api/JobApi.Service/Dapr/Components:/Dapr/Components"
+    command:
+      [
+        "/daprd",
+        "--app-id", "job-api",
+        "--app-port", "8080",
+        "--dapr-http-port", "6085",
+        "--resources-path", "./Components",
+        "--resources-path", "./Dapr/Components",
+        "--resources-path", "./Dapr/Components/Timers",
+        "--resources-path", "./Dapr/Components/Secrets",
+        "-config", "./Config/config.yaml"
+      ]
+
+  user-api:
+    build:
+      context: ./services/user-api/     
+    image: registry.eelkhair.net/user-api:latest  
+    ports:
+      - "6092:8080"
+      - "6095:6095"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - DAPR_HTTP_PORT=6095
+    networks:
+      - ai-job-board-net
+
+  user-api-sidecar:
+    image: "daprio/daprd:1.15.8"
+    container_name: "user-api-side-car"
+    depends_on:
+      - user-api
+    volumes:
+      - "./Config/:/Config"
+      - "./Components/:/Components"
+      - "./services/user-api/UserApi.Service/Dapr:/Dapr"
+    network_mode: "service:user-api"
+    command: [
+      "./daprd",
+      "--app-id", "user-api",
+      "--app-port", "8080",
+      "--dapr-http-port", "6095",
+      "--resources-path", "./Components",
+      "--resources-path", "./Dapr/Components",
+      "--resources-path", "./Dapr/Components/Timers",
+      "--resources-path", "./Dapr/Components/Secrets",
+      "-config", "./Config/config.yaml"
+    ]
+
+  company-api:
+    build:
+      context: ./services/company-api/     
+    image: registry.eelkhair.net/company-api:latest  
+    ports:
+      - "6072:8080"
+      - "6075:6075"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - DAPR_HTTP_PORT=6075
+    networks:
+      - ai-job-board-net
+
+  company-api-sidecar:
+    image: "daprio/daprd:1.15.8"
+    container_name: "company-api-side-car"
+    depends_on:
+      - company-api
+    volumes:
+      - "./Config/:/Config"
+      - "./Components/:/Components"
+      - "./services/company-api/CompanyApi.Service/Dapr:/Dapr"
+    network_mode: "service:company-api"
+    command: [
+      "./daprd",
+      "--app-id", "company-api",
+      "--app-port", "8080",
+      "--dapr-http-port", "6075",
+      "--resources-path", "./Components",
+      "--resources-path", "./Dapr/Components/Timers",
+      "--resources-path", "./Dapr/Components/Secrets",
+      "-config", "./Config/config.yaml"
+    ]
+      
+  seq:
+    image: datalust/seq:latest
+    ports:
+      - "5341:80"
+    environment: 
+      - ACCEPT_EULA=Y
+      - SEQ_FIRSTRUN_NOAUTHENTICATION=true
+    networks:
+      - ai-job-board-net
+
+networks:
+  ai-job-board-net:
+    name: ai-job-board-net

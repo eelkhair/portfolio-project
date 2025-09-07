@@ -12,10 +12,10 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Development
 WORKDIR /src
+COPY ["Nuget.Config", "."]
 COPY ["JobApi.Service/JobApi.Service.csproj", "JobApi.Service/"]
-COPY ["Elkhair.Dev.Common/Elkhair.Dev.Common.csproj", "Elkhair.Dev.Common/"]
 COPY ["JobAPI.Contracts/JobAPI.Contracts.csproj", "JobAPI.Contracts/"]
-RUN dotnet restore "./JobApi.Service/JobApi.Service.csproj"
+RUN dotnet restore "./JobApi.Service/JobApi.Service.csproj"  --configfile "Nuget.Config"
 COPY . .
 WORKDIR "/src/JobApi.Service"
 RUN dotnet build "./JobApi.Service.csproj" -c $BUILD_CONFIGURATION -o /app/build
