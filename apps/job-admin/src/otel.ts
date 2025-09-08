@@ -1,6 +1,6 @@
 // src/otel.ts
 import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
-import { BatchSpanProcessor, ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
+import { BatchSpanProcessor} from '@opentelemetry/sdk-trace-base';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { Resource } from '@opentelemetry/resources';
 import { SemanticResourceAttributes as SRA } from '@opentelemetry/semantic-conventions';
@@ -9,12 +9,12 @@ import {ZipkinExporter} from '@opentelemetry/exporter-zipkin';
 
 const exporter = new OTLPTraceExporter({ url: environment.otel });
 const zipkinExporter = new ZipkinExporter({
-  url: environment.otel,
-  serviceName: 'job-admin'
+  url: environment.otelZipkin,
+  serviceName: 'admin-fe'
 });
 const provider = new WebTracerProvider({
   resource: new Resource({
-    [SRA.SERVICE_NAME]: 'job-admin',
+    [SRA.SERVICE_NAME]: 'admin-fe',
     [SRA.DEPLOYMENT_ENVIRONMENT]: 'dev',
   }),
   spanProcessors: [

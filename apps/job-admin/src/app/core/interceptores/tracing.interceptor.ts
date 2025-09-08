@@ -1,25 +1,50 @@
-import { HttpInterceptorFn, HttpResponse, HttpErrorResponse } from '@angular/common/http';
+// src/app/tracing.interceptor.ts
+import {
+  HttpInterceptorFn,
+  HttpResponse,
+  HttpErrorResponse,
+} from '@angular/common/http';
 import { trace, SpanKind, SpanStatusCode, Span } from '@opentelemetry/api';
-import { finalize, tap } from 'rxjs/operators';
+import { tap, finalize } from 'rxjs/operators';
+
+const EXCLUDE: RegExp[] = [
+  /\/v1\/traces$/i,
+  /\/api\/v2\/spans$/i,
+  /^assets\//i,
+  /\.woff2?$|\.png$|\.jpe?g$|\.svg$|\.css$|\.js$/i,
+  /(^|\/)healthz(\?|$)/i,
+];
 
 export const tracingInterceptor: HttpInterceptorFn = (req, next) => {
-  const tracer = trace.getTracer('job-admin-fe');
+  const urlStr = req.url.toString();
 
-  const span: Span = tracer.startSpan(`HTTP ${req.method} ${path(req.url)}`, {
+  if (EXCLUDE.some(re => re.test(urlStr))) {
+    return next(req);
+  }
+
+  const tracer = trace.getTracer('admin-fe');
+  const span: Span = tracer.startSpan(`HTTP ${req.method} ${path(urlStr)}`, {
     kind: SpanKind.CLIENT,
-    attributes: { 'http.method': req.method, 'http.url': scrub(req.url) },
+    attributes: {
+      'http.method': req.method,
+      'http.url': scrub(urlStr),
+    },
   });
 
-  const tp = traceparent(span);
-  const tracedReq = req.clone({ setHeaders: { traceparent: tp } });
+  const headers: Record<string, string> = {};
+  if (!req.headers.has('traceparent')) headers['traceparent'] = toTraceparent(span);
+  const tracedReq = Object.keys(headers).length ? req.clone({ setHeaders: headers }) : req;
 
   const t0 = performance.now();
+
   return next(tracedReq).pipe(
     tap({
-      next: (evt) => {
+      next: evt => {
         if (evt instanceof HttpResponse) {
           span.setAttribute('http.status_code', evt.status);
-          if (evt.status >= 400) span.setStatus({ code: SpanStatusCode.ERROR });
+          if (evt.status >= 400) {
+            span.setStatus({ code: SpanStatusCode.ERROR });
+          }
         }
       },
       error: (err: HttpErrorResponse) => {
@@ -35,6 +60,7 @@ export const tracingInterceptor: HttpInterceptorFn = (req, next) => {
   );
 };
 
-function scrub(url: string){ try{const u=new URL(url,location.origin);u.search='';return u.toString();}catch{ return url; } }
-function path(url: string){ try{ return new URL(url,location.origin).pathname; }catch{ return url; } }
-function traceparent(span: Span){ const c=span.spanContext(); const s=(c.traceFlags&1)===1?'01':'00'; return `00-${c.traceId}-${c.spanId}-${s}`; }
+/* helpers */
+function scrub(url: string){ try{ const u=new URL(url, location.origin); u.search=''; return u.toString(); } catch { return url; } }
+function path(url: string){ try{ return new URL(url, location.origin).pathname; } catch { return url; } }
+function toTraceparent(span: Span){ const c = span.spanContext(); const s = (c.traceFlags & 1) === 1 ? '01' : '00'; return `00-${c.traceId}-${c.spanId}-${s}`; }
