@@ -10,6 +10,7 @@ namespace CompanyApi.Infrastructure.Data;
 public partial class CompanyDbContext
 {
     public DbSet<Company> Companies { get; set; }
+    public DbSet<Industry> Industries { get; set; }
 }
 
 public partial class CompanyDbContext : DbContext, ICompanyDbContext
@@ -41,7 +42,6 @@ public partial class CompanyDbContext : DbContext, ICompanyDbContext
         //modelBuilder.SeedData();
     }
     
-
     public Task<int> SaveChangesAsync(ClaimsPrincipal user, CancellationToken cancellationToken)
     {
         var now = DateTime.UtcNow;

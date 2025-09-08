@@ -10,7 +10,7 @@ public class CreateCompanyEndpoint
     public override void Configure()
     {
         Post("/companies");
-        Permissions("create:companies");
+        Permissions("write:companies");
     }
 
     public override async Task HandleAsync(CreateCompanyRequest request, CancellationToken ct)

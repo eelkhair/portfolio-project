@@ -48,9 +48,9 @@ builder.Services.AddFastEndpoints()
 builder.Services.AddCors();
 
 builder.Services.AddScoped<ICompanyQueryService, CompanyQueryService>();
+builder.Services.AddScoped<IIndustryQueryService, IndustryQueryService>();
 
 builder.ConfigureLoggingAndTracing("admin-api");
-
 
 builder.Services.AddAuthentication(options =>
     {

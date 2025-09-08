@@ -7,6 +7,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobApi.Service", "services\job-api\JobApi.Service\JobApi.Service.csproj", "{EC73AD0D-E9E0-4232-A67A-1094E1E3C09C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "services", "services", "{6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}"
+	ProjectSection(SolutionItems) = preProject
+		services\Elkhair.Dev.Common\Application\DaprExtensions.cs = services\Elkhair.Dev.Common\Application\DaprExtensions.cs
+		services\Elkhair.Dev.Common\Application\Extensions.cs = services\Elkhair.Dev.Common\Application\Extensions.cs
+		services\Elkhair.Dev.Common\Application\LoggingAndTracingExtensions.cs = services\Elkhair.Dev.Common\Application\LoggingAndTracingExtensions.cs
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "job-api", "job-api", "{34F29689-4830-4406-B6E6-A36922FFAA5B}"
 	ProjectSection(SolutionItems) = preProject
@@ -78,6 +83,18 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Elkhair.Dev.Common", "Elkhair.Dev.Common", "{55EFE0A8-3F4A-46E2-BD74-39D3D74D8B5E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elkhair.Dev.Common", "services\Elkhair.Dev.Common\Elkhair.Dev.Common.csproj", "{A13EA2EF-14FC-4CB1-BFCE-608B1728B788}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Components", "Components", "{7FCF5303-CB4C-4D08-98CF-E14F771C77C1}"
+	ProjectSection(SolutionItems) = preProject
+		Components\jaeger.yaml = Components\jaeger.yaml
+		Components\rabbitmq.yaml = Components\rabbitmq.yaml
+		Components\statestore.yaml = Components\statestore.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{3CE6F25C-5B37-4BA7-AFF8-8952DBA0A575}"
+	ProjectSection(SolutionItems) = preProject
+		Config\config.yaml = Config\config.yaml
+	EndProjectSection
 EndProject
 Global
 				GlobalSection(SolutionConfigurationPlatforms) = preSolution

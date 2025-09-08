@@ -4,11 +4,9 @@ import {Button, ButtonDirective} from 'primeng/button';
 import {InputText} from 'primeng/inputtext';
 import {CompanyStore} from '../../company.store';
 import {Divider} from 'primeng/divider';
-import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Select} from 'primeng/select';
-import {INDUSTRIES} from '../helpers/industries';
-import {Company} from '../../../../core/types/models/Company';
-
+import {FormDebugger} from '../../../../shared/debuggers/forms/form-debugger/form-debugger';
 @Component({
   selector: 'app-company-create',
   imports: [
@@ -19,13 +17,14 @@ import {Company} from '../../../../core/types/models/Company';
     ReactiveFormsModule,
     Select,
     ButtonDirective,
+    FormDebugger,
   ],
   templateUrl: './company-create.html',
   styleUrl: './company-create.css'
 })
 export class CompanyCreate {
   store= inject(CompanyStore);
-  industries = INDUSTRIES;
+  industries = this.store.industries
   nameInput = viewChild<ElementRef<HTMLInputElement>>('name');
   form = new FormGroup({
     name: new FormControl<string>('', Validators.required),
@@ -49,10 +48,13 @@ export class CompanyCreate {
       return;
     }
     this.store.createCompany({
-      name: '',
-      createdAt: '',
-      updatedAt: '',
-      uId: ''
+      name: this.form.controls.name.value!,
+      companyEmail: this.form.controls.companyEmail.value!,
+      industryUId: this.form.controls.industry.value!,
+      adminFirstName: this.form.controls.adminFirstName.value!,
+      adminLastName: this.form.controls.adminLastName.value!,
+      adminEmail: this.form.controls.adminEmail.value!,
+      companyWebsite: this.form.controls.companyWebsite.value!,
     })
   }
 

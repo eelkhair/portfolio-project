@@ -30,13 +30,14 @@
           <div class="flex items-center gap-2 mt-4">
             <label for="industry" class="font-semibold w-35">Industry<span class="text-red-500 text-2xl">*</span></label>
             <p-select
-              [options]="industries"
+              [options]="industries()"
               formControlName="industry"
               placeholder="Select Industry"
               appendTo="body"
               class ="flex-auto"
               required
-              optionLabel="label">
+              optionValue="uId"
+              optionLabel="name">
             </p-select>
           </div>
           @if(form.controls.industry.invalid && form.controls.industry.touched ){
@@ -50,21 +51,21 @@
           <span class="p-text-secondary block mb-6">Enter company admin information.</span>
           <div class="flex items-center gap-2 mt-4">
             <label for="adminFirstName" class="font-semibold w-24">First Name<span class="text-red-500 text-2xl">*</span></label>
-            <input pInputText id="adminFirstName" class="flex-auto w-66" autocomplete="off" required/>
+            <input pInputText id="adminFirstName" class="flex-auto w-66" autocomplete="off" required formControlName="adminFirstName"/>
           </div>
           @if(form.controls.adminFirstName.invalid && form.controls.adminFirstName.touched ){
             <span class="text-red-700 w-full text-right block">Admin first name is required.</span>
           }
           <div class="flex items-center gap-2 mt-4">
             <label for="adminLastName" class="font-semibold w-24">Last Name<span class="text-red-500 text-2xl">*</span></label>
-            <input pInputText id="adminLastName"  class="flex-auto" autocomplete="off" required/>
+            <input pInputText id="adminLastName"  class="flex-auto" autocomplete="off" required formControlName="adminLastName"/>
           </div>
           @if(form.controls.adminLastName.invalid && form.controls.adminLastName.touched ){
             <span class="text-red-700 w-full text-right block">Admin last name is required.</span>
           }
           <div class="flex items-center gap-2 mt-4">
             <label for="adminEmail" class="font-semibold w-24">Email<span class="text-red-500 text-2xl">*</span></label>
-            <input pInputText id="adminEmail" class="flex-auto" autocomplete="off" required/>
+            <input pInputText id="adminEmail" class="flex-auto" autocomplete="off" required formControlName="adminEmail"/>
           </div>
           @if(form.controls.adminEmail.invalid && form.controls.adminEmail.touched ){
             <span class="text-red-700 w-full text-right block">A valid admin email is required.</span>
@@ -79,3 +80,4 @@
     </div>
   </form>
 </p-dialog>
+<app-form-debugger [form]="form"/>

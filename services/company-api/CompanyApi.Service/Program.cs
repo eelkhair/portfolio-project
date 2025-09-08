@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Security.Claims;
+using CompanyApi.Application;
 using CompanyApi.Application.Queries;
 using CompanyApi.Application.Queries.Interfaces;
 using CompanyApi.Features.Companies.Create;
@@ -50,6 +51,7 @@ builder.Services.AddFastEndpoints()
     });
 builder.Services.AddCors();
 builder.Services.AddScoped<ICompanyQueryService, CompanyQueryService>();
+builder.Services.AddScoped<IIndustryQueryService, IndustryQueryService>();
 builder.Services.AddScoped<IRegister, Mappers >();
 
 builder.Services.AddDbContext<CompanyDbContext>(options =>

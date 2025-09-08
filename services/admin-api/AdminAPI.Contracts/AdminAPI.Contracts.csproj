@@ -10,4 +10,8 @@
       <Folder Include="Models\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="CompanyAPI.Contracts" Version="1.0.0" />
+    </ItemGroup>
+
 </Project>
