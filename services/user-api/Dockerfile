@@ -12,13 +12,13 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Development
 WORKDIR /src
+COPY ["Nuget.Config", "."]
 COPY ["UserApi.Service/UserApi.Service.csproj", "UserApi.Service/"]
-COPY ["Elkhair.Dev.Common/Elkhair.Dev.Common.csproj", "Elkhair.Dev.Common/"]
 COPY ["UserAPI.Contracts/UserAPI.Contracts.csproj", "UserAPI.Contracts/"]
-RUN dotnet restore "./UserApi.Service/UserApi.Service.csproj"
+RUN dotnet restore "./UserApi.Service/UserApi.Service.csproj"  --configfile "Nuget.Config"
 COPY . .
 WORKDIR "/src/UserApi.Service"
-RUN dotnet build "./UserApi.Service.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "./UserApi.Service.csproj" -c $BUILD_CONFIGURATION -o /app/build 
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish

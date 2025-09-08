@@ -34,17 +34,23 @@ services:
     depends_on:
       - ai-service
     network_mode: "service:ai-service"
+    volumes:
+      - "../Config/:/Config"
+      - "../Components/:/Components"
     command: [
       "./daprd",
       "--app-id", "ai-service",
       "--app-port", "6082",
       "--dapr-http-port", "6083",
-      "--log-level", "debug"
+      "--log-level", "debug",
+      "--resources-path", "./Components",
+      "-config", "./Config/config.yaml"
+      
     ]
 
   job-api:
     build:
-      context: ./services/job-api/
+      context: ../services/job-api/
     image: registry.eelkhair.net/job-api:latest
     ports:
       - "6084:8080"   # app
@@ -62,9 +68,9 @@ services:
       - job-api
     network_mode: "service:job-api"
     volumes:
-      - "./Config/:/Config"
-      - "./Components/:/Components"
-      - "./services/job-api/JobApi.Service/Dapr/Components:/Dapr/Components"
+      - "../Config/:/Config"
+      - "../Components/:/Components"
+      - "../services/job-api/JobApi.Service/Dapr:/Dapr"
     command:
       [
         "/daprd",
@@ -80,7 +86,7 @@ services:
 
   user-api:
     build:
-      context: ./services/user-api/     
+      context: ../services/user-api/     
     image: registry.eelkhair.net/user-api:latest  
     ports:
       - "6092:8080"
@@ -97,9 +103,9 @@ services:
     depends_on:
       - user-api
     volumes:
-      - "./Config/:/Config"
-      - "./Components/:/Components"
-      - "./services/user-api/UserApi.Service/Dapr:/Dapr"
+      - "../Config/:/Config"
+      - "../Components/:/Components"
+      - "../services/user-api/UserApi.Service/Dapr:/Dapr"
     network_mode: "service:user-api"
     command: [
       "./daprd",
@@ -115,7 +121,7 @@ services:
 
   company-api:
     build:
-      context: ./services/company-api/     
+      context: ../services/company-api/     
     image: registry.eelkhair.net/company-api:latest  
     ports:
       - "6072:8080"
@@ -132,9 +138,9 @@ services:
     depends_on:
       - company-api
     volumes:
-      - "./Config/:/Config"
-      - "./Components/:/Components"
-      - "./services/company-api/CompanyApi.Service/Dapr:/Dapr"
+      - "../Config/:/Config"
+      - "../Components/:/Components"
+      - "../services/company-api/CompanyApi.Service/Dapr:/Dapr"
     network_mode: "service:company-api"
     command: [
       "./daprd",
@@ -142,6 +148,41 @@ services:
       "--app-port", "8080",
       "--dapr-http-port", "6075",
       "--resources-path", "./Components",
+      "--resources-path", "./Dapr/Components/Timers",
+      "--resources-path", "./Dapr/Components/Secrets",
+      "-config", "./Config/config.yaml"
+    ]
+    
+  admin-api:
+    build:
+      context: ../services/admin-api/
+    image: registry.eelkhair.net/admin-api:latest
+    ports:
+      - "6062:8080"
+      - "6045:6045"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - DAPR_HTTP_PORT=6045
+    networks:
+      - ai-job-board-net
+
+  admin-api-sidecar:
+    image: "daprio/daprd:1.15.8"
+    container_name: "admin-api-side-car"
+    depends_on:
+      - admin-api
+    volumes:
+      - "../Config/:/Config"
+      - "../Components/:/Components"
+      - "../services/admin-api/AdminApi.Service/Dapr:/Dapr"
+    network_mode: "service:admin-api"
+    command: [
+      "./daprd",
+      "--app-id", "admin-api",
+      "--app-port", "8080",
+      "--dapr-http-port", "6045",
+      "--resources-path", "./Components",
+      "--resources-path", "./Dapr/Components",
       "--resources-path", "./Dapr/Components/Timers",
       "--resources-path", "./Dapr/Components/Secrets",
       "-config", "./Config/config.yaml"

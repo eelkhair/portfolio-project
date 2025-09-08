@@ -12,21 +12,21 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Development
 WORKDIR /src
-COPY ["JobApi.Service/JobApi.Service.csproj", "JobApi.Service/"]
-COPY ["Elkhair.Dev.Common/Elkhair.Dev.Common.csproj", "Elkhair.Dev.Common/"]
-COPY ["JobAPI.Contracts/JobAPI.Contracts.csproj", "JobAPI.Contracts/"]
-RUN dotnet restore "./JobApi.Service/JobApi.Service.csproj"
+COPY ["Nuget.Config", "."]
+COPY ["AdminApi.Service/AdminApi.Service.csproj", "AdminApi.Service/"]
+COPY ["AdminAPI.Contracts/AdminAPI.Contracts.csproj", "AdminAPI.Contracts/"]
+RUN dotnet restore "./AdminApi.Service/AdminApi.Service.csproj"  --configfile "Nuget.Config"
 COPY . .
-WORKDIR "/src/JobApi.Service"
-RUN dotnet build "./JobApi.Service.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/AdminApi.Service"
+RUN dotnet build "./AdminApi.Service.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./JobApi.Service.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./AdminApi.Service.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "JobApi.Service.dll"]
+ENTRYPOINT ["dotnet", "AdminApi.Service.dll"]

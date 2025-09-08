@@ -6,6 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev --respawn src/index.ts",
+    "debug": "ts-node-dev --respawn --transpile-only --inspect=0.0.0.0:9229 src/index.ts",
+    "debug:brk": "ts-node-dev --respawn --transpile-only --inspect-brk=localhost/0.0.0.0:9229 src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js"
   },

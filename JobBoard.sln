@@ -32,6 +32,53 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{97DB
 		scripts\docker-publsh.sh = scripts\docker-publsh.sh
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "user-api", "user-api", "{D27A4457-B09A-4389-B56C-7A1E180B5F89}"
+	ProjectSection(SolutionItems) = preProject
+		services\user-api\Dockerfile = services\user-api\Dockerfile
+		services\user-api\Nuget.Config = services\user-api\Nuget.Config
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserApi.Service", "services\user-api\UserApi.Service\UserApi.Service.csproj", "{DA8D976B-3C28-4ECB-923A-59167EE25ABE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserAPI.Contracts", "services\user-api\UserAPI.Contracts\UserAPI.Contracts.csproj", "{B76718D9-1F9C-462A-B980-F48282456504}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "admin-api", "admin-api", "{D12A1538-3710-454B-91F8-FA92024D5A9E}"
+	ProjectSection(SolutionItems) = preProject
+		services\admin-api\Dockerfile = services\admin-api\Dockerfile
+		services\admin-api\.dockerignore = services\admin-api\.dockerignore
+		services\admin-api\Nuget.Config = services\admin-api\Nuget.Config
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminAPI.Contracts", "services\admin-api\AdminAPI.Contracts\AdminAPI.Contracts.csproj", "{5ED52D07-9BB8-4EF4-9DF1-53D19A8A5FDB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminApi.Service", "services\admin-api\AdminApi.Service\AdminApi.Service.csproj", "{26C25DD2-F218-4209-9EA3-DEF2D029048C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ai-service", "ai-service", "{E946D98E-8216-438D-BD42-407A4B4E8201}"
+	ProjectSection(SolutionItems) = preProject
+		services\ai-service\src\index.ts = services\ai-service\src\index.ts
+		services\ai-service\Dockerfile = services\ai-service\Dockerfile
+		services\ai-service\.dockerignore = services\ai-service\.dockerignore
+		services\ai-service\package.json = services\ai-service\package.json
+		services\ai-service\settings\swagger.js = services\ai-service\settings\swagger.js
+		services\ai-service\tsconfig.json = services\ai-service\tsconfig.json
+		services\ai-service\package-lock.json = services\ai-service\package-lock.json
+		services\ai-service\run.sh = services\ai-service\run.sh
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BA3D8C05-0820-48F3-A42F-0CF4FB40BD4D}"
+	ProjectSection(SolutionItems) = preProject
+		services\ai-service\src\index.ts = services\ai-service\src\index.ts
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "settings", "settings", "{20D49EF3-D810-4DE5-9817-FDB6DC93EC3C}"
+	ProjectSection(SolutionItems) = preProject
+		services\ai-service\settings\swagger.js = services\ai-service\settings\swagger.js
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Elkhair.Dev.Common", "Elkhair.Dev.Common", "{55EFE0A8-3F4A-46E2-BD74-39D3D74D8B5E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elkhair.Dev.Common", "services\Elkhair.Dev.Common\Elkhair.Dev.Common.csproj", "{A13EA2EF-14FC-4CB1-BFCE-608B1728B788}"
+EndProject
 Global
 				GlobalSection(SolutionConfigurationPlatforms) = preSolution
 								Debug|Any CPU = Debug|Any CPU
@@ -54,6 +101,26 @@ Global
 					{391F1325-33CC-4414-B0C5-05395FF006F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 					{391F1325-33CC-4414-B0C5-05395FF006F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 					{391F1325-33CC-4414-B0C5-05395FF006F2}.Release|Any CPU.Build.0 = Release|Any CPU
+					{DA8D976B-3C28-4ECB-923A-59167EE25ABE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{DA8D976B-3C28-4ECB-923A-59167EE25ABE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{DA8D976B-3C28-4ECB-923A-59167EE25ABE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{DA8D976B-3C28-4ECB-923A-59167EE25ABE}.Release|Any CPU.Build.0 = Release|Any CPU
+					{B76718D9-1F9C-462A-B980-F48282456504}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{B76718D9-1F9C-462A-B980-F48282456504}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{B76718D9-1F9C-462A-B980-F48282456504}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{B76718D9-1F9C-462A-B980-F48282456504}.Release|Any CPU.Build.0 = Release|Any CPU
+					{5ED52D07-9BB8-4EF4-9DF1-53D19A8A5FDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{5ED52D07-9BB8-4EF4-9DF1-53D19A8A5FDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{5ED52D07-9BB8-4EF4-9DF1-53D19A8A5FDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{5ED52D07-9BB8-4EF4-9DF1-53D19A8A5FDB}.Release|Any CPU.Build.0 = Release|Any CPU
+					{26C25DD2-F218-4209-9EA3-DEF2D029048C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{26C25DD2-F218-4209-9EA3-DEF2D029048C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{26C25DD2-F218-4209-9EA3-DEF2D029048C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{26C25DD2-F218-4209-9EA3-DEF2D029048C}.Release|Any CPU.Build.0 = Release|Any CPU
+					{A13EA2EF-14FC-4CB1-BFCE-608B1728B788}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{A13EA2EF-14FC-4CB1-BFCE-608B1728B788}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{A13EA2EF-14FC-4CB1-BFCE-608B1728B788}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{A13EA2EF-14FC-4CB1-BFCE-608B1728B788}.Release|Any CPU.Build.0 = Release|Any CPU
 				EndGlobalSection
 				GlobalSection(SolutionProperties) = preSolution
 								HideSolutionNode = FALSE
@@ -68,5 +135,16 @@ Global
 		{45755CDE-8322-42B4-ADC0-A0126A3997A4} = {6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}
 		{F4901292-135E-4E36-93E7-C02762BA6116} = {45755CDE-8322-42B4-ADC0-A0126A3997A4}
 		{391F1325-33CC-4414-B0C5-05395FF006F2} = {45755CDE-8322-42B4-ADC0-A0126A3997A4}
+		{D27A4457-B09A-4389-B56C-7A1E180B5F89} = {6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}
+		{DA8D976B-3C28-4ECB-923A-59167EE25ABE} = {D27A4457-B09A-4389-B56C-7A1E180B5F89}
+		{B76718D9-1F9C-462A-B980-F48282456504} = {D27A4457-B09A-4389-B56C-7A1E180B5F89}
+		{D12A1538-3710-454B-91F8-FA92024D5A9E} = {6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}
+		{5ED52D07-9BB8-4EF4-9DF1-53D19A8A5FDB} = {D12A1538-3710-454B-91F8-FA92024D5A9E}
+		{26C25DD2-F218-4209-9EA3-DEF2D029048C} = {D12A1538-3710-454B-91F8-FA92024D5A9E}
+		{E946D98E-8216-438D-BD42-407A4B4E8201} = {6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}
+		{BA3D8C05-0820-48F3-A42F-0CF4FB40BD4D} = {E946D98E-8216-438D-BD42-407A4B4E8201}
+		{20D49EF3-D810-4DE5-9817-FDB6DC93EC3C} = {E946D98E-8216-438D-BD42-407A4B4E8201}
+		{55EFE0A8-3F4A-46E2-BD74-39D3D74D8B5E} = {6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}
+		{A13EA2EF-14FC-4CB1-BFCE-608B1728B788} = {55EFE0A8-3F4A-46E2-BD74-39D3D74D8B5E}
 	EndGlobalSection
 EndGlobal

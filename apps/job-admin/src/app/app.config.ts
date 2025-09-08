@@ -12,14 +12,14 @@ import {provideAuth0} from '@auth0/auth0-angular';
 import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
 import {providePrimeNG} from 'primeng/config';
 import {authInterceptor} from './core/interceptores/auth.interceptor';
-import {AllCommunityModule} from 'ag-grid-community';
+import {tracingInterceptor} from './core/interceptores/tracing.interceptor';
 
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
-    provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
+    provideHttpClient(withFetch(), withInterceptors([authInterceptor, tracingInterceptor])),
     provideRouter(routes, withComponentInputBinding(), withViewTransitions()),
     provideAnimationsAsync(),
     providePrimeNG({

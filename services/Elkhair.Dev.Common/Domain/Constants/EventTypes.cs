@@ -2,10 +2,5 @@
 
 public static class EventTypes
 {
-    public const string JobCreated = "JobCreated";
-    public const string JobUpdated = "JobUpdated";
-    public const string JobDeleted = "JobDeleted";
-
-    public const string ApplicationSubmitted = "ApplicationSubmitted";
-    public const string ApplicationReviewed = "ApplicationReviewed";
+    public const string CompanyCreated = "company.created";
 }
