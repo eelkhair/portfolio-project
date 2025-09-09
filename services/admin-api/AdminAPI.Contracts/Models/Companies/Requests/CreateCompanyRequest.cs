@@ -27,4 +27,8 @@ public class CreateCompanyRequest
     [EmailAddress]
     public string AdminEmail { get; set; } = string.Empty;
     
+    public string CreatedByUserId { get; set; } = string.Empty;
+    
+    
+    
 }

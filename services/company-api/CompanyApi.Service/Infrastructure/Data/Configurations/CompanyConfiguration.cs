@@ -24,6 +24,7 @@ public class CompanyConfiguration : IEntityTypeConfiguration<Company>
 
         builder.Property(j => j.EEO)
             .HasMaxLength(500);
+        builder.Property(c=> c.IndustryId).IsRequired();
         
         builder.HasOne(c => c.Industry).WithMany(i => i.Companies).HasForeignKey(c => c.IndustryId);
     }

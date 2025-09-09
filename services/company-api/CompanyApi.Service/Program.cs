@@ -1,6 +1,9 @@
 using System.Diagnostics;
+using System.Reflection;
 using System.Security.Claims;
 using CompanyApi.Application;
+using CompanyApi.Application.Commands;
+using CompanyApi.Application.Commands.Interfaces;
 using CompanyApi.Application.Queries;
 using CompanyApi.Application.Queries.Interfaces;
 using CompanyApi.Features.Companies.Create;
@@ -52,8 +55,12 @@ builder.Services.AddFastEndpoints()
 builder.Services.AddCors();
 builder.Services.AddScoped<ICompanyQueryService, CompanyQueryService>();
 builder.Services.AddScoped<IIndustryQueryService, IndustryQueryService>();
-builder.Services.AddScoped<IRegister, Mappers >();
+builder.Services.AddScoped<ICompanyCommandService, CompanyCommandService>();
 
+var mapsterConfig = TypeAdapterConfig.GlobalSettings;
+mapsterConfig.Scan(Assembly.GetExecutingAssembly());   // <-- finds Mappers : IRegister
+
+builder.Services.AddSingleton(mapsterConfig);
 builder.Services.AddDbContext<CompanyDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("CompanyDbContext"),

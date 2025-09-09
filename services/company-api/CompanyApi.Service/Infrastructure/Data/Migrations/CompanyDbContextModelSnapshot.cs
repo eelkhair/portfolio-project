@@ -85,7 +85,6 @@ namespace CompanyApi.Infrastructure.Data.Migrations
                         .HasColumnName("PeriodStart");
 
                     b.Property<string>("Phone")
-                        .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 

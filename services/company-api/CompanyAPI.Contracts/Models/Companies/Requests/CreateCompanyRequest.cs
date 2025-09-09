@@ -1,9 +1,20 @@
-namespace CompanyAPI.Contracts.Models.Companies.Requests;
+using System.ComponentModel.DataAnnotations;
 
+namespace CompanyAPI.Contracts.Models.Companies.Requests;
 public class CreateCompanyRequest
 {
+    [Required]
     public string Name { get; set; } = string.Empty;
-    public string? About { get; set; }
-    public string? EEO { get; set; }  
+
+    [Required]
+    [EmailAddress]
+    public string CompanyEmail { get; set; } = string.Empty;
+
+    [Url]
+    public string? CompanyWebsite { get; set; }
+
+    [Required]
+    public Guid IndustryUId { get; set; }
     
 }
+    

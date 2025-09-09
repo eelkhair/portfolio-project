@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using System.Security.Claims;
+using AdminApi.Application.Commands;
+using AdminApi.Application.Commands.Interfaces;
 using AdminApi.Application.Queries;
 using AdminApi.Application.Queries.Interfaces;
 using Elkhair.Dev.Common.Application;
@@ -48,6 +50,7 @@ builder.Services.AddFastEndpoints()
 builder.Services.AddCors();
 
 builder.Services.AddScoped<ICompanyQueryService, CompanyQueryService>();
+builder.Services.AddScoped<ICompanyCommandService, CompanyCommandService>();
 builder.Services.AddScoped<IIndustryQueryService, IndustryQueryService>();
 
 builder.ConfigureLoggingAndTracing("admin-api");

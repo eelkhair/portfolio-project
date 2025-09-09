@@ -15,6 +15,8 @@ public class Mappers : IRegister
         
         
         config.NewConfig<CreateCompanyRequest, Company>()
+            .Map(dest => dest.Email, c=> c.CompanyEmail)
+            .Map(dest => dest.Website, c=> c.CompanyWebsite)
             .Map(dest => dest.CreatedAt, _ => DateTime.UtcNow)
             .Map(dest => dest.UpdatedAt, _ => DateTime.UtcNow);
         

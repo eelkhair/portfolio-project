@@ -1,10 +1,12 @@
+using AdminApi.Application.Commands.Interfaces;
 using AdminAPI.Contracts.Models.Companies.Requests;
 using AdminAPI.Contracts.Models.Companies.Responses;
+using Elkhair.Dev.Common.Application;
 using FastEndpoints;
 
 namespace AdminApi.Features.Companies.Create;
 
-public class CreateCompanyEndpoint
+public class CreateCompanyEndpoint(ICompanyCommandService service)
     : Endpoint<CreateCompanyRequest, CompanyResponse>
 {
     public override void Configure()
@@ -15,8 +17,9 @@ public class CreateCompanyEndpoint
 
     public override async Task HandleAsync(CreateCompanyRequest request, CancellationToken ct)
     {
-    
-        await SendAsync(new CompanyResponse(), cancellation:ct);
+        request.CreatedByUserId = User.GetUserId();
+        var company = await service.CreateAsync(request, ct);
+        await SendAsync(company, cancellation:ct);
     }
     
 }

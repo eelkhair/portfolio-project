@@ -21,10 +21,10 @@ public class IndustryQueryService(ICompanyDbContext companyDbContext, ILogger<In
 
             activity?.Stop();
             return industries.Adapt<List<IndustryResponse>>();
-        }catch (OperationCanceledException)
+        }catch (OperationCanceledException e)
         {
             activity?.SetStatus(ActivityStatusCode.Error, "canceled");
-            logger.LogWarning("Fetch industries canceled");
+            logger.LogError(e, "Fetch industries canceled");
             throw;
         }
         catch (Exception ex)

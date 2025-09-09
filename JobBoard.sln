@@ -35,6 +35,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{97DB
 	ProjectSection(SolutionItems) = preProject
 		scripts\docker-compose.registry.yml = scripts\docker-compose.registry.yml
 		scripts\docker-publsh.sh = scripts\docker-publsh.sh
+		scripts\nuget-push.ps1 = scripts\nuget-push.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "user-api", "user-api", "{D27A4457-B09A-4389-B56C-7A1E180B5F89}"
@@ -94,6 +95,13 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{3CE6F25C-5B37-4BA7-AFF8-8952DBA0A575}"
 	ProjectSection(SolutionItems) = preProject
 		Config\config.yaml = Config\config.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{8F216E64-AB1B-4402-A602-B20D7B4C470F}"
+	ProjectSection(SolutionItems) = preProject
+		docs\job_board_microservices_complete.pdf = docs\job_board_microservices_complete.pdf
+		docs\README.md = docs\README.md
+		docs\create-company.puml = docs\create-company.puml
 	EndProjectSection
 EndProject
 Global

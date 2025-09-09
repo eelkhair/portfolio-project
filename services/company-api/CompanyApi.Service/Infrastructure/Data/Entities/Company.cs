@@ -9,7 +9,7 @@ public class Company : BaseAuditableEntity
     public string? Description { get; set; }
     public string? Website { get; set; }
     public required string Email { get; set; }
-    public required string Phone { get; set; }
+    public string? Phone { get; set; }
     public string? About { get; set; }
     public string? EEO { get; set; }
     public DateTime? Founded { get; set; }
