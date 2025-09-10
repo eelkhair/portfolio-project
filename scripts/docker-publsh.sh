@@ -15,6 +15,7 @@ declare -A services=(
   ["job-api"]="../services/job-api"
   ["company-api"]="../services/company-api"
   ["admin-api"]="../services/admin-api"
+  ["user-api"]="../services/user-api"
 )
 
 for name in "${!services[@]}"; do
@@ -30,5 +31,16 @@ for name in "${!services[@]}"; do
   echo "-----------------------------"
 done
 
-echo "🚀 Starting containers using docker-compose.registry.yml..."
-docker compose -f docker-compose.registry.yml -p job-board up -d
+echo "🚀 Starting containers using docker compose on remote host..."
+ssh -tt eelkhair@192.168.1.112 <<EOF
+set -euo pipefail
+
+# login on the remote using the same password
+echo "$DOCKER_PASSWORD" | docker login registry.eelkhair.net --username eelkhair --password-stdin
+
+docker compose -p job-board pull
+docker compose -p job-board up -d
+exit
+EOF
+
+echo "✅ all done!"

@@ -6,7 +6,6 @@ import {CompanyStore} from '../../company.store';
 import {Divider} from 'primeng/divider';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Select} from 'primeng/select';
-import {FormDebugger} from '../../../../shared/debuggers/forms/form-debugger/form-debugger';
 @Component({
   selector: 'app-company-create',
   imports: [
@@ -17,7 +16,6 @@ import {FormDebugger} from '../../../../shared/debuggers/forms/form-debugger/for
     ReactiveFormsModule,
     Select,
     ButtonDirective,
-    FormDebugger,
   ],
   templateUrl: './company-create.html',
   styleUrl: './company-create.css'

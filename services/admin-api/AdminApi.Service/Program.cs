@@ -74,16 +74,25 @@ builder.Services.AddAuthentication(options =>
         };
     });
 builder.Services.AddAuthorization();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowJobAdmin", policy =>
+            policy
+                .WithOrigins(
+                    "http://localhost:4200",
+                    "https://job-admin.eelkhair.net"
+                )
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+        // add this ONLY if you send cookies/Authorization with credentials:
+        //.AllowCredentials()
+    );
+});
 
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.User ?? new ClaimsPrincipal());
 builder.Services.AddDaprClient();
 var app = builder.Build();
 
-app.UseCors(policy => policy.AllowAnyHeader()
-    .AllowAnyMethod()
-    .WithOrigins("http://localhost:4200")
-    .WithOrigins("https://job-admin.eelkhair.net")
-);
 
 app.UseAuthentication();    
 app.UseAuthorization();  
@@ -126,5 +135,6 @@ app.Use(async (context, next) =>
     // Call the next middleware in the pipeline
     await next();
 });
+app.UseCors("AllowJobAdmin");  
 app.Run();
 
