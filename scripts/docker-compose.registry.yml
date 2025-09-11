@@ -197,6 +197,22 @@ services:
       - SEQ_FIRSTRUN_NOAUTHENTICATION=true
     networks:
       - ai-job-board-net
+  
+  job-board-status:
+    build:
+      context: ../services/HealthChecks
+    image: registry.eelkhair.net/health-check:latest
+    environment:
+      - HealthChecksUI__HealthChecks__0__Name=Admin API
+      - HealthChecksUI__HealthChecks__0__Uri=https://job-admin-api.eelkhair.net/healthzEndpoint 
+      - HealthChecksUI__HealthChecks__1__Name=Company API
+      - HealthChecksUI__HealthChecks__1__Uri=https://job-company-api.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__2__Name=Job API
+      - HealthChecksUI__HealthChecks__2__Uri=https://job-api.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__3__Name=User API
+      - HealthChecksUI__HealthChecks__3__Uri=https://job-user-api.eelkhair.net/healthzEndpoint 
+    ports:
+      - "5107:8080"
 
 networks:
   ai-job-board-net:

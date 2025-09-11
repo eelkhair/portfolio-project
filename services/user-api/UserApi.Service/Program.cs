@@ -3,7 +3,8 @@ using System.Security.Claims;
 using Elkhair.Dev.Common.Application;
 using FastEndpoints;
 using FastEndpoints.Swagger;
-
+using HealthChecks.UI.Client;
+using JobBoard.HealthChecks;
 using UserApi.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 using Microsoft.IdentityModel.Tokens;
 using NSwag;
+using UserApi.Infrastructure;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,7 +51,7 @@ builder.Services.AddFastEndpoints()
         };
     });
 builder.Services.AddCors();
-
+builder.AddCustomHealthChecks();
 
 builder.Services.AddDbContext<UserDbContext>(options =>
 {
@@ -126,5 +128,7 @@ app.MapGet("/", (HttpContext ctx) => ctx.Response.Redirect("/swagger")).ExcludeF
 #if DEBUG
 Debugger.Launch();
 #endif
+app.MapCustomHealthChecks("/healthzEndpoint", "/liveness", UIResponseWriter.WriteHealthCheckUIResponse);
+
 app.Run();
 

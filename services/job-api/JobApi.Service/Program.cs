@@ -4,12 +4,15 @@ using Elkhair.Dev.Common.Application;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using FluentValidation;
+using HealthChecks.UI.Client;
 using JobApi.Application.Queries;
 using JobApi.Application.Queries.Interfaces;
 using JobAPI.Contracts.Models.Jobs.Requests;
 using JobApi.Features.Companies.Create;
 using JobApi.Features.Jobs.Create;
+using JobApi.Infrastructure;
 using JobApi.Infrastructure.Data;
+using JobBoard.HealthChecks;
 using Mapster;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -71,6 +74,7 @@ builder.Services.AddDbContext<JobDbContext>(options =>
                 errorNumbersToAdd: null);
         });
 });
+builder.AddCustomHealthChecks();
 builder.Services.AddScoped<IJobDbContext, JobDbContext>();
 builder.ConfigureLoggingAndTracing("job-api");
 // Add Authorization support (even if not using yet)
@@ -146,5 +150,7 @@ app.Use(async (context, next) =>
     // Call the next middleware in the pipeline
     await next();
 });
+app.MapCustomHealthChecks("/healthzEndpoint", "/liveness", UIResponseWriter.WriteHealthCheckUIResponse);
+
 app.Run();
 

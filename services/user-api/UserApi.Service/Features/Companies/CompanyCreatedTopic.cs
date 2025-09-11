@@ -9,8 +9,8 @@ public class CompanyCreatedTopic : EndpointWithoutRequest
     {
         Get("/companies/create");
         Permissions("create:companies");
-        // Options(c => 
-        //     c.WithTopic(PubSubNames.RabbitMq, EventTypes.CompanyCreated));
+         Options(c => 
+             c.WithTopic(PubSubNames.RabbitMq, "company.created"));
     }
 
     public override async Task HandleAsync(CancellationToken ct)

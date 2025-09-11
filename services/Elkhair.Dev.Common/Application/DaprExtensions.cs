@@ -1,4 +1,7 @@
+using System.Net;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using AdminAPI.Contracts.Models;
 using Dapr.Client;
 using Microsoft.AspNetCore.Http;
 
@@ -16,6 +19,31 @@ public static class DaprExtensions
             new AuthenticationHeaderValue("Bearer", token.Replace("Bearer ", string.Empty));
         
         return httpClient;
+    }
+    
+    public static async Task<ApiResponse<T>> Process<T>(Func<Task<T>> func)
+    {
+        try
+        {
+            var response = await func().ConfigureAwait(false);
+            return new ApiResponse<T>()
+            {
+                StatusCode = HttpStatusCode.OK,
+                Data = response,
+                Success = true
+            };
+        }
+        catch (InvocationException e)
+        {
+            var error = await e.Response.Content.ReadFromJsonAsync<ApiError>();   
+            return new ApiResponse<T>()
+            {
+                StatusCode = e.Response.StatusCode,
+                Exceptions = error,
+                Success = false
+            };
+        }
+        
     }
     
     

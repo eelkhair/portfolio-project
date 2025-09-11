@@ -1,8 +1,10 @@
 $ErrorActionPreference = 'Stop'
 
-$rootPath = 'C:\Users\elkha\RiderProjects\portfolio project\services'
+$rootPath = 'C:\Users\elkha\RiderProjects\portfolio project'
 $packages = @(
-  Join-Path $rootPath 'company-api\CompanyApi.Contracts'
+  Join-Path $rootPath 'services\company-api\CompanyApi.Contracts'
+  Join-Path $rootPath 'services\Elkhair.Dev.Common'
+  Join-Path $rootPath 'HealthChecks\JobBoard.HealthChecks'
 )
 
 $sourceUrl = 'https://nuget.eelkhair.net/v3/index.json'

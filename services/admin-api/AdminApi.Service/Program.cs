@@ -4,9 +4,12 @@ using AdminApi.Application.Commands;
 using AdminApi.Application.Commands.Interfaces;
 using AdminApi.Application.Queries;
 using AdminApi.Application.Queries.Interfaces;
+using AdminApi.Infrastructure;
 using Elkhair.Dev.Common.Application;
 using FastEndpoints;
 using FastEndpoints.Swagger;
+using HealthChecks.UI.Client;
+using JobBoard.HealthChecks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using NSwag;
@@ -48,7 +51,7 @@ builder.Services.AddFastEndpoints()
         };
     });
 builder.Services.AddCors();
-
+builder.AddCustomHealthChecks();
 builder.Services.AddScoped<ICompanyQueryService, CompanyQueryService>();
 builder.Services.AddScoped<ICompanyCommandService, CompanyCommandService>();
 builder.Services.AddScoped<IIndustryQueryService, IndustryQueryService>();
@@ -136,5 +139,7 @@ app.Use(async (context, next) =>
     await next();
 });
 app.UseCors("AllowJobAdmin");  
+app.MapCustomHealthChecks("/healthzEndpoint", "/liveness", UIResponseWriter.WriteHealthCheckUIResponse);
+
 app.Run();
 

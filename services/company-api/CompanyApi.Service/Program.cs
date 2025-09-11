@@ -7,10 +7,13 @@ using CompanyApi.Application.Commands.Interfaces;
 using CompanyApi.Application.Queries;
 using CompanyApi.Application.Queries.Interfaces;
 using CompanyApi.Features.Companies.Create;
+using CompanyApi.Infrastructure;
 using CompanyApi.Infrastructure.Data;
 using Elkhair.Dev.Common.Application;
 using FastEndpoints;
 using FastEndpoints.Swagger;
+using HealthChecks.UI.Client;
+using JobBoard.HealthChecks;
 using Mapster;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -56,7 +59,7 @@ builder.Services.AddCors();
 builder.Services.AddScoped<ICompanyQueryService, CompanyQueryService>();
 builder.Services.AddScoped<IIndustryQueryService, IndustryQueryService>();
 builder.Services.AddScoped<ICompanyCommandService, CompanyCommandService>();
-
+builder.AddCustomHealthChecks();
 var mapsterConfig = TypeAdapterConfig.GlobalSettings;
 mapsterConfig.Scan(Assembly.GetExecutingAssembly());   // <-- finds Mappers : IRegister
 
@@ -146,5 +149,7 @@ app.Use(async (context, next) =>
     // Call the next middleware in the pipeline
     await next();
 });
+app.MapCustomHealthChecks("/healthzEndpoint", "/liveness", UIResponseWriter.WriteHealthCheckUIResponse);
+
 await app.RunAsync();
 

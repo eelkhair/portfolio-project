@@ -16,6 +16,7 @@ declare -A services=(
   ["company-api"]="../services/company-api"
   ["admin-api"]="../services/admin-api"
   ["user-api"]="../services/user-api"
+  ["health-check"]="../services/HealthChecks"
 )
 
 for name in "${!services[@]}"; do
