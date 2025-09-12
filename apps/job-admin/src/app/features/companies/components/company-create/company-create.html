@@ -1,6 +1,6 @@
 <p-dialog header="Create Company" [modal]="true" (onShow)="focusName()"
-          [visible]="store.showCompanyDialog()"
-          (visibleChange)="store.showCompanyDialog.set($event)"
+          [visible]="store.showCreateCompanyDialog()"
+          (visibleChange)="store.showCreateCompanyDialog.set($event)"
           (onHide)="closeDialog()"
            >
 
@@ -16,6 +16,11 @@
           @if(form.controls.name.invalid && form.controls.name.touched){
             <span class="text-red-700 w-full text-right block">Company name is required.</span>
           }
+          @if(errors()?.["name"]; as err){
+            @for(error of err; track $index){
+              <span class="text-red-700 w-full text-right block">{{error}}</span>
+            }
+          }
           <div class="flex items-center gap-2 mt-4">
             <label for="companyEmail" class="font-semibold w-35">Company Email<span class="text-red-500 text-2xl">*</span></label>
             <input pInputText id="companyEmail" type="email" name="companyEmail" class="flex-auto" autocomplete="off" formControlName="companyEmail" required/>
@@ -23,10 +28,20 @@
           @if(form.controls.companyEmail.invalid && form.controls.companyEmail.touched ){
             <span class="text-red-700 w-full text-right block">A valid company email is required.</span>
           }
+          @if(errors()?.["companyEmail"]; as err){
+            @for(error of err; track $index){
+              <span class="text-red-700 w-full text-right block">{{error}}</span>
+            }
+          }
           <div class="flex items-center gap-2 mt-4">
             <label for="companyWebsite" class="font-semibold w-35">Company Website</label>
             <input pInputText id="companyWebsite" class="flex-auto" autocomplete="off" formControlName="companyWebsite"/>
           </div>
+          @if(errors()?.["companyWebsite"]; as err){
+            @for(error of err; track $index){
+              <span class="text-red-700 w-full text-right block">{{error}}</span>
+            }
+          }
           <div class="flex items-center gap-2 mt-4">
             <label for="industry" class="font-semibold w-35">Industry<span class="text-red-500 text-2xl">*</span></label>
             <p-select
@@ -56,12 +71,22 @@
           @if(form.controls.adminFirstName.invalid && form.controls.adminFirstName.touched ){
             <span class="text-red-700 w-full text-right block">Admin first name is required.</span>
           }
+          @if(errors()?.["adminFirstName"]; as err){
+            @for(error of err; track $index){
+              <span class="text-red-700 w-full text-right block">{{error}}</span>
+            }
+          }
           <div class="flex items-center gap-2 mt-4">
             <label for="adminLastName" class="font-semibold w-24">Last Name<span class="text-red-500 text-2xl">*</span></label>
             <input pInputText id="adminLastName"  class="flex-auto" autocomplete="off" required formControlName="adminLastName"/>
           </div>
           @if(form.controls.adminLastName.invalid && form.controls.adminLastName.touched ){
             <span class="text-red-700 w-full text-right block">Admin last name is required.</span>
+          }
+          @if(errors()?.["adminLastName"]; as err){
+            @for(error of err; track $index){
+              <span class="text-red-700 w-full text-right block">{{error}}</span>
+            }
           }
           <div class="flex items-center gap-2 mt-4">
             <label for="adminEmail" class="font-semibold w-24">Email<span class="text-red-500 text-2xl">*</span></label>
@@ -70,12 +95,17 @@
           @if(form.controls.adminEmail.invalid && form.controls.adminEmail.touched ){
             <span class="text-red-700 w-full text-right block">A valid admin email is required.</span>
           }
+          @if(errors()?.["adminEmail"]; as err){
+            @for(error of err; track $index){
+              <span class="text-red-700 w-full text-right block">{{error}}</span>
+            }
+          }
         </div>
       </div>
     </div>
     <p-divider/>
     <div class="flex justify-around mt-4 bg-gray-100 p-4">
-      <p-button label="Cancel" severity="contrast" (click)="store.showCompanyDialog.set(false)" />
+      <p-button label="Cancel" severity="contrast" (click)="store.showCreateCompanyDialog.set(false)" />
       <button pButton type="submit"><span class="pi pi-save"></span>Save</button>
     </div>
   </form>

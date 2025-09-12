@@ -13,6 +13,7 @@ import {provideAnimationsAsync} from '@angular/platform-browser/animations/async
 import {providePrimeNG} from 'primeng/config';
 import {authInterceptor} from './core/interceptores/auth.interceptor';
 import {tracingInterceptor} from './core/interceptores/tracing.interceptor';
+import {MessageService} from 'primeng/api';
 
 
 export const appConfig: ApplicationConfig = {
@@ -34,7 +35,9 @@ export const appConfig: ApplicationConfig = {
           }
         }
       }
+
     }),
+    MessageService,
     provideAuth0({
       domain: 'elkhair-dev.us.auth0.com',
       clientId: 'YXnqj0gOfZJD8Ypje7mdZqdoenCHNzWA',
@@ -46,7 +49,5 @@ export const appConfig: ApplicationConfig = {
       cacheLocation: 'localstorage',
       useRefreshTokens: true
     })
-
-
   ]
 };

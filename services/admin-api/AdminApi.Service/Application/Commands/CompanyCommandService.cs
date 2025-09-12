@@ -20,8 +20,11 @@ public class CompanyCommandService(DaprClient client) : ICompanyCommandService
                 "companies",
                 request,
                 ct));
-        
-        await client.PublishEventAsync(PubSubNames.RabbitMq, "company.created", response.Data, ct);
+
+        if (response.Success)
+        { 
+            await client.PublishEventAsync(PubSubNames.RabbitMq, "company.created", response.Data, ct);
+        }
         
         return response;
     }

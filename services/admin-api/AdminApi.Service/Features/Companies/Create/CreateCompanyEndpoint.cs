@@ -20,9 +20,8 @@ public class CreateCompanyEndpoint(ICompanyCommandService service)
     public override async Task HandleAsync(CreateCompanyRequest request, CancellationToken ct)
     {
         request.CreatedByUserId = User.GetUserId();
-
-            var company = await service.CreateAsync(request, ct);
-            await SendAsync(company, (int) company.StatusCode, ct);
+        var company = await service.CreateAsync(request, ct);
+        await SendAsync(company, (int) company.StatusCode, ct);
         
     }
 }

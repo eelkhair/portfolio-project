@@ -4,6 +4,7 @@ import {Company} from '../types/models/Company';
 import {environment} from '../../../environments/environment';
 import {Industry} from '../types/models/Industry';
 import {CreateCompanyDto} from '../types/Dtos/CreateCompanyDto';
+import {ApiResponse} from '../types/Dtos/ApiResponse';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +21,6 @@ export class CompanyService {
   }
 
   createCompany(company: CreateCompanyDto) {
-    return this.http.post<Company>(environment.apiUrl+'companies', company);
+    return this.http.post<ApiResponse<Company>>(environment.apiUrl+'companies', company);
   }
 }

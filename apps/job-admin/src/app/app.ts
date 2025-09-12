@@ -4,6 +4,7 @@ import {Footer} from './layout/footer/footer';
 import {RouterOutlet} from '@angular/router';
 import {Nav} from './layout/nav/nav';
 import {AccountService} from './core/services/account.service';
+import {ToastModule} from 'primeng/toast';
 
 @Component({
   selector: 'app-root',
@@ -11,6 +12,7 @@ import {AccountService} from './core/services/account.service';
     Header,
     Footer,
     RouterOutlet,
+    ToastModule,
     Nav,
   ],
   templateUrl: './app.html',

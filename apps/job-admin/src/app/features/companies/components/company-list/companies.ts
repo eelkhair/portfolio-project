@@ -19,10 +19,11 @@ import {CompanyCreate} from '../company-create/company-create';
 export class Companies implements OnInit {
   store = inject(CompanyStore);
   companies = this.store.companies;
-
   theme = themeQuartz; // new theming API
   colDefs: ColDef[] = [
-    { field: 'uId' },
+    { field: 'uId'
+
+    },
     { field: 'name' },
     { field: 'eeo' },
     { field: 'about' },
@@ -58,9 +59,6 @@ export class Companies implements OnInit {
           : '',
       filter: 'agDateColumnFilter'
     },
-
-
-
   ];
 
   ngOnInit(): void {

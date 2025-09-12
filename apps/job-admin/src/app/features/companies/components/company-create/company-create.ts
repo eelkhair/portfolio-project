@@ -1,4 +1,4 @@
-import {Component, ElementRef, inject, viewChild} from '@angular/core';
+import {Component, ElementRef, inject, signal, viewChild} from '@angular/core';
 import {Dialog} from 'primeng/dialog';
 import {Button, ButtonDirective} from 'primeng/button';
 import {InputText} from 'primeng/inputtext';
@@ -6,6 +6,7 @@ import {CompanyStore} from '../../company.store';
 import {Divider} from 'primeng/divider';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Select} from 'primeng/select';
+import {ApiError} from '../../../../core/types/Dtos/ApiResponse';
 @Component({
   selector: 'app-company-create',
   imports: [
@@ -22,6 +23,7 @@ import {Select} from 'primeng/select';
 })
 export class CompanyCreate {
   store= inject(CompanyStore);
+  errors= signal<Record<string, string[]>|undefined>(undefined);
   industries = this.store.industries
   nameInput = viewChild<ElementRef<HTMLInputElement>>('name');
   form = new FormGroup({
@@ -53,11 +55,22 @@ export class CompanyCreate {
       adminLastName: this.form.controls.adminLastName.value!,
       adminEmail: this.form.controls.adminEmail.value!,
       companyWebsite: this.form.controls.companyWebsite.value!,
+    }).subscribe({
+      next:company => {
+        this.store.notificationService.info("Provisioning!",`The company '${company.data?.name}' is being provisioned!`)
+      },
+      error: (err: any) => {
+        const errors = err.error?.exceptions as ApiError|null|undefined;
+        if(errors){
+          this.errors.set(errors.errors)
+        }
+
+      }
     })
   }
 
   closeDialog() {
-    this.store.showCompanyDialog.set(false);
+    this.store.showCreateCompanyDialog.set(false);
     this.form.reset();
   }
 }

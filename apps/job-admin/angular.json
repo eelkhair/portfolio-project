@@ -8,7 +8,12 @@
   "projects": {
     "job-admin": {
       "projectType": "application",
-      "schematics": {},
+      "schematics": {
+        "@schematics/angular:service": {
+          "skipTests": true,
+          "path": "src/app/core/services"
+        }
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
