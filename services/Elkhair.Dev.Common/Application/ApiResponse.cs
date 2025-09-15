@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace AdminAPI.Contracts.Models;
+namespace Elkhair.Dev.Common.Application;
 
 public class ApiResponse<T>
 {

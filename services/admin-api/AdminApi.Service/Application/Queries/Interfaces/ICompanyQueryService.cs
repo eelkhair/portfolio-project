@@ -1,8 +1,9 @@
-using AdminAPI.Contracts.Models.Companies.Responses;
+using CompanyAPI.Contracts.Models.Companies.Responses;
+using Elkhair.Dev.Common.Application;
 
 namespace AdminApi.Application.Queries.Interfaces;
 
 public interface ICompanyQueryService
 {
-    Task<List<CompanyResponse>> ListAsync(HttpContext context, CancellationToken ct);
+    Task<ApiResponse<List<CompanyResponse>>> ListAsync(CancellationToken ct);
 }

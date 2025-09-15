@@ -4,6 +4,12 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <RootNamespace>UserAPI.Contracts</RootNamespace>
+        <PackageId>JobBoard.UserAPI.Contracts</PackageId>
+        <Authors>Elkhair Elkhair</Authors>
+        <Version>1.0.2</Version>
+        <Description>Shared components for User Api</Description>
+        <IsPackable>true</IsPackable>
     </PropertyGroup>
 
 </Project>

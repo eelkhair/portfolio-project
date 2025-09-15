@@ -62,9 +62,6 @@ namespace CompanyApi.Infrastructure.Data.Migrations
                     b.Property<int>("IndustryId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Logo")
                         .HasMaxLength(400)
                         .HasColumnType("nvarchar(400)");
@@ -96,6 +93,11 @@ namespace CompanyApi.Infrastructure.Data.Migrations
                         .HasDefaultValue("Active");
 
                     b.Property<string>("Size")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 

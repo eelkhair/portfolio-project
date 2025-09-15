@@ -1,5 +1,5 @@
 ﻿using AdminAPI.Contracts.Enums;
-using AdminAPI.Contracts.Models.Companies.Responses;
+using CompanyAPI.Contracts.Models.Companies.Responses;
 
 namespace AdminAPI.Contracts.Models.Jobs.Responses;
 

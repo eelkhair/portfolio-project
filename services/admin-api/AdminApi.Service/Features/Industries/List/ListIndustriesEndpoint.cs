@@ -1,11 +1,12 @@
 ﻿using AdminApi.Application.Queries.Interfaces;
 using CompanyAPI.Contracts.Models.Industries.Responses;
+using Elkhair.Dev.Common.Application;
 using FastEndpoints;
 
 namespace AdminApi.Features.Industries.List;
 
 
-public class ListIndustriesEndpoint(IIndustryQueryService service) : EndpointWithoutRequest<List<IndustryResponse>>
+public class ListIndustriesEndpoint(IIndustryQueryService service) : EndpointWithoutRequest<ApiResponse<List<IndustryResponse>>>
 {
     public override void Configure()
     {

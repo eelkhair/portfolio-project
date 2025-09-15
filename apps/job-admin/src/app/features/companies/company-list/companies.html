@@ -5,8 +5,6 @@
 
 <ag-grid-angular class="w-full" style="height:650px"
   [rowData]="companies()"
-   (firstDataRendered)="onFirstDataRendered($event)"
-
   [columnDefs]="colDefs"
                  [pagination]="true"
   [theme]="theme">

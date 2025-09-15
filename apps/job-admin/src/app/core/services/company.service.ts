@@ -14,10 +14,10 @@ export class CompanyService {
 
 
   list(){
-    return this.http.get<Company[]>(environment.apiUrl+'companies');
+    return this.http.get<ApiResponse<Company[]>>(environment.apiUrl+'companies');
   }
   listIndustries(){
-    return this.http.get<Industry[]>(environment.apiUrl+'industries');
+    return this.http.get<ApiResponse<Industry[]>>(environment.apiUrl+'industries');
   }
 
   createCompany(company: CreateCompanyDto) {

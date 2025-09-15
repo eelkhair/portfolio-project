@@ -1,10 +1,11 @@
 using AdminApi.Application.Queries.Interfaces;
-using AdminAPI.Contracts.Models.Companies.Responses;
+using CompanyAPI.Contracts.Models.Companies.Responses;
+using Elkhair.Dev.Common.Application;
 using FastEndpoints;
 
 namespace AdminApi.Features.Companies.List;
 
-public class ListCompaniesEndpoint(ICompanyQueryService service) : EndpointWithoutRequest<List<CompanyResponse>>
+public class ListCompaniesEndpoint(ICompanyQueryService service) : EndpointWithoutRequest<ApiResponse<List<CompanyResponse>>>
 {
     public override void Configure()
     {
@@ -14,7 +15,7 @@ public class ListCompaniesEndpoint(ICompanyQueryService service) : EndpointWitho
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var companies = await service.ListAsync( HttpContext, ct);
+        var companies = await service.ListAsync(ct);
         await SendAsync( companies , cancellation: ct);
     }
 }

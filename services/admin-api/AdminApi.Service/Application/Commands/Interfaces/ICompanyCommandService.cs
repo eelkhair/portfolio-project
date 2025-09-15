@@ -1,7 +1,6 @@
-﻿using System.Security.Claims;
-using AdminAPI.Contracts.Models;
-using AdminAPI.Contracts.Models.Companies.Requests;
-using AdminAPI.Contracts.Models.Companies.Responses;
+﻿using AdminAPI.Contracts.Models.Companies.Requests;
+using CompanyAPI.Contracts.Models.Companies.Responses;
+using Elkhair.Dev.Common.Application;
 
 namespace AdminApi.Application.Commands.Interfaces;
 

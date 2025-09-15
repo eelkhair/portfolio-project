@@ -1,11 +1,11 @@
 using System.Diagnostics;
-using System.Security.Claims;
 using AdminApi.Application.Commands;
 using AdminApi.Application.Commands.Interfaces;
 using AdminApi.Application.Queries;
 using AdminApi.Application.Queries.Interfaces;
 using AdminApi.Infrastructure;
 using Elkhair.Dev.Common.Application;
+using Elkhair.Dev.Common.Dapr;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using HealthChecks.UI.Client;
@@ -17,8 +17,11 @@ using NSwag;
 var builder = WebApplication.CreateBuilder(args);
 
 var cfg = builder.Configuration;
+var domain = cfg["Auth0:Domain"];
 // Register FastEndpoints + Swagger
 
+builder.Services.AddMessageSender();
+builder.Services.AddStateManager();
 builder.Services.AddFastEndpoints()
     .SwaggerDocument(o =>
     {
@@ -36,8 +39,8 @@ builder.Services.AddFastEndpoints()
                 {
                     AuthorizationCode = new OpenApiOAuthFlow
                     {
-                        AuthorizationUrl = $"https://{builder.Configuration["Auth0:Domain"]}/authorize",
-                        TokenUrl = $"https://{builder.Configuration["Auth0:Domain"]}/oauth/token",
+                        AuthorizationUrl = $"https://{domain}/authorize",
+                        TokenUrl = $"https://{domain}/oauth/token",
                         Scopes = new Dictionary<string, string>
                         {
                             ["read:jobs"]  = "Read jobs",
@@ -52,6 +55,7 @@ builder.Services.AddFastEndpoints()
     });
 builder.Services.AddCors();
 builder.AddCustomHealthChecks();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICompanyQueryService, CompanyQueryService>();
 builder.Services.AddScoped<ICompanyCommandService, CompanyCommandService>();
 builder.Services.AddScoped<IIndustryQueryService, IndustryQueryService>();
@@ -65,12 +69,12 @@ builder.Services.AddAuthentication(options =>
     })
     .AddJwtBearer(options =>
     {
-        options.Authority = $"https://{cfg["Auth0:Domain"]}/";
+        options.Authority = $"https://{domain}/";
         options.Audience = cfg["Auth0:Audience"];
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = $"https://{cfg["Auth0:Domain"]}/",
+            ValidIssuer = $"https://{domain}/",
             ValidateAudience = true,
             ValidAudience = cfg["Auth0:Audience"],
             ValidateLifetime = true
@@ -92,7 +96,6 @@ builder.Services.AddCors(options =>
     );
 });
 
-builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.User ?? new ClaimsPrincipal());
 builder.Services.AddDaprClient();
 var app = builder.Build();
 
@@ -140,6 +143,5 @@ app.Use(async (context, next) =>
 });
 app.UseCors("AllowJobAdmin");  
 app.MapCustomHealthChecks("/healthzEndpoint", "/liveness", UIResponseWriter.WriteHealthCheckUIResponse);
-
-app.Run();
+await app.RunAsync();
 

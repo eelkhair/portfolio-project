@@ -1,18 +1,24 @@
 using System.Diagnostics;
 using System.Security.Claims;
 using Elkhair.Dev.Common.Application;
+using Elkhair.Dev.Common.Dapr;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using HealthChecks.UI.Client;
 using JobBoard.HealthChecks;
 using UserApi.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 using Microsoft.IdentityModel.Tokens;
 using NSwag;
+using UserApi.Application.Commands;
+using UserApi.Application.Commands.Interfaces;
 using UserApi.Infrastructure;
+using UserApi.Infrastructure.Auth0;
+using UserApi.Infrastructure.Auth0.Interfaces;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -53,6 +59,14 @@ builder.Services.AddFastEndpoints()
 builder.Services.AddCors();
 builder.AddCustomHealthChecks();
 
+builder.Services.AddDaprClient();
+
+builder.Services.AddHttpClient("auth0");
+builder.Services.AddScoped<IUserCommandService, UserCommandService>();
+builder.Services.AddSingleton<IAuth0TokenService, Auth0TokenService>();
+builder.Services.AddTransient<IAuth0Factory, DefaultAuth0Factory>();
+builder.Services.AddHostedService<Auth0TokenStartupService>();
+builder.Services.AddMessageSender();
 builder.Services.AddDbContext<UserDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("UserDbContext"),

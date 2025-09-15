@@ -7,7 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="CompanyAPI.Contracts" Version="1.0.0" />
+      <PackageReference Include="JobBoard.CompanyAPI.Contracts" Version="1.0.3" />
+      <PackageReference Include="JobBoard.UserAPI.Contracts" Version="1.0.2" />
     </ItemGroup>
 
 </Project>

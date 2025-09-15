@@ -14,7 +14,7 @@ public class CompanyCommandService(ICompanyDbContext context): ICompanyCommandSe
     public async Task<CompanyResponse> CreateAsync(CreateCompanyRequest request, ClaimsPrincipal user, CancellationToken ct)
     {
         var company = request.Adapt<Company>();
-
+        company.Status = "Provisioning";
         company.IndustryId = await context.Industries.Where(c => c.UId == request.IndustryUId).Select(c => c.Id)
             .FirstAsync(ct);
         context.Companies.Add(company);

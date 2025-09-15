@@ -2,11 +2,11 @@ import {Component, ElementRef, inject, signal, viewChild} from '@angular/core';
 import {Dialog} from 'primeng/dialog';
 import {Button, ButtonDirective} from 'primeng/button';
 import {InputText} from 'primeng/inputtext';
-import {CompanyStore} from '../../company.store';
+import {CompanyStore} from '../company.store';
 import {Divider} from 'primeng/divider';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Select} from 'primeng/select';
-import {ApiError} from '../../../../core/types/Dtos/ApiResponse';
+import {ApiError} from '../../../core/types/Dtos/ApiResponse';
 @Component({
   selector: 'app-company-create',
   imports: [

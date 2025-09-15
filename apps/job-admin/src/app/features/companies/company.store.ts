@@ -13,16 +13,23 @@ export class CompanyStore{
   companies = signal<Company[]>([])
   industries = signal<Industry[]>([])
   showCreateCompanyDialog = signal(false)
+  selectedCompany = signal<Company|undefined>(undefined);
   notificationService = inject(NotificationService);
 
 
   load = () => {
-    this.companyService.list().subscribe(companies => {
-      this.companies.set(companies);
+    this.loadCompanies().subscribe(response => {
+      this.companies.set(response.data!);
     })
-    this.companyService.listIndustries().subscribe(industries => {
-      this.industries.set(industries);
+    this.loadIndustries().subscribe(response => {
+      this.industries.set(response.data!);
     })
+  }
+  loadCompanies = () => {
+    return this.companyService.list()
+  }
+  loadIndustries = () => {
+    return this.companyService.listIndustries()
   }
 
   createCompany(company: CreateCompanyDto) {
@@ -36,4 +43,18 @@ export class CompanyStore{
       }));
   }
 
+  selectCompany(id: string) {
+    this.selectedCompany.set(this.companies().find(c=>c.uId === id));
+  }
+
+  loadCompany(id: string) {
+    this.loadIndustries().subscribe(response => {
+      this.industries.set(response.data!);
+    })
+    this.loadCompanies().subscribe(response => {
+        this.companies.set(response.data!);
+        this.selectCompany(id);
+
+    })
+  }
 }

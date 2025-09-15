@@ -1,7 +1,6 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using AdminAPI.Contracts.Models;
 using Dapr.Client;
 using Microsoft.AspNetCore.Http;
 
@@ -43,8 +42,20 @@ public static class DaprExtensions
                 Success = false
             };
         }
-        
     }
-    
+    public static async Task<TRes?> InvokeWithHeadersAsync<TReq, TRes>(
+        this DaprClient dapr, HttpMethod method, string appId, string methodName,
+        TReq payload, IDictionary<string,string>? headers, CancellationToken ct = default)
+    {
+        var req = dapr.CreateInvokeMethodRequest(method, appId, methodName);
+        req.Content = JsonContent.Create(payload);
+        if (headers != null)
+            foreach (var h in headers)
+                req.Headers.TryAddWithoutValidation(h.Key, h.Value);
+
+        using var res = await dapr.InvokeMethodWithResponseAsync(req, ct);
+        res.EnsureSuccessStatusCode();
+        return await res.Content.ReadFromJsonAsync<TRes>(cancellationToken: ct);
+    }
     
 }

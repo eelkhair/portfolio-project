@@ -15,7 +15,7 @@ public class Company : BaseAuditableEntity
     public DateTime? Founded { get; set; }
     public string? Size { get; set; }
     public string? Logo { get; set; }
-    public required bool IsActive { get; set; }
+    public required string Status { get; set; }
     
     public required int IndustryId { get; set; }
     public Industry Industry { get; set; } = null!;

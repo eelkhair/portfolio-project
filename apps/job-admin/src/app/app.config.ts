@@ -14,13 +14,14 @@ import {providePrimeNG} from 'primeng/config';
 import {authInterceptor} from './core/interceptores/auth.interceptor';
 import {tracingInterceptor} from './core/interceptores/tracing.interceptor';
 import {MessageService} from 'primeng/api';
+import {idempotencyInterceptor} from './core/interceptores/idempotency/idempotency.interceptor';
 
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
-    provideHttpClient(withFetch(), withInterceptors([authInterceptor, tracingInterceptor])),
+    provideHttpClient(withFetch(), withInterceptors([authInterceptor, tracingInterceptor, idempotencyInterceptor])),
     provideRouter(routes, withComponentInputBinding(), withViewTransitions()),
     provideAnimationsAsync(),
     providePrimeNG({
