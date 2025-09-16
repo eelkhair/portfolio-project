@@ -57,7 +57,23 @@ builder.Services.AddFastEndpoints()
             });
         };
     });
-builder.Services.AddCors();
+
+const string CorsPolicy = "fe";
+
+builder.Services.AddCors(o =>
+{
+    o.AddPolicy(CorsPolicy, p => p
+        .WithOrigins(
+            "http://localhost:4200",
+            "https://job-admin.eelkhair.net"
+        )
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials()
+        // (optional) if you want to read your trace id on the client
+        .WithExposedHeaders("trace-id")
+    );
+});
 builder.Services.AddScoped<IValidator<CreateJobRequest>, CreateJobValidator>();
 builder.Services.AddScoped<ICompanyQueryService, CompanyQueryService>();
 builder.Services.AddScoped<IRegister, Mappers >();
@@ -103,11 +119,7 @@ builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpContextAccessor>().H
 builder.Services.AddDaprClient();
 var app = builder.Build();
 
-app.UseCors(policy => policy.AllowAnyHeader()
-    .AllowAnyMethod()
-    .WithOrigins("http://localhost:4200")
-    .WithOrigins("https://job-admin.eelkhair.net")
-);
+app.UseCors(CorsPolicy);
 
 app.UseAuthentication();    
 app.UseAuthorization();  

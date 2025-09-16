@@ -10,6 +10,7 @@ using CompanyApi.Features.Companies.Create;
 using CompanyApi.Infrastructure;
 using CompanyApi.Infrastructure.Data;
 using Elkhair.Dev.Common.Application;
+using Elkhair.Dev.Common.Dapr;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using HealthChecks.UI.Client;
@@ -59,6 +60,7 @@ builder.Services.AddCors();
 builder.Services.AddScoped<ICompanyQueryService, CompanyQueryService>();
 builder.Services.AddScoped<IIndustryQueryService, IndustryQueryService>();
 builder.Services.AddScoped<ICompanyCommandService, CompanyCommandService>();
+builder.Services.AddMessageSender();
 builder.AddCustomHealthChecks();
 var mapsterConfig = TypeAdapterConfig.GlobalSettings;
 mapsterConfig.Scan(Assembly.GetExecutingAssembly());   // <-- finds Mappers : IRegister

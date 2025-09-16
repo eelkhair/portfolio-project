@@ -7,4 +7,5 @@ namespace CompanyApi.Application.Commands.Interfaces;
 public interface ICompanyCommandService
 {
     Task<CompanyResponse> CreateAsync(CreateCompanyRequest request, ClaimsPrincipal user, CancellationToken ct);
+    Task<bool> ActivateAsync(Guid companyUId, ClaimsPrincipal user, CancellationToken ct);
 }

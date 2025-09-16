@@ -16,4 +16,8 @@
       <Folder Include="Enums\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="JobBoard.UserAPI.Contracts" Version="1.0.2" />
+    </ItemGroup>
+
 </Project>

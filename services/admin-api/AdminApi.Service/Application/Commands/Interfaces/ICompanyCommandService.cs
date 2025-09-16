@@ -7,5 +7,5 @@ namespace AdminApi.Application.Commands.Interfaces;
 public interface ICompanyCommandService
 {
     Task<ApiResponse<CompanyResponse>> CreateAsync(CreateCompanyRequest request, CancellationToken ct);
-    
+
 }

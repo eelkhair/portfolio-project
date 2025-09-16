@@ -28,6 +28,7 @@
     "@angular/platform-browser": "^20.2.3",
     "@angular/router": "^20.2.3",
     "@auth0/auth0-angular": "^2.2.3",
+    "@microsoft/signalr": "^9.0.6",
     "@opentelemetry/api": "^1.7.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.52.0",
     "@opentelemetry/exporter-zipkin": "^1.25.0",

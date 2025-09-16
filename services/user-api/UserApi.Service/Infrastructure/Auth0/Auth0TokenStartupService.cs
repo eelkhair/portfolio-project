@@ -17,7 +17,7 @@ public class Auth0TokenStartupService(
         {
             logger.LogInformation("Refreshing Auth0 token on startup...");
             var token = await tokenService.RefreshAccessTokenAsync(cancellationToken);
-            logger.LogInformation("Auth0 token refreshed successfully (length: {Length}).", token.Length);
+            logger.LogInformation("Auth0 token refreshed successfully (length: {Length})", token.Length);
         }
         catch (Exception ex)
         {

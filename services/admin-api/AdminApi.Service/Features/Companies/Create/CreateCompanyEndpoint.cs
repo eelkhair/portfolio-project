@@ -28,12 +28,12 @@ public class CreateCompanyEndpoint(ICompanyCommandService service, IMessageSende
             await sender.SendEventAsync(PubSubNames.RabbitMq, "provision.user", User.GetUserId(), new
                 ProvisionUserEvent
             {
-                CompanyName = company.Data?.Name,
+                CompanyName = company.Data?.Name!,
                 FirstName = request.AdminFirstName,
                 LastName = request.AdminLastName,
                 Email= request.AdminEmail,
                 WebSite = request.CompanyWebsite,
-                CompanyUId = company.Data?.UId,
+                CompanyUId = company.Data?.UId ?? Guid.Empty,
                 CompanyEmail = request.CompanyEmail
                 
             }, ct);

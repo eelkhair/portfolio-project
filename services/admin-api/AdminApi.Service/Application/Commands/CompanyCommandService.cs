@@ -16,4 +16,5 @@ public class CompanyCommandService(DaprClient client, UserContextService accesso
         return await DaprExtensions.Process(() =>
             client.InvokeMethodAsync<CompanyResponse>(message,cancellationToken: ct));
     }
+
 }

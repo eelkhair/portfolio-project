@@ -1,4 +1,5 @@
-﻿using AH.Metadata.Domain.Constants;
+﻿using System.Diagnostics;
+using AH.Metadata.Domain.Constants;
 using Dapr.Client;
 using UserApi.Infrastructure.Auth0.Interfaces;
 
@@ -7,6 +8,7 @@ namespace UserApi.Infrastructure.Auth0;
 public class Auth0TokenService(
     IConfiguration configuration,
     DaprClient dapr,
+    ActivitySource activitySource,
     IHttpClientFactory httpClientFactory) : IAuth0TokenService
 {
     private const string StateStoreName = StateStores.Redis; // ensure this matches your Dapr component
@@ -14,12 +16,16 @@ public class Auth0TokenService(
 
     public async Task<string> GetAccessTokenAsync(CancellationToken ct = default)
     {
+        using var activity = activitySource.StartActivity("Getting Auth0 token.");
         var cached = await dapr.GetStateAsync<string>(StateStoreName, TokenStateKey, cancellationToken: ct);
+        activity?.SetTag("cached", cached is not null);
+        activity?.Stop();
         return string.IsNullOrWhiteSpace(cached) ? await RefreshAccessTokenAsync(ct) : cached!;
     }
 
     public async Task<string> RefreshAccessTokenAsync(CancellationToken ct = default)
     {
+        using var activity = activitySource.StartActivity("Refreshing Auth0 token.");
         var domain       = configuration["Auth0:Domain"]        ?? throw new InvalidOperationException("Missing Auth0:Domain");
         var clientId     = configuration["Auth0:ApiClientId"]   ?? throw new InvalidOperationException("Missing Auth0:ApiClientId");
         var clientSecret = configuration["Auth0:ApiClientSecret"]?? throw new InvalidOperationException("Missing Auth0:ApiClientSecret");
@@ -50,7 +56,9 @@ public class Auth0TokenService(
             value: token,
             metadata: new Dictionary<string, string> { ["ttlInSeconds"] = ttl.ToString() },
             cancellationToken: ct);
-
+        
+        activity?.SetTag("token.length", token.Length);
+        activity?.Stop();
         return token;
     }
 }

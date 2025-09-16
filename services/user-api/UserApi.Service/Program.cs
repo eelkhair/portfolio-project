@@ -62,7 +62,7 @@ builder.AddCustomHealthChecks();
 builder.Services.AddDaprClient();
 
 builder.Services.AddHttpClient("auth0");
-builder.Services.AddScoped<IUserCommandService, UserCommandService>();
+builder.Services.AddScoped<IAuth0CommandService, Auth0CommandService>();
 builder.Services.AddSingleton<IAuth0TokenService, Auth0TokenService>();
 builder.Services.AddTransient<IAuth0Factory, DefaultAuth0Factory>();
 builder.Services.AddHostedService<Auth0TokenStartupService>();

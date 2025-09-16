@@ -24,4 +24,19 @@ public class CompanyCommandService(ICompanyDbContext context): ICompanyCommandSe
         return company.Adapt<CompanyResponse>();
 
     }
+
+    public async Task<bool> ActivateAsync(Guid companyUId, ClaimsPrincipal user, CancellationToken ct)
+    {
+        var company = await context.Companies.Where(c => c.UId == companyUId).SingleOrDefaultAsync(ct);
+
+        if (company == null)
+        {
+            return false;
+        }
+       
+        company.Status = "Active";
+        context.Companies.Update(company);
+        await context.SaveChangesAsync(user, ct);
+        return true;
+    }
 }

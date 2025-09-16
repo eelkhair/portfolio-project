@@ -22,6 +22,8 @@ var domain = cfg["Auth0:Domain"];
 
 builder.Services.AddMessageSender();
 builder.Services.AddStateManager();
+builder.Services.AddSignalR();
+
 builder.Services.AddFastEndpoints()
     .SwaggerDocument(o =>
     {
@@ -53,7 +55,18 @@ builder.Services.AddFastEndpoints()
             });
         };
     });
-builder.Services.AddCors();
+const string CorsPolicy = "AllowJobAdmin";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(CorsPolicy, p => p
+        .WithOrigins(
+            "http://localhost:4200",
+            "https://job-admin.eelkhair.net")
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials()
+        .WithExposedHeaders("trace-id"));
+});
 builder.AddCustomHealthChecks();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICompanyQueryService, CompanyQueryService>();
@@ -79,27 +92,27 @@ builder.Services.AddAuthentication(options =>
             ValidAudience = cfg["Auth0:Audience"],
             ValidateLifetime = true
         };
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var path = context.HttpContext.Request.Path;
+                var token = context.Request.Query["access_token"];
+
+                if (!string.IsNullOrEmpty(token) &&
+                    path.StartsWithSegments("/hubs/notifications"))
+                {
+                    context.Token = token;
+                }
+                return Task.CompletedTask;
+            }
+        };
     });
 builder.Services.AddAuthorization();
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowJobAdmin", policy =>
-            policy
-                .WithOrigins(
-                    "http://localhost:4200",
-                    "https://job-admin.eelkhair.net"
-                )
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-        // add this ONLY if you send cookies/Authorization with credentials:
-        //.AllowCredentials()
-    );
-});
 
 builder.Services.AddDaprClient();
 var app = builder.Build();
-
-
+app.UseCors(CorsPolicy);
 app.UseAuthentication();    
 app.UseAuthorization();  
 app.UseCloudEvents();
@@ -141,7 +154,8 @@ app.Use(async (context, next) =>
     // Call the next middleware in the pipeline
     await next();
 });
-app.UseCors("AllowJobAdmin");  
+
+app.MapHub<NotificationsHub>("/hubs/notifications").RequireAuthorization(); 
 app.MapCustomHealthChecks("/healthzEndpoint", "/liveness", UIResponseWriter.WriteHealthCheckUIResponse);
 await app.RunAsync();
 
