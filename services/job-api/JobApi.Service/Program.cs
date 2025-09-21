@@ -5,15 +5,14 @@ using FastEndpoints;
 using FastEndpoints.Swagger;
 using FluentValidation;
 using HealthChecks.UI.Client;
-using JobApi.Application.Queries;
-using JobApi.Application.Queries.Interfaces;
+using JobApi.Application;
+using JobApi.Application.Interfaces;
 using JobAPI.Contracts.Models.Jobs.Requests;
-using JobApi.Features.Companies.Create;
+
 using JobApi.Features.Jobs.Create;
 using JobApi.Infrastructure;
 using JobApi.Infrastructure.Data;
 using JobBoard.HealthChecks;
-using Mapster;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -75,8 +74,6 @@ builder.Services.AddCors(o =>
     );
 });
 builder.Services.AddScoped<IValidator<CreateJobRequest>, CreateJobValidator>();
-builder.Services.AddScoped<ICompanyQueryService, CompanyQueryService>();
-builder.Services.AddScoped<IRegister, Mappers >();
 
 builder.Services.AddDbContext<JobDbContext>(options =>
 {
@@ -92,6 +89,7 @@ builder.Services.AddDbContext<JobDbContext>(options =>
 });
 builder.AddCustomHealthChecks();
 builder.Services.AddScoped<IJobDbContext, JobDbContext>();
+builder.Services.AddScoped<ICompanyCommandService, CompanyCommandService>();
 builder.ConfigureLoggingAndTracing("job-api");
 // Add Authorization support (even if not using yet)
 

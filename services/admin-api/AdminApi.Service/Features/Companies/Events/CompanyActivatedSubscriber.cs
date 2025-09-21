@@ -25,12 +25,20 @@ public class CompanyActivatedSubscriber(
     {
         try
         {
-            using var act = activitySource.StartActivity("sending signalR company.activated");
-            // push to the user’s group
+            using var act = activitySource.StartActivity(
+                "signalr.message.send",
+                ActivityKind.Producer);
+
+            act?.SetTag("messaging.system", "signalr");
+            act?.SetTag("messaging.destination.name", "CompanyActivated");
+            act?.SetTag("messaging.operation", "send");
+            var parent = Activity.Current; 
             await hub.Clients.Group(e.UserId).SendAsync("CompanyActivated", new
             {
                 e.Data.CompanyUId,
                 e.Data.CompanyName,
+                TraceParent =parent?.Id,                 
+                TraceState =parent?.TraceStateString,    
                 Message = $"“{e.Data.CompanyName}” has been activated."
             }, ct);
             act?.SetTag("enduser.id", e.UserId);

@@ -80,6 +80,7 @@ builder.Services.AddDbContext<UserDbContext>(options =>
         });
 });
 builder.Services.AddScoped<IUserDbContext, UserDbContext>();
+builder.Services.AddScoped<ICompanyCommandService, CompanyCommandService>();
 
 // Add Authorization support (even if not using yet)
 

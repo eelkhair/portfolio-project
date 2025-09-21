@@ -5,12 +5,15 @@ import { NotificationService } from './notification.service';
 import {AccountService} from './account.service';
 import {environment} from '../../../environments/environment';
 import {toSignal} from '@angular/core/rxjs-interop';
+import {Attributes, propagation, ROOT_CONTEXT, SpanKind, SpanStatusCode, trace} from '@opentelemetry/api';
  // wherever your auth lives
 
 export interface CompanyActivatedMsg {
   companyUId: string;
   companyName: string;
   message: string;
+  traceParent?: string;
+  traceState?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -18,8 +21,7 @@ export class RealtimeNotificationsService {
   private hub?: signalR.HubConnection;
   private notify = inject(NotificationService);
   private account = inject(AccountService);
-
-  // reactive bits (optional)
+  private tracer = trace.getTracer('admin-fe')
   connected = signal(false);
   companyActivated = signal<CompanyActivatedMsg | null>(null);
   private token = toSignal(this.account.auth.getAccessTokenSilently());
@@ -41,13 +43,44 @@ export class RealtimeNotificationsService {
       .configureLogging(signalR.LogLevel.Warning) // change to Information for debugging
       .build();
 
+
     this.hub.on('CompanyActivated', (msg: CompanyActivatedMsg) => {
-      this.companyActivated.set(msg);
-      this.notify.success('Company activated', `“${msg.companyName}” is now active.`);
+      const carrier: Record<string, string> = {};
+      if (msg.traceParent) carrier['traceparent'] = msg.traceParent;
+      if (msg.traceState)  carrier['tracestate']  = msg.traceState;
+      const parentCtx = propagation.extract(ROOT_CONTEXT, carrier);
+      this.tracer.startActiveSpan(
+        'signalr.message.received',
+        {
+          kind: SpanKind.CONSUMER,
+          attributes: {
+            'messaging.system': 'signalr',
+            'messaging.operation': 'process',
+            'messaging.destination.name': 'CompanyActivated',
+            'company.id': msg.companyUId,
+            'company.name': msg.companyName,
+          },
+        },
+        parentCtx,
+        (span) => {
+        try {
+          this.companyActivated.set(msg);
+          this.notify.success('Company activated', `“${msg.companyName}” is now active.`);
+
+          span.setStatus({ code: SpanStatusCode.OK });
+        } catch (err: any) {
+          span.recordException(err);
+          span.setStatus({ code: SpanStatusCode.ERROR, message: err?.message });
+          throw err;
+        } finally {
+          span.end();
+        }
+      });
     });
 
     this.hub.onreconnecting(() => {
       this.connected.set(false);
+
       // optional: one-time toast on first reconnect attempt
       this.notify.info('Reconnecting…', 'Trying to restore realtime connection.');
     });

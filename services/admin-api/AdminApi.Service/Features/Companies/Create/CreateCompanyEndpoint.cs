@@ -25,7 +25,7 @@ public class CreateCompanyEndpoint(ICompanyCommandService service, IMessageSende
 
         if (company.Success)
         {
-            await sender.SendEventAsync(PubSubNames.RabbitMq, "provision.user", User.GetUserId(), new
+            await sender.SendEventAsync(PubSubNames.RabbitMq, "company.created", User.GetUserId(), new
                 ProvisionUserEvent
             {
                 CompanyName = company.Data?.Name!,

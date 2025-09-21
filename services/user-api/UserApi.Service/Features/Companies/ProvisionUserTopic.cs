@@ -1,22 +1,25 @@
 ﻿using System.Diagnostics;
 using AH.Metadata.Domain.Constants;
+using Auth0.ManagementApi.Models;
 using Dapr.Client;
+using Elkhair.Dev.Common.Application;
 using Elkhair.Dev.Common.Dapr;
 using Elkhair.Dev.Common.Domain.Constants;
 using FastEndpoints;
 using UserApi.Application.Commands.Interfaces;
 using UserAPI.Contracts.Models.Events;
+using UserAPI.Contracts.Models.Requests;
 
 namespace UserApi.Features.Companies;
 
-public class ProvisionUserTopic(ActivitySource activitySource, DaprClient client, IAuth0CommandService service, IMessageSender sender) : Endpoint<EventDto<ProvisionUserEvent>>
+public class ProvisionUserTopic(ActivitySource activitySource, DaprClient client, IAuth0CommandService aut0Service, IMessageSender sender, ICompanyCommandService commandService) : Endpoint<EventDto<ProvisionUserEvent>>
 {
     public override void Configure()
     {
-        Post("/Provision/user");
+        Post("events/company/create");
         AllowAnonymous();
          Options(c => 
-             c.WithTopic(PubSubNames.RabbitMq, "provision.user"));
+             c.WithTopic(PubSubNames.RabbitMq, "company.created"));
     }
 
     public override async Task HandleAsync(EventDto<ProvisionUserEvent> request, CancellationToken ct)
@@ -30,15 +33,41 @@ public class ProvisionUserTopic(ActivitySource activitySource, DaprClient client
         activity?.SetTag("user.email", request.Data.Email);
         activity?.SetTag("company.uid", request.Data.CompanyUId);
         activity?.SetTag("user.first-name", request.Data.FirstName);
-      
+        
+        
         try
         {
             using var activity2 = activitySource.StartActivity("Provisioning User.");
-            await service.ProvisionUserAsync(request.Data, ct);
-            activity2?.SetTag("user.email", request.Data.Email);
-            activity2?.SetTag("company.uid", request.Data.CompanyUId);
-            await sender.SendEventAsync(PubSubNames.RabbitMq, "provision.user.success", request.UserId, request.Data, ct);
-            
+            var (auth0User, auth0Company)= await aut0Service.ProvisionUserAsync(request.Data, ct);
+        
+            if (auth0User is not null &&  auth0Company is not null)
+            {
+                using var activity4 = activitySource.StartActivity("Saving to database.");
+                var principal = DaprExtensions.CreateUser(request.UserId);
+                var userId = await commandService.CreateUser(new CreateUserRequest
+                {
+                    Auth0Id = auth0User.UserId,
+                    FirstName = auth0User.FirstName,
+                    LastName = auth0User.LastName,
+                    Email = auth0User.Email
+                }, principal, ct);
+                var companyId = await commandService.CreateCompany(new CreateCompanyRequest()
+                {
+                    Auth0OrganizationId = auth0Company.Id,
+                    Name = auth0Company.DisplayName,
+                    UId = request.Data.CompanyUId,
+                }, principal, ct);
+                await commandService.AddUserToCompany(userId, companyId, principal, ct);
+                
+                activity4?.SetTag("user.id", userId);
+                activity4?.SetTag("company.id", companyId);
+                activity4?.SetTag("auth0.user.id", auth0User.UserId);
+                activity4?.SetTag("auth0.company.id", auth0Company.Id);
+                activity2?.SetTag("user.email", request.Data.Email);
+                activity2?.SetTag("company.uid", request.Data.CompanyUId);
+                await sender.SendEventAsync(PubSubNames.RabbitMq, "provision.user.success", request.UserId, request.Data, ct);
+
+            }
         }
         catch (ArgumentException e)
         {
@@ -59,6 +88,9 @@ public class ProvisionUserTopic(ActivitySource activitySource, DaprClient client
         activity3?.SetTag("user.email", request.Data.Email);
         activity3?.SetTag("company.uid", request.Data.CompanyUId);
 
+       
+        
+        
         
         await SendOkAsync(ct);
     }

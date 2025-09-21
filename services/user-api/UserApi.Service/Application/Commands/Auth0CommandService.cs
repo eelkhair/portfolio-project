@@ -12,7 +12,7 @@ public class Auth0CommandService(ActivitySource activitySource, IAuth0Factory fa
 {
     private IAuth0Resource? Resource;
 
-    public async Task<bool> ProvisionUserAsync(ProvisionUserEvent user,
+    public async Task<(User, Organization)> ProvisionUserAsync(ProvisionUserEvent user,
         CancellationToken ct)
     {
         using var activity = activitySource.StartActivity("Creating Auth0 Organization.");
@@ -36,13 +36,11 @@ public class Auth0CommandService(ActivitySource activitySource, IAuth0Factory fa
         using var activity3 = activitySource.StartActivity("Adding User to Organization.");
      
         var response = await AddMemberToOrganizationAsync(organization.Data?.Id!, auth0User.Data?.UserId!, "rol_jrY03i0FY002L8sQ", ct);
-        if (response.Success)
-        { 
-            activity3?.SetTag("organization.id", organization.Data?.Id);
-            activity3?.SetTag("user.id", auth0User.Data?.UserId);
-            return true;
-        }
-        throw new ArgumentException(response.Exceptions?.Message?? "Error adding user to organization.");
+        if (!response.Success)
+            throw new ArgumentException(response.Exceptions?.Message ?? "Error adding user to organization.");
+        activity3?.SetTag("organization.id", organization.Data?.Id);
+        activity3?.SetTag("user.id", auth0User.Data?.UserId);
+        return (auth0User.Data!, organization.Data!);
     }
 
     private async Task<ApiResponse<bool>> AddMemberToOrganizationAsync(string organizationId, string userId, string role, CancellationToken ct)

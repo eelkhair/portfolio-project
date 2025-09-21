@@ -1,8 +1,9 @@
-﻿using UserAPI.Contracts.Models.Events;
+﻿using Auth0.ManagementApi.Models;
+using UserAPI.Contracts.Models.Events;
 
 namespace UserApi.Application.Commands.Interfaces;
 
 public interface IAuth0CommandService
 {
-    Task<bool> ProvisionUserAsync(ProvisionUserEvent user, CancellationToken ct);
+    Task<(User, Organization)> ProvisionUserAsync(ProvisionUserEvent user, CancellationToken ct);
 }

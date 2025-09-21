@@ -10,6 +10,8 @@ namespace UserApi.Infrastructure.Data;
 public partial class UserDbContext : DbContext, IUserDbContext
 {
     public DbSet<User> Users { get; set; } = null!;
+    public DbSet<Company> Companies { get; set; } = null!;
+    public DbSet<UserCompany> UserCompanies { get; set; } = null!;
     
     public UserDbContext(DbContextOptions<UserDbContext> options) : base(options) { }
 

@@ -4,7 +4,7 @@ using JobAPI.Contracts.Models.Jobs.Responses;
 
 namespace JobApi.Features.Jobs.Create;
 
-public class CreateJobEndpoint :  Endpoint<CreateJobRequest, JobResponse, CreateJobMapper>
+public class CreateJobEndpoint :  Endpoint<CreateJobRequest, JobResponse>
 {
     public override void Configure()
     {
