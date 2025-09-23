@@ -35,8 +35,10 @@ services:
       - ai-service
     network_mode: "service:ai-service"
     volumes:
-      - "../Config/:/Config"
-      - "../Components/:/Components"
+      - "/home/eelkhair/Dapr/shared/Config/:/Config"
+      - "/home/eelkhair/Dapr/shared/Components:/Components"
+      - "/home/eelkhair/Dapr/job-ai/:/Dapr"
+
     command: [
       "./daprd",
       "--app-id", "ai-service",
@@ -44,8 +46,10 @@ services:
       "--dapr-http-port", "6083",
       "--log-level", "debug",
       "--resources-path", "./Components",
+      "--resources-path", "./Dapr/Components",
+      "--resources-path", "./Dapr/Components/Secrets",
       "-config", "./Config/config.yaml"
-      
+    
     ]
 
   job-api:
@@ -68,9 +72,9 @@ services:
       - job-api
     network_mode: "service:job-api"
     volumes:
-      - "../Config/:/Config"
-      - "../Components/:/Components"
-      - "../services/job-api/JobApi.Service/Dapr:/Dapr"
+      - "/home/eelkhair/Dapr/shared/Config/:/Config"
+      - "/home/eelkhair/Dapr/shared/Components/:/Components"
+      - "/home/eelkhair/Dapr/job-api/:/Dapr"
     command:
       [
         "/daprd",
@@ -79,15 +83,14 @@ services:
         "--dapr-http-port", "6085",
         "--resources-path", "./Components",
         "--resources-path", "./Dapr/Components",
-        "--resources-path", "./Dapr/Components/Timers",
         "--resources-path", "./Dapr/Components/Secrets",
         "-config", "./Config/config.yaml"
       ]
 
   user-api:
     build:
-      context: ../services/user-api/     
-    image: registry.eelkhair.net/user-api:latest  
+      context: ../services/user-api/
+    image: registry.eelkhair.net/user-api:latest
     ports:
       - "6092:8080"
       - "6095:6095"
@@ -103,9 +106,9 @@ services:
     depends_on:
       - user-api
     volumes:
-      - "../Config/:/Config"
-      - "../Components/:/Components"
-      - "../services/user-api/UserApi.Service/Dapr:/Dapr"
+      - "/home/eelkhair/Dapr/shared/Config/:/Config"
+      - "/home/eelkhair/Dapr/shared/Components:/Components"
+      - "/home/eelkhair/Dapr/user-api/:/Dapr"
     network_mode: "service:user-api"
     command: [
       "./daprd",
@@ -114,15 +117,15 @@ services:
       "--dapr-http-port", "6095",
       "--resources-path", "./Components",
       "--resources-path", "./Dapr/Components",
-      "--resources-path", "./Dapr/Components/Timers",
       "--resources-path", "./Dapr/Components/Secrets",
+      "--resources-path", "./Dapr/Components/Timers",
       "-config", "./Config/config.yaml"
     ]
 
   company-api:
     build:
-      context: ../services/company-api/     
-    image: registry.eelkhair.net/company-api:latest  
+      context: ../services/company-api/
+    image: registry.eelkhair.net/company-api:latest
     ports:
       - "6072:8080"
       - "6075:6075"
@@ -138,9 +141,9 @@ services:
     depends_on:
       - company-api
     volumes:
-      - "../Config/:/Config"
-      - "../Components/:/Components"
-      - "../services/company-api/CompanyApi.Service/Dapr:/Dapr"
+      - "/home/eelkhair/Dapr/shared/Config/:/Config"
+      - "/home/eelkhair/Dapr/shared/Components/:/Components"
+      - "/home/eelkhair/Dapr/company-api/:/Dapr"
     network_mode: "service:company-api"
     command: [
       "./daprd",
@@ -148,11 +151,10 @@ services:
       "--app-port", "8080",
       "--dapr-http-port", "6075",
       "--resources-path", "./Components",
-      "--resources-path", "./Dapr/Components/Timers",
       "--resources-path", "./Dapr/Components/Secrets",
       "-config", "./Config/config.yaml"
     ]
-    
+  
   admin-api:
     build:
       context: ../services/admin-api/
@@ -172,9 +174,9 @@ services:
     depends_on:
       - admin-api
     volumes:
-      - "../Config/:/Config"
-      - "../Components/:/Components"
-      - "../services/admin-api/AdminApi.Service/Dapr:/Dapr"
+      - "/home/eelkhair/Dapr/shared/Config/:/Config"
+      - "/home/eelkhair/Dapr/shared/Components/:/Components"
+      - "/home/eelkhair/Dapr/admin-api/:/Dapr"
     network_mode: "service:admin-api"
     command: [
       "./daprd",
@@ -183,37 +185,39 @@ services:
       "--dapr-http-port", "6045",
       "--resources-path", "./Components",
       "--resources-path", "./Dapr/Components",
-      "--resources-path", "./Dapr/Components/Timers",
       "--resources-path", "./Dapr/Components/Secrets",
       "-config", "./Config/config.yaml"
     ]
-      
-  seq:
-    image: datalust/seq:latest
-    ports:
-      - "5341:80"
-    environment: 
-      - ACCEPT_EULA=Y
-      - SEQ_FIRSTRUN_NOAUTHENTICATION=true
-    networks:
-      - ai-job-board-net
-  
+
   job-board-status:
     build:
       context: ../services/HealthChecks
     image: registry.eelkhair.net/health-check:latest
     environment:
       - HealthChecksUI__HealthChecks__0__Name=Admin API
-      - HealthChecksUI__HealthChecks__0__Uri=https://job-admin-api.eelkhair.net/healthzEndpoint 
+      - HealthChecksUI__HealthChecks__0__Uri=https://job-admin-api.eelkhair.net/healthzEndpoint
       - HealthChecksUI__HealthChecks__1__Name=Company API
       - HealthChecksUI__HealthChecks__1__Uri=https://job-company-api.eelkhair.net/healthzEndpoint
       - HealthChecksUI__HealthChecks__2__Name=Job API
       - HealthChecksUI__HealthChecks__2__Uri=https://job-api.eelkhair.net/healthzEndpoint
       - HealthChecksUI__HealthChecks__3__Name=User API
-      - HealthChecksUI__HealthChecks__3__Uri=https://job-user-api.eelkhair.net/healthzEndpoint 
+      - HealthChecksUI__HealthChecks__3__Uri=https://job-users-api.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__4__Name=AI API
+      - HealthChecksUI__HealthChecks__4__Uri=https://job-ai.eelkhair.net/healthzEndpoint
     ports:
       - "5107:8080"
+  
+  seq:
+    image: datalust/seq:latest
+    ports:
+      - "5341:80"
+    environment:
+      - ACCEPT_EULA=Y
+      - SEQ_FIRSTRUN_NOAUTHENTICATION=true
+    networks:
+      - ai-job-board-net
 
 networks:
   ai-job-board-net:
     name: ai-job-board-net
+

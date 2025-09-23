@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { AuthGuard } from '@auth0/auth0-angular';
-
 export const routes: Routes = [
   {
     path: '',
@@ -15,7 +14,7 @@ export const routes: Routes = [
       { path: 'settings', loadChildren:()=> import('./features/settings/settings.routes').then(m => m.SETTINGS_ROUTES) },
     ],
   },
-
   // Fallback
   { path: '**', redirectTo: '' },
+
 ];

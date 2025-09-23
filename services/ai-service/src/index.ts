@@ -1,60 +1,55 @@
-import express from 'express';
-import cors from 'cors';
-const { swaggerUi, swaggerSpec } = require('../settings/swagger');
+import "dotenv/config";
+import Fastify, {FastifyInstance} from "fastify";
+import cors from "@fastify/cors";
+import swagger from "@fastify/swagger";
+import swaggerUi from "@fastify/swagger-ui";
+import {
+    ZodTypeProvider,
+    jsonSchemaTransform,
+    validatorCompiler,
+    serializerCompiler
+} from "fastify-type-provider-zod";
 
-const app = express();
-app.use(cors());
-app.use(express.json());
+import devRoutes from "./routes.dev.js";
+import daprRoutes from "./routes.dapr.js";
+import healthRoutes from "./routes.health.js";
+import traceIdPlugin from "./plugins/trace-id.js"; // ← extension-less
 
-// 👉 Dapr topic discovery
-app.get('/dapr/subscribe', (_req, res) => {
-    // Return [] if you have no pub/sub yet.
-    // When you add topics, return an array of { pubsubname, topic, route } objects.
-    res.type('application/json').send([]);
+const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
+app.setValidatorCompiler(validatorCompiler);
+app.setSerializerCompiler(serializerCompiler);
+await app.register(traceIdPlugin);
+
+await app.register(cors, { origin: true });
+await app.register(swagger, {
+    openapi: { info: { title: "AI Service", version: "1.0.0" } },
+    transform: jsonSchemaTransform,
+});
+await app.register(swaggerUi, { routePrefix: "/docs",
+    uiConfig: {
+        docExpansion: 'none',           // collapse groups
+        tagsSorter: 'alpha',
+        operationsSorter: 'alpha',
+        defaultModelsExpandDepth: -1,   // hide "Schemas/Models"
+    },
 });
 
-/**
- * @swagger
- * /api/ai/hello:
- *   get:
- *     summary: test swagger
- *     responses:
- *       200:
- *         description: success
- */
-app.get('/api/ai/hello', (_req, res) => {
-    res.json({ message: 'Hello from AI service!' });
-});
+    app.get("/api/env", async () => {
+        return {
+            NODE_ENV: process.env.NODE_ENV,
+            PORT: process.env.PORT,
+            PUBSUB_NAME: process.env.PUBSUB_NAME,
+            STATESTORE_NAME: process.env.STATESTORE_NAME,
+            SECRETSTORE_NAME: process.env.SECRETSTORE_NAME,
+            exporter: process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT,
+            zipkin: process.env.OTEL_EXPORTER_ZIPKIN_ENDPOINT
+        };
+    });
 
-/**
- * @swagger
- * /process-text:
- *   post:
- *     summary: Process a text input
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - text
- *             properties:
- *               text:
- *                 type: string
- *     responses:
- *       200:
- *         description: Text successfully processed
- */
-app.post('/process-text', (req, res) => {
-    const { text } = req.body;
-    res.json({ result: `Processed: ${text}` });
-});
+app.get("/", {schema:{hide: true}}, async (request, reply): Promise<any> => reply.redirect("/docs") )
+await app.register(healthRoutes); // livez/readyz/healthzEndpoint
+await app.register(devRoutes);
+await app.register(daprRoutes);
 
-// Swagger last so it doesn't intercept /dapr/* probes
-app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
-const port = Number(process.env.PORT) || 6082;
-app.listen(port, '0.0.0.0', () => {
-    console.log(`AI service running on port ${port}`);
-});
+const port = Number(process.env.PORT ?? 6082);
+await app.listen({ port, host: "0.0.0.0" });

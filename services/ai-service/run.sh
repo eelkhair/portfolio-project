@@ -1,79 +1,111 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 set -euo pipefail
 
-# ==== Fixed config to match docker-compose =====
+# ========= Config =========
 APP_ID="ai-service"
-APP_PORT="6082"          # service port
-DAPR_HTTP_PORT="6083"    # Dapr HTTP port
-DAPR_GRPC_PORT="46082"   # Dapr gRPC (free port for local)
-DAPR_PROFILE_PORT="56082"
-LOG_LEVEL="debug"
-COMPONENTS_PATH="../Components"
-CONFIG_PATH="../Config/config.yaml"
+APP_PORT="${APP_PORT:-6082}"
 
-# ---- helpers ----
+# Liveness vs Readiness
+LIVE_PATH="${LIVE_PATH:-/livez}"
+READY_PATH="${READY_PATH:-/readyz}"
+LIVE_URL="http://127.0.0.1:${APP_PORT}${LIVE_PATH}"
+READY_URL="http://127.0.0.1:${APP_PORT}${READY_PATH}"
+
+# Dapr ports
+DAPR_HTTP_PORT="${DAPR_HTTP_PORT:-6083}"
+DAPR_GRPC_PORT="${DAPR_GRPC_PORT:-46082}"
+DAPR_PROFILE_PORT="${DAPR_PROFILE_PORT:-56082}"
+LOG_LEVEL="${LOG_LEVEL:-debug}"
+
+# Dapr resources/config
+COMPONENTS_PATH="${COMPONENTS_PATH:-../../Components}"
+# FIX: independent second folder (e.g., secrets)
+COMPONENTS_PATH2="${COMPONENTS_PATH2:-Dapr/Components/Secrets}"
+CONFIG_PATH="${CONFIG_PATH:-../../Config/config.yaml}"
+
+# Optional: have daprd probe your app readiness directly
+# set ENABLE_APP_HEALTH=true to enable these flags
+APP_HEALTH_INTERVAL_MS="${APP_HEALTH_INTERVAL_MS:-2000}"
+APP_HEALTH_TIMEOUT_MS="${APP_HEALTH_TIMEOUT_MS:-500}"
+APP_HEALTH_THRESHOLD="${APP_HEALTH_THRESHOLD:-3}"
+
+# ========= Helpers =========
 die(){ echo "❌ $*" >&2; exit 1; }
 have(){ command -v "$1" >/dev/null 2>&1; }
 
 choose_start_cmd() {
-  # prefer start:prod -> start -> dev
-  if [[ -f package.json ]]; then
-    if jq -e '.scripts["start:prod"]' package.json >/dev/null 2>&1; then
-      echo "npm run start:prod"; return
-    elif jq -e '.scripts["start"]' package.json >/dev/null 2>&1; then
-      echo "npm start"; return
-    elif jq -e '.scripts["dev"]' package.json >/dev/null 2>&1; then
-      echo "npm run dev"; return
-    fi
+  # Prefer a built artifact if present; else fall back to dev
+  if [[ -f "dist/index.js" || -f "dist/main.js" ]]; then
+    if jq -e '.scripts["start:prod"]' package.json >/dev/null 2>&1; then echo "npm run start:prod"; return; fi
+    if jq -e '.scripts["start"]'     package.json >/dev/null 2>&1; then echo "npm start";         return; fi
+    [[ -f "dist/index.js" ]] && { echo "node dist/index.js"; return; }
+    [[ -f "dist/main.js"  ]] && { echo "node dist/main.js";  return; }
   fi
-  # fallback
-  if [[ -f "dist/main.js" ]]; then
-    echo "node dist/main.js"; return
-  fi
-  die "Could not infer start command. Add a start script in package.json or build to dist/main.js."
+  if jq -e '.scripts["dev"]' package.json >/dev/null 2>&1; then echo "npm run dev"; return; fi
+  die "No build and no dev script. Add a dev script or build to dist/index.js."
 }
 
-wait_for_port() {
-  local port="$1" tries=60
-  echo "⏳ Waiting for port ${port}..."
-  for _ in $(seq 1 $tries); do
-    if curl -fsS "http://127.0.0.1:${port}" >/dev/null 2>&1; then return 0; fi
-    sleep 0.5
+wait_for_200() {
+  local url="$1" tries="${2:-60}" delay="${3:-0.5}"
+  echo "⏳ Waiting for 200 from ${url} ..."
+  for _ in $(seq 1 "$tries"); do
+    local code
+    code="$(curl -sS -o /dev/null -w '%{http_code}' "$url" || true)"
+    if [[ "$code" == "200" ]]; then
+      echo "✅ 200 from ${url}"
+      return 0
+    fi
+    sleep "$delay"
   done
+  echo "⚠️  No 200 from ${url} within timeout."
   return 1
 }
 
-# ---- checks ----
+cleanup(){
+  echo -e "\n🧹 Stopping..."
+  [[ -n "${DAPR_PID:-}" ]] && kill "$DAPR_PID" 2>/dev/null || true
+  [[ -n "${APP_PID:-}"  ]] && kill "$APP_PID"  2>/dev/null || true
+}
+trap cleanup EXIT INT TERM
+
+# ========= Pre-flight =========
 have jq    || die "jq is required (reads package.json)."
 have daprd || die "daprd not found. Install the Dapr CLI."
-[[ -d "$COMPONENTS_PATH" ]] || echo "⚠️  Missing ${COMPONENTS_PATH} (continuing)"
-[[ -f "$CONFIG_PATH"     ]] || echo "⚠️  Missing ${CONFIG_PATH} (continuing)"
 
-# ---- deps (only if node project and node_modules missing) ----
+[[ -d "$COMPONENTS_PATH"  ]] || echo "⚠️  Missing ${COMPONENTS_PATH} (continuing)"
+[[ -d "$COMPONENTS_PATH2" ]] || echo "⚠️  Missing ${COMPONENTS_PATH2} (continuing)"
+[[ -f "$CONFIG_PATH"      ]] || echo "⚠️  Missing ${CONFIG_PATH} (continuing)"
+
+# Auto-install deps for dev convenience
 if [[ -f package.json && ! -d node_modules ]]; then
   echo "📦 Installing dependencies..."
   npm ci || npm install
 fi
 
-# ---- start app ----
+# ========= Start app =========
 APP_CMD="$(choose_start_cmd)"
 echo "▶️  Starting app: ${APP_CMD}"
 bash -lc "${APP_CMD}" &
 APP_PID=$!
 
-cleanup(){
-  echo -e "\n🧹 Stopping..."
-  [[ -n "${DAPR_PID:-}" && -e /proc/$DAPR_PID ]] && kill "$DAPR_PID" || true
-  [[ -e /proc/$APP_PID ]] && kill "$APP_PID" || true
-}
-trap cleanup EXIT INT TERM
+# Wait for LIVENESS only (server listening)
+wait_for_200 "$LIVE_URL" 120 0.5 || echo "ℹ️  Continuing even though liveness not OK yet."
 
-if ! wait_for_port "$APP_PORT"; then
-  echo "⚠️  App hasn't opened ${APP_PORT} yet; starting daprd anyway."
+# ========= Start Dapr =========
+echo "🚀 Starting daprd (HTTP ${DAPR_HTTP_PORT}, gRPC ${DAPR_GRPC_PORT})..."
+
+# Build optional app-health args
+DAPR_APP_HEALTH_ARGS=()
+if [[ "${ENABLE_APP_HEALTH:-false}" == "true" ]]; then
+  DAPR_APP_HEALTH_ARGS+=(
+    --enable-app-health-check
+    --app-health-probe-interval "${APP_HEALTH_INTERVAL_MS}"
+    --app-health-probe-timeout  "${APP_HEALTH_TIMEOUT_MS}"
+    --app-health-threshold      "${APP_HEALTH_THRESHOLD}"
+    --app-health-check-path     "${READY_PATH}"
+  )
 fi
 
-# ---- start dapr sidecar ----
-echo "🚀 Starting daprd (HTTP ${DAPR_HTTP_PORT}, gRPC ${DAPR_GRPC_PORT})..."
 daprd \
   --app-id         "${APP_ID}" \
   --app-port       "${APP_PORT}" \
@@ -81,13 +113,25 @@ daprd \
   --dapr-grpc-port "${DAPR_GRPC_PORT}" \
   --profile-port   "${DAPR_PROFILE_PORT}" \
   --resources-path "${COMPONENTS_PATH}" \
+  --resources-path "${COMPONENTS_PATH2}" \
   --config         "${CONFIG_PATH}" \
-  --log-level      "${LOG_LEVEL}" &
-
+  --log-level      "${LOG_LEVEL}" \
+  "${DAPR_APP_HEALTH_ARGS[@]}" &
 DAPR_PID=$!
 
-echo "✅ ai-service running
-   App:  http://localhost:${APP_PORT}
-   Dapr: http://localhost:${DAPR_HTTP_PORT}  (gRPC ${DAPR_GRPC_PORT})
-Press Ctrl+C to stop."
+# (Optional) Wait for READINESS after daprd is up
+wait_for_200 "$READY_URL" 240 1 || echo "ℹ️  App not ready yet; Dapr started anyway."
+
+cat <<EOF
+
+✅ ${APP_ID} running
+   App:   http://localhost:${APP_PORT}
+          Live:  ${LIVE_URL}
+          Ready: ${READY_URL}
+   Dapr:  http://localhost:${DAPR_HTTP_PORT}  (gRPC ${DAPR_GRPC_PORT})
+
+Press Ctrl+C to stop.
+EOF
+
+# Block on children
 wait

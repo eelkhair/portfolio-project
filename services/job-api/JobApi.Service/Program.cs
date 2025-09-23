@@ -91,7 +91,6 @@ builder.AddCustomHealthChecks();
 builder.Services.AddScoped<IJobDbContext, JobDbContext>();
 builder.Services.AddScoped<ICompanyCommandService, CompanyCommandService>();
 builder.ConfigureLoggingAndTracing("job-api");
-// Add Authorization support (even if not using yet)
 
 builder.Services.AddAuthentication(options =>
     {
