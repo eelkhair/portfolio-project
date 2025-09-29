@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 using UserApi.Application.Commands.Interfaces;
 using UserAPI.Contracts.Models.Requests;
 using UserApi.Infrastructure.Data;
@@ -10,6 +11,12 @@ public class CompanyCommandService(IUserDbContext context): ICompanyCommandServi
 {
     public async Task<int> CreateUser(CreateUserRequest request, ClaimsPrincipal principal, CancellationToken ct)
     {
+        var existing = await context.Users.SingleOrDefaultAsync(c=> c.Email == request.Email, ct);
+        if (existing is not null)
+        {
+            return existing.Id;
+        }
+        
         var user = new User
         {
             FirstName = request.FirstName,

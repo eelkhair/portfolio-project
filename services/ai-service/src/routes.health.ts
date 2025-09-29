@@ -30,6 +30,7 @@ export default async function healthRoutes(app: FastifyInstance) {
     app.addHook('onRoute', (r) => {
         r.schema ??= {};
         r.schema.tags ??= ['health'];
+        r.schema.hide =true;
     });
 
     let lastReadyAt = 0;

@@ -57,6 +57,7 @@ public class Auth0CommandService(ActivitySource activitySource, IAuth0Factory fa
             FirstName = user.FirstName,
             LastName = user.LastName,
             CreatedAt = DateTime.UtcNow,
+            UserMetadata = new Dictionary<string, string> { { user.CompanyUId.ToString() , "company-admin"}}
         };
 
         Resource ??=  await factory.GetAuth0ResourceAsync(ct);

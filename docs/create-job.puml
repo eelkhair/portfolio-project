@@ -1,0 +1,35 @@
+﻿@startuml
+title Job Creation Event Flow
+
+actor Employer
+participant "Job Admin UI\n(Angular)" as AdminUI
+participant "Admin API\n(.NET)" as AdminAPI
+participant "Job API\n(.NET)" as JobAPI
+database "SQL Server\n(JobDb)" as SQL
+queue "RabbitMQ / Dapr PubSub" as Bus
+participant "AI Service\n(Node.js)" as AIService
+database "Cosmos DB\n(AI Jobs)" as Cosmos
+participant "OpenAI" as OpenAI
+
+== Job Creation ==
+Employer -> AdminUI : Submit job form
+AdminUI -> AdminAPI : POST /jobs
+AdminAPI -> JobAPI : CreateJob(command)
+JobAPI -> SQL : Insert job metadata
+SQL --> JobAPI : OK
+JobAPI -> Bus : Publish job.created (jobId, companyId)
+JobAPI --> AdminAPI : Return JobId
+AdminAPI --> AdminUI : Job created confirmation
+
+== AI Service Reaction ==
+Bus -> AIService : job.created event
+AIService -> JobAPI : Fetch job details\n(jobId, description)
+JobAPI --> AIService : Job metadata + description
+
+AIService -> Cosmos : Store original job description
+AIService -> OpenAI : Generate embeddings + rewritten text
+OpenAI --> AIService : Response (embedding + rewrite)
+AIService -> Cosmos : Save embeddings + enhanced description
+AIService -> Bus : Publish job.ai.enriched event (optional)
+
+@enduml

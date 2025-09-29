@@ -10,8 +10,6 @@ public class CompanyCommandService(DaprClient client, UserContextService accesso
 {
     public async Task<ApiResponse<CompanyResponse>> CreateAsync(CreateCompanyRequest request, CancellationToken ct)
     {
-        var c = client.CreateInvokeMethodRequest(HttpMethod.Get, "ai-service", "api/env");
-        var d= await client.InvokeMethodAsync<Dictionary<string,string>>(c, cancellationToken: ct);
         var message = client.CreateInvokeMethodRequest(HttpMethod.Post, "company-api", "companies");
         message.Headers.Add("Authorization", accessor.GetHeader("Authorization"));
         message.Content=  JsonContent.Create(request);

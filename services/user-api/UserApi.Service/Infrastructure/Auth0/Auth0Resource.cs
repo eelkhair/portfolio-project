@@ -48,13 +48,34 @@ public class Auth0Resource(ManagementApiClient client) : IAuth0Resource
     {
         try
         {
+            var existingUsers = await client.Users.GetUsersByEmailAsync(user.Email, cancellationToken:ct);
+            if (existingUsers.Any())
+            {
+                var metadata =(existingUsers[0].UserMetadata);
+                var dict = (Dictionary<string, object>) metadata.ToObject<Dictionary<string, object>>();
+               
+                var model = (Dictionary<string, string>) user.UserMetadata;
+
+                foreach (var (key, value) in model)
+                {
+                    dict.Add(key, value);
+                }
+	
+                await client.Users.UpdateAsync(existingUsers[0].UserId,
+                    new UserUpdateRequest
+                    {
+                        UserMetadata= dict
+                    }, ct);
+                return OkResult(existingUsers[0]);
+            }
             var created = await client.Users.CreateAsync(new UserCreateRequest
             {
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email,
                 Password = "Yamin2025!",
-                Connection = "Username-Password-Authentication"
+                Connection = "Username-Password-Authentication",
+                UserMetadata = user.UserMetadata
             },ct);
             
             return CreatedResult(created);

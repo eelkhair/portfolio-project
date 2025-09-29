@@ -1,5 +1,5 @@
 import "dotenv/config";
-import Fastify, {FastifyInstance} from "fastify";
+import Fastify from "fastify";
 import cors from "@fastify/cors";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
@@ -13,7 +13,10 @@ import {
 import devRoutes from "./routes.dev.js";
 import daprRoutes from "./routes.dapr.js";
 import healthRoutes from "./routes.health.js";
-import traceIdPlugin from "./plugins/trace-id.js"; // ← extension-less
+import traceIdPlugin from "./plugins/trace-id.js";
+import aiRoutes from "./routes.ai.js";
+import {OpenAIService} from "./lib/openai.service.js";
+import {env} from "./config.js"; // ← extension-less
 
 const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
 app.setValidatorCompiler(validatorCompiler);
@@ -34,7 +37,7 @@ await app.register(swaggerUi, { routePrefix: "/docs",
     },
 });
 
-    app.get("/api/env", async () => {
+    app.get("/api/env", {schema:{hide: true}}, async () => {
         return {
             NODE_ENV: process.env.NODE_ENV,
             PORT: process.env.PORT,
@@ -47,9 +50,14 @@ await app.register(swaggerUi, { routePrefix: "/docs",
     });
 
 app.get("/", {schema:{hide: true}}, async (request, reply): Promise<any> => reply.redirect("/docs") )
+
+
+const service = new OpenAIService({ apiKey: env.OPENAI_API_KEY, model: env.OPENAI_MODEL });
+
 await app.register(healthRoutes); // livez/readyz/healthzEndpoint
 await app.register(devRoutes);
 await app.register(daprRoutes);
+await app.register(aiRoutes,{service});
 
 const port = Number(process.env.PORT ?? 6082);
 await app.listen({ port, host: "0.0.0.0" });
