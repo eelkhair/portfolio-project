@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject, input, OnInit} from '@angular/core';
 import {JobsStore} from '../../../features/jobs/jobs.store';
 import {CompanySelectionStore} from './company-selection.store';
 import {Select} from 'primeng/select';
@@ -15,6 +15,7 @@ import {Button} from 'primeng/button';
 })
 export class CompanySelection implements OnInit {
   store = inject(CompanySelectionStore);
+  title = input<string>('');
   ngOnInit() {
     if (!this.store.selectedCompany()) {
       this.store.populateCompanies();
