@@ -1,20 +1,25 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, effect, inject, OnDestroy} from '@angular/core';
+import {CompanySelection} from '../../shared/companies/company-selection/company-selection';
+import {CompanySelectionStore} from '../../shared/companies/company-selection/company-selection.store';
 import {JobsStore} from './jobs.store';
-import {ReactiveFormsModule} from '@angular/forms';
-import {Select} from 'primeng/select';
 
 @Component({
   selector: 'app-jobs',
   imports: [
-    ReactiveFormsModule,
-    Select
+    CompanySelection
   ],
   templateUrl: './jobs.html',
   styleUrl: './jobs.css'
 })
-export class Jobs implements OnInit {
+export class Jobs{
+  companySelectionStore = inject(CompanySelectionStore);
   store = inject(JobsStore);
-  ngOnInit() {
-    this.store.populateCompanies();
+  selectedCompany = this.companySelectionStore.selectedCompany;
+  constructor() {
+    effect(() => {
+      if(this.selectedCompany()) {
+        console.log(this.selectedCompany());
+      }
+    });
   }
 }

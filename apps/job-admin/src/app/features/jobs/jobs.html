@@ -1,17 +1,4 @@
-
-@if(store.company(); as company ){
-{{ company.name}}
-}@else{
-  <div class="flex justify-center">
-    <p-select
-      [options]="store.companiesList()"
-      placeholder="Select Company"
-      appendTo="body"
-      required
-      optionValue="uId"
-      optionLabel="name">
-    </p-select>
-  </div>
-}
+<app-company-selection/>
+{{ selectedCompany()?.name}}
 
 

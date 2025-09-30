@@ -23,8 +23,6 @@ export class CompanyStore{
     effect(()=>{
       const activated = this.realtimeNotificationService.companyActivated();
       if (!activated) return;
-
-
       this.companies.update(list =>
         list.map(c => c.uId === activated.companyUId
           ? { ...c, status: 'Active' }
