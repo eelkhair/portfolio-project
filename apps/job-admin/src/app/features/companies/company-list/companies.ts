@@ -21,7 +21,7 @@ import {Router} from '@angular/router';
 export class Companies implements OnInit {
   store = inject(CompanyStore);
   companies = this.store.companies;
-  theme = themeQuartz; // new theming API
+  theme = themeQuartz;
   router = inject(Router);
   colDefs: ColDef[] = [
     { field: 'uId', autoHeight: true,

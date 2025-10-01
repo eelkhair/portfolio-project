@@ -21,12 +21,6 @@ export class Nav implements OnInit {
     const apply = () => {
       const url = this.router.url;
       this.items.forEach(group => {
-        // group.expanded = (group.items ?? []).some(c =>
-        //   typeof c.routerLink === 'string'
-        //     ? url.startsWith(c.routerLink as string)
-        //     : false
-        // );
-
         (group.items ?? []).forEach(c => {
           (c as any).styleClass = (typeof c.routerLink === 'string' && url.startsWith(c.routerLink as string))
             ? 'router-active'

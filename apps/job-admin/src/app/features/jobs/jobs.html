@@ -1,6 +1,13 @@
 <app-company-selection title="Jobs for"/>
 @if(store.selectedCompany(); as company){
-  <div class="flex w-full mt-4"></div>
+  <div class="flex w-full mt-4">
+    <ag-grid-angular class="w-full" style="height:650px"
+                     [rowData]="store.jobs()"
+                     [columnDefs]="colDefs"
+                     [pagination]="true"
+                     [theme]="theme">
+    </ag-grid-angular>
+  </div>
 }
 
 
