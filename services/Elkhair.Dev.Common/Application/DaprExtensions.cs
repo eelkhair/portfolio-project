@@ -35,6 +35,7 @@ public static class DaprExtensions
         }
         catch (InvocationException e)
         {
+            var errorText = await e.Response.Content.ReadAsStringAsync();
             var error = await e.Response.Content.ReadFromJsonAsync<ApiError>();   
             return new ApiResponse<T>()
             {

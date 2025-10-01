@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Reflection;
 using System.Security.Claims;
 using Elkhair.Dev.Common.Application;
 using FastEndpoints;
@@ -13,6 +14,7 @@ using JobApi.Features.Jobs.Create;
 using JobApi.Infrastructure;
 using JobApi.Infrastructure.Data;
 using JobBoard.HealthChecks;
+using Mapster;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -24,7 +26,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 var cfg = builder.Configuration;
 // Register FastEndpoints + Swagger
+var mapsterConfig = TypeAdapterConfig.GlobalSettings;
+mapsterConfig.Scan(Assembly.GetExecutingAssembly());
 
+builder.Services.AddSingleton(mapsterConfig);
 builder.Services.AddFastEndpoints()
     .SwaggerDocument(o =>
     {
@@ -90,6 +95,7 @@ builder.Services.AddDbContext<JobDbContext>(options =>
 builder.AddCustomHealthChecks();
 builder.Services.AddScoped<IJobDbContext, JobDbContext>();
 builder.Services.AddScoped<ICompanyCommandService, CompanyCommandService>();
+builder.Services.AddScoped<IJobQueryService, JobQueryService>();
 builder.ConfigureLoggingAndTracing("job-api");
 
 builder.Services.AddAuthentication(options =>

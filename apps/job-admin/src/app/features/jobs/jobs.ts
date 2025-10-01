@@ -1,6 +1,5 @@
-import {Component, effect, inject, OnDestroy} from '@angular/core';
+import {Component, effect, inject, OnDestroy, signal} from '@angular/core';
 import {CompanySelection} from '../../shared/companies/company-selection/company-selection';
-import {CompanySelectionStore} from '../../shared/companies/company-selection/company-selection.store';
 import {JobsStore} from './jobs.store';
 
 @Component({
@@ -12,13 +11,11 @@ import {JobsStore} from './jobs.store';
   styleUrl: './jobs.css'
 })
 export class Jobs{
-  companySelectionStore = inject(CompanySelectionStore);
   store = inject(JobsStore);
-  selectedCompany = this.companySelectionStore.selectedCompany;
   constructor() {
     effect(() => {
-      if(this.selectedCompany()) {
-        console.log(this.selectedCompany());
+      if(this.store.selectedCompany()) {
+        this.store.loadJobs();
       }
     });
   }

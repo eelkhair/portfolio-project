@@ -13,5 +13,5 @@ public class Job : BaseAuditableEntity
     public string? SalaryRange { get; set; }
     public ICollection<Responsibility> Responsibilities { get; set; } = [];
     public ICollection<Qualification> Qualifications { get; set; } = [];
-    public Company? Company { get; set; }
+    public Company Company { get; set; } = null!;
 }

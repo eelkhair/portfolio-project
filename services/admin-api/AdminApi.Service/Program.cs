@@ -72,6 +72,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICompanyQueryService, CompanyQueryService>();
 builder.Services.AddScoped<ICompanyCommandService, CompanyCommandService>();
 builder.Services.AddScoped<IIndustryQueryService, IndustryQueryService>();
+builder.Services.AddScoped<IJobQueryService, JobQueryService>();
 
 builder.ConfigureLoggingAndTracing("admin-api");
 
