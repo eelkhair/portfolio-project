@@ -1,5 +1,5 @@
 ﻿using AdminApi.Application.Queries.Interfaces;
-using AdminAPI.Contracts.Models.Jobs.Responses;
+using JobAPI.Contracts.Models.Jobs.Responses;
 using Elkhair.Dev.Common.Application;
 using FastEndpoints;
 

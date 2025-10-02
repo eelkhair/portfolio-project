@@ -1,15 +1,19 @@
-import {Component, effect, inject, OnDestroy, signal} from '@angular/core';
+import {Component, effect, inject} from '@angular/core';
 import {CompanySelection} from '../../shared/companies/company-selection/company-selection';
 import {JobsStore} from './jobs.store';
 import {ColDef, themeQuartz} from 'ag-grid-community';
-import {AgButton} from '../../shared/ag-button/ag-button';
 import {AgGridAngular} from 'ag-grid-angular';
+import {AgButton} from '../../shared/ag-button/ag-button';
+import {Button} from 'primeng/button';
+import {RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-jobs',
   imports: [
     CompanySelection,
-    AgGridAngular
+    AgGridAngular,
+    Button,
+    RouterLink
   ],
   templateUrl: './jobs.html',
   styleUrl: './jobs.css'
@@ -19,14 +23,18 @@ export class Jobs{
   theme = themeQuartz;
 
   colDefs: ColDef[] = [
-    {
-      field: 'uId', autoHeight: true,
-      width: 100
-    },
-    { field: 'name' },
-    { field: 'website' },
-    { field: 'email' },
-    { field: 'status'},
+    { field: 'uId', autoHeight: true,
+      cellRenderer: AgButton,
+      width:100,
+      cellRendererParams: (e:any)=>{
+        return { click:()=>{
+            alert(e.value);
+          //  void this.router.navigateByUrl('/companies/'+ e.value);
+          }
+        }
+      }},
+    { field: 'title' },
+    { field: 'location'},
     {
       field: 'createdAt',
       valueFormatter: ({ value }) =>

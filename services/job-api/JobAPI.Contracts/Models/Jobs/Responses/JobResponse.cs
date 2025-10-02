@@ -7,7 +7,8 @@ public class JobResponse
 {
     public Guid UId { get; set; }
     public string Title { get; set; }
-    public CompanyResponse? Company { get; set; } = null!;
+    public Guid CompanyUId { get; set; }
+    public string CompanyName { get; set; }
     public string Location { get; set; }
     public JobType JobType { get; set; }
     public string AboutRole { get; set; }

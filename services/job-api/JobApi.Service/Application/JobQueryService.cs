@@ -10,7 +10,12 @@ public class JobQueryService(IJobDbContext context): IJobQueryService
 {
     public async Task<List<JobResponse>> ListAsync(Guid companyUId, CancellationToken ct)
     {
-        var jobs = await context.Jobs.Where(c => c.Company.UId == companyUId).ToListAsync(ct);
+        var jobs = await context.Jobs.Where(c => c.Company.UId == companyUId)
+            
+            .Include(c=>c.Company)
+            .Include(c=>c.Qualifications)
+            .Include(c=>c.Responsibilities)
+            .ToListAsync(ct);
         
         return jobs.Adapt<List<JobResponse>>();
     }

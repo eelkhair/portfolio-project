@@ -1,4 +1,4 @@
-import {Component, ViewEncapsulation} from '@angular/core';
+import {Component} from '@angular/core';
 import {ICellRendererAngularComp} from 'ag-grid-angular';
 import { ICellRendererParams } from 'ag-grid-community';
 import {Button} from 'primeng/button';

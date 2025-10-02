@@ -1,1 +1,64 @@
-<p>job-upsert works!</p>
+@if(store.selectedCompany()){
+  <div class="flex justify-between">
+    <app-company-selection title="Create job for"/>
+    <p-button label="Create Job" icon="pi pi-plus"/>
+  </div>
+}@else{
+  <app-company-selection title="Create job for"/>
+}
+
+@if(store.selectedCompany(); as company){
+  <div class="flex mt-8 w-full justify-between gap-10">
+    <div class="flex w-full flex-col gap-4">
+      <div class="w-full flex gap-5 items-center">
+        <label for="title" class="text-lg w-28">Title</label>
+        <input pInputText name="title" id="title" placeholder="Title" class="w-full"/>
+      </div>
+      <div >
+        <div class="w-full flex gap-5 items-center">
+          <label for="aboutRole" class="text-lg w-28">About Role</label>
+          <textarea   rows="8" pTextarea name="aboutRole" id="aboutRole" placeholder="About Role" class="w-full"></textarea>
+        </div>
+        <div class=" text-blue-600 cursor-pointer font-bold justify-end flex w-full">Enhance with AI</div>
+
+      </div>
+
+      <div class="w-full flex gap-5 items-center">
+        <label for="location" class="text-lg w-28">Location</label>
+        <input pInputText name="location" id="location" placeholder="Location" class="w-full"/>
+      </div>
+      <div class="w-full flex gap-5 items-center">
+        <label for="jobType" class="text-lg w-28">Job Type</label>
+        <input pInputText name="jobType" id="jobType" placeholder="Job Type" class="w-full"/>
+      </div>
+      <div class="w-full flex gap-5 items-center">
+        <label for="salaryRange" class="text-lg w-28">Salary Range</label>
+        <input pInputText name="salaryRange" id="salaryRange" placeholder="Salary Range" class="w-full"/>
+      </div>
+    </div>
+
+    <div class="w-full flex flex-col gap-4" >
+      <div>
+        <div class="w-full flex gap-5 items-center">
+          <label for="responsibilities" class="text-lg w-28">Responsibilities</label>
+          <textarea pTextarea rows="8" name="responsibilities" id="responsibilities" placeholder="Responsibilities" class="w-7/8"></textarea>
+        </div>
+        <span class="float-end text-blue-600 cursor-pointer font-bold">Enhance with AI</span>
+      </div>
+      <div>
+        <div class="w-full flex gap-5 items-center">
+          <label for="qualifications" class="text-lg w-28">Qualifications</label>
+          <textarea pTextarea rows="8" name="qualifications" id="qualifications" placeholder="Qualifications" class="w-7/8"></textarea>
+        </div>
+        <span class="float-end text-blue-600 cursor-pointer font-bold">Enhance with AI</span>
+
+      </div>
+
+    </div>
+  </div>
+  <div class="flex justify-center mt-10">
+    <p-button label="Create Job" icon="pi pi-plus"/>
+  </div>
+
+
+}

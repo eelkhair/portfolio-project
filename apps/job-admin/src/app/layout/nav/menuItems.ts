@@ -17,6 +17,7 @@ export class NavItems{
         label: 'Jobs', icon: 'pi pi-briefcase',
         items: [
           { label: 'All Jobs', icon: 'pi pi-list', routerLink: '/jobs', routerLinkActiveOptions: {exact: true} },
+          { label: 'Create Job', icon: 'pi pi-plus', routerLink: '/jobs/new' },
           { label: 'Drafts', icon: 'pi pi-file', routerLink: '/jobs/drafts' },
         ]
       },

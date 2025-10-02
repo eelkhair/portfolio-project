@@ -96,6 +96,7 @@ builder.AddCustomHealthChecks();
 builder.Services.AddScoped<IJobDbContext, JobDbContext>();
 builder.Services.AddScoped<ICompanyCommandService, CompanyCommandService>();
 builder.Services.AddScoped<IJobQueryService, JobQueryService>();
+builder.Services.AddScoped<IJobCommandService, JobCommandService>();
 builder.ConfigureLoggingAndTracing("job-api");
 
 builder.Services.AddAuthentication(options =>

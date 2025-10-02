@@ -1,10 +1,11 @@
 ﻿using FastEndpoints;
+using JobApi.Application.Interfaces;
 using JobAPI.Contracts.Models.Jobs.Requests;
 using JobAPI.Contracts.Models.Jobs.Responses;
 
 namespace JobApi.Features.Jobs.Create;
 
-public class CreateJobEndpoint :  Endpoint<CreateJobRequest, JobResponse>
+public class CreateJobEndpoint(IJobCommandService service) :  Endpoint<CreateJobRequest, JobResponse>
 {
     public override void Configure()
     {
@@ -15,9 +16,8 @@ public class CreateJobEndpoint :  Endpoint<CreateJobRequest, JobResponse>
 
     public override async Task HandleAsync(CreateJobRequest request, CancellationToken ct)
     {
-   
-        await SendAsync(new JobResponse()
-      , cancellation:ct);
+        var response = await service.CreateJobAsync(request, User, ct);
+        await SendAsync(response, cancellation:ct);
     }
 }
 

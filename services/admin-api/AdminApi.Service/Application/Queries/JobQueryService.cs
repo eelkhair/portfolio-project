@@ -1,7 +1,7 @@
 ﻿using AdminApi.Application.Queries.Interfaces;
-using AdminAPI.Contracts.Models.Jobs.Responses;
 using Dapr.Client;
 using Elkhair.Dev.Common.Application;
+using JobAPI.Contracts.Models.Jobs.Responses;
 
 namespace AdminApi.Application.Queries;
 

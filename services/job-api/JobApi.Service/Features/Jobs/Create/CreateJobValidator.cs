@@ -11,6 +11,7 @@ public class CreateJobValidator : Validator<CreateJobRequest>
     public CreateJobValidator()
     {
         RuleFor(c => c.Title).NotEmpty();
+        RuleFor(c => c.AboutRole).NotEmpty();
 
         RuleFor(c => c.CompanyUId)
             .MustAsync(CompanyExists)
