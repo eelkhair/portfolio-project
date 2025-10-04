@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
-import { getContainer } from "./lib/cosmos.js";
-import {tracer} from "./tracing.js";
+import { getContainer } from "../lib/cosmos.js";
+import {tracer} from "../tracing.js";
 import {SpanStatusCode} from "@opentelemetry/api";
 
 export default async function devRoutes(app: FastifyInstance) {

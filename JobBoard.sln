@@ -104,6 +104,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{8F216E64-A
 		docs\README.md = docs\README.md
 		docs\create-company.puml = docs\create-company.puml
 		docs\create-job.puml = docs\create-job.puml
+		docs\ai-service-visual-handbook-with-tables.pdf = docs\ai-service-visual-handbook-with-tables.pdf
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HealthChecks", "HealthChecks", "{73ECFB93-CBD2-4EB8-9356-AF2E8F63E712}"

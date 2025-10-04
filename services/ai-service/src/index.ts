@@ -10,13 +10,14 @@ import {
     serializerCompiler
 } from "fastify-type-provider-zod";
 
-import devRoutes from "./routes.dev.js";
-import daprRoutes from "./routes.dapr.js";
-import healthRoutes from "./routes.health.js";
+import devRoutes from "./routes/routes.dev.js";
+import daprRoutes from "./routes/routes.dapr.js";
+import healthRoutes from "./routes/routes.health.js";
 import traceIdPlugin from "./plugins/trace-id.js";
-import aiRoutes from "./routes.ai.js";
+import aiRoutes from "./routes/routes.ai.js";
 import {OpenAIService} from "./lib/openai.service.js";
-import {env} from "./config.js"; // ← extension-less
+import {env} from "./config.js";
+import jobsGenerate from "./routes/jobs-generate.js"; // ← extension-less
 
 const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
 app.setValidatorCompiler(validatorCompiler);
@@ -58,6 +59,7 @@ await app.register(healthRoutes); // livez/readyz/healthzEndpoint
 await app.register(devRoutes);
 await app.register(daprRoutes);
 await app.register(aiRoutes,{service});
+await app.register(jobsGenerate);
 
 const port = Number(process.env.PORT ?? 6082);
 await app.listen({ port, host: "0.0.0.0" });
