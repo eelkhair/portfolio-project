@@ -8,6 +8,7 @@ import {FormArray, FormBuilder, FormControl, ReactiveFormsModule, Validators} fr
 import {JobType} from '../../../core/types/Dtos/CreateJobRequest';
 import {Select} from 'primeng/select';
 import {Tooltip} from 'primeng/tooltip';
+import {JobGenerate} from '../job-generate/job-generate';
 
 @Component({
   selector: 'app-job-upsert',
@@ -19,7 +20,8 @@ import {Tooltip} from 'primeng/tooltip';
     ReactiveFormsModule,
     Select,
     ButtonDirective,
-    Tooltip
+    Tooltip,
+    JobGenerate
   ],
   templateUrl: './job-upsert.html',
   styleUrl: './job-upsert.css'
@@ -27,14 +29,7 @@ import {Tooltip} from 'primeng/tooltip';
 export class JobUpsert implements OnInit {
   store = inject(JobsStore)
   private fb = inject(FormBuilder)
-  jobTypes: { label: string; value: JobType }[] = [
-    { label: 'Full time', value: 'FullTime' },
-    { label: 'Part time', value: 'PartTime' },
-    { label: 'Contract',  value: 'Contract' },
-    { label: 'Internship', value: 'Internship' },
-    { label: 'Temporary', value: 'Temporary' },
-    { label: 'Other',     value: 'Other' },
-  ];
+  company = computed(() => this.store.selectedCompany());
 
   form = this.fb.nonNullable.group({
     title: ['', Validators.required],
@@ -45,6 +40,15 @@ export class JobUpsert implements OnInit {
     responsibilities: this.fb.array<FormControl<string>>([]),
     qualifications: this.fb.array<FormControl<string>>([]),
   });
+
+  jobTypes: { label: string; value: JobType }[] = [
+    { label: 'Full time', value: 'FullTime' },
+    { label: 'Part time', value: 'PartTime' },
+    { label: 'Contract',  value: 'Contract' },
+    { label: 'Internship', value: 'Internship' },
+    { label: 'Temporary', value: 'Temporary' },
+    { label: 'Other',     value: 'Other' },
+  ];
   ngOnInit() {
     // this.setStringArray('responsibilities', [
     //   'Own core module architecture',
@@ -52,6 +56,7 @@ export class JobUpsert implements OnInit {
     //   'Document tech decisions',
     // ]);
   }
+
   responsibilities(): FormArray<FormControl<string>> {
     return this.form.controls.responsibilities;
   }
@@ -73,12 +78,6 @@ export class JobUpsert implements OnInit {
     this.qualifications().removeAt(i);
   }
 
-  submit(){
-    console.log(this.form.value);
-  }
-
-  company = computed(() => this.store.selectedCompany());
-
   private setStringArray(
     key: 'responsibilities' | 'qualifications',
     values: string[]
@@ -98,5 +97,12 @@ export class JobUpsert implements OnInit {
       text = this.form.controls.qualifications.value[i]
     }
     console.log(text);
+  }
+
+  submit(){
+    console.log(this.form.value);
+  }
+  saveDraft() {
+
   }
 }

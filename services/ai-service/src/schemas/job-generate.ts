@@ -2,7 +2,7 @@ import {z} from "zod";
 
 export const JobGenRequest = z.object({
     brief: z.string().min(10),
-    roleLevel: z.enum(["junior","mid","senior"]).default("mid"),
+    roleLevel: z.enum(["junior","mid","senior", "staff","principal"]).default("mid"),
     tone: z.enum(["neutral","concise","friendly"]).default("neutral"),
     maxBullets: z.number().int().min(3).max(8).default(6),
     companyName: z.string().optional(),
@@ -23,7 +23,7 @@ export const JobGenResponse = z.object({
     notes: z.string().max(600),
     location: z.string().optional(),
     metadata: z.object({
-        roleLevel: z.enum(["junior","mid","senior"]),
+        roleLevel: z.enum(["junior","mid","senior", "staff", "principal"]).default("mid"),
         tone: z.enum(["neutral","concise","friendly"])
     })
 });

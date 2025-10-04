@@ -59,7 +59,7 @@ await app.register(healthRoutes); // livez/readyz/healthzEndpoint
 await app.register(devRoutes);
 await app.register(daprRoutes);
 await app.register(aiRoutes,{service});
-await app.register(jobsGenerate);
+await app.register(jobsGenerate, {service});
 
 const port = Number(process.env.PORT ?? 6082);
 await app.listen({ port, host: "0.0.0.0" });

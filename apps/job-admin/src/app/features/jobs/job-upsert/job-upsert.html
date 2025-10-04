@@ -1,9 +1,17 @@
 <form [formGroup]="form" (ngSubmit)="submit()">
-  @if(store.selectedCompany()){
+  @if(store.selectedCompany(); as c){
     <div class="flex justify-between">
       <app-company-selection title="Create job for"/>
-      <p-button label="Create Job" icon="pi pi-plus" type="submit"/>
+      <div class="flex gap-3">
+        <button pButton label="Prefill with AI"
+                  class="bg-white border-purple-600 hover:bg-purple-100 text-purple-600"
+
+                icon="pi pi-sparkles" type="button" (click)="store.showGenerate.set(true)"></button>
+        <p-button label="Save Draft" icon="pi pi-bookmark" type="button" (click)="saveDraft()"/>
+        <p-button label="Publish Job" icon="pi pi-save" type="submit"/>
+      </div>
     </div>
+    <app-job-generate [companyName] = "c.name??''"/>
   }@else{
     <app-company-selection title="Create job for"/>
   }
@@ -45,8 +53,6 @@
           </div>
         </div>
         <div class="w-full flex flex-col gap-8">
-
-          <!-- Responsibilities -->
           <div>
             <label class="text-lg block mb-2">Responsibilities</label>
             <div formArrayName="responsibilities" class="flex flex-col gap-3">
@@ -75,8 +81,6 @@
                       (click)="addResponsibility()"></button>
             </div>
           </div>
-
-          <!-- Qualifications -->
           <div>
             <label class="text-lg block mb-2">Qualifications</label>
             <div formArrayName="qualifications" class="flex flex-col gap-3">
@@ -103,14 +107,11 @@
             <div class="flex justify-between mt-2">
               <button pButton type="button" icon="pi pi-plus" label="Add"
                       (click)="addQualification()"></button>
-
             </div>
           </div>
 
         </div>
       </div>
-      <div class="flex justify-center mt-10">
-        <p-button label="Create Job" icon="pi pi-plus" type="submit"/>
-      </div>
   }
 </form>
+

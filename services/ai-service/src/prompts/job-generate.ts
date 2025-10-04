@@ -44,7 +44,8 @@ Return JSON ONLY in this shape:
   "aboutRole": "2-4 short paragraphs; omit salary/benefits if not provided",
   "responsibilities": ["bullet 1", "bullet 2", "... up to ${p.maxBullets}"],
   "qualifications": ["bullet 1", "bullet 2", "... up to ${p.maxBullets}"],
-  "notes": "explicit caveats, e.g., missing salary; mention location normalization if applied",
+  "notes": "explicit caveats, e.g., missing salary; if none, use \\"\\"",
+  "location": "City, ST | Remote | Hybrid | \\"\\" if unknown",
   "metadata": { "roleLevel": "${p.roleLevel}", "tone": "${p.tone}" }
 }
 `.trim();

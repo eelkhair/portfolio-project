@@ -1,0 +1,4 @@
+.fixed-textarea {
+  resize: none;      /* disables user resize */
+  width: 100%;       /* optional full width */
+}
