@@ -17,7 +17,7 @@ export default fp<AiPluginOpts>(async (app: FastifyInstance, opts) => {
 
   app.route({
     method: "POST",
-    url: "/v1/jobs/:companyId/generate",
+    url: "/ai/jobs/:companyId/generate",
     schema: {
       tags: ["ai"],
       summary: "Generate a structured job post draft with OpenAI",
@@ -35,9 +35,9 @@ export default fp<AiPluginOpts>(async (app: FastifyInstance, opts) => {
       try {
         const params = Params.parse(req.params);
         const body = JobGenRequest.parse(req.body);
-
+        console.log(body);
         const result: JobGenResponseT = await service.generateJob(params.companyId, body);
-
+        console.log(result);
         return reply.send(result);
       } catch (err: any) {
         const allowed = [400, 401, 429, 500] as const;

@@ -12,9 +12,4 @@
       <PackageReference Include="JobBoard.UserAPI.Contracts" Version="1.0.2" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Models\Jobs\Requests\" />
-      <Folder Include="Models\Jobs\Responses\" />
-    </ItemGroup>
-
 </Project>

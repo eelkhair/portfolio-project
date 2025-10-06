@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using AdminApi.Application.Commands;
 using AdminApi.Application.Commands.Interfaces;
 using AdminApi.Application.Queries;
@@ -73,6 +75,7 @@ builder.Services.AddScoped<ICompanyQueryService, CompanyQueryService>();
 builder.Services.AddScoped<ICompanyCommandService, CompanyCommandService>();
 builder.Services.AddScoped<IIndustryQueryService, IndustryQueryService>();
 builder.Services.AddScoped<IJobQueryService, JobQueryService>();
+builder.Services.AddScoped<IOpenAICommandService, OpenAICommandService>();
 
 builder.ConfigureLoggingAndTracing("admin-api");
 
@@ -110,7 +113,13 @@ builder.Services.AddAuthentication(options =>
         };
     });
 builder.Services.AddAuthorization();
-
+builder.Services.ConfigureHttpJsonOptions(opts =>
+{
+    opts.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    opts.SerializerOptions.Converters.Add(
+        new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
+    );
+});
 builder.Services.AddDaprClient();
 var app = builder.Build();
 app.UseCors(CorsPolicy);

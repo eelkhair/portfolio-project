@@ -1,4 +1,4 @@
-import {Component, computed, inject, OnInit} from '@angular/core';
+import {Component, computed, effect, inject, OnInit} from '@angular/core';
 import {JobsStore} from '../jobs.store';
 import {CompanySelection} from '../../../shared/companies/company-selection/company-selection';
 import {InputText} from 'primeng/inputtext';
@@ -50,11 +50,18 @@ export class JobUpsert implements OnInit {
     { label: 'Other',     value: 'Other' },
   ];
   ngOnInit() {
-    // this.setStringArray('responsibilities', [
-    //   'Own core module architecture',
-    //   'Implement CI-ready code with lint/tests',
-    //   'Document tech decisions',
-    // ]);
+  }
+  constructor() {
+    effect(() => {
+      const aiResponse = this.store.aiResponse();
+      if (aiResponse) {
+        this.form.controls.title.setValue(aiResponse.title);
+        this.form.controls.aboutRole.setValue(aiResponse.aboutRole);
+        this.form.controls.location.setValue(aiResponse.location);
+        this.setStringArray('responsibilities', aiResponse.responsibilities);
+        this.setStringArray('qualifications', aiResponse.qualifications);
+      }
+    });
   }
 
   responsibilities(): FormArray<FormControl<string>> {

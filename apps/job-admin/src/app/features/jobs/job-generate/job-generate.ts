@@ -1,4 +1,4 @@
-import {Component, effect, inject, input, OnInit} from '@angular/core';
+import {Component, inject, input, OnInit, signal} from '@angular/core';
 import {JobsStore} from '../jobs.store';
 import {Dialog} from 'primeng/dialog';
 import {Button} from 'primeng/button';
@@ -6,9 +6,11 @@ import {InputText} from 'primeng/inputtext';
 import {Step, StepList, StepPanel, StepPanels, Stepper} from 'primeng/stepper';
 import {Textarea} from 'primeng/textarea';
 import {Select} from 'primeng/select';
-import {Tooltip} from 'primeng/tooltip';
 import {AutoComplete} from 'primeng/autocomplete';
-import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import {JobGenRequest, RoleLevel, Tone} from '../../../core/types/Dtos/JobGen';
+import {locationValidator, normalizeLocation} from './utils/jobGenLocation.validator';
+
 @Component({
   selector: 'app-job-generate',
   imports: [
@@ -22,9 +24,8 @@ import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} fr
     StepPanel,
     Textarea,
     Select,
-    Tooltip,
     AutoComplete,
-    ReactiveFormsModule
+    ReactiveFormsModule,
   ],
   templateUrl: './job-generate.html',
   styleUrl: './job-generate.css'
@@ -32,44 +33,105 @@ import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} fr
 export class JobGenerate implements OnInit {
   store = inject(JobsStore);
   private fb = inject(FormBuilder)
-  skillSuggestions: string[] = [];
-  companyName=input<string>('test')
+
+  companyName=input.required<string>()
+  errors = signal<string[]>([])
+  validSteppers: Record<number, boolean> = {1:false, 2:false, 3:false, 4:true };
 
   form = this.fb.nonNullable.group({
-    brief:['',Validators.required, Validators.minLength(10)],
-    companyName: ['',Validators.required],
-    teamName : [''],
-    titleSeed: ['',Validators.required],
-    location: [''],
-    mustHaves: this.fb.control<string[]>([], { nonNullable: true }),
-    niceToHaves: this.fb.control<string[]>([], { nonNullable: true })
+    basics:this.fb.group({
+      companyName: ['',Validators.required],
+      teamName : [''],
+      titleSeed: ['',Validators.required],
+      location: ['', locationValidator()],
+    }),
+    scope:this.fb.group({
+      brief:['',[Validators.required, Validators.minLength(10)]],
+      roleLevel:['Mid',Validators.required],
+    }),
+    qualifications:this.fb.group({
+      mustHaves: this.fb.control<string[]>([], { nonNullable: true }),
+      niceToHaves: this.fb.control<string[]>([], { nonNullable: true }),
+      techStack: this.fb.control<string[]>([], { nonNullable: true })
+    }),
+    style:this.fb.group({
+      maxBullets:[6,[Validators.required, Validators.min(3), Validators.max(8)]],
+      tone:['Neutral', Validators.required],
+      benefits:[''],
+    }),
   })
+
   ngOnInit() {
-    this.form.controls.companyName.setValue(this.companyName())
+    this.validateSteps();
+    this.form.controls.basics.controls.companyName.setValue(this.companyName())
+    this.form.controls.basics.statusChanges.subscribe(()=> this.validateStep(1))
+    this.form.controls.scope.statusChanges.subscribe(()=> this.validateStep(2) )
+    this.form.controls.qualifications.statusChanges.subscribe(()=> this.validateStep(3))
+    this.form.controls.style.statusChanges.subscribe(()=> this.validateStep(4))
   }
-  private allSkills = [
-    '.NET','REST','SQL','Kafka','Terraform','Azure','Kubernetes','Docker','PostgreSQL','C#','Java','Go'
-  ];
-
-  onComplete(e: { query: string }, current: string[]) {
-    const q = (e.query || '').trim().toLowerCase();
-
-    const base = this.allSkills
-      .filter(s => s.toLowerCase().includes(q))
-      .filter(s => !current.includes(s))
-      .slice(0, 9); // leave room for the "add query" item
-
-    const includeQuery = q.length > 0 &&
-      !current.map(x => x.toLowerCase()).includes(q) &&
-      !base.map(x => x.toLowerCase()).includes(q);
-
-    this.skillSuggestions = includeQuery ? [e.query, ...base] : base;
+  submit() {
+    if(this.form.invalid) {
+      const errs = this.store.getAllErrors(this.form);
+      this.errors.set(this.store.buildErrors(errs))
+      return;
+    }
+    this.errors.set([])
+    const payload: JobGenRequest = {
+      ...this.form.controls.basics.value,
+      ...this.form.controls.scope.value,
+      ...this.form.controls.style.value,
+      location: normalizeLocation(this.form.controls.basics.value.location),
+      tone:this.form.controls.style.controls.tone.value?.toLowerCase() as Tone,
+      roleLevel:this.form.controls.scope.controls.roleLevel.value?.toLowerCase() as RoleLevel,
+      techStackCSV: this.form.controls.qualifications.controls.techStack.value.join(', '),
+      mustHavesCSV: this.form.controls.qualifications.controls.mustHaves.value.join(', '),
+      niceToHavesCSV: this.form.controls.qualifications.controls.niceToHaves.value.join(', ')
+    } as JobGenRequest;
+    this.store.generateDraft(payload).subscribe()
   }
 
-// When sending to your API later:
- // const mustHavesCSV = this.mustHaves.join(', ');
-  submit(e: SubmitEvent) {
-    e.preventDefault();
-    console.log(this.form.value, this.form.valid);
+  validateStep(i: number | undefined) {
+    let errs: Array<{ path: string; validator: string; details: any }>;
+
+    switch(i){
+      case 1:
+        if(this.form.controls.basics.dirty){
+          errs = this.store.getAllErrors(this.form.controls.basics);
+          this.errors.set(this.store.buildErrors(errs))
+        }
+
+        this.validateSteps()
+        break;
+      case 2:
+        if(this.form.controls.scope.dirty) {
+          errs = this.store.getAllErrors(this.form.controls.scope);
+          this.errors.set(this.store.buildErrors(errs))
+        }
+        this.validateSteps()
+        break;
+      case 3:
+        if (this.form.controls.qualifications.dirty){
+          errs = this.store.getAllErrors(this.form.controls.qualifications);
+          this.errors.set(this.store.buildErrors(errs))
+        }
+        this.validateSteps()
+        break;
+      case 4:
+        if(this.form.controls.style.dirty){
+          errs = this.store.getAllErrors(this.form.controls.style);
+          this.errors.set(this.store.buildErrors(errs))
+        }
+
+        this.validateSteps()
+        break;
+    }
+  }
+  validateSteps(){
+    this.validSteppers[1] = this.form.controls.basics.valid;
+    this.validSteppers[2] = this.form.controls.scope.valid
+      && this.validSteppers[1]
+    this.validSteppers[3] = this.form.controls.qualifications.valid
+      && this.validSteppers[2]
+    this.validSteppers[4] = this.form.controls.style.valid && this.validSteppers[3];
   }
 }

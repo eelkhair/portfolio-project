@@ -2,6 +2,9 @@ import {inject, Injectable, signal} from '@angular/core';
 import {JobService} from '../../core/services/job.service';
 import {CompanySelectionStore} from '../../shared/companies/company-selection/company-selection.store';
 import {Job} from '../../core/types/models/Job';
+import {cities} from './job-generate/us-cities';
+import {JobGenRequest, JobGenResponse} from '../../core/types/Dtos/JobGen';
+import {tap} from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class JobsStore {
@@ -10,6 +13,10 @@ export class JobsStore {
   private jobService = inject(JobService);
   jobs = signal<Job[]>([])
   showGenerate = signal(false);
+  aiResponse = signal<JobGenResponse|undefined>(undefined)
+  skillSuggestions: string[] = [];
+  techStackSuggestions: string[] = [];
+  citySuggestions: string[] = [];
 
   loadJobs(){
     const selectedCompany = this.selectedCompany();
@@ -22,4 +29,129 @@ export class JobsStore {
     }
     return undefined;
   }
+
+  generateDraft(payload: JobGenRequest) {
+
+    return this.jobService.generateDraft(this.selectedCompany()?.uId!, payload).pipe(tap(job => {
+      this.aiResponse.set(job.data)
+    }));
+
+  }
+
+
+  private allSkills = [
+    '.NET','REST','SQL','Kafka','Terraform','Azure','Kubernetes','Docker','PostgreSQL','C#','Java','Go'
+  ];
+
+  private techStackArray = [
+    '.NET 8', 'C#', 'ASP.NET Core', 'Entity Framework Core', 'SQL Server', 'Cosmos DB',
+    'Angular 17', 'TypeScript', 'TailwindCSS', 'PrimeNG',
+    'Next.js', 'React', 'Node.js', 'Fastify',
+    'Docker', 'Dapr', 'RabbitMQ', 'Redis',
+    'Azure App Service', 'Azure Functions', 'Azure Container Apps', 'Azure DevOps',
+    'OpenAI API', 'Azure OpenAI', 'Python', 'FastEndpoints', 'Mapster'
+  ]
+
+  onTechStackComplete(e: { query: string; }, value: string[]) {
+    const q = (e.query || '').trim().toLowerCase();
+
+    const base = this.techStackArray
+      .filter(s => s.toLowerCase().includes(q))
+      .filter(s => !value.includes(s))
+      .slice(0, 9); // leave room for the "add query" item
+
+    const includeQuery = q.length > 0 &&
+      !value.map(x => x.toLowerCase()).includes(q) &&
+      !base.map(x => x.toLowerCase()).includes(q);
+
+    this.techStackSuggestions = includeQuery ? [e.query, ...base] : base;
+  }
+  onComplete(e: { query: string }, current: string[]) {
+    const q = (e.query || '').trim().toLowerCase();
+
+    const base = this.allSkills
+      .filter(s => s.toLowerCase().includes(q))
+      .filter(s => !current.includes(s))
+      .slice(0, 9); // leave room for the "add query" item
+
+    const includeQuery = q.length > 0 &&
+      !current.map(x => x.toLowerCase()).includes(q) &&
+      !base.map(x => x.toLowerCase()).includes(q);
+
+    this.skillSuggestions = includeQuery ? [e.query, ...base] : base;
+  }
+  getAllErrors(control: import('@angular/forms').AbstractControl, path: string = ''): Array<{
+    path: string; validator: string; details: any;
+  }> {
+    const out: Array<{ path: string; validator: string; details: any }> = [];
+
+    if (control.errors) {
+      Object.entries(control.errors).forEach(([validator, details]) => {
+        out.push({ path: path || '(root)', validator, details });
+      });
+    }
+
+    const anyControl = control as any;
+
+    // FormGroup
+    if (anyControl.controls && !(anyControl.length >= 0)) {
+      Object.keys(anyControl.controls).forEach(key => {
+        out.push(...this.getAllErrors(anyControl.controls[key], path ? `${path}.${key}` : key));
+      });
+    }
+
+    // FormArray
+    if (Array.isArray(anyControl.controls)) {
+      anyControl.controls.forEach((c: any, i: number) => {
+        out.push(...this.getAllErrors(c, `${path}[${i}]`));
+      });
+    }
+
+    return out;
+  }
+
+  onCompleteCity(e: { query: string }) {
+    const q = (e.query || '').trim().toLowerCase();
+    if (!q) { this.citySuggestions = []; return; }
+
+    // prefix/contains match; de-dupe already done at build time
+    this.citySuggestions = cities
+      .filter(x => x.toLowerCase().includes(q))
+      .slice(0, 10);
+  }
+  buildErrors(errs: { path: string; validator: string; details: any; }[]): string[] {
+    // [{ path, validator, details }]
+    const seen = new Set<string>();
+
+    const label = (path: string) =>
+      path
+        .replace(/([a-z])([A-Z])/g, '$1 $2')   // split camelCase
+        .replace(/^\w/, c => c.toUpperCase()); // capitalise first
+
+    const msg = (e: any) => {
+      switch (e.validator) {
+        case 'required':   return `${label(e.path)} is required`;
+        case 'minlength':  return `${label(e.path)} must be at least ${e.details.requiredLength} characters`;
+        case 'maxlength':  return `${label(e.path)} must be at most ${e.details.requiredLength} characters`;
+        case 'min':        return `${label(e.path)} must be ≥ ${e.details.min}`;
+        case 'max':        return `${label(e.path)} must be ≤ ${e.details.max}`;
+        case 'email':      return `${label(e.path)} must be a valid email`;
+        case 'pattern':    return `${label(e.path)} has an invalid format`;
+        case 'arrayMin':   return `${label(e.path)} must have at least ${e.details.min} item(s)`;
+        case 'arrayMax':   return `${label(e.path)} must have at most ${e.details.max} item(s)`;
+        case 'distinct':   return `${label(e.path)} contains duplicate values`;
+        case 'enum':       return `${label(e.path)} must be one of: ${e.details.allowed.join(', ')}`;
+        case 'locationFormat': return `${label(e.path)} must be "City, ST", "Remote", "Hybrid", or empty`;
+        default:           return `${label(e.path)} is invalid`;
+      }
+    };
+
+    return errs.map(msg).filter(m => {
+      if (seen.has(m)) return false;
+      seen.add(m);
+      return true;
+    });
+  }
+
+
 }
