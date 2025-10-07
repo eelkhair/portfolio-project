@@ -1,16 +1,20 @@
 <!--suppress JSUnusedGlobalSymbols -->
 <p-dialog header="Generate Draft"
-          (onHide)="store.showGenerate.set(false)"
+          (onHide)="store.showGenerate.set(false);form.reset();errors.set([])"
           (visibleChange)="store.showGenerate.set(false)"
           [modal]="true" [visible]="store.showGenerate()"
-          [style]="{ width: '40rem', minHeight:'470px' }">
+          [closable]="!isFinalStep()"
+
+          [closeOnEscape]="!isFinalStep()"
+          [style]="{ width: '60rem', minHeight:'470px' }">
 
     <p-stepper [value]="1" class="basis-[50rem]" (valueChange)="validateStep($event)" >
       <p-step-list>
-        <p-step [value]="1" >Basics</p-step>
+        <p-step [value]="1" [disabled]="isFinalStep()">Basics</p-step>
         <p-step [value]="2" [disabled]="!validSteppers[1]">>Scope</p-step>
         <p-step [value]="3" [disabled]="!validSteppers[2]">Qualifications</p-step>
         <p-step [value]="4" [disabled]="!validSteppers[3]">Style</p-step>
+        <p-step [value]="5" [disabled]="!isFinalStep()">Generate</p-step>
       </p-step-list>
       <p-step-panels>
         <p-step-panel [value]="1">
@@ -22,11 +26,11 @@
                 <input class="w-full" autofocus pInputText placeholder="Backend Engineer" formControlName="titleSeed"/>
               </div>
               <div class="flex items-center">
-                <label class="w-40">Company</label>
+                <label class="w-40">Company<span class="text-red-600 font-bold">*</span></label>
                 <input class="w-full"  pInputText formControlName="companyName"/>
               </div>
               <div class="flex w-full items-center">
-                <label class="w-40">Team</label>
+                <label class="w-40">Team<span class="text-red-600 font-bold">*</span></label>
                 <input class="w-full" pInputText formControlName="teamName"/>
               </div>
               <div class=" flex w-full items-center">
@@ -155,7 +159,23 @@
               </div>
               <div class="flex pt-6 justify-between mt-1">
                 <p-button label="Back" severity="secondary" icon="pi pi-arrow-left" (onClick)="activateCallback(3)"/>
-                <p-button label="Generate" icon="pi pi-arrow-right" iconPos="right" type="button" [disabled]="!validSteppers[4]" (click)="submit()"/>
+                <p-button label="Generate" icon="pi pi-arrow-right" iconPos="right" type="button" [disabled]="!validSteppers[4]" (click)="activateCallback(5);submit()"/>
+              </div>
+            </form>
+          </ng-template>
+        </p-step-panel>
+        <p-step-panel [value]="5">
+          <ng-template #content let-activateCallback="activateCallback">
+            <form [formGroup]="form.controls.style">
+              <div class="flex w-full flex-col gap-3">
+                @if(isFinalStep()){
+                  <p-progress-spinner strokeWidth="3" fill="transparent" animationDuration=".5s" [style]="{ width: '150px', height: '150px' }" />
+                }
+              </div>
+              <div class="pt-6 center mt-1 w-full">
+
+                <h1 class="text-2xl">Generating Draft...</h1>
+                <p-button label="Close" icon="pi pi-arrow-right" iconPos="right" type="button" [disabled]="isFinalStep()" (click)="store.showGenerate.set(false); activateCallback(1);this.form.reset();validateSteps()"/>
               </div>
             </form>
           </ng-template>

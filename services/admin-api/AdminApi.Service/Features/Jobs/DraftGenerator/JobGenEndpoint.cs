@@ -33,21 +33,18 @@ public sealed class JobGenEndpoint(IOpenAICommandService _ai)
             RoleLevel = req.RoleLevel,   // keep enum; service can ToString().ToLowerInvariant()
             Tone = req.Tone,
             MaxBullets = req.MaxBullets,
-            CompanyName = EmptyToNull(req.CompanyName),
-            TeamName = EmptyToNull(req.TeamName),
+            CompanyName = req.CompanyName,
+            TeamName = req.TeamName,
             Location = req.Location?.Trim(),
-            TitleSeed = EmptyToNull(req.TitleSeed),
-            TechStackCSV = EmptyToNull(req.TechStackCSV),
-            MustHavesCSV = EmptyToNull(req.MustHavesCSV),
-            NiceToHavesCSV = EmptyToNull(req.NiceToHavesCSV),
-            Benefits = EmptyToNull(req.Benefits)
+            TitleSeed = req.TitleSeed,
+            TechStackCSV = req.TechStackCSV,
+            MustHavesCSV = req.MustHavesCSV,
+            NiceToHavesCSV = req.NiceToHavesCSV,
+            Benefits = req.Benefits
         };
 
         var result = await _ai.GenerateJobAsync(companyId, normalized, ct);
 
         await SendOkAsync(result, ct);
     }
-
-    private static string? EmptyToNull(string? s) => string.IsNullOrWhiteSpace(s) ? null : s;
-
 }

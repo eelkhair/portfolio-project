@@ -11,7 +11,6 @@ export function locationValidator(opts: LocationValidatorOptions = {}): Validato
 
   return (c: AbstractControl): ValidationErrors | null => {
     const raw = (c.value ?? '').toString().trim();
-    console.log(raw, keywords);
     if (!raw) return null; // optional field
 
     // keyword checks (Remote/Hybrid)

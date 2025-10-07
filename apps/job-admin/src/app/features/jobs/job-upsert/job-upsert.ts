@@ -73,16 +73,20 @@ export class JobUpsert implements OnInit {
 
   addResponsibility(initial = ''): void {
     this.responsibilities().push(new FormControl<string>(initial, { nonNullable: true }));
+    this.setStringArray('responsibilities', this.responsibilities().value);
   }
   removeResponsibility(i: number): void {
     this.responsibilities().removeAt(i);
+    this.setStringArray('responsibilities', this.responsibilities().value)
   }
 
   addQualification(initial = ''): void {
     this.qualifications().push(new FormControl<string>(initial, { nonNullable: true }));
+    this.setStringArray('qualifications', this.qualifications().value);
   }
   removeQualification(i: number): void {
     this.qualifications().removeAt(i);
+    this.setStringArray('qualifications', this.qualifications().value)
   }
 
   private setStringArray(

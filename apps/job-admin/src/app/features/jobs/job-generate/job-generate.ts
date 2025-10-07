@@ -10,6 +10,7 @@ import {AutoComplete} from 'primeng/autocomplete';
 import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {JobGenRequest, RoleLevel, Tone} from '../../../core/types/Dtos/JobGen';
 import {locationValidator, normalizeLocation} from './utils/jobGenLocation.validator';
+import {ProgressSpinner} from 'primeng/progressspinner';
 
 @Component({
   selector: 'app-job-generate',
@@ -26,6 +27,7 @@ import {locationValidator, normalizeLocation} from './utils/jobGenLocation.valid
     Select,
     AutoComplete,
     ReactiveFormsModule,
+    ProgressSpinner,
   ],
   templateUrl: './job-generate.html',
   styleUrl: './job-generate.css'
@@ -33,15 +35,15 @@ import {locationValidator, normalizeLocation} from './utils/jobGenLocation.valid
 export class JobGenerate implements OnInit {
   store = inject(JobsStore);
   private fb = inject(FormBuilder)
-
   companyName=input.required<string>()
   errors = signal<string[]>([])
-  validSteppers: Record<number, boolean> = {1:false, 2:false, 3:false, 4:true };
+  validSteppers: Record<number, boolean> = {1:false, 2:false, 3:false, 4:true};
+  isFinalStep = signal(false)
 
   form = this.fb.nonNullable.group({
     basics:this.fb.group({
       companyName: ['',Validators.required],
-      teamName : [''],
+      teamName : ['', Validators.required],
       titleSeed: ['',Validators.required],
       location: ['', locationValidator()],
     }),
@@ -70,24 +72,36 @@ export class JobGenerate implements OnInit {
     this.form.controls.style.statusChanges.subscribe(()=> this.validateStep(4))
   }
   submit() {
+
     if(this.form.invalid) {
       const errs = this.store.getAllErrors(this.form);
       this.errors.set(this.store.buildErrors(errs))
       return;
     }
+    this.isFinalStep.set(true)
     this.errors.set([])
+    for (let i = 0; i<5;i++){
+      if(this.validSteppers[i]){
+        this.validSteppers[i] = false;
+      }
+
+    }
     const payload: JobGenRequest = {
       ...this.form.controls.basics.value,
       ...this.form.controls.scope.value,
       ...this.form.controls.style.value,
+      benefits:this.form.controls.style.controls.benefits.value??'',
       location: normalizeLocation(this.form.controls.basics.value.location),
-      tone:this.form.controls.style.controls.tone.value?.toLowerCase() as Tone,
-      roleLevel:this.form.controls.scope.controls.roleLevel.value?.toLowerCase() as RoleLevel,
-      techStackCSV: this.form.controls.qualifications.controls.techStack.value.join(', '),
-      mustHavesCSV: this.form.controls.qualifications.controls.mustHaves.value.join(', '),
-      niceToHavesCSV: this.form.controls.qualifications.controls.niceToHaves.value.join(', ')
+      tone:this.form.controls.style.controls.tone.value?.toLowerCase() as Tone?? '',
+      roleLevel:this.form.controls.scope.controls.roleLevel.value?.toLowerCase() as RoleLevel ?? '',
+      techStackCSV: this.form.controls.qualifications.controls.techStack.value.join(', ')??'',
+      mustHavesCSV: this.form.controls.qualifications.controls.mustHaves.value.join(', ')??'',
+      niceToHavesCSV: this.form.controls.qualifications.controls.niceToHaves.value.join(', ')??''
     } as JobGenRequest;
-    this.store.generateDraft(payload).subscribe()
+    this.store.generateDraft(payload).subscribe(()=>{
+      this.isFinalStep.set(false)
+      this.form.reset();
+    })
   }
 
   validateStep(i: number | undefined) {
@@ -133,5 +147,6 @@ export class JobGenerate implements OnInit {
     this.validSteppers[3] = this.form.controls.qualifications.valid
       && this.validSteppers[2]
     this.validSteppers[4] = this.form.controls.style.valid && this.validSteppers[3];
+    this.isFinalStep.set(false)
   }
 }
