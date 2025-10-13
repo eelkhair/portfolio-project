@@ -9,15 +9,16 @@ import {
     validatorCompiler,
     serializerCompiler
 } from "fastify-type-provider-zod";
-
-import devRoutes from "./routes/routes.dev.js";
-import daprRoutes from "./routes/routes.dapr.js";
-import healthRoutes from "./routes/routes.health.js";
+//import devRoutes from "./routes/jobs/upsert.js";
+import daprRoutes from "./routes/utils/dapr.js";
+import healthRoutes from "./routes/utils/health.js";
 import traceIdPlugin from "./plugins/trace-id.js";
-import aiRoutes from "./routes/routes.ai.js";
-import {OpenAIService} from "./lib/openai.service.js";
+import aiRoutes from "./routes/drafts/rewrite.js";
 import {env} from "./config.js";
-import jobsGenerate from "./routes/jobs-generate.js"; // ← extension-less
+import jobsGenerate from "./routes/drafts/generate.js";
+
+import {CosmosService} from "./services/cosmos.service.js";
+import {OpenAIService} from "./services/openai.service.js"; // ← extension-less
 
 const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
 app.setValidatorCompiler(validatorCompiler);
@@ -53,13 +54,13 @@ await app.register(swaggerUi, { routePrefix: "/docs",
 app.get("/", {schema:{hide: true}}, async (request, reply): Promise<any> => reply.redirect("/docs") )
 
 
-const service = new OpenAIService({ apiKey: env.OPENAI_API_KEY, model: env.OPENAI_MODEL });
-
+const openAIService = new OpenAIService({ apiKey: env.OPENAI_API_KEY, model: env.OPENAI_MODEL });
+const cosmosService = new CosmosService();
 await app.register(healthRoutes); // livez/readyz/healthzEndpoint
-await app.register(devRoutes);
+
 await app.register(daprRoutes);
-await app.register(aiRoutes,{service});
-await app.register(jobsGenerate, {service});
+await app.register(aiRoutes,{service: openAIService});
+await app.register(jobsGenerate, {openAIService: openAIService, cosmosService: cosmosService});
 
 const port = Number(process.env.PORT ?? 6082);
 await app.listen({ port, host: "0.0.0.0" });

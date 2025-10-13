@@ -27,4 +27,3 @@ export const JobGenResponse = z.object({
         tone: z.enum(["neutral","concise","friendly"])
     })
 });
-export type JobGenResponseT = z.infer<typeof JobGenResponse>;

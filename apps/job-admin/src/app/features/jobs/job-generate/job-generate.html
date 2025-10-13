@@ -8,7 +8,7 @@
           [closeOnEscape]="!isFinalStep()"
           [style]="{ width: '60rem', minHeight:'470px' }">
 
-    <p-stepper [value]="1" class="basis-[50rem]" (valueChange)="validateStep($event)" >
+    <p-stepper [value]="1" class="basis-[50rem]" (valueChange)="validateStep($event)" #stepper >
       <p-step-list>
         <p-step [value]="1" [disabled]="isFinalStep()">Basics</p-step>
         <p-step [value]="2" [disabled]="!validSteppers[1]">>Scope</p-step>

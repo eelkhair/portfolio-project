@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import fp from "fastify-plugin";
 import { z } from "zod";
-import { OpenAIService } from "../lib/openai.service.js";
+import { OpenAIService } from "../../lib/openai.service.js";
 
 type AiPluginOpts = { service: OpenAIService };
 
@@ -14,9 +14,9 @@ export default fp<AiPluginOpts>(async (app: FastifyInstance, opts) => {
 
     app.route({
         method: "GET",
-        url: "/ai/rewrite",
+        url: "/drafts/rewrite",
         schema: {
-            tags: ["ai"],
+            tags: ["drafts"],
             summary: "Rewrite a short prompt with OpenAI",
             querystring: Query,
             response: {

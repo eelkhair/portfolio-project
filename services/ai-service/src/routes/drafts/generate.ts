@@ -1,25 +1,23 @@
 import type { FastifyInstance } from "fastify";
 import fp from "fastify-plugin";
 import { z } from "zod";
-import type { OpenAIService } from "../lib/openai.service.js";
-import {JobGenRequest, JobGenResponse} from "../schemas/job-generate.js";
+import type { OpenAIService } from "../../services/openai.service.js";
+import {JobGenRequest, JobGenResponse} from "../../schemas/job-generate.js";
+import {CosmosService} from "../../services/cosmos.service.js";
 
-type AiPluginOpts = { service: OpenAIService };
-
+type AiPluginOpts = { openAIService: OpenAIService, cosmosService: CosmosService };
 const Params = z.object({ companyId: z.string().min(1) });
-
 type JobGenResponseT = z.infer<typeof JobGenResponse>;
 
 const ErrRes = z.object({ error: z.string() });
-
 export default fp<AiPluginOpts>(async (app: FastifyInstance, opts) => {
-  const { service } = opts;
+  const { openAIService, cosmosService } = opts;
 
   app.route({
     method: "POST",
-    url: "/ai/jobs/:companyId/generate",
+    url: "/drafts/:companyId/generate",
     schema: {
-      tags: ["ai"],
+      tags: ["drafts"],
       summary: "Generate a structured job post draft with OpenAI",
       params: Params,
       body: JobGenRequest,
@@ -35,9 +33,9 @@ export default fp<AiPluginOpts>(async (app: FastifyInstance, opts) => {
       try {
         const params = Params.parse(req.params);
         const body = JobGenRequest.parse(req.body);
-        console.log(body);
-        const result: JobGenResponseT = await service.generateJob(params.companyId, body);
-        console.log(result);
+        const result: JobGenResponseT = await openAIService.generateJob(params.companyId, body);
+        await cosmosService.saveDraft(params.companyId, result);
+
         return reply.send(result);
       } catch (err: any) {
         const allowed = [400, 401, 429, 500] as const;

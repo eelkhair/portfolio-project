@@ -1,4 +1,4 @@
-import {Component, inject, input, OnInit, signal} from '@angular/core';
+import {Component, inject, input, OnInit, signal, viewChild} from '@angular/core';
 import {JobsStore} from '../jobs.store';
 import {Dialog} from 'primeng/dialog';
 import {Button} from 'primeng/button';
@@ -11,6 +11,7 @@ import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {JobGenRequest, RoleLevel, Tone} from '../../../core/types/Dtos/JobGen';
 import {locationValidator, normalizeLocation} from './utils/jobGenLocation.validator';
 import {ProgressSpinner} from 'primeng/progressspinner';
+import {NotificationService} from '../../../core/services/notification.service';
 
 @Component({
   selector: 'app-job-generate',
@@ -33,7 +34,9 @@ import {ProgressSpinner} from 'primeng/progressspinner';
   styleUrl: './job-generate.css'
 })
 export class JobGenerate implements OnInit {
+
   store = inject(JobsStore);
+  private stepper = viewChild<Stepper>('stepper');
   private fb = inject(FormBuilder)
   companyName=input.required<string>()
   errors = signal<string[]>([])
@@ -98,10 +101,18 @@ export class JobGenerate implements OnInit {
       mustHavesCSV: this.form.controls.qualifications.controls.mustHaves.value.join(', ')??'',
       niceToHavesCSV: this.form.controls.qualifications.controls.niceToHaves.value.join(', ')??''
     } as JobGenRequest;
-    this.store.generateDraft(payload).subscribe(()=>{
-      this.isFinalStep.set(false)
-      this.form.reset();
-    })
+    this.store.generateDraft(payload).subscribe({
+      next: ()=>{
+        this.isFinalStep.set(false)
+        this.form.reset();
+      }, error: () => {
+        this.store.notificationService.error("Error","Failed to generate draft. \nPlease try again later");
+        this.validateSteps()
+        this.stepper()?.value.set(4)
+        this.isFinalStep.set(false)
+      }
+    }
+   )
   }
 
   validateStep(i: number | undefined) {

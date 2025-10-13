@@ -23,7 +23,6 @@ export class OpenAIService{
             clearTimeout(t);
         }
     }
-    // You already have rewrite(q: string) — adding:
     async generateJob(companyId: string, body: unknown) {
         const req = JobGenRequest.parse(body);
 
@@ -88,7 +87,6 @@ export class OpenAIService{
             throw error;
         }
 
-        // Validate final object shape
         return JobGenResponse.parse(parsed);
     }
 }

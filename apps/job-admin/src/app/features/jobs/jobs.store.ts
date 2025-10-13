@@ -5,6 +5,7 @@ import {Job} from '../../core/types/models/Job';
 import {cities} from './job-generate/us-cities';
 import {JobGenRequest, JobGenResponse} from '../../core/types/Dtos/JobGen';
 import {tap} from 'rxjs/operators';
+import {NotificationService} from '../../core/services/notification.service';
 
 @Injectable({ providedIn: 'root' })
 export class JobsStore {
@@ -17,6 +18,8 @@ export class JobsStore {
   skillSuggestions: string[] = [];
   techStackSuggestions: string[] = [];
   citySuggestions: string[] = [];
+  notificationService = inject(NotificationService);
+
 
   loadJobs(){
     const selectedCompany = this.selectedCompany();
