@@ -1,7 +1,8 @@
 import type { FastifyInstance } from "fastify";
 import fp from "fastify-plugin";
 import { z } from "zod";
-import { OpenAIService } from "../../lib/openai.service.js";
+import {OpenAIService} from "../../services/openai.service.js";
+
 
 type AiPluginOpts = { service: OpenAIService };
 

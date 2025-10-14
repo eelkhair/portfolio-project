@@ -16,10 +16,15 @@ import traceIdPlugin from "./plugins/trace-id.js";
 import aiRoutes from "./routes/drafts/rewrite.js";
 import {env} from "./config.js";
 import jobsGenerate from "./routes/drafts/generate.js";
+import './otel.js'
 
 import {CosmosService} from "./services/cosmos.service.js";
-import {OpenAIService} from "./services/openai.service.js"; // ← extension-less
+import {OpenAIService} from "./services/openai.service.js";
+import {startOtel, stopOtel} from "./otel.js";
+import {tracer} from "./tracing.js";
 
+
+await startOtel();
 const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
@@ -61,6 +66,18 @@ await app.register(healthRoutes); // livez/readyz/healthzEndpoint
 await app.register(daprRoutes);
 await app.register(aiRoutes,{service: openAIService});
 await app.register(jobsGenerate, {openAIService: openAIService, cosmosService: cosmosService});
-
+app.get('/ping', async (_req, _rep) => {
+    return await tracer.startActiveSpan('handler.ping', async (span) => {
+        try {
+            return { pong: true };
+        } finally {
+            span.end();
+        }
+    });
+});
 const port = Number(process.env.PORT ?? 6082);
+
+process.on('SIGINT', async () => { await app.close(); await stopOtel(); process.exit(0); });
+process.on('SIGTERM', async () => { await app.close(); await stopOtel(); process.exit(0); });
+
 await app.listen({ port, host: "0.0.0.0" });

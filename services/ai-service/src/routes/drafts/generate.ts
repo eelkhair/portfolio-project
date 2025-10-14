@@ -2,14 +2,17 @@ import type { FastifyInstance } from "fastify";
 import fp from "fastify-plugin";
 import { z } from "zod";
 import type { OpenAIService } from "../../services/openai.service.js";
-import {JobGenRequest, JobGenResponse} from "../../schemas/job-generate.js";
-import {CosmosService} from "../../services/cosmos.service.js";
+import { JobGenRequest, JobGenResponse } from "../../schemas/job-generate.js";
+import { CosmosService } from "../../services/cosmos.service.js";
+import { SpanStatusCode } from "@opentelemetry/api";
+import {tracer} from "../../tracing.js";
 
-type AiPluginOpts = { openAIService: OpenAIService, cosmosService: CosmosService };
-const Params = z.object({ companyId: z.string().min(1) });
+type AiPluginOpts = { openAIService: OpenAIService; cosmosService: CosmosService };
 type JobGenResponseT = z.infer<typeof JobGenResponse>;
 
+const Params = z.object({ companyId: z.string().min(1) });
 const ErrRes = z.object({ error: z.string() });
+
 export default fp<AiPluginOpts>(async (app: FastifyInstance, opts) => {
   const { openAIService, cosmosService } = opts;
 
@@ -26,23 +29,37 @@ export default fp<AiPluginOpts>(async (app: FastifyInstance, opts) => {
         400: ErrRes,
         401: ErrRes,
         429: ErrRes,
-        500: ErrRes
-      } as const
+        500: ErrRes,
+      } as const,
     },
     handler: async (req, reply) => {
-      try {
-        const params = Params.parse(req.params);
-        const body = JobGenRequest.parse(req.body);
-        const result: JobGenResponseT = await openAIService.generateJob(params.companyId, body);
-        await cosmosService.saveDraft(params.companyId, result);
+      return tracer.startActiveSpan("handler.ai.drafts.generate", async (span) => {
+        try {
+          const { companyId } = Params.parse(req.params);
+          const body = JobGenRequest.parse(req.body);
 
-        return reply.send(result);
-      } catch (err: any) {
-        const allowed = [400, 401, 429, 500] as const;
-        const status = allowed.includes(err?.status) ? err.status : 500;
-        app.log.error({ err }, "OpenAI job.generate failed");
-        return reply.status(status).send({ error: "AI_REQUEST_FAILED" });
-      }
-    }
+          span.addEvent("GenerateWithOpenAI:start", { companyId });
+          const result: JobGenResponseT = await openAIService.generateJob(companyId, body);
+          span.addEvent("GenerateWithOpenAI:ok");
+
+          span.addEvent("SaveDraft:start", { companyId });
+          await cosmosService.saveDraft(companyId, result);
+          span.addEvent("SaveDraft:ok");
+
+          span.setStatus({ code: SpanStatusCode.OK, message: "Draft generated and saved" });
+          return result; // ✅ Single response path
+        } catch (err: any) {
+          const allowed = [400, 401, 429, 500] as const;
+          const status = allowed.includes(err?.status) ? err.status : 500;
+
+          span.recordException(err);
+          span.setStatus({ code: SpanStatusCode.ERROR, message: "AI_REQUEST_FAILED" });
+          reply.status(status);
+          return { error: "AI_REQUEST_FAILED" };
+        } finally {
+          span.end();
+        }
+      });
+    },
   });
 });

@@ -49,8 +49,6 @@
 //                 span.recordException(err);
 //                 span.setStatus({ code: SpanStatusCode.ERROR, message: err?.message });
 //                 return reply.code(404).send({ error: 'not found' });
-//             } finally {
-//                 span.end();
 //             }
 //         })
 //     );

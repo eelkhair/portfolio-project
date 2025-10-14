@@ -38,7 +38,7 @@ export default async function healthRoutes(app: FastifyInstance) {
     let lastReadyCode = 503;
 
     async function runReadiness(): Promise<{ code: number; body: HealthBody }> {
-        const DAPR = `http://127.0.0.1:${process.env.DAPR_HTTP_PORT ?? 6083}/v1.0`;
+        const DAPR = `http://127.0.0.1:${process.env.DAPR_HTTP_PORT ?? 3500}/v1.0`;
         const PUBSUB = process.env.PUBSUB_NAME ?? 'rabbitmq.pubsub';
         const TOPIC = process.env.PUBSUB_HEALTH_TOPIC ?? 'healthCheckTopic';
         const SECRET = process.env.SECRETSTORE_NAME ?? 'local-secret-store';
