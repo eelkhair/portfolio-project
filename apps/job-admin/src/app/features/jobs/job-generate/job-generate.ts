@@ -103,6 +103,7 @@ export class JobGenerate implements OnInit {
     } as JobGenRequest;
     this.store.generateDraft(payload).subscribe({
       next: ()=>{
+        console.log(this.store.aiResponse());
         this.isFinalStep.set(false)
         this.form.reset();
       }, error: () => {

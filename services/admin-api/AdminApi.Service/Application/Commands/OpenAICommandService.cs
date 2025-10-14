@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Net;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using AdminApi.Application.Commands.Interfaces;
 using AdminAPI.Contracts.Models.Jobs.Requests;
@@ -18,36 +19,50 @@ public class OpenAICommandService(DaprClient client, UserContextService accessor
     public async Task<ApiResponse<JobGenResponse>> GenerateJobAsync(string companyId, JobGenRequest request,
         CancellationToken ct = default)
     {
-        var req = client.CreateInvokeMethodRequest(
-            HttpMethod.Post,
-            appId: "ai-service",
-            methodName: $"drafts/{companyId}/generate"
-        );
-        
-        if (accessor.GetHeader("Authorization") is { } auth && !string.IsNullOrWhiteSpace(auth))
-            req.Headers.TryAddWithoutValidation("Authorization", auth);
-
-        
-        req.Content = JsonContent.Create(request, options: JsonOpts);
-
-        using var resp = await client.InvokeMethodWithResponseAsync(req, ct);
-
-        var raw = await resp.Content.ReadAsStringAsync(ct);
-
-        if (!resp.IsSuccessStatusCode)
+        try
         {
+            var req = client.CreateInvokeMethodRequest(
+                HttpMethod.Post,
+                appId: "ai-service",
+                methodName: $"drafts/{companyId}/generate"
+            );
 
-            _logger.LogError("ai-service returned {StatusCode}: {Body}", (int)resp.StatusCode, raw);
+            if (accessor.GetHeader("Authorization") is { } auth && !string.IsNullOrWhiteSpace(auth))
+                req.Headers.TryAddWithoutValidation("Authorization", auth);
 
-            throw new HttpRequestException(
-                $"ai-service {resp.StatusCode}: {raw}", null, resp.StatusCode);
+
+            req.Content = JsonContent.Create(request, options: JsonOpts);
+
+            using var resp = await client.InvokeMethodWithResponseAsync(req, ct);
+
+            var raw = await resp.Content.ReadAsStringAsync(ct);
+
+            if (!resp.IsSuccessStatusCode)
+            {
+
+                _logger.LogError("ai-service returned {StatusCode}: {Body}", (int)resp.StatusCode, raw);
+
+                throw new HttpRequestException(
+                    $"ai-service {resp.StatusCode}: {raw}", null, resp.StatusCode);
+            }
+
+            var result = JsonSerializer.Deserialize<JobGenResponse>(raw, JsonOpts);
+
+            if (result is null)
+                throw new InvalidOperationException("Empty or invalid JSON from ai-service.");
+
+            return new ApiResponse<JobGenResponse>() { Data = result, Success = true, StatusCode = HttpStatusCode.OK };
+        }catch (Exception e)
+        {
+            _logger.LogError(e, "Error generating job draft");
+            return new ApiResponse<JobGenResponse>() { Success = false, StatusCode = HttpStatusCode.InternalServerError, Exceptions = new ApiError()
+            {
+                Message = e.Message,
+                Errors = new Dictionary<string, string[]>()
+                {
+                    {"Error", [e.Message]}
+                }
+            }};
         }
-        
-        var result = JsonSerializer.Deserialize<JobGenResponse>(raw, JsonOpts); 
-        
-        if (result is null)
-            throw new InvalidOperationException("Empty or invalid JSON from ai-service.");
-
-        return new ApiResponse<JobGenResponse>(){Data=result};
     }
 }

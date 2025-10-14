@@ -25,5 +25,6 @@ export const JobGenResponse = z.object({
     metadata: z.object({
         roleLevel: z.enum(["junior","mid","senior", "staff", "principal"]).default("mid"),
         tone: z.enum(["neutral","concise","friendly"])
-    })
+    }),
+    draftId: z.string().optional(),
 });

@@ -15,7 +15,7 @@ export class CosmosService{
 
     async saveDraft(companyId:string, result: JobGenResponseT){
         const container = this.getContainer("drafts");
-        await container.items.upsert({...result, companyId});
+        return (await container.items.upsert({...result, companyId})).resource?.id;
     }
 
     private getContainer(container:string): Container {

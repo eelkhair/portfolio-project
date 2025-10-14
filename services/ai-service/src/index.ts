@@ -16,8 +16,6 @@ import traceIdPlugin from "./plugins/trace-id.js";
 import aiRoutes from "./routes/drafts/rewrite.js";
 import {env} from "./config.js";
 import jobsGenerate from "./routes/drafts/generate.js";
-import './otel.js'
-
 import {CosmosService} from "./services/cosmos.service.js";
 import {OpenAIService} from "./services/openai.service.js";
 import {startOtel, stopOtel} from "./otel.js";

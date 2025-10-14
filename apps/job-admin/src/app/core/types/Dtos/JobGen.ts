@@ -25,7 +25,7 @@ export interface JobGenResponse {
   aboutRole: string;
   responsibilities: string[];
   qualifications: string[];
-
+  draftId?: string;
   /** required; "" if none */
   notes: string;
 

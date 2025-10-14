@@ -1,4 +1,4 @@
-ru#!/usr/bin/env bash
+rubas#!/usr/bin/env bash
 set -euo pipefail
 
 # ========= Config =========

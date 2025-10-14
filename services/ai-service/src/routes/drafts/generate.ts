@@ -8,7 +8,7 @@ import { SpanStatusCode } from "@opentelemetry/api";
 import {tracer} from "../../tracing.js";
 
 type AiPluginOpts = { openAIService: OpenAIService; cosmosService: CosmosService };
-type JobGenResponseT = z.infer<typeof JobGenResponse>;
+type JobGenResponseT = z.infer<typeof JobGenResponse> & {draftId?: string};
 
 const Params = z.object({ companyId: z.string().min(1) });
 const ErrRes = z.object({ error: z.string() });
@@ -43,11 +43,10 @@ export default fp<AiPluginOpts>(async (app: FastifyInstance, opts) => {
           span.addEvent("GenerateWithOpenAI:ok");
 
           span.addEvent("SaveDraft:start", { companyId });
-          await cosmosService.saveDraft(companyId, result);
-          span.addEvent("SaveDraft:ok");
-
+          result.draftId =await cosmosService.saveDraft(companyId, result);
+          span.addEvent("SaveDraft:ok", {draftId: result.draftId});
           span.setStatus({ code: SpanStatusCode.OK, message: "Draft generated and saved" });
-          return result; // ✅ Single response path
+          return result;
         } catch (err: any) {
           const allowed = [400, 401, 429, 500] as const;
           const status = allowed.includes(err?.status) ? err.status : 500;

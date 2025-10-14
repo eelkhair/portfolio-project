@@ -6,12 +6,8 @@ public class JobGenResponse
     public string AboutRole { get; set; } = "";
     public List<string> Responsibilities { get; set; } = new();
     public List<string> Qualifications { get; set; } = new();
-
-    /// <summary>Required; empty string if no caveats.</summary>
     public string Notes { get; set; } = "";
-
-    /// <summary>Required; "" if unknown. Normalized to "City, ST" | "Remote" | "Hybrid".</summary>
     public string Location { get; set; } = "";
-
     public JobGenMetadata Metadata { get; set; } = new();
+    public string DraftId { get; set; } = "";
 }
