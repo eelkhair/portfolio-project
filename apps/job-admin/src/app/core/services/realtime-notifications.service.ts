@@ -4,9 +4,8 @@ import { firstValueFrom } from 'rxjs';
 import { NotificationService } from './notification.service';
 import {AccountService} from './account.service';
 import {environment} from '../../../environments/environment';
-import {toSignal} from '@angular/core/rxjs-interop';
-import {Attributes, propagation, ROOT_CONTEXT, SpanKind, SpanStatusCode, trace} from '@opentelemetry/api';
- // wherever your auth lives
+import {propagation, ROOT_CONTEXT, SpanKind, SpanStatusCode, trace} from '@opentelemetry/api';
+
 
 export interface CompanyActivatedMsg {
   companyUId: string;
@@ -24,8 +23,6 @@ export class RealtimeNotificationsService {
   private tracer = trace.getTracer('admin-fe')
   connected = signal(false);
   companyActivated = signal<CompanyActivatedMsg | null>(null);
-  private token = toSignal(this.account.auth.getAccessTokenSilently());
-
   private starting = false;
 
   async start(hubUrl = environment.apiUrl + 'hubs/notifications') {

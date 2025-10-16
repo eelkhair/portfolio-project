@@ -6,6 +6,7 @@ import {cities} from './job-generate/us-cities';
 import {JobGenRequest, JobGenResponse} from '../../core/types/Dtos/JobGen';
 import {tap} from 'rxjs/operators';
 import {NotificationService} from '../../core/services/notification.service';
+import {Draft} from '../../core/types/Dtos/draft';
 
 @Injectable({ providedIn: 'root' })
 export class JobsStore {
@@ -34,14 +35,28 @@ export class JobsStore {
   }
 
   generateDraft(payload: JobGenRequest) {
-
     return this.jobService.generateDraft(this.selectedCompany()?.uId!, payload).pipe(tap(job => {
       this.aiResponse.set(job.data)
     }));
-
   }
-
-
+  saveDraft(payload: Draft) {
+    return this.jobService.saveDraft(this.selectedCompany()?.uId!, payload).pipe(tap(job => {
+      let draft: JobGenResponse;
+      draft = {
+        aboutRole: job.data?.aboutRole??'',
+        draftId: job.data?.id,
+        location: job.data?.location??'',
+        metadata: {roleLevel: payload.metadata?.roleLevel??'mid' , tone: payload.metadata?.tone??'neutral'},
+        notes: job.data?.notes??'',
+        qualifications: job.data?.qualifications??[],
+        responsibilities: job.data?.responsibilities?? [],
+        title: job.data?.title??'',
+        jobType: payload.jobType??'',
+        salaryRange:payload.salaryRange??''
+      };
+      this.aiResponse.set(draft);
+    }));
+  }
   private allSkills = [
     '.NET','REST','SQL','Kafka','Terraform','Azure','Kubernetes','Docker','PostgreSQL','C#','Java','Go'
   ];

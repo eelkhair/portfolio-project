@@ -14,7 +14,6 @@ public sealed class JobGenEndpoint(IOpenAICommandService _ai)
     public override void Configure()
     {
         Post(RouteTemplate);
-        AllowAnonymous(); // or RequireAuthorization()
         Summary(s =>
         {
             s.Summary = "Generate a structured job draft via AI";

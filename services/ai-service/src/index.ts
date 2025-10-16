@@ -14,6 +14,8 @@ import daprRoutes from "./routes/utils/dapr.js";
 import healthRoutes from "./routes/utils/health.js";
 import traceIdPlugin from "./plugins/trace-id.js";
 import aiRoutes from "./routes/drafts/rewrite.js";
+import draftUpsert from "./routes/drafts/upsert.js";
+
 import {env} from "./config.js";
 import jobsGenerate from "./routes/drafts/generate.js";
 import {CosmosService} from "./services/cosmos.service.js";
@@ -59,9 +61,9 @@ app.get("/", {schema:{hide: true}}, async (request, reply): Promise<any> => repl
 
 const openAIService = new OpenAIService({ apiKey: env.OPENAI_API_KEY, model: env.OPENAI_MODEL });
 const cosmosService = new CosmosService();
-await app.register(healthRoutes); // livez/readyz/healthzEndpoint
-
+await app.register(healthRoutes);
 await app.register(daprRoutes);
+await app.register(draftUpsert,{cosmosService});
 await app.register(aiRoutes,{service: openAIService});
 await app.register(jobsGenerate, {openAIService: openAIService, cosmosService: cosmosService});
 app.get('/ping', async (_req, _rep) => {

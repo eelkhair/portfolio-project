@@ -1,6 +1,6 @@
 <!--suppress JSUnusedGlobalSymbols -->
 <p-dialog header="Generate Draft"
-          (onHide)="store.showGenerate.set(false);form.reset();errors.set([])"
+          (onHide)="store.showGenerate.set(false);form.reset();errors.set([]);setDefaults()"
           (visibleChange)="store.showGenerate.set(false)"
           [modal]="true" [visible]="store.showGenerate()"
           [closable]="!isFinalStep()"
@@ -10,7 +10,7 @@
 
     <p-stepper [value]="1" class="basis-[50rem]" (valueChange)="validateStep($event)" #stepper >
       <p-step-list>
-        <p-step [value]="1" [disabled]="isFinalStep()">Basics</p-step>
+        <p-step [value]="1" [disabled]="isFinalStep() && !success()">Basics</p-step>
         <p-step [value]="2" [disabled]="!validSteppers[1]">>Scope</p-step>
         <p-step [value]="3" [disabled]="!validSteppers[2]">Qualifications</p-step>
         <p-step [value]="4" [disabled]="!validSteppers[3]">Style</p-step>
@@ -35,7 +35,6 @@
               </div>
               <div class=" flex w-full items-center">
                 <label class="w-40">Location</label>
-
                   <p-autoComplete
                     formControlName="location"
                     [suggestions]="store.citySuggestions"
@@ -46,10 +45,7 @@
                     class="w-full"
                     placeholder="City, ST | Remote | Hybrid">
                   </p-autoComplete>
-
               </div>
-
-
             </div>
             <div class="flex pt-6 justify-end ">
               <p-button label="Next" icon="pi pi-arrow-right" iconPos="right" [disabled]="!validSteppers[1]" (onClick)="activateCallback(2)"/>
@@ -167,16 +163,22 @@
         <p-step-panel [value]="5">
           <ng-template #content let-activateCallback="activateCallback">
             <form [formGroup]="form.controls.style">
-              <div class="flex w-full flex-col gap-3">
                 @if(isFinalStep()){
-                  <p-progress-spinner strokeWidth="3" fill="transparent" animationDuration=".5s" [style]="{ width: '150px', height: '150px' }" />
-                }
-              </div>
-              <div class="pt-6 center mt-1 w-full">
+                  @if(!success()){
 
-                <h1 class="text-2xl">Generating Draft...</h1>
-                <p-button label="Close" icon="pi pi-arrow-right" iconPos="right" type="button" [disabled]="isFinalStep()" (click)="store.showGenerate.set(false); activateCallback(1);this.form.reset();validateSteps()"/>
-              </div>
+                    <div class="flex w-full flex-col gap-3 mb-24 mt-12">
+                      <p-progress-spinner strokeWidth="3" fill="transparent" animationDuration=".5s" [style]="{ width: '175px', height: '175px' }">
+                      </p-progress-spinner>
+                      <span style="position:relative; margin: -125px auto auto; text-align:center; font-size:18px">Generating<br/>Draft</span>
+                    </div>
+                  }
+                }
+              @if(success()){
+                <div class="pt-6 flex flex-col items-center gap-6  mt-1 w-full center" style="margin-top: 75px">
+                  <h1 class="text-2xl margin-auto center">The draft was generated successfully!</h1>
+                  <p-button label="Close" icon="pi pi-arrow-right" iconPos="right" type="button" [disabled]="isFinalStep()" (click)="store.showGenerate.set(false); activateCallback(1);this.form.reset();validateSteps();success.set(false); setDefaults()"/>
+                </div>
+              }
             </form>
           </ng-template>
         </p-step-panel>

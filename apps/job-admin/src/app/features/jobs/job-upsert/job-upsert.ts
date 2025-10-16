@@ -9,6 +9,7 @@ import {JobType} from '../../../core/types/Dtos/CreateJobRequest';
 import {Select} from 'primeng/select';
 import {Tooltip} from 'primeng/tooltip';
 import {JobGenerate} from '../job-generate/job-generate';
+import {Draft} from '../../../core/types/Dtos/draft';
 
 @Component({
   selector: 'app-job-upsert',
@@ -35,19 +36,19 @@ export class JobUpsert implements OnInit {
     title: ['', Validators.required],
     aboutRole: ['', [Validators.required, Validators.minLength(20)]],
     location: ['', Validators.required],
-    jobType: this.fb.nonNullable.control<JobType>('FullTime', Validators.required),
+    jobType: this.fb.nonNullable.control<JobType>('fullTime', Validators.required),
     salaryRange: this.fb.control<string | null>(null),
     responsibilities: this.fb.array<FormControl<string>>([]),
     qualifications: this.fb.array<FormControl<string>>([]),
   });
 
   jobTypes: { label: string; value: JobType }[] = [
-    { label: 'Full time', value: 'FullTime' },
-    { label: 'Part time', value: 'PartTime' },
-    { label: 'Contract',  value: 'Contract' },
-    { label: 'Internship', value: 'Internship' },
-    { label: 'Temporary', value: 'Temporary' },
-    { label: 'Other',     value: 'Other' },
+    { label: 'Full time', value: 'fullTime' },
+    { label: 'Part time', value: 'partTime' },
+    { label: 'Contract',  value: 'contract' },
+    { label: 'Internship', value: 'internship' },
+    { label: 'Temporary', value: 'temporary' },
+    { label: 'Other',     value: 'other' },
   ];
   ngOnInit() {
   }
@@ -114,6 +115,23 @@ export class JobUpsert implements OnInit {
     console.log(this.form.value);
   }
   saveDraft() {
+    const payload: Draft = {
+      aboutRole: this.form.controls.aboutRole.value,
+      id: this.store.aiResponse()?.draftId ??'',
+      jobType: this.form.controls.jobType.value,
+      location: this.form.controls.location.value,
+      metadata: {roleLevel: this.store.aiResponse()?.metadata?.roleLevel?? 'mid', tone: this.store.aiResponse()?.metadata?.tone??'neutral'},
+      notes: this.store.aiResponse()?.notes ?? '',
+      qualifications: this.form.controls.qualifications.value,
+      responsibilities: this.form.controls.responsibilities.value,
+      salaryRange: this.form.controls.salaryRange.value ??'',
+      title: this.form.controls.title.value ??''
 
+    }
+    this.store.saveDraft(payload).subscribe({
+      next: ()=>{
+        this.store.notificationService.success('Success', 'The draft was saved successfully!')
+      }
+    })
   }
 }

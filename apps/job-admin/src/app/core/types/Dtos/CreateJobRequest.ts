@@ -1,12 +1,12 @@
 
-export type JobType = 'FullTime' | 'PartTime' | 'Contract' | 'Internship' | 'Temporary' | 'Other';
+export type JobType = 'fullTime' | 'partTime' | 'contract' | 'internship' | 'temporary' | 'other';
 
 export interface CreateJobDto {
   title: string;
   companyUId: string;
   location: string;
-  jobType: JobType;
   aboutRole: string;
+  jobType: JobType;
   salaryRange?: string | null;
   responsibilities: string[];
   qualifications: string[];

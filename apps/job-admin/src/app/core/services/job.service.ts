@@ -4,6 +4,7 @@ import {ApiResponse} from '../types/Dtos/ApiResponse';
 import {environment} from '../../../environments/environment';
 import {Job} from '../types/models/Job';
 import {JobGenRequest, JobGenResponse} from '../types/Dtos/JobGen';
+import {Draft} from '../types/Dtos/draft';
 
 @Injectable({ providedIn: 'root' })
 export class JobService {
@@ -15,5 +16,8 @@ export class JobService {
 
   generateDraft(uId: string, payload: JobGenRequest) {
     return this.http.post<ApiResponse<JobGenResponse>>(environment.apiUrl+ 'jobs/'+uId +'/generate', payload);
+  }
+  saveDraft(uId: string, payload: Draft) {
+    return this.http.put<ApiResponse<Draft>>(environment.apiUrl+ 'jobs/'+uId +'/save-draft',payload);
   }
 }

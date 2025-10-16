@@ -9,7 +9,7 @@ HARD RULES
 - Normalize US location to "City, ST"; allow Remote/Hybrid if stated.
 - No placeholders like "TBD".
 - Responsibilities start with action verbs ("Design", "Build", "Own").
-- Role level: junior|mid|senior. Tone: neutral|concise|friendly.
+- Role level: junior|mid|senior|staff|principal. Tone: neutral|concise|friendly.
 - Output JSON ONLY. Match schema exactly (no markdown, no extra keys).
 - If there are no caveats, set "notes" to "" (empty string).
 - Always include "location". Normalize to "City, ST", or "Remote"/"Hybrid" if stated. If unknown, set location to "" (empty string).

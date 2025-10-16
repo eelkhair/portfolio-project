@@ -26,12 +26,10 @@ export interface JobGenResponse {
   responsibilities: string[];
   qualifications: string[];
   draftId?: string;
-  /** required; "" if none */
   notes: string;
-
-  /** required; "" if unknown. Normalized to "City, ST" | "Remote" | "Hybrid". */
   location: string;
-
+  jobType?: string;
+  salaryRange?:string;
   metadata: {
     roleLevel: RoleLevel;
     tone: Tone;

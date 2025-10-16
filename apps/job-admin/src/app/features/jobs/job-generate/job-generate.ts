@@ -11,7 +11,6 @@ import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {JobGenRequest, RoleLevel, Tone} from '../../../core/types/Dtos/JobGen';
 import {locationValidator, normalizeLocation} from './utils/jobGenLocation.validator';
 import {ProgressSpinner} from 'primeng/progressspinner';
-import {NotificationService} from '../../../core/services/notification.service';
 
 @Component({
   selector: 'app-job-generate',
@@ -42,6 +41,7 @@ export class JobGenerate implements OnInit {
   errors = signal<string[]>([])
   validSteppers: Record<number, boolean> = {1:false, 2:false, 3:false, 4:true};
   isFinalStep = signal(false)
+  success=signal(false)
 
   form = this.fb.nonNullable.group({
     basics:this.fb.group({
@@ -68,7 +68,13 @@ export class JobGenerate implements OnInit {
 
   ngOnInit() {
     this.validateSteps();
-    this.form.controls.basics.controls.companyName.setValue(this.companyName())
+    this.setDefaults()
+  }
+  protected setDefaults(){
+    this.form.controls.style.controls.maxBullets.setValue(6);
+    this.form.controls.style.controls.tone.setValue('Neutral');
+    this.form.controls.scope.controls.roleLevel.setValue('Mid');
+    this.form.controls.basics.controls.companyName.setValue(this.companyName());
     this.form.controls.basics.statusChanges.subscribe(()=> this.validateStep(1))
     this.form.controls.scope.statusChanges.subscribe(()=> this.validateStep(2) )
     this.form.controls.qualifications.statusChanges.subscribe(()=> this.validateStep(3))
@@ -77,6 +83,7 @@ export class JobGenerate implements OnInit {
   submit() {
 
     if(this.form.invalid) {
+      this.success.set(false)
       const errs = this.store.getAllErrors(this.form);
       this.errors.set(this.store.buildErrors(errs))
       return;
@@ -103,14 +110,17 @@ export class JobGenerate implements OnInit {
     } as JobGenRequest;
     this.store.generateDraft(payload).subscribe({
       next: ()=>{
-        console.log(this.store.aiResponse());
         this.isFinalStep.set(false)
         this.form.reset();
+        this.success.set(true)
+        this.store.notificationService.success("Success", "The draft was generated successfully!")
+        this.setDefaults()
       }, error: () => {
         this.store.notificationService.error("Error","Failed to generate draft. \nPlease try again later");
         this.validateSteps()
         this.stepper()?.value.set(4)
         this.isFinalStep.set(false)
+        this.success.set(false)
       }
     }
    )

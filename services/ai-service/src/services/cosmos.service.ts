@@ -1,8 +1,7 @@
 import { CosmosClient, Container } from "@azure/cosmos";
-
-import {JobGenResponse} from "../schemas/job-generate.js";
 import {z} from "zod";
-type JobGenResponseT = z.infer<typeof JobGenResponse>;
+import {JobDraft} from "../schemas/job-draft.js";
+type JobDraftT = z.infer<typeof JobDraft>;
 export class CosmosService{
     private client: CosmosClient;
     constructor() {
@@ -13,7 +12,7 @@ export class CosmosService{
         });
     }
 
-    async saveDraft(companyId:string, result: JobGenResponseT){
+    async saveDraft(companyId:string, result: JobDraftT){
         const container = this.getContainer("drafts");
         return (await container.items.upsert({...result, companyId})).resource?.id;
     }
