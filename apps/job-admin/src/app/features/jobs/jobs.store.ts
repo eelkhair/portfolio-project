@@ -14,6 +14,7 @@ export class JobsStore {
   selectedCompany = this.companySelectionStore.selectedCompany;
   private jobService = inject(JobService);
   jobs = signal<Job[]>([])
+  drafts= signal<Draft[]>([])
   showGenerate = signal(false);
   aiResponse = signal<JobGenResponse|undefined>(undefined)
   skillSuggestions: string[] = [];
@@ -172,4 +173,11 @@ export class JobsStore {
   }
 
 
+  loadDrafts(companyId: string) {
+    return this.jobService.loadDrafts(companyId).pipe(tap(drafts => {
+      if(drafts?.data) {
+        this.drafts.set(drafts?.data);
+      }
+    }));
+  }
 }

@@ -20,5 +20,19 @@ export class CosmosService{
     private getContainer(container:string): Container {
         return this.client.database(process.env.COSMOS_DB!).container(container)
     }
+
+    async listDrafts(companyId:string){
+        const container = this.getContainer("drafts");
+        const querySpec = {
+            query: "SELECT * FROM c WHERE c.companyId = @companyId",
+            parameters: [
+                { name: "@companyId", value: companyId }
+            ]
+        };
+
+        const { resources } = await container.items.query(querySpec).fetchAll();
+        return resources as JobDraftT[];
+
+    }
 }
 

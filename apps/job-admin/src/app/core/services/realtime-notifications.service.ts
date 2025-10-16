@@ -6,7 +6,6 @@ import {AccountService} from './account.service';
 import {environment} from '../../../environments/environment';
 import {propagation, ROOT_CONTEXT, SpanKind, SpanStatusCode, trace} from '@opentelemetry/api';
 
-
 export interface CompanyActivatedMsg {
   companyUId: string;
   companyName: string;

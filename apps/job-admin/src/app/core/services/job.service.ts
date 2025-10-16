@@ -20,4 +20,9 @@ export class JobService {
   saveDraft(uId: string, payload: Draft) {
     return this.http.put<ApiResponse<Draft>>(environment.apiUrl+ 'jobs/'+uId +'/save-draft',payload);
   }
+
+  loadDrafts(companyId: string) {
+    return this.http.get<ApiResponse<Draft[]>>(environment.apiUrl+ 'jobs/'+companyId +'/list-drafts');
+
+  }
 }

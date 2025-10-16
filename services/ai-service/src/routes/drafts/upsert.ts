@@ -30,7 +30,7 @@ export default fp<{ cosmosService: CosmosService }>(async (app: FastifyInstance,
         },
         handler: async (req, reply) =>
         {
-            console.log("Incoming draft body:", req.body);
+
             return tracer.startActiveSpan("handler.ai.drafts.upsert", async (span)=>{
                 try {
                     const { companyId } = Params.parse(req.params);
@@ -38,16 +38,16 @@ export default fp<{ cosmosService: CosmosService }>(async (app: FastifyInstance,
                     span.addEvent("SaveDraft:start", { companyId: companyId });
                     request.id =await cosmosService.saveDraft(companyId, request);
                     span.addEvent("SaveDraft:ok", {draftId: request.id});
+                    reply.status(200);
                     return request;
                 }catch (err: any) {
-                    console.log(req.body);
                     const allowed = [400, 401, 429, 500] as const;
                     const status = allowed.includes(err?.status) ? err.status : 500;
 
                     span.recordException(err);
-                    span.setStatus({ code: SpanStatusCode.ERROR, message: "AI_REQUEST_FAILED" });
+                    span.setStatus({ code: SpanStatusCode.ERROR, message: "COSMOS_REQUEST_FAILED" });
                     reply.status(status);
-                    return { error: "AI_REQUEST_FAILED" };
+                    return { error: "COSMOS_REQUEST_FAILED" };
                 } finally {
                     span.end();
                 }

@@ -15,6 +15,7 @@ import healthRoutes from "./routes/utils/health.js";
 import traceIdPlugin from "./plugins/trace-id.js";
 import aiRoutes from "./routes/drafts/rewrite.js";
 import draftUpsert from "./routes/drafts/upsert.js";
+import draftList from "./routes/drafts/list.js";
 
 import {env} from "./config.js";
 import jobsGenerate from "./routes/drafts/generate.js";
@@ -64,6 +65,7 @@ const cosmosService = new CosmosService();
 await app.register(healthRoutes);
 await app.register(daprRoutes);
 await app.register(draftUpsert,{cosmosService});
+await app.register(draftList, {cosmosService});
 await app.register(aiRoutes,{service: openAIService});
 await app.register(jobsGenerate, {openAIService: openAIService, cosmosService: cosmosService});
 app.get('/ping', async (_req, _rep) => {

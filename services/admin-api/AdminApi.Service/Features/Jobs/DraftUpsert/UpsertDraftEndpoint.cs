@@ -4,7 +4,7 @@ using AdminAPI.Contracts.Models.Jobs.Responses;
 using Elkhair.Dev.Common.Application;
 using FastEndpoints;
 
-namespace AdminApi.Features.Jobs.UpsertDraft;
+namespace AdminApi.Features.Jobs.DraftUpsert;
 
 public sealed class UpsertDraftEndpoint(IJobCommandService service):
     Endpoint<JobDraftRequest, ApiResponse<JobDraftResponse>>

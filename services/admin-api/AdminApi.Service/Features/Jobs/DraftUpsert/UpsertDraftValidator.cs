@@ -2,7 +2,7 @@
 using FastEndpoints;
 using FluentValidation;
 
-namespace AdminApi.Features.Jobs.UpsertDraft;
+namespace AdminApi.Features.Jobs.DraftUpsert;
 
 public sealed class UpsertDraftValidator: Validator<JobDraftRequest>
 {
