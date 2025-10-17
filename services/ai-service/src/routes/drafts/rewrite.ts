@@ -1,27 +1,25 @@
 import type { FastifyInstance } from "fastify";
 import fp from "fastify-plugin";
 import { z } from "zod";
-import {OpenAIService} from "../../services/openai.service.js";
-
+import { OpenAIService } from "../../services/openai.service.js";
+import { JobRewriteItemRequest, JobRewriteItemResponse } from "../../schemas/job-rewrite-item.js";
 
 type AiPluginOpts = { service: OpenAIService };
+
+const ErrRes  = z.object({ error: z.string() });
 
 export default fp<AiPluginOpts>(async (app: FastifyInstance, opts) => {
     const { service } = opts;
 
-    const Query  = z.object({ q: z.string().min(1) });
-    const Reply  = z.object({ text: z.string() });
-    const ErrRes = z.object({ error: z.string() });
-
     app.route({
-        method: "GET",
-        url: "/drafts/rewrite",
+        method: "PUT",
+        url: "/drafts/rewrite/item",
         schema: {
             tags: ["drafts"],
-            summary: "Rewrite a short prompt with OpenAI",
-            querystring: Query,
+            summary: "Rewrite a single field item (no persistence)",
+            body: JobRewriteItemRequest,
             response: {
-                200: Reply,
+                200: JobRewriteItemResponse,
                 400: ErrRes,
                 401: ErrRes,
                 429: ErrRes,
@@ -30,13 +28,14 @@ export default fp<AiPluginOpts>(async (app: FastifyInstance, opts) => {
         },
         handler: async (req, reply) => {
             try {
-                const { q } = Query.parse(req.query);
-                const result = await service.rewrite(q);
+                const body = JobRewriteItemRequest.parse(req.body);
+
+                const result = await service.rewriteItem(body);
                 return reply.send(result);
             } catch (err: any) {
                 const allowed = [400, 401, 429, 500] as const;
                 const status = allowed.includes(err?.status) ? err.status : 500;
-                app.log.error({ err }, "OpenAI request failed");
+                app.log.error({ err }, "AI rewrite-item request failed");
                 return reply.status(status).send({ error: "AI_REQUEST_FAILED" });
             }
         },

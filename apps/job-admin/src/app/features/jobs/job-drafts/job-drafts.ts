@@ -31,7 +31,9 @@ export class JobDrafts{
       }},
     { field: 'title' },
     { field: 'aboutRole' },
-    { field: 'location' }
+    { field: 'location' },
+    { field: 'jobType' },
+    { field: 'salaryRange' },
   ]
   constructor() {
     effect(()=>{

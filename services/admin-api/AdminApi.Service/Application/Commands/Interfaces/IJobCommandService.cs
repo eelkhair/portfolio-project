@@ -8,4 +8,6 @@ public interface IJobCommandService
 {
     Task<ApiResponse<JobDraftResponse>> CreateDraft(string companyId, JobDraftRequest request,
         CancellationToken ct = default);
+
+    Task<ApiResponse<List<JobDraftResponse>>> ListDrafts(string companyId, CancellationToken ct = default);
 }
