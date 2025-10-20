@@ -45,7 +45,7 @@ export class JobsStore {
       let draft: JobGenResponse;
       draft = {
         aboutRole: job.data?.aboutRole??'',
-        draftId: job.data?.id,
+        id: job.data?.id,
         location: job.data?.location??'',
         metadata: {roleLevel: payload.metadata?.roleLevel??'mid' , tone: payload.metadata?.tone??'neutral'},
         notes: job.data?.notes??'',
@@ -179,5 +179,19 @@ export class JobsStore {
         this.drafts.set(drafts?.data);
       }
     }));
+  }
+
+  populateDraft(id: string) {
+    const drafts = this.drafts()
+    let draft: Draft|undefined;
+    if(drafts){
+      draft =drafts.find(x => x.id === id);
+    }
+    if(!draft) return
+
+    const response = draft as JobGenResponse;
+    this.aiResponse.set(response)
+
+    console.log(this.aiResponse())
   }
 }

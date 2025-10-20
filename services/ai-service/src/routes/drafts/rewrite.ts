@@ -29,8 +29,9 @@ export default fp<AiPluginOpts>(async (app: FastifyInstance, opts) => {
         handler: async (req, reply) => {
             try {
                 const body = JobRewriteItemRequest.parse(req.body);
-
+                console.log(body)
                 const result = await service.rewriteItem(body);
+                console.log(result)
                 return reply.send(result);
             } catch (err: any) {
                 const allowed = [400, 401, 429, 500] as const;

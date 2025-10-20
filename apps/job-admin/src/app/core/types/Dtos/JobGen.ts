@@ -25,7 +25,7 @@ export interface JobGenResponse {
   aboutRole: string;
   responsibilities: string[];
   qualifications: string[];
-  draftId?: string;
+  id?: string;
   notes: string;
   location: string;
   jobType?: string;

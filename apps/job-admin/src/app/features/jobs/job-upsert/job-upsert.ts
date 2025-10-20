@@ -1,4 +1,4 @@
-import {Component, computed, effect, inject, OnInit} from '@angular/core';
+import {Component, computed, effect, inject, input, OnDestroy, OnInit} from '@angular/core';
 import {JobsStore} from '../jobs.store';
 import {CompanySelection} from '../../../shared/companies/company-selection/company-selection';
 import {InputText} from 'primeng/inputtext';
@@ -10,6 +10,11 @@ import {Select} from 'primeng/select';
 import {Tooltip} from 'primeng/tooltip';
 import {JobGenerate} from '../job-generate/job-generate';
 import {Draft} from '../../../core/types/Dtos/draft';
+import {JobAIEnhancerStore} from '../ai-enhancer.store';
+import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
+import {EnhancementRequest} from '../../../core/types/Dtos/EnhancementDto';
+import {JobEnhancer} from '../job-enhancer/job-enhancer';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-job-upsert',
@@ -27,8 +32,13 @@ import {Draft} from '../../../core/types/Dtos/draft';
   templateUrl: './job-upsert.html',
   styleUrl: './job-upsert.css'
 })
-export class JobUpsert implements OnInit {
+export class JobUpsert implements OnInit, OnDestroy{
+  ref?: DynamicDialogRef;
+  router= inject(Router);
+  dialogService = inject(DialogService);
   store = inject(JobsStore)
+  id= input<string>()
+  enhanceStore = inject(JobAIEnhancerStore)
   private fb = inject(FormBuilder)
   company = computed(() => this.store.selectedCompany());
 
@@ -51,6 +61,19 @@ export class JobUpsert implements OnInit {
     { label: 'Other',     value: 'other' },
   ];
   ngOnInit() {
+    const id = this.id()
+
+    if(id) {
+      if (!this.store.selectedCompany()) {
+        void this.router.navigate(["jobs", "drafts"])
+      }else{
+        this.store.populateDraft(id);
+      }
+    }
+  }
+  ngOnDestroy() {
+    this.form.reset();
+    this.store.aiResponse.set(undefined);
   }
   constructor() {
     effect(() => {
@@ -99,25 +122,18 @@ export class JobUpsert implements OnInit {
     arr.markAsDirty();                            // optional UX
     arr.updateValueAndValidity({ emitEvent: true });
   }
-
-  enhanceWithAI(type: string, i: number) {
-    let text:string
-    if (type=='responsibilities') {
-      text= this.form.controls.responsibilities.value[i]
-
-    }else{
-      text = this.form.controls.qualifications.value[i]
+  submit() {
+    if (this.form.invalid) return
+    const model = {
+      ...this.form.value,
+      draftId: this.store.aiResponse()?.id
     }
-    console.log(text);
-  }
-
-  submit(){
-    console.log(this.form.value);
+    console.log(model);
   }
   saveDraft() {
     const payload: Draft = {
       aboutRole: this.form.controls.aboutRole.value,
-      id: this.store.aiResponse()?.draftId ??'',
+      id: this.store.aiResponse()?.id ??'',
       jobType: this.form.controls.jobType.value,
       location: this.form.controls.location.value,
       metadata: {roleLevel: this.store.aiResponse()?.metadata?.roleLevel?? 'mid', tone: this.store.aiResponse()?.metadata?.tone??'neutral'},
@@ -131,6 +147,86 @@ export class JobUpsert implements OnInit {
     this.store.saveDraft(payload).subscribe({
       next: ()=>{
         this.store.notificationService.success('Success', 'The draft was saved successfully!')
+      }
+    })
+  }
+
+  enhanceAboutMe() {
+    const model = this.enhanceStore.buildModel('aboutRole', this.form.controls.aboutRole.value,{
+      title: this.form.controls.title.value,
+      qualifications: this.form.controls.qualifications.value .filter(c=> c.length >= 3),
+      responsibilities: this.form.controls.responsibilities.value .filter(c=> c.length >= 3)
+    })
+    if(model != undefined){
+      this.showDialog(model);
+    }
+  }
+  enhanceResponsibility(i: number) {
+    const text= this.form.controls.responsibilities.value[i];
+    const model = this.enhanceStore.buildModel('responsibilities', text,{
+      title: this.form.controls.title.value,
+      qualifications: this.form.controls.qualifications.value .filter(c=> c.length >= 3),
+      aboutRole: this.form.controls.aboutRole.value
+    });
+    if(model != undefined){
+      this.showDialog(model,i);
+    }
+  }
+
+  enhanceQualification(i: number) {
+    const text= this.form.controls.qualifications.value[i];
+
+    const model = this.enhanceStore.buildModel('qualifications', text,{
+      title: this.form.controls.title.value,
+      responsibilities: this.form.controls.responsibilities.value
+        .filter(c=> c.length >= 3)
+      ,
+      aboutRole: this.form.controls.aboutRole.value
+    });
+    if(model != undefined){
+      this.showDialog(model, i);
+    }
+
+  }
+  showDialog(model: EnhancementRequest, selectedIndex: number|undefined = undefined) {
+    if (!model.value){return;}
+    model.context["CompanyName"] = this.company()?.name;
+    let header: string;
+    switch (model.field){
+      case 'aboutRole':
+        header = 'Enhance About Role';
+        break;
+      case 'responsibilities':
+        header = 'Enhance Responsibility';
+        break;
+      case 'qualifications':
+        header = 'Enhance Qualification';
+        break;
+      default:
+        header = 'Enhancement';
+    }
+
+    this.ref = this.dialogService.open(JobEnhancer, {
+      header: header,
+      width:'60rem',
+      modal:true,closable:false, closeOnEscape: false,
+      data: {model: model},
+    });
+
+    this.ref.onClose.subscribe(result => {
+     if(!result ){ return; }
+      if(selectedIndex != undefined){
+        if(model.field== 'responsibilities'){
+          let current = this.form.controls.responsibilities.value;
+          current[selectedIndex] = result;
+          this.form.controls.responsibilities.setValue(current);
+        }else{
+          let current = this.form.controls.qualifications.value;
+          current[selectedIndex] = result;
+          this.form.controls.qualifications.setValue(current);
+        }
+      }else{
+        this.form.controls.aboutRole.setValue(result);
       }
     })
   }

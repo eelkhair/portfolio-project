@@ -67,22 +67,22 @@ public class JobCommandService(DaprClient client, UserContextService accessor, I
         }
     }
 
-  
-
-    public async Task<ApiResponse<List<JobDraftResponse>>> ListDrafts(string companyId, CancellationToken ct = default)
+    public async Task<ApiResponse<JobRewriteResponse>> RewriteItem(JobRewriteRequest request, CancellationToken ct)
     {
         try
         {
             var req = client.CreateInvokeMethodRequest(
-                HttpMethod.Get,
+                HttpMethod.Put,
                 appId: "ai-service",
-                methodName: $"drafts/{companyId}"
+                methodName: $"drafts/rewrite/item"
             );
 
             if (accessor.GetHeader("Authorization") is { } auth && !string.IsNullOrWhiteSpace(auth))
                 req.Headers.TryAddWithoutValidation("Authorization", auth);
-            
 
+
+            req.Content = JsonContent.Create(request, options: JsonOpts);
+            
             using var resp = await client.InvokeMethodWithResponseAsync(req, ct);
 
             var raw = await resp.Content.ReadAsStringAsync(ct);
@@ -96,16 +96,17 @@ public class JobCommandService(DaprClient client, UserContextService accessor, I
                     $"ai-service {resp.StatusCode}: {raw}", null, resp.StatusCode);
             }
 
-            var result = JsonSerializer.Deserialize<List<JobDraftResponse>>(raw, JsonOpts);
+            var result = JsonSerializer.Deserialize<JobRewriteResponse>(raw, JsonOpts);
 
             if (result is null)
                 throw new InvalidOperationException("Empty or invalid JSON from ai-service.");
 
-            return new ApiResponse<List<JobDraftResponse>> { Data = result, Success = true, StatusCode = HttpStatusCode.OK };
-        }catch (Exception e)
+            return new ApiResponse<JobRewriteResponse> { Data = result, Success = true, StatusCode = HttpStatusCode.OK };
+        }
+        catch (Exception e)
         {
             _logger.LogError(e, "Error generating job draft");
-            return new ApiResponse<List<JobDraftResponse>> { Success = false, StatusCode = HttpStatusCode.InternalServerError, Exceptions = new ApiError()
+            return new ApiResponse<JobRewriteResponse> { Success = false, StatusCode = HttpStatusCode.InternalServerError, Exceptions = new ApiError()
             {
                 Message = e.Message,
                 Errors = new Dictionary<string, string[]>()

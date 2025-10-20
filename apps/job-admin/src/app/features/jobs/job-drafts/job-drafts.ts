@@ -6,6 +6,7 @@ import {CompanySelection} from '../../../shared/companies/company-selection/comp
 import {AgGridAngular} from 'ag-grid-angular';
 import {ColDef, themeQuartz} from 'ag-grid-community';
 import {AgButton} from '../../../shared/ag-button/ag-button';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-job-drafts',
@@ -18,14 +19,14 @@ import {AgButton} from '../../../shared/ag-button/ag-button';
 })
 export class JobDrafts{
   store = inject(JobsStore);
+  router= inject(Router);
   colDefs: ColDef[] = [
     { field: 'id', autoHeight: true,
       cellRenderer: AgButton,
       width:100,
       cellRendererParams: (e:any)=>{
         return { click:()=>{
-            alert(e.value);
-            //  void this.router.navigateByUrl('/companies/'+ e.value);
+              void this.router.navigateByUrl('/jobs/new/'+ e.value);
           }
         }
       }},
@@ -38,9 +39,7 @@ export class JobDrafts{
   constructor() {
     effect(()=>{
       if (this.store.selectedCompany()){
-        this.store.loadDrafts(this.store.selectedCompany()?.uId!).subscribe((drafts: ApiResponse<Draft[]>) => {
-          console.log(drafts);
-        });
+        this.store.loadDrafts(this.store.selectedCompany()?.uId!).subscribe();
       }
     })
 

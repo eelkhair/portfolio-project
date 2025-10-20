@@ -18,26 +18,28 @@ import {RouterLink} from '@angular/router';
   templateUrl: './jobs.html',
   styleUrl: './jobs.css'
 })
-export class Jobs{
+export class Jobs {
   store = inject(JobsStore);
   theme = themeQuartz;
 
   colDefs: ColDef[] = [
-    { field: 'uId', autoHeight: true,
+    {
+      field: 'uId', autoHeight: true,
       cellRenderer: AgButton,
-      width:100,
-      cellRendererParams: (e:any)=>{
-        return { click:()=>{
+      width: 100,
+      cellRendererParams: (e: any) => {
+        return {
+          click: () => {
             alert(e.value);
-          //  void this.router.navigateByUrl('/companies/'+ e.value);
           }
         }
-      }},
-    { field: 'title' },
-    { field: 'location'},
+      }
+    },
+    {field: 'title'},
+    {field: 'location'},
     {
       field: 'createdAt',
-      valueFormatter: ({ value }) =>
+      valueFormatter: ({value}) =>
         value
           ? new Date(value).toLocaleString(undefined, {
             year: 'numeric',
@@ -53,7 +55,7 @@ export class Jobs{
     },
     {
       field: 'updatedAt',
-      valueFormatter: ({ value }) =>
+      valueFormatter: ({value}) =>
         value
           ? new Date(value).toLocaleString(undefined, {
             year: 'numeric',
@@ -68,9 +70,10 @@ export class Jobs{
       filter: 'agDateColumnFilter'
     },
   ];
+
   constructor() {
     effect(() => {
-      if(this.store.selectedCompany()) {
+      if (this.store.selectedCompany()) {
         this.store.loadJobs();
       }
     });

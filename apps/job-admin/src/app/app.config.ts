@@ -15,6 +15,7 @@ import {authInterceptor} from './core/interceptores/auth.interceptor';
 import {tracingInterceptor} from './core/interceptores/tracing.interceptor';
 import {MessageService} from 'primeng/api';
 import {idempotencyInterceptor} from './core/interceptores/idempotency/idempotency.interceptor';
+import {DialogService} from 'primeng/dynamicdialog';
 
 
 export const appConfig: ApplicationConfig = {
@@ -49,6 +50,7 @@ export const appConfig: ApplicationConfig = {
       },
       cacheLocation: 'localstorage',
       useRefreshTokens: true
-    })
+    }),
+    DialogService
   ]
 };

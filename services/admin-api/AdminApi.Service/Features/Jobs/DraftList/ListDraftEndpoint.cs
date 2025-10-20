@@ -1,11 +1,11 @@
-﻿using AdminApi.Application.Commands.Interfaces;
+﻿using AdminApi.Application.Queries.Interfaces;
 using AdminAPI.Contracts.Models.Jobs.Responses;
 using Elkhair.Dev.Common.Application;
 using FastEndpoints;
 
 namespace AdminApi.Features.Jobs.DraftList;
 
-public sealed class ListDraftEndpoint(IJobCommandService service) :
+public sealed class ListDraftEndpoint(IJobQueryService service) :
     EndpointWithoutRequest<ApiResponse<List<JobDraftResponse>>>
 {
     private const string RouteTemplate = "jobs/{companyId}/list-drafts";
