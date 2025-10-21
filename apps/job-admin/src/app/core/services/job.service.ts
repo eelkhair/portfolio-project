@@ -6,6 +6,7 @@ import {Job} from '../types/models/Job';
 import {JobGenRequest, JobGenResponse} from '../types/Dtos/JobGen';
 import {Draft} from '../types/Dtos/draft';
 import {EnhancementRequest, EnhancementResponse} from '../types/Dtos/EnhancementDto';
+import {CreateJobDto} from '../types/Dtos/CreateJobRequest';
 
 @Injectable({ providedIn: 'root' })
 export class JobService {
@@ -29,5 +30,9 @@ export class JobService {
 
   rewrite(model: EnhancementRequest) {
     return this.http.put<ApiResponse<EnhancementResponse>>(environment.apiUrl +"jobs/drafts/rewrite", model);
+  }
+
+  createJob(model: CreateJobDto) {
+    return this.http.post<ApiResponse<Job[]>>(environment.apiUrl + 'jobs', model);
   }
 }

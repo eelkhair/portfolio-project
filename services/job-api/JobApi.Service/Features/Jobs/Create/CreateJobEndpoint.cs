@@ -11,7 +11,6 @@ public class CreateJobEndpoint(IJobCommandService service) :  Endpoint<CreateJob
     {
         Verbs(Http.POST);
         Routes("/jobs");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CreateJobRequest request, CancellationToken ct)

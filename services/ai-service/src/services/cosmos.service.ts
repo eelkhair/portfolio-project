@@ -3,6 +3,7 @@ import {z} from "zod";
 import {JobDraft} from "../schemas/job-draft.js";
 type JobDraftT = z.infer<typeof JobDraft>;
 export class CosmosService{
+
     private client: CosmosClient;
     constructor() {
         this.client = new CosmosClient({
@@ -15,6 +16,11 @@ export class CosmosService{
     async saveDraft(companyId:string, result: JobDraftT){
         const container = this.getContainer("drafts");
         return (await container.items.upsert({...result, companyId})).resource?.id;
+    }
+
+    async deleteDraft(id: string, companyId:string) {
+        const container = this.getContainer("drafts");
+        await container.item(id, companyId).delete();
     }
 
     private getContainer(container:string): Container {

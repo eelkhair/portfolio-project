@@ -7,6 +7,7 @@ import {JobGenRequest, JobGenResponse} from '../../core/types/Dtos/JobGen';
 import {tap} from 'rxjs/operators';
 import {NotificationService} from '../../core/services/notification.service';
 import {Draft} from '../../core/types/Dtos/draft';
+import {CreateJobDto} from '../../core/types/Dtos/CreateJobRequest';
 
 @Injectable({ providedIn: 'root' })
 export class JobsStore {
@@ -193,5 +194,9 @@ export class JobsStore {
     this.aiResponse.set(response)
 
     console.log(this.aiResponse())
+  }
+
+  createJob(model: CreateJobDto) {
+    return this.jobService.createJob(model)
   }
 }

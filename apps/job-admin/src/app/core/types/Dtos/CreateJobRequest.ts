@@ -10,4 +10,6 @@ export interface CreateJobDto {
   salaryRange?: string | null;
   responsibilities: string[];
   qualifications: string[];
+  draftId?: string;
+  deleteDraft: boolean;
 }

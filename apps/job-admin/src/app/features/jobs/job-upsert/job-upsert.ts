@@ -1,11 +1,11 @@
-import {Component, computed, effect, inject, input, OnDestroy, OnInit} from '@angular/core';
+import {Component, computed, effect, inject,  OnDestroy, OnInit} from '@angular/core';
 import {JobsStore} from '../jobs.store';
 import {CompanySelection} from '../../../shared/companies/company-selection/company-selection';
 import {InputText} from 'primeng/inputtext';
 import {Textarea} from 'primeng/textarea';
 import {Button, ButtonDirective} from 'primeng/button';
 import {FormArray, FormBuilder, FormControl, ReactiveFormsModule, Validators} from '@angular/forms';
-import {JobType} from '../../../core/types/Dtos/CreateJobRequest';
+import {CreateJobDto, JobType} from '../../../core/types/Dtos/CreateJobRequest';
 import {Select} from 'primeng/select';
 import {Tooltip} from 'primeng/tooltip';
 import {JobGenerate} from '../job-generate/job-generate';
@@ -14,7 +14,10 @@ import {JobAIEnhancerStore} from '../ai-enhancer.store';
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {EnhancementRequest} from '../../../core/types/Dtos/EnhancementDto';
 import {JobEnhancer} from '../job-enhancer/job-enhancer';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
+import {JobPublishConfirm} from '../job-publish-confirm/job-publish-confirm';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {distinctUntilChanged, map} from 'rxjs';
 
 @Component({
   selector: 'app-job-upsert',
@@ -34,10 +37,18 @@ import {Router} from '@angular/router';
 })
 export class JobUpsert implements OnInit, OnDestroy{
   ref?: DynamicDialogRef;
+  confirmRef?: DynamicDialogRef;
+  route = inject(ActivatedRoute);
   router= inject(Router);
   dialogService = inject(DialogService);
   store = inject(JobsStore)
-  id= input<string>()
+  readonly draftId = toSignal(
+    this.route.paramMap.pipe(
+      map(p => p.get('draftId')),
+      distinctUntilChanged()
+    ),
+    { initialValue: null }
+  );
   enhanceStore = inject(JobAIEnhancerStore)
   private fb = inject(FormBuilder)
   company = computed(() => this.store.selectedCompany());
@@ -61,13 +72,13 @@ export class JobUpsert implements OnInit, OnDestroy{
     { label: 'Other',     value: 'other' },
   ];
   ngOnInit() {
-    const id = this.id()
+    const draftId = this.draftId()
 
-    if(id) {
+    if(draftId) {
       if (!this.store.selectedCompany()) {
         void this.router.navigate(["jobs", "drafts"])
       }else{
-        this.store.populateDraft(id);
+        this.store.populateDraft(draftId);
       }
     }
   }
@@ -123,12 +134,28 @@ export class JobUpsert implements OnInit, OnDestroy{
     arr.updateValueAndValidity({ emitEvent: true });
   }
   submit() {
-    if (this.form.invalid) return
-    const model = {
-      ...this.form.value,
-      draftId: this.store.aiResponse()?.id
-    }
-    console.log(model);
+    if (this.form.invalid) return;
+    this.confirmRef = this.dialogService.open(JobPublishConfirm, {
+      header: "Confirm Publish",
+      width:'25rem',
+      modal:true,closable:true, closeOnEscape: true,
+      data:{draftId: this.draftId()}
+    });
+    this.confirmRef.onClose.subscribe(result => {
+      if(result === undefined) return;
+      const model = {
+        ...this.form.value,
+        draftId: this.store.aiResponse()?.id,
+        companyUId: this.store.selectedCompany()?.uId!,
+        deleteDraft: result
+      } as CreateJobDto
+      this.store.createJob(model).subscribe({
+        next: () => {
+          this.store.notificationService.success("Success","The job was published successfully.");
+          void this.router.navigate(["jobs"]);
+        }
+      })
+    });
   }
   saveDraft() {
     const payload: Draft = {
