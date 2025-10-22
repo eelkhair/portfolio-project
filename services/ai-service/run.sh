@@ -21,6 +21,7 @@ LOG_LEVEL="${LOG_LEVEL:-debug}"
 COMPONENTS_PATH="${COMPONENTS_PATH:-../../Components}"
 # FIX: independent second folder (e.g., secrets)
 COMPONENTS_PATH2="${COMPONENTS_PATH2:-Dapr/Components/Secrets}"
+COMPONENTS_PATH3="${COMPONENTS_PATH3:-Dapr/Components/Events}"
 CONFIG_PATH="${CONFIG_PATH:-../../Config/config.yaml}"
 
 # Optional: have daprd probe your app readiness directly
@@ -74,6 +75,7 @@ have daprd || die "daprd not found. Install the Dapr CLI."
 
 [[ -d "$COMPONENTS_PATH"  ]] || echo "⚠️  Missing ${COMPONENTS_PATH} (continuing)"
 [[ -d "$COMPONENTS_PATH2" ]] || echo "⚠️  Missing ${COMPONENTS_PATH2} (continuing)"
+[[ -d "$COMPONENTS_PATH3" ]] || echo "⚠️  Missing ${COMPONENTS_PATH3} (continuing)"
 [[ -f "$CONFIG_PATH"      ]] || echo "⚠️  Missing ${CONFIG_PATH} (continuing)"
 
 # Auto-install deps for dev convenience
@@ -114,6 +116,7 @@ daprd \
   --profile-port   "${DAPR_PROFILE_PORT}" \
   --resources-path "${COMPONENTS_PATH}" \
   --resources-path "${COMPONENTS_PATH2}" \
+  --resources-path "${COMPONENTS_PATH3}" \
   --config         "${CONFIG_PATH}" \
   --log-level      "${LOG_LEVEL}" \
   "${DAPR_APP_HEALTH_ARGS[@]}" &

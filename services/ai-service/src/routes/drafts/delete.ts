@@ -2,7 +2,6 @@ import {z} from "zod";
 import fp from "fastify-plugin";
 import {CosmosService} from "../../services/cosmos.service.js";
 import {FastifyInstance} from "fastify";
-import {JobDraft} from "../../schemas/job-draft.js";
 import {tracer} from "../../tracing.js";
 import {SpanStatusCode} from "@opentelemetry/api";
 

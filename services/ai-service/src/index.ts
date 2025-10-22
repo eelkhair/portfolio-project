@@ -24,6 +24,7 @@ import {CosmosService} from "./services/cosmos.service.js";
 import {OpenAIService} from "./services/openai.service.js";
 import {startOtel, stopOtel} from "./otel.js";
 import {tracer} from "./tracing.js";
+import jobPublishedEventListener from "./routes/jobs/events/job-published-event-listener.js";
 
 
 await startOtel();
@@ -60,7 +61,17 @@ await app.register(swaggerUi, { routePrefix: "/docs",
 
 app.get("/", {schema:{hide: true}}, async (request, reply): Promise<any> => reply.redirect("/docs") )
 
-
+app.addContentTypeParser(
+    'application/cloudevents+json',
+    { parseAs: 'string' },
+    (req, body, done) => {
+        try {
+            done(null, JSON.parse(body as string));
+        } catch (err) {
+            done(err as Error);
+        }
+    }
+);
 const openAIService = new OpenAIService({ apiKey: env.OPENAI_API_KEY, model: env.OPENAI_MODEL });
 const cosmosService = new CosmosService();
 await app.register(healthRoutes);
@@ -68,6 +79,7 @@ await app.register(daprRoutes);
 await app.register(draftUpsert,{cosmosService});
 await app.register(draftDelete,{cosmosService});
 await app.register(draftList, {cosmosService});
+await app.register(jobPublishedEventListener, {cosmosService, openAIService});
 await app.register(aiRoutes,{service: openAIService});
 await app.register(jobsGenerate, {openAIService: openAIService, cosmosService: cosmosService});
 app.get('/ping', async (_req, _rep) => {

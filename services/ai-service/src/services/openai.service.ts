@@ -178,4 +178,14 @@ export class OpenAIService{
             clearTimeout(t);
         }
     }
+
+    async embed(text: string): Promise<{ vector: number[]; model: string }> {
+
+        const normalized = text.replace(/\s+/g, " ").trim();
+        const res = await this.client.embeddings.create({
+            model: "text-embedding-3-small",
+            input: normalized,
+        });
+        return { vector: res.data[0].embedding as number[], model: res.model };
+    }
 }

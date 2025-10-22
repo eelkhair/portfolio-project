@@ -1,6 +1,7 @@
 import { CosmosClient, Container } from "@azure/cosmos";
 import {z} from "zod";
 import {JobDraft} from "../schemas/job-draft.js";
+import {JobPayloadType} from "../schemas/job-published-event.js";
 type JobDraftT = z.infer<typeof JobDraft>;
 export class CosmosService{
 
@@ -23,10 +24,6 @@ export class CosmosService{
         await container.item(id, companyId).delete();
     }
 
-    private getContainer(container:string): Container {
-        return this.client.database(process.env.COSMOS_DB!).container(container)
-    }
-
     async listDrafts(companyId:string){
         const container = this.getContainer("drafts");
         const querySpec = {
@@ -39,6 +36,14 @@ export class CosmosService{
         const { resources } = await container.items.query(querySpec).fetchAll();
         return resources as JobDraftT[];
 
+    }
+
+    async upsertJob(job: JobPayloadType){
+        const container = this.getContainer("jobs");
+        await container.items.upsert(job)
+    }
+    private getContainer(container:string): Container {
+        return this.client.database(process.env.COSMOS_DB!).container(container)
     }
 }
 
