@@ -40,7 +40,7 @@ export class CosmosService{
 
     async upsertJob(job: JobPayloadType){
         const container = this.getContainer("jobs");
-        await container.items.upsert({job, companyId: job.companyUId})
+        await container.items.upsert({...job, companyId: job.companyUId})
     }
     private getContainer(container:string): Container {
         return this.client.database(process.env.COSMOS_DB!).container(container)
