@@ -84,32 +84,6 @@ export class ControlDebugComponent  implements OnInit {
   }
 
   /**
-   * Toggles the 'show' signal in the given DebugModel, updates localStorage,
-   * and sets the 'ready' signal to true.
-   * @param model - The DebugModel instance to update.
-   */
-  protected processToggle(model:DebugModel) {
-    model.show.update((v) => !v);
-    this.setStorageItem(model.key, model.show() ? '1' : '0');
-    model.ready.set(true)
-  }
-
-  /**
-   * Sets the visibility state (`show`) of all debug models at once.
-   * Also persists the new state to localStorage and marks each model as ready.
-   *
-   * This is useful for global toggles like "Show All" or "Hide All" in a form debugger UI.
-   *
-   * @param {boolean} state - The new visibility state to apply to all debug models (true = show, false = hide).
-   */
-  setAll(state: boolean) {
-    this.debugModels.forEach(({model}) => {
-      model.show.set(state);
-      this.setStorageItem(model.key, state ? '1' : '0');
-      model.ready.set(true)
-    });
-  }
-  /**
    * Determines if the given value is a "leaf" node in a form structure,
    * i.e., an object containing 'errors', 'dirty', or 'touched' properties.
    * @param value - The value to check.

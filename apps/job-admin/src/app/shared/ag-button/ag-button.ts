@@ -20,7 +20,7 @@ export class AgButton implements ICellRendererAngularComp {
     }): void {
       this.params = params;
     }
-    refresh(params: ICellRendererParams): boolean {
+    refresh(): boolean {
       return true;
     }
 

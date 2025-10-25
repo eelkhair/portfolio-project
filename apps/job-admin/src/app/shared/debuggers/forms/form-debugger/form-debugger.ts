@@ -1,4 +1,4 @@
-import {Component, DestroyRef, inject, input, OnInit, signal, ViewEncapsulation} from '@angular/core';
+import {Component, DestroyRef, inject, input, OnInit, signal} from '@angular/core';
 import {UpperCasePipe} from "@angular/common";
 import {AbstractControl, FormArray, FormControl, FormGroup} from '@angular/forms';
 import {ControlDebugComponent} from '../control-debug/control-debug';

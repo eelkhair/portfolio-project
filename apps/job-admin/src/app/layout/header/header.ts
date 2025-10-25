@@ -1,4 +1,4 @@
-import {Component, effect, inject, OnInit, signal} from '@angular/core';
+import {Component, inject, OnInit, signal} from '@angular/core';
 import {Button} from 'primeng/button';
 import {Menu} from 'primeng/menu';
 import {AccountService} from '../../core/services/account.service';

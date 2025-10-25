@@ -1,5 +1,4 @@
 import {Component, inject, input, OnInit} from '@angular/core';
-import {JobsStore} from '../../../features/jobs/jobs.store';
 import {CompanySelectionStore} from './company-selection.store';
 import {Select} from 'primeng/select';
 import {Button} from 'primeng/button';

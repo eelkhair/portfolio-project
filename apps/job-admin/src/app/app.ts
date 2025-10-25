@@ -25,11 +25,11 @@ export class App implements OnInit {
   destroyRef = inject(DestroyRef);
   private rt = inject(RealtimeNotificationsService);
   ngOnInit() {
-    const sub =this.accountService.auth.getAccessTokenSilently().subscribe(token=>
+    const sub =this.accountService.auth.getAccessTokenSilently().subscribe(()=>
       this.rt.start(environment.apiUrl + 'hubs/notifications' )
     );
     this.destroyRef.onDestroy(()=>{
-      this.rt.stop();
+      void this.rt.stop();
       sub.unsubscribe();
     })
 

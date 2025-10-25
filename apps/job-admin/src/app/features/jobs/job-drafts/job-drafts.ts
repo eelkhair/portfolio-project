@@ -1,7 +1,5 @@
 import {Component, effect, inject} from '@angular/core';
 import {JobsStore} from '../jobs.store';
-import {ApiResponse} from '../../../core/types/Dtos/ApiResponse';
-import {Draft} from '../../../core/types/Dtos/draft';
 import {CompanySelection} from '../../../shared/companies/company-selection/company-selection';
 import {AgGridAngular} from 'ag-grid-angular';
 import {ColDef, themeQuartz} from 'ag-grid-community';
