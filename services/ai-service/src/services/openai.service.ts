@@ -35,7 +35,7 @@ export class OpenAIService{
                     minItems: 3, maxItems: 8,
                     items: { type: "string", minLength: 3 }
                 },
-                // notes & location are required in strict mode; allow empty string for both
+                // notes and location are required in strict mode; allow empty string for both
                 notes: { type: "string", minLength: 0, maxLength: 600 },
                 location: { type: "string", minLength: 0, maxLength: 120 },
                 metadata: {

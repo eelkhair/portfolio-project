@@ -21,9 +21,9 @@ export default fp<{ cosmosService: CosmosService, openAIService:OpenAIService }>
             const ce   = JobPublishedCloudEvent.parse(req.body);
 
             const job = extractJobPayload(ce);
-            var text = buildJobText(job)
+            const text = buildJobText(job)
 
-            var embeddings = await openAIService.embed(text);
+            const embeddings = await openAIService.embed(text);
             job.model = embeddings.model;
             job.vector = embeddings.vector;
 

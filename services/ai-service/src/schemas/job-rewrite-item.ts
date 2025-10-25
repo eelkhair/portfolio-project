@@ -30,7 +30,7 @@ const FieldEnum = z.enum(FieldLiterals);
 const trimTo = <T extends z.ZodTypeAny>(schema: T) =>
     z.preprocess((v) => (typeof v === "string" ? v.trim() : v), schema);
 
-// Lowercase + trim before enum validation (safe for any ZodEnum)
+// Lowercase +trim before enum validation (safe for any ZodEnum)
 const toLowerEnum = (e: z.ZodEnum<any>) =>
     z.preprocess(
         (v) => (typeof v === "string" ? v.trim().toLowerCase() : v),
