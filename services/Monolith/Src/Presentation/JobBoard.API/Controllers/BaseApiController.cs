@@ -1,0 +1,78 @@
+// In: JobBoard.API.Controllers.BaseApiController.cs
+
+using FluentValidation;
+using JobBoard.API.Helpers;
+using JobBoard.Application.Actions.Base;
+using JobBoard.Application.Infrastructure.Exceptions;
+using JobBoard.Application.Interfaces.Configurations;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace JobBoard.API.Controllers;
+
+/// <summary>
+/// Base API Controller providing standardized execution methods for commands and queries.
+/// </summary>
+[ApiController]
+[Authorize]
+[Route("api/[controller]")]
+[Produces("application/json")]
+public abstract class BaseApiController : ControllerBase
+{
+
+    /// <summary>
+    /// Executes a standard command and returns the appropriate IActionResult.
+    /// This should be the default choice for any write operation.
+    /// </summary>
+    protected async Task<IActionResult> ExecuteCommandAsync<TResult>(
+        BaseCommand<TResult> command,
+        Func<ApiResponse<TResult>, IActionResult> onSuccess)
+    {
+        try
+        {
+            var result = await ExecuteCoreAsync(command);
+            return onSuccess(ApiResponse<TResult>.Success(result));
+        }
+        catch (Exception ex)
+        {
+            return HandleException(ex);
+        }
+    }
+
+    /// <summary>
+    /// Executes a read-only query and returns the appropriate IActionResult.
+    /// </summary>
+    protected async Task<IActionResult> ExecuteQueryAsync<TResult>(
+        BaseQuery<TResult> query,
+        Func<ApiResponse<TResult>, IActionResult> onSuccess)
+    {
+        try
+        {
+            var result = await ExecuteCoreAsync(query);
+            return onSuccess(ApiResponse<TResult>.Success(result));
+        }
+        catch (Exception ex)
+        {
+            return HandleException(ex);
+        }
+    }
+    
+    private Task<TResult> ExecuteCoreAsync<TResult>(IRequest<TResult> request)
+    {
+        var handlerType = typeof(IHandler<,>).MakeGenericType(request.GetType(), typeof(TResult));
+        var handler = HttpContext.RequestServices.GetRequiredService(handlerType);
+        return ((dynamic)handler).HandleAsync((dynamic)request, HttpContext.RequestAborted);
+    }
+    
+    private IActionResult HandleException(Exception exception)
+    {
+        return exception switch
+        {
+            ValidationException ex => BadRequest(ApiResponse.Fail(ex.Errors.ToDictionary(e => e.PropertyName, e => new[] { e.ErrorMessage }))),
+            UnauthorizedAccessException ex => Unauthorized(ApiResponse.Fail(ex.Message)),
+            ForbiddenAccessException ex => StatusCode(StatusCodes.Status403Forbidden, ApiResponse.Fail(ex.Message)),
+            NotFoundException ex => NotFound(ApiResponse.Fail(ex.Message)),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, ApiResponse.Fail("An unexpected error occurred. Please contact support."))
+        };
+    }
+}
