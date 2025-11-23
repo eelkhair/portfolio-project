@@ -18,7 +18,7 @@
     display: block;
     width: 160px !important;
     filter: brightness(0) invert(1);
-    background-image: url('/images/corteva_logo.png'); 
+  //  background-image: url('/images/corteva_logo.png'); 
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
@@ -28,7 +28,7 @@
 .hc-aside__logo{
     width: 26px !important; 
     height: 26px;
-    background-image: url('/images/corteva-logo-sm.png');
+  //  background-image: url('/images/corteva-logo-sm.png');
     filter: brightness(0) invert(1);
     min-width:0;
     margin-top:15px !important;
