@@ -2,33 +2,33 @@
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35021.124
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobAPI.Contracts", "services\job-api\JobAPI.Contracts\JobAPI.Contracts.csproj", "{FEB5E1E6-3211-489F-B08E-64BD4B6C3825}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobAPI.Contracts", "services\Micro Services\job-api\JobAPI.Contracts\JobAPI.Contracts.csproj", "{FEB5E1E6-3211-489F-B08E-64BD4B6C3825}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobApi.Service", "services\job-api\JobApi.Service\JobApi.Service.csproj", "{EC73AD0D-E9E0-4232-A67A-1094E1E3C09C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobApi.Service", "services\Micro Services\job-api\JobApi.Service\JobApi.Service.csproj", "{EC73AD0D-E9E0-4232-A67A-1094E1E3C09C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "services", "services", "{6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}"
 	ProjectSection(SolutionItems) = preProject
-		services\Elkhair.Dev.Common\Application\DaprExtensions.cs = services\Elkhair.Dev.Common\Application\DaprExtensions.cs
-		services\Elkhair.Dev.Common\Application\Extensions.cs = services\Elkhair.Dev.Common\Application\Extensions.cs
-		services\Elkhair.Dev.Common\Application\LoggingAndTracingExtensions.cs = services\Elkhair.Dev.Common\Application\LoggingAndTracingExtensions.cs
+		services\Elkhair.Dev.Common\Application\DaprExtensions.cs = services\Micro Services\Elkhair.Dev.Common\Application\DaprExtensions.cs
+		services\Elkhair.Dev.Common\Application\Extensions.cs = services\Micro Services\Elkhair.Dev.Common\Application\Extensions.cs
+		services\Elkhair.Dev.Common\Application\LoggingAndTracingExtensions.cs = services\Micro Services\Elkhair.Dev.Common\Application\LoggingAndTracingExtensions.cs
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "job-api", "job-api", "{34F29689-4830-4406-B6E6-A36922FFAA5B}"
 	ProjectSection(SolutionItems) = preProject
-		services\job-api\Dockerfile = services\job-api\Dockerfile
-		services\job-api\.dockerignore = services\job-api\.dockerignore
-		services\job-api\Nuget.Config = services\job-api\Nuget.Config
+		services\job-api\Dockerfile = services\Micro Services\job-api\Dockerfile
+		services\job-api\.dockerignore = services\Micro Services\job-api\.dockerignore
+		services\job-api\Nuget.Config = services\Micro Services\job-api\Nuget.Config
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompanyAPI.Contracts", "services\company-api\CompanyAPI.Contracts\CompanyAPI.Contracts.csproj", "{F4901292-135E-4E36-93E7-C02762BA6116}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompanyAPI.Contracts", "services\Micro Services\company-api\CompanyAPI.Contracts\CompanyAPI.Contracts.csproj", "{F4901292-135E-4E36-93E7-C02762BA6116}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompanyApi.Service", "services\company-api\CompanyApi.Service\CompanyApi.Service.csproj", "{391F1325-33CC-4414-B0C5-05395FF006F2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompanyApi.Service", "services\Micro Services\company-api\CompanyApi.Service\CompanyApi.Service.csproj", "{391F1325-33CC-4414-B0C5-05395FF006F2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "company-api", "company-api", "{45755CDE-8322-42B4-ADC0-A0126A3997A4}"
 	ProjectSection(SolutionItems) = preProject
-		services\company-api\Dockerfile = services\company-api\Dockerfile
-		services\company-api\.dockerignore = services\company-api\.dockerignore
-		services\company-api\Nuget.Config = services\company-api\Nuget.Config
+		services\company-api\Dockerfile = services\Micro Services\company-api\Dockerfile
+		services\company-api\.dockerignore = services\Micro Services\company-api\.dockerignore
+		services\company-api\Nuget.Config = services\Micro Services\company-api\Nuget.Config
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{97DBD6A3-512E-4CD4-AE68-6EC565FBC253}"
@@ -41,24 +41,24 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{97DB
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "user-api", "user-api", "{D27A4457-B09A-4389-B56C-7A1E180B5F89}"
 	ProjectSection(SolutionItems) = preProject
-		services\user-api\Dockerfile = services\user-api\Dockerfile
-		services\user-api\Nuget.Config = services\user-api\Nuget.Config
+		services\user-api\Dockerfile = services\Micro Services\user-api\Dockerfile
+		services\user-api\Nuget.Config = services\Micro Services\user-api\Nuget.Config
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserApi.Service", "services\user-api\UserApi.Service\UserApi.Service.csproj", "{DA8D976B-3C28-4ECB-923A-59167EE25ABE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserApi.Service", "services\Micro Services\user-api\UserApi.Service\UserApi.Service.csproj", "{DA8D976B-3C28-4ECB-923A-59167EE25ABE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserAPI.Contracts", "services\user-api\UserAPI.Contracts\UserAPI.Contracts.csproj", "{B76718D9-1F9C-462A-B980-F48282456504}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserAPI.Contracts", "services\Micro Services\user-api\UserAPI.Contracts\UserAPI.Contracts.csproj", "{B76718D9-1F9C-462A-B980-F48282456504}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "admin-api", "admin-api", "{D12A1538-3710-454B-91F8-FA92024D5A9E}"
 	ProjectSection(SolutionItems) = preProject
-		services\admin-api\Dockerfile = services\admin-api\Dockerfile
-		services\admin-api\.dockerignore = services\admin-api\.dockerignore
-		services\admin-api\Nuget.Config = services\admin-api\Nuget.Config
+		services\admin-api\Dockerfile = services\Micro Services\admin-api\Dockerfile
+		services\admin-api\.dockerignore = services\Micro Services\admin-api\.dockerignore
+		services\admin-api\Nuget.Config = services\Micro Services\admin-api\Nuget.Config
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminAPI.Contracts", "services\admin-api\AdminAPI.Contracts\AdminAPI.Contracts.csproj", "{5ED52D07-9BB8-4EF4-9DF1-53D19A8A5FDB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminAPI.Contracts", "services\Micro Services\admin-api\AdminAPI.Contracts\AdminAPI.Contracts.csproj", "{5ED52D07-9BB8-4EF4-9DF1-53D19A8A5FDB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminApi.Service", "services\admin-api\AdminApi.Service\AdminApi.Service.csproj", "{26C25DD2-F218-4209-9EA3-DEF2D029048C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminApi.Service", "services\Micro Services\admin-api\AdminApi.Service\AdminApi.Service.csproj", "{26C25DD2-F218-4209-9EA3-DEF2D029048C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ai-service", "ai-service", "{E946D98E-8216-438D-BD42-407A4B4E8201}"
 	ProjectSection(SolutionItems) = preProject
@@ -84,7 +84,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "settings", "settings", "{20
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Elkhair.Dev.Common", "Elkhair.Dev.Common", "{55EFE0A8-3F4A-46E2-BD74-39D3D74D8B5E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elkhair.Dev.Common", "services\Elkhair.Dev.Common\Elkhair.Dev.Common.csproj", "{A13EA2EF-14FC-4CB1-BFCE-608B1728B788}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elkhair.Dev.Common", "services\Micro Services\Elkhair.Dev.Common\Elkhair.Dev.Common.csproj", "{A13EA2EF-14FC-4CB1-BFCE-608B1728B788}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Components", "Components", "{7FCF5303-CB4C-4D08-98CF-E14F771C77C1}"
 	ProjectSection(SolutionItems) = preProject
@@ -111,12 +111,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HealthChecks", "HealthCheck
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HealthChecks", "HealthChecks", "{6E111D1A-9F3E-4486-960C-57AF7DA4D809}"
 	ProjectSection(SolutionItems) = preProject
-		services\HealthChecks\Dockerfile = services\HealthChecks\Dockerfile
+		services\HealthChecks\Dockerfile = services\Micro Services\HealthChecks\Dockerfile
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.WebStatus", "services\HealthChecks\JobBoard.WebStatus\JobBoard.WebStatus.csproj", "{1264D55B-686A-4113-B882-B5B8A12F5D39}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.WebStatus", "services\Micro Services\HealthChecks\JobBoard.WebStatus\JobBoard.WebStatus.csproj", "{1264D55B-686A-4113-B882-B5B8A12F5D39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.HealthChecks", "services\HealthChecks\JobBoard.HealthChecks\JobBoard.HealthChecks.csproj", "{338B7BFE-C80F-43F0-9A98-AD8477C75B8D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.HealthChecks", "services\Micro Services\HealthChecks\JobBoard.HealthChecks\JobBoard.HealthChecks.csproj", "{338B7BFE-C80F-43F0-9A98-AD8477C75B8D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Monolith", "Monolith", "{315D5079-3539-49CA-93AF-2614E2A84E44}"
 EndProject
@@ -152,6 +152,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.Infrastructure.Smtp", "services\Monolith\Src\Infrastructure\JobBoard.Infrastructure.Smtp\JobBoard.Infrastructure.Smtp.csproj", "{8C2AB03D-33D7-4965-A686-EA8BFE5F21FA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.API", "services\Monolith\Src\Presentation\JobBoard.API\JobBoard.API.csproj", "{43614005-1121-4F50-9705-963590729F45}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Micro Services", "Micro Services", "{C188C6D3-42A7-48DB-82B2-15E67325DE94}"
 EndProject
 Global
 				GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -247,24 +249,18 @@ Global
 								SolutionGuid = {A1C2D3E4-F5A6-47B8-9C0D-E1F2A3B4C5D6}
 				EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{34F29689-4830-4406-B6E6-A36922FFAA5B} = {6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}
 		{FEB5E1E6-3211-489F-B08E-64BD4B6C3825} = {34F29689-4830-4406-B6E6-A36922FFAA5B}
 		{EC73AD0D-E9E0-4232-A67A-1094E1E3C09C} = {34F29689-4830-4406-B6E6-A36922FFAA5B}
-		{45755CDE-8322-42B4-ADC0-A0126A3997A4} = {6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}
 		{F4901292-135E-4E36-93E7-C02762BA6116} = {45755CDE-8322-42B4-ADC0-A0126A3997A4}
 		{391F1325-33CC-4414-B0C5-05395FF006F2} = {45755CDE-8322-42B4-ADC0-A0126A3997A4}
-		{D27A4457-B09A-4389-B56C-7A1E180B5F89} = {6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}
 		{DA8D976B-3C28-4ECB-923A-59167EE25ABE} = {D27A4457-B09A-4389-B56C-7A1E180B5F89}
 		{B76718D9-1F9C-462A-B980-F48282456504} = {D27A4457-B09A-4389-B56C-7A1E180B5F89}
-		{D12A1538-3710-454B-91F8-FA92024D5A9E} = {6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}
 		{5ED52D07-9BB8-4EF4-9DF1-53D19A8A5FDB} = {D12A1538-3710-454B-91F8-FA92024D5A9E}
 		{26C25DD2-F218-4209-9EA3-DEF2D029048C} = {D12A1538-3710-454B-91F8-FA92024D5A9E}
 		{E946D98E-8216-438D-BD42-407A4B4E8201} = {6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}
 		{BA3D8C05-0820-48F3-A42F-0CF4FB40BD4D} = {E946D98E-8216-438D-BD42-407A4B4E8201}
 		{20D49EF3-D810-4DE5-9817-FDB6DC93EC3C} = {E946D98E-8216-438D-BD42-407A4B4E8201}
-		{55EFE0A8-3F4A-46E2-BD74-39D3D74D8B5E} = {6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}
 		{A13EA2EF-14FC-4CB1-BFCE-608B1728B788} = {55EFE0A8-3F4A-46E2-BD74-39D3D74D8B5E}
-		{6E111D1A-9F3E-4486-960C-57AF7DA4D809} = {6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}
 		{1264D55B-686A-4113-B882-B5B8A12F5D39} = {6E111D1A-9F3E-4486-960C-57AF7DA4D809}
 		{338B7BFE-C80F-43F0-9A98-AD8477C75B8D} = {6E111D1A-9F3E-4486-960C-57AF7DA4D809}
 		{315D5079-3539-49CA-93AF-2614E2A84E44} = {6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}
@@ -282,5 +278,12 @@ Global
 		{0693DE9C-07EE-4970-A17A-68A28CA6C8DD} = {F14B3350-CE99-4C91-9077-1C0840D9A738}
 		{8C2AB03D-33D7-4965-A686-EA8BFE5F21FA} = {F14B3350-CE99-4C91-9077-1C0840D9A738}
 		{43614005-1121-4F50-9705-963590729F45} = {AD9ACDC2-CC8A-4163-8C51-7BFA37233E39}
+		{C188C6D3-42A7-48DB-82B2-15E67325DE94} = {6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}
+		{D12A1538-3710-454B-91F8-FA92024D5A9E} = {C188C6D3-42A7-48DB-82B2-15E67325DE94}
+		{45755CDE-8322-42B4-ADC0-A0126A3997A4} = {C188C6D3-42A7-48DB-82B2-15E67325DE94}
+		{55EFE0A8-3F4A-46E2-BD74-39D3D74D8B5E} = {C188C6D3-42A7-48DB-82B2-15E67325DE94}
+		{6E111D1A-9F3E-4486-960C-57AF7DA4D809} = {C188C6D3-42A7-48DB-82B2-15E67325DE94}
+		{34F29689-4830-4406-B6E6-A36922FFAA5B} = {C188C6D3-42A7-48DB-82B2-15E67325DE94}
+		{D27A4457-B09A-4389-B56C-7A1E180B5F89} = {C188C6D3-42A7-48DB-82B2-15E67325DE94}
 	EndGlobalSection
 EndGlobal

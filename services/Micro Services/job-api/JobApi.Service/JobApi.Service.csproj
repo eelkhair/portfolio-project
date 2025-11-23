@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>JobApi</RootNamespace>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <UserSecretsId>4e68095f-9ed6-4de7-b54b-2da4ee6d5d61</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+
+      <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="8.0.1" />
+
+      <PackageReference Include="Elkhair.Dev.Common" Version="1.0.16" />
+
+      <PackageReference Include="FastEndpoints" Version="6.2.0" />
+      <PackageReference Include="FastEndpoints.Security" Version="6.2.0" />
+      <PackageReference Include="FastEndpoints.Swagger" Version="6.2.0" />
+      <PackageReference Include="JobBoard.CompanyAPI.Contracts" Version="1.0.3" />
+      <PackageReference Include="JobBoard.HealthChecks" Version="1.0.3" />
+      <PackageReference Include="JobBoard.UserAPI.Contracts" Version="1.0.2" />
+      <PackageReference Include="Mapster" Version="7.4.0" />
+      <PackageReference Include="Mapster.Core" Version="1.2.1" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.19" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.7">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\JobAPI.Contracts\JobAPI.Contracts.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Dapr\Components\Timers\" />
+      <Folder Include="Infrastructure\Data\Migrations\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="..\.dockerignore" />
+    </ItemGroup>
+
+</Project>
