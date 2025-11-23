@@ -83,21 +83,29 @@ public static class DependencyInjection
                     _ => false
                 };
             });
-            //c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
-            //{
-            //    Type = SecuritySchemeType.OAuth2,
-            //    Flows = new OpenApiOAuthFlows
-            //    {
-            //        AuthorizationCode = new OpenApiOAuthFlow
-            //        {
-            //            AuthorizationUrl = new Uri($"{configuration["AzureAd:Authority"]}/oauth2/v2.0/authorize"),
-            //            TokenUrl = new Uri($"{configuration["AzureAd:Authority"]}/oauth2/v2.0/token"),
-            //            Scopes = new Dictionary<string, string> { { configuration["AzureAd:Scope"] ?? throw new InvalidOperationException("Missing Azure Add Scope"), "Access the API as the authenticated user" } }
-            //        }
-            //    }
-            //});
-            //var apiScope = configuration["AzureAd:Scope"] ?? throw new InvalidOperationException("Missing AzureAd:Scope in configuration.");
-
+            var domain = configuration["Auth0:Domain"]?? string.Empty;
+            var audience = configuration["Auth0:Audience"] ?? string.Empty;
+            
+            var scopes = new Dictionary<string, string>
+            {
+                { "read:jobs", "Read Jobs" },
+                { "profile", "Profile" }
+            };
+            c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+            {
+                //Name = "Authorization",
+                //In = ParameterLocation.Header,
+                Type = SecuritySchemeType.OAuth2,
+                Flows = new OpenApiOAuthFlows
+                {
+                    AuthorizationCode = new OpenApiOAuthFlow
+                    {
+                        Scopes = scopes,
+                        AuthorizationUrl = new Uri($"https://{domain}/authorize?audience={audience}"),
+                        TokenUrl = new Uri($"https://{domain}/oauth/token")
+                    }
+                }
+            });
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
@@ -154,7 +162,8 @@ public static class DependencyInjection
                 options.SwaggerEndpoint("/swagger/v1/swagger.json", "JobBoard API v1");
                 options.SwaggerEndpoint("/swagger/odata-v1/swagger.json", "JobBoard OData v1");
                 options.RoutePrefix = string.Empty;
-                options.OAuthClientId(configuration["AzureAd:ClientId"]);
+                options.OAuthClientId(configuration["Auth0:SwaggerClientId"]);
+                options.OAuthClientSecret(configuration["Auth0:SwaggerClientSecret"]);
                 options.OAuthAppName("JobBoard API - Swagger UI");
                 options.OAuthUsePkce();
             });
