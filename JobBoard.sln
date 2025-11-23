@@ -107,8 +107,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{8F216E64-A
 		docs\ai-service-visual-handbook-with-tables.pdf = docs\ai-service-visual-handbook-with-tables.pdf
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HealthChecks", "HealthChecks", "{73ECFB93-CBD2-4EB8-9356-AF2E8F63E712}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HealthChecks", "HealthChecks", "{6E111D1A-9F3E-4486-960C-57AF7DA4D809}"
 	ProjectSection(SolutionItems) = preProject
 		services\HealthChecks\Dockerfile = services\micro-services\HealthChecks\Dockerfile
