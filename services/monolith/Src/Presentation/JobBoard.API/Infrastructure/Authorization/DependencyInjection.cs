@@ -1,6 +1,7 @@
 using JobBoard.Domain;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
+using Microsoft.IdentityModel.Tokens;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Trace;
 
@@ -16,17 +17,24 @@ public static class DependencyInjection
     public static IServiceCollection AddAuthorizationService(this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddMicrosoftIdentityWebApi(options =>
+        services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.Authority = $"https://{configuration["Auth0:Domain"]}/";
+                options.Audience = configuration["Auth0:Audience"];
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    configuration.Bind("AzureAd", options);
-                    options.TokenValidationParameters.ValidAudiences =
-                    [
-                        configuration["AzureAd:ClientId"],
-                        $"api://{configuration["AzureAd:ClientId"]}"
-                    ];
-                },
-                options => { configuration.Bind("AzureAd", options); });
+                    ValidateIssuer = true,
+                    ValidIssuer = $"https://{configuration["Auth0:Domain"]}/",
+                    ValidateAudience = true,
+                    ValidAudience = configuration["Auth0:Audience"],
+                    ValidateLifetime = true
+                };
+            });
         services.AddCors(options =>
         {
             options.AddPolicy("AllowMyFrontendApp",

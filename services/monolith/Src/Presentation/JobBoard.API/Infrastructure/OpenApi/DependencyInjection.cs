@@ -83,20 +83,20 @@ public static class DependencyInjection
                     _ => false
                 };
             });
-            c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
-            {
-                Type = SecuritySchemeType.OAuth2,
-                Flows = new OpenApiOAuthFlows
-                {
-                    AuthorizationCode = new OpenApiOAuthFlow
-                    {
-                        AuthorizationUrl = new Uri($"{configuration["AzureAd:Authority"]}/oauth2/v2.0/authorize"),
-                        TokenUrl = new Uri($"{configuration["AzureAd:Authority"]}/oauth2/v2.0/token"),
-                        Scopes = new Dictionary<string, string> { { configuration["AzureAd:Scope"] ?? throw new InvalidOperationException("Missing Azure Add Scope"), "Access the API as the authenticated user" } }
-                    }
-                }
-            });
-            var apiScope = configuration["AzureAd:Scope"] ?? throw new InvalidOperationException("Missing AzureAd:Scope in configuration.");
+            //c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+            //{
+            //    Type = SecuritySchemeType.OAuth2,
+            //    Flows = new OpenApiOAuthFlows
+            //    {
+            //        AuthorizationCode = new OpenApiOAuthFlow
+            //        {
+            //            AuthorizationUrl = new Uri($"{configuration["AzureAd:Authority"]}/oauth2/v2.0/authorize"),
+            //            TokenUrl = new Uri($"{configuration["AzureAd:Authority"]}/oauth2/v2.0/token"),
+            //            Scopes = new Dictionary<string, string> { { configuration["AzureAd:Scope"] ?? throw new InvalidOperationException("Missing Azure Add Scope"), "Access the API as the authenticated user" } }
+            //        }
+            //    }
+            //});
+            //var apiScope = configuration["AzureAd:Scope"] ?? throw new InvalidOperationException("Missing AzureAd:Scope in configuration.");
 
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
@@ -109,7 +109,7 @@ public static class DependencyInjection
                             Id = "oauth2"
                         }
                     },
-                    [apiScope]
+                    []
                 }
             });
 
@@ -158,8 +158,8 @@ public static class DependencyInjection
                 options.OAuthAppName("JobBoard API - Swagger UI");
                 options.OAuthUsePkce();
             });
-            var clientId = configuration["AzureAd:ClientId"];
-            var apiScope = configuration["AzureAd:Scope"] ?? throw new InvalidOperationException("Missing AzureAd:Scope in configuration.");
+            var clientId = configuration["Auth0:ClientId"];
+            var apiScope = "LabAdmin";
             app.MapScalarApiReference("/scalar/v1", options =>
             {
                 options.WithOpenApiRoutePattern("/swagger/v1/swagger.json"); 

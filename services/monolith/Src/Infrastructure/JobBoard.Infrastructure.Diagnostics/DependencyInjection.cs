@@ -67,12 +67,7 @@ public static class DependencyInjection
                                   throw new InvalidOperationException("Database connection string is not configured."),
                 name: "database-check",
                 timeout: TimeSpan.FromSeconds(10),
-                tags: ["database", "critical"])
-            
-            .AddCheck<KafkaHealthCheck>(
-                name: "kafka-connection-check",
-                timeout: TimeSpan.FromSeconds(10),
-                tags: ["messaging", "critical"]);
+                tags: ["database", "critical"]);
 
         return services;
     }

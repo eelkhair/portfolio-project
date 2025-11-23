@@ -3,7 +3,6 @@ using JobBoard.API.Infrastructure.Authorization;
 using JobBoard.API.Infrastructure.OpenApi;
 using JobBoard.Application;
 using JobBoard.Application.Interfaces.Users;
-using JobBoard.Infrastructure.Configuration;
 using JobBoard.Infrastructure.Diagnostics;
 using JobBoard.Infrastructure.Outbox;
 using JobBoard.Infrastructure.Persistence;
