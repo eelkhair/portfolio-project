@@ -1,0 +1,44 @@
+---
+config:
+  theme: dark
+---
+flowchart BT
+
+    subgraph CORE ["Core Domain Components"]
+        direction BT
+        app(("<br>Application<br><br>")):::coregroup
+        domain("<br>Domain<br><br>"):::coregroup
+        events("<br>Integration<br>Events<br><br>"):::coregroup
+    end
+
+    subgraph INFRA ["Infrastructure Components"]
+        direction BT
+        config("<br>Configuration<br><br>"):::infragroup
+        smtp("<br>Smtp<br><br>"):::infragroup
+        persistence(("Persistence")):::infragroup
+        outbox("<br>Outbox<br><br>"):::infragroup
+        diagnostics("<br>Diagnostics<br><br>"):::infragroup
+    end
+
+    subgraph PRESENTATION ["Presentation Components"]
+        direction LR
+        api(("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;API&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")):::presgroup
+        func(("Azure<br>&nbsp;&nbsp;&nbsp;Function&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")):::presgroup
+    end
+
+    api --> persistence & outbox & config & smtp & diagnostics
+    func --> persistence & outbox & config & smtp & diagnostics
+
+    outbox & config &  persistence & smtp & diagnostics --> app
+
+    app --> domain & events
+
+    classDef coregroup fill:#ff9100,stroke:#ff9100,stroke-width:2.5px,color:#fff;
+    classDef infragroup fill:#2ecc40,stroke:#2ecc40,stroke-width:2.5px,color:#fff;
+    classDef presgroup fill:#2196f3,stroke:#2196f3,stroke-width:2.5px,color:#fff;
+
+    style CORE fill:#ff910026,stroke:#ff9100,stroke-width:2.5px,color:#fff;
+    style INFRA fill:#2ecc4026,stroke:#2ecc40,stroke-width:2.5px,color:#fff;
+    style PRESENTATION fill:#2196f326,stroke:#2196f3,stroke-width:2.5px,color:#fff;
+
+    linkStyle default stroke:#fff,stroke-width:2px;
