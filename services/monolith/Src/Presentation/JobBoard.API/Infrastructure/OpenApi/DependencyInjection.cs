@@ -89,7 +89,7 @@ public static class DependencyInjection
             var scopes = new Dictionary<string, string>
             {
                 { "read:jobs", "Read Jobs" },
-                { "profile", "Profile" }
+                { "read:companies", "Read Companies" }
             };
             c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
             {
