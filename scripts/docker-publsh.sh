@@ -13,11 +13,11 @@ declare -A services=(
   ["job-admin"]="../apps/job-admin"
   ["job-public"]="../apps/job-public"
   ["ai-service"]="../services/ai-service"
-  ["job-api"]="../services/job-api"
-  ["company-api"]="../services/company-api"
-  ["admin-api"]="../services/admin-api"
-  ["user-api"]="../services/user-api"
-  ["health-check"]="../services/HealthChecks"
+  ["job-api"]="../services/micro-services/job-api"
+  ["company-api"]="../services/micro-services/company-api"
+  ["admin-api"]="../services/micro-services/admin-api"
+  ["user-api"]="../services/micro-services/user-api"
+  ["health-check"]="../services/micro-services/HealthChecks"
 )
 
 for name in "${!services[@]}"; do

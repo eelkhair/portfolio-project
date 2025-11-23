@@ -2,11 +2,11 @@ $ErrorActionPreference = 'Stop'
 
 $rootPath = 'C:\Users\elkha\RiderProjects\portfolio project'
 $packages = @(
-  Join-Path $rootPath 'services\company-api\CompanyApi.Contracts'
-  Join-Path $rootPath 'services\job-api\JobApi.Contracts'
-  Join-Path $rootPath 'services\user-api\UserAPI.Contracts'
-  Join-Path $rootPath 'services\Elkhair.Dev.Common'
-  Join-Path $rootPath 'services\HealthChecks\JobBoard.HealthChecks'
+  Join-Path $rootPath 'services\micro-services\company-api\CompanyApi.Contracts'
+  Join-Path $rootPath 'services\micro-services\job-api\JobApi.Contracts'
+  Join-Path $rootPath 'services\micro-services\user-api\UserAPI.Contracts'
+  Join-Path $rootPath 'services\micro-services\Elkhair.Dev.Common'
+  Join-Path $rootPath 'services\micro-services\HealthChecks\JobBoard.HealthChecks'
 )
 
 $sourceUrl = 'https://nuget.eelkhair.net/v3/index.json'

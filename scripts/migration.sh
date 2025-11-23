@@ -1,5 +1,5 @@
 #!/bin/bash
-cd ../services/company-api/CompanyAPI.Service
+cd ../services/micro-services/company-api/CompanyAPI.Service
 echo "Current directory: $(pwd)"
 dotnet ef database update
 
