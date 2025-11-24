@@ -167,8 +167,8 @@ public static class DependencyInjection
                 options.OAuthAppName("JobBoard API - Swagger UI");
                 options.OAuthUsePkce();
             });
-            var clientId = configuration["Auth0:ClientId"];
-            var apiScope = "LabAdmin";
+            var clientId = configuration["Auth0:SwaggerClientId"];
+            var apiScopes = new []{"read:jobs", "read:companies"};
             app.MapScalarApiReference("/scalar/v1", options =>
             {
                 options.WithOpenApiRoutePattern("/swagger/v1/swagger.json"); 
@@ -177,7 +177,8 @@ public static class DependencyInjection
                     o =>
                     {
                         o.ClientId = clientId;
-                        o.SelectedScopes = [apiScope];
+                        o.ClientSecret= configuration["Auth0:SwaggerClientSecret"];
+                        o.SelectedScopes = apiScopes ;
                         o.Pkce = Pkce.Sha256;
                     }
                 );
@@ -191,7 +192,8 @@ public static class DependencyInjection
                     o =>
                     {
                         o.ClientId = clientId;
-                        o.SelectedScopes = [apiScope];
+                        o.ClientSecret= configuration["Auth0:SwaggerClientSecret"];
+                        o.SelectedScopes = apiScopes;
                         o.Pkce = Pkce.Sha256;
                     }
                 );
