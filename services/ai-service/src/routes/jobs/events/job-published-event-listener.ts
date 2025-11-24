@@ -16,7 +16,7 @@ export default fp<{ cosmosService: CosmosService; openAIService: OpenAIService }
             {
                 schema: {
                     summary: "Dapr pubsub: job.published",
-                    tags: ["events", "dapr"],
+                    tags: ["events"],
 
                     // ★ ZOD body schema
                     body: JobPublishedCloudEvent,
