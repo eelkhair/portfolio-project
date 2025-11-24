@@ -82,7 +82,7 @@ await app.register(draftList, {cosmosService});
 await app.register(jobPublishedEventListener, {cosmosService, openAIService});
 await app.register(aiRoutes,{service: openAIService});
 await app.register(jobsGenerate, {openAIService: openAIService, cosmosService: cosmosService});
-app.get('/ping', async (_req, _rep) => {
+app.get('/ping', {schema:{hide: true}}, async (_req, _rep) => {
     return await tracer.startActiveSpan('handler.ping', async (span) => {
         try {
             return { pong: true };

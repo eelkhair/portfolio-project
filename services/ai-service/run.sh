@@ -1,4 +1,4 @@
-rubas#!/usr/bin/env bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 # ========= Config =========
@@ -19,16 +19,30 @@ LOG_LEVEL="${LOG_LEVEL:-debug}"
 
 # Dapr resources/config
 COMPONENTS_PATH="${COMPONENTS_PATH:-../../Components}"
-# FIX: independent second folder (e.g., secrets)
 COMPONENTS_PATH2="${COMPONENTS_PATH2:-Dapr/Components/Secrets}"
 COMPONENTS_PATH3="${COMPONENTS_PATH3:-Dapr/Components/Events}"
 CONFIG_PATH="${CONFIG_PATH:-../../Config/config.yaml}"
 
-# Optional: have daprd probe your app readiness directly
-# set ENABLE_APP_HEALTH=true to enable these flags
+# Optional: Dapr app health probe
 APP_HEALTH_INTERVAL_MS="${APP_HEALTH_INTERVAL_MS:-2000}"
 APP_HEALTH_TIMEOUT_MS="${APP_HEALTH_TIMEOUT_MS:-500}"
 APP_HEALTH_THRESHOLD="${APP_HEALTH_THRESHOLD:-3}"
+
+# ========= Env for app =========
+# Default to dev locally; override in Docker/CI with NODE_ENV=production
+export NODE_ENV="${NODE_ENV:-development}"
+
+# In dev we skip the heavy pubsub check to avoid timing issues on Windows+WSL.
+# In Docker/production you can set SKIP_PUBSUB=false.
+export SKIP_PUBSUB="${SKIP_PUBSUB:-true}"
+
+# Optional: allow skipping ALL Dapr checks if you ever want that
+export SKIP_DAPR="${SKIP_DAPR:-false}"
+
+# Startup grace window for readiness in ms (handled inside routes.health.ts)
+export READINESS_BOOT_GRACE_MS="${READINESS_BOOT_GRACE_MS:-8000}"
+# Cache TTL for readiness body (ms)
+export READINESS_CACHE_MS="${READINESS_CACHE_MS:-2000}"
 
 # ========= Helpers =========
 die(){ echo "❌ $*" >&2; exit 1; }
@@ -96,7 +110,6 @@ wait_for_200 "$LIVE_URL" 120 0.5 || echo "ℹ️  Continuing even though livenes
 # ========= Start Dapr =========
 echo "🚀 Starting daprd (HTTP ${DAPR_HTTP_PORT}, gRPC ${DAPR_GRPC_PORT})..."
 
-# Build optional app-health args
 DAPR_APP_HEALTH_ARGS=()
 if [[ "${ENABLE_APP_HEALTH:-false}" == "true" ]]; then
   DAPR_APP_HEALTH_ARGS+=(
@@ -122,7 +135,7 @@ daprd \
   "${DAPR_APP_HEALTH_ARGS[@]}" &
 DAPR_PID=$!
 
-# (Optional) Wait for READINESS after daprd is up
+# Optional: Wait for READINESS (now has startup grace + dev-mode skip)
 wait_for_200 "$READY_URL" 240 1 || echo "ℹ️  App not ready yet; Dapr started anyway."
 
 cat <<EOF
@@ -132,6 +145,10 @@ cat <<EOF
           Live:  ${LIVE_URL}
           Ready: ${READY_URL}
    Dapr:  http://localhost:${DAPR_HTTP_PORT}  (gRPC ${DAPR_GRPC_PORT})
+
+NODE_ENV=${NODE_ENV}
+SKIP_PUBSUB=${SKIP_PUBSUB}
+SKIP_DAPR=${SKIP_DAPR}
 
 Press Ctrl+C to stop.
 EOF
