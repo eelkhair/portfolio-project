@@ -11,4 +11,4 @@ public sealed record CompanyInput( string Name,
     string? EEO,
     DateTime? Founded,
     string? Size,
-    int IndustryId);
+    long IndustryId);

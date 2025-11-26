@@ -79,7 +79,6 @@ public class Company : BaseAuditableEntity
         Size = CompanySize.Create(size)
             .Ensure<CompanySize, string?>("Company.InvalidSize");
 
-    // Only Industry aggregate root should call this!
     internal void SetIndustry(long industryId)
     {
         IndustryId = industryId;
@@ -88,39 +87,41 @@ public class Company : BaseAuditableEntity
     // Factory
     public static Company Create(CompanyInput input)
     {
-        return ValidateAndCreate(input);
+        var company =  ValidateAndCreate(input);
+        company.SetIndustry(input.IndustryId);
+        return company;
     }
 
     private static Company ValidateAndCreate(CompanyInput input)
     {
         var errors = new List<Error>();
 
-        var name       = CompanyName.Create(input.Name).Collect<CompanyName, string>(errors);
-        var email      = CompanyEmail.Create(input.Email).Collect<CompanyEmail, string>(errors);
-        var status     = CompanyStatus.Create(input.Status).Collect<CompanyStatus, string>(errors);
+        var name = CompanyName.Create(input.Name).Collect<CompanyName, string>(errors);
+        var email = CompanyEmail.Create(input.Email).Collect<CompanyEmail, string>(errors);
+        var status = CompanyStatus.Create(input.Status).Collect<CompanyStatus, string>(errors);
 
         var description = CompanyDescription.Create(input.Description)
             .Collect<CompanyDescription, string?>(errors);
 
-        var website     = CompanyWebsite.Create(input.Website)
+        var website = CompanyWebsite.Create(input.Website)
             .Collect<CompanyWebsite, string?>(errors);
 
-        var logo        = CompanyLogo.Create(input.Logo)
+        var logo = CompanyLogo.Create(input.Logo)
             .Collect<CompanyLogo, string?>(errors);
 
-        var phone       = CompanyPhone.Create(input.Phone)
+        var phone = CompanyPhone.Create(input.Phone)
             .Collect<CompanyPhone, string?>(errors);
 
-        var about       = CompanyAbout.Create(input.About)
+        var about = CompanyAbout.Create(input.About)
             .Collect<CompanyAbout, string?>(errors);
 
-        var eeo         = CompanyEEO.Create(input.EEO)
+        var eeo = CompanyEEO.Create(input.EEO)
             .Collect<CompanyEEO, string?>(errors);
 
-        var founded     = CompanyFounded.Create(input.Founded)
+        var founded = CompanyFounded.Create(input.Founded)
             .Collect<CompanyFounded, DateTime?>(errors);
 
-        var size        = CompanySize.Create(input.Size)
+        var size = CompanySize.Create(input.Size)
             .Collect<CompanySize, string?>(errors);
 
         // validate IndustryId exists but DO NOT assign here

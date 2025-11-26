@@ -20,7 +20,7 @@ public class CompanyEEO
         value = value.Trim();
         if (value.Length > 500)
         {
-            errors.Add(new Error("EEO.TooLong", "Logo cannot exceed 500 characters."));
+            errors.Add(new Error("EEO.TooLong", "EEO cannot exceed 500 characters."));
         }
 
         return errors.Count > 0
