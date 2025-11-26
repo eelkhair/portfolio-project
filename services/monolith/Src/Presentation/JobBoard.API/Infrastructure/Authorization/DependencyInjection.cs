@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using JobBoard.Domain;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
@@ -75,6 +76,9 @@ public static class DependencyInjection
 
         try
         {
+#if DEBUG
+            Debugger.Launch();
+#endif
             app.Run();
         }
         finally

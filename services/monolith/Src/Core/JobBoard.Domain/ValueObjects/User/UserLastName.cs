@@ -1,6 +1,6 @@
 using JobBoard.Domain.Exceptions;
 
-namespace JobBoard.Domain.ValueObjects;
+namespace JobBoard.Domain.ValueObjects.User;
 
 public class UserLastName
 {

@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using JobBoard.Domain.Exceptions;
 
-namespace JobBoard.Domain.ValueObjects;
+namespace JobBoard.Domain.ValueObjects.User;
 
 public partial class UserEmail
 {

@@ -3,7 +3,7 @@
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
 using JobBoard.Domain.Exceptions;
-using JobBoard.Domain.ValueObjects;
+using JobBoard.Domain.ValueObjects.User;
 
 // ReSharper disable NullableWarningSuppressionIsUsed
 
