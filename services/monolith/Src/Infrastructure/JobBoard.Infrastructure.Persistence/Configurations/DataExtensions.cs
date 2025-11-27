@@ -1,4 +1,3 @@
-using JobBoard.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -6,48 +5,58 @@ namespace JobBoard.Infrastructure.Persistence.Configurations;
 
 public static class DataExtensions
 {
-    private static void ConfigureBaseProperties<TBaseEntity>(this EntityTypeBuilder<TBaseEntity> builder, bool sequentialId = false)
-        where TBaseEntity : BaseEntity
+    public static void ConfigureBusinessEntity<TEntity>(this EntityTypeBuilder<TEntity> builder)
+        where TEntity : class
     {
-        builder.HasKey(e => e.UId);
-        if (sequentialId)
-        { 
-            builder.Property(e => e.UId).HasDefaultValueSql("newsequentialid()");
-        }
-        else
-        {
-            builder.Property(e => e.UId).IsRequired().ValueGeneratedNever();
-        }
-    }
+        var table = builder.Metadata.GetTableName()!;
+        var schema = builder.Metadata.GetSchema() ?? "dbo";
+        var sequence = $"{table}_Sequence";
 
-    internal static void ConfigureBusinessEntity<TBusinessEntity>(this EntityTypeBuilder<TBusinessEntity> builder,
-        bool isTemporal = true, bool isSequential = false) where TBusinessEntity : BaseEntity
-    {
-        builder.ConfigureBaseProperties(isSequential);
-        builder.Property(e => e.Id).ValueGeneratedNever();
-        builder.HasIndex(e => e.Id).IsUnique();
+        builder.HasKey("Id");
 
-        if (isTemporal)
-        {
-            builder.ToTable(x => x.IsTemporal());
-        }
+        builder.Property<int>("Id")
+            .ValueGeneratedOnAdd()
+            .HasDefaultValueSql($"NEXT VALUE FOR {sequence}");
+
+        builder.Property<Guid>("UId")
+            .IsRequired()
+            .ValueGeneratedNever();
         
+        builder.ToTable(table, schema, tb =>
+        {
+            tb.IsTemporal();
+        });
+    }
+    
+    public static void ConfigureAuditableProperties<TEntity>(this EntityTypeBuilder<TEntity> builder)
+        where TEntity : class
+    {
+        builder.Property<DateTime>("CreatedAt")
+            .IsRequired();
+
+        builder.Property<string>("CreatedBy")
+            .HasMaxLength(100)
+            .IsRequired();
+
+        builder.Property<DateTime>("UpdatedAt")
+            .IsRequired();
+
+        builder.Property<string>("UpdatedBy")
+            .HasMaxLength(100)
+            .IsRequired();
     }
 
-    internal static void ConfigureInfrastructureEntity<TInfraEntity>(this EntityTypeBuilder<TInfraEntity> builder)
-        where TInfraEntity : BaseEntity
-    {
-        builder.ConfigureBaseProperties(true);
-        builder.Property(e => e.Id).UseIdentityColumn();
-    }
 
-    internal static void ConfigureAuditableProperties<TAuditableEntity>(
-        this EntityTypeBuilder<TAuditableEntity> builder) where TAuditableEntity : BaseAuditableEntity
+    public static void ConfigureInfrastructureEntity<TEntity>(this EntityTypeBuilder<TEntity> builder)
+        where TEntity : class
     {
-        builder.Property(e => e.CreatedAt).HasColumnType("datetime2").IsRequired();
-        builder.Property(e => e.UpdatedAt).HasColumnType("datetime2");
-        builder.Property(e => e.CreatedBy).HasMaxLength(100).IsRequired();
-        builder.Property(e => e.UpdatedBy).HasMaxLength(100);
+        builder.HasKey("Id");
 
+        builder.Property<int>("Id")
+            .UseIdentityColumn();
+
+        builder.Property<Guid>("UId")
+            .IsRequired()
+            .HasDefaultValueSql("newsequentialid()");
     }
 }

@@ -1,21 +1,21 @@
-// ReSharper disable UnusedMember.Global
-
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-
+using JobBoard.Domain.Aggregates;
 using JobBoard.Domain.Exceptions;
+using JobBoard.Domain.Helpers;
 using JobBoard.Domain.ValueObjects.User;
-
-// ReSharper disable NullableWarningSuppressionIsUsed
 
 namespace JobBoard.Domain.Entities.Users;
 
 public class User : BaseAuditableEntity
 {
-    public string FirstName { get;private  set; } 
-    public string LastName { get; private set; }
-    public string Email { get; private  set; }
-    public string ExternalId { get; private  set; }
-    private User(string firstName, string lastName, string email, string externalId)
+    protected User()
+    {
+        FirstName = string.Empty;
+        LastName = string.Empty;
+        Email = string.Empty;
+        ExternalId = string.Empty;
+    }
+    
+    private User(string firstName, string lastName, string email, string? externalId)
     {
         FirstName = firstName;
         LastName = lastName;
@@ -23,107 +23,65 @@ public class User : BaseAuditableEntity
         ExternalId = externalId;
     }
     
-    public void SetFirstName(string firstName)
+    public string FirstName { get; private set; }
+    public string LastName { get; private set; }
+    public string Email { get; private set; }
+    public string? ExternalId { get; private set; }
+    
+    public void SetFirstName(string firstName) =>
+        FirstName = UserFirstName
+            .Create(firstName)
+            .Ensure<UserFirstName, string>("User.InvalidFirstName")!;
+
+    public void SetLastName(string lastName) =>
+        LastName = UserLastName
+            .Create(lastName)
+            .Ensure<UserLastName, string>("User.InvalidLastName")!;
+
+    public void SetEmail(string email) =>
+        Email = UserEmail
+            .Create(email)
+            .Ensure<UserEmail, string>("User.InvalidEmail")!;
+
+    public void SetExternalId(string externalId) =>
+        ExternalId = UserExternalId
+            .Create(externalId)
+            .Ensure<UserExternalId, string?>("User.InvalidExternalId")!;
+    
+    public static User Create(
+        string firstName,
+        string lastName,
+        string email,
+        string? externalId,
+        Guid uId,
+        int id,
+        DateTime? createdAt = null,
+        string? createdBy = null)
     {
-        var result = UserFirstName.Create(firstName);
-        
-        if (result.IsFailure)
-        {
-            throw new DomainException("User.InvalidFirstName", result.Errors);
-        }
-        FirstName = result.Value!.Value;
+        var user = ValidateAndCreate(firstName, lastName, email, externalId);
+        user.Id = id;
+        user.UId = uId;
+        EntityFactory.ApplyAudit(user, createdAt, createdBy);
+
+        return user;
     }
     
-    public void SetLastName(string lastName)
-    {
-        var result = UserLastName.Create(lastName);
-        if (result.IsFailure)
-        {
-            throw new DomainException("User.InvalidLastName", result.Errors);
-        }
-        LastName = result.Value!.Value;
-    }
-    
-    public void SetEmail(string email)
-    {
-        var result = UserEmail.Create(email);
-        if (result.IsFailure)
-        {
-            throw new DomainException("User.InvalidEmail", result.Errors);
-        }
-        
-        Email = result.Value!.Value;
-    }
-    
-    public void SetExternalId(string externalId)
-    {
-        var result = UserExternalId.Create(externalId);
-        if (result.IsFailure)
-        {
-            throw new DomainException("User.InvalidExternalId", result.Errors);
-        }
-        
-        ExternalId = result.Value!.Value;
-    }
-    
-    public static User Create(string firstName, 
+    private static User ValidateAndCreate(
+        string firstName, 
         string lastName, 
         string email, 
-        string externalId,
-        DateTime? createdAt = null,
-        string? createdBy = null
-
-        )
-    {
-         var user = ValidateAndCreateEntity(firstName, lastName, email, externalId);
-
-         if (createdAt.HasValue)
-         {
-             user.CreatedAt = createdAt.Value; 
-             user.UpdatedAt = createdAt.Value;
-         }
-
-         if (string.IsNullOrEmpty(createdBy)) return user;
-         user.CreatedBy = createdBy;
-         user.UpdatedBy = createdBy;
-
-         return user;
-    }
-    
-    private static User ValidateAndCreateEntity(string firstName, string lastName, string email, string externalId)
+        string? externalId)
     {
         var errors = new List<Error>();
-        
-        var firstNameResult = UserFirstName.Create(firstName);
-        if (firstNameResult.IsFailure)
-        {
-            errors.AddRange(firstNameResult.Errors);
-        }
-        
-        var lastNameResult = UserLastName.Create(lastName);
-        if (lastNameResult.IsFailure)
-        {
-            errors.AddRange(lastNameResult.Errors);
-        }
-        
-        var emailResult = UserEmail.Create(email);
-        if (emailResult.IsFailure)
-        {
-            errors.AddRange(emailResult.Errors);
-        }
-        
-        var externalIdResult = UserExternalId.Create(externalId);
-        if (externalIdResult.IsFailure)
-        {
-            errors.AddRange(externalIdResult.Errors);
-        }
-        
+
+        var fName = UserFirstName.Create(firstName).Collect<UserFirstName, string>(errors)!;
+        var lName = UserLastName.Create(lastName).Collect<UserLastName, string>(errors)!;
+        var mail = UserEmail.Create(email).Collect<UserEmail, string>(errors)!;
+        var extId = UserExternalId.Create(externalId).Collect<UserExternalId, string?>(errors)!;
+
         if (errors.Count > 0)
-        {
             throw new DomainException("User.InvalidEntity", errors);
-        }
-        
-        return new  User(firstNameResult.Value!.Value, 
-            lastNameResult.Value!.Value, emailResult.Value!.Value, externalIdResult.Value!.Value);
+
+        return new User(fName, lName, mail, extId);
     }
 }

@@ -1,14 +1,20 @@
 ﻿namespace JobBoard.Domain.Aggregates;
 
-public sealed record CompanyInput( string Name,
+public sealed record CompanyInput(
+    int Id,
+    Guid UId,
+    string Name,
     string Email,
     string Status,
-    string? Description,
-    string? Website,
-    string? Logo,
-    string? Phone,
-    string? About, 
-    string? EEO,
-    DateTime? Founded,
-    string? Size,
-    long IndustryId);
+    int IndustryId,
+    string? Description = null,
+    string? Website = null,
+    string? Logo = null,
+    string? Phone = null,
+    string? About = null,
+    string? EEO = null,
+    DateTime? Founded = null,
+    string? Size = null,
+
+    DateTime? CreatedAt = null,
+    string? CreatedBy = null);

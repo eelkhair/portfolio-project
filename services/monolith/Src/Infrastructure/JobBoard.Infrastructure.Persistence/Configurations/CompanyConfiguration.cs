@@ -8,7 +8,7 @@ public class CompanyConfiguration : IEntityTypeConfiguration<Company>
 {
     public void Configure(EntityTypeBuilder<Company> builder)
     {
-        builder.ToTable("Companies", "Company", x=> x.IsTemporal());
+        builder.ToTable("Companies", "Company");
         builder.ConfigureAuditableProperties();
         builder.ConfigureBusinessEntity();
         builder.Property(c => c.Name).HasMaxLength(250).IsRequired();
@@ -28,5 +28,19 @@ public class CompanyConfiguration : IEntityTypeConfiguration<Company>
         
         builder.Property(c=> c.IndustryId).IsRequired();
         builder.Property(c=> c.Status).IsRequired().HasMaxLength(30);
+              
+        builder.HasOne(c => c.Industry)
+            .WithMany(i => i.Companies)
+            .HasForeignKey(c => c.IndustryId)
+            .OnDelete(DeleteBehavior.Restrict); 
+
+        builder.HasMany(c => c.Jobs)
+            .WithOne(j => j.Company)
+            .HasForeignKey(j => j.CompanyId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        builder.Metadata
+            .FindNavigation(nameof(Company.Jobs))!
+            .SetPropertyAccessMode(PropertyAccessMode.Field);
     }
 }

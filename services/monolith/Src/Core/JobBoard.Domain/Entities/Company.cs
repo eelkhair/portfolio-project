@@ -33,11 +33,27 @@ public class Company : BaseAuditableEntity
     public string? Logo { get; private set; }
     public string Status { get; private set; }
 
-    public long IndustryId { get; private set; }
-
+    public int IndustryId { get; private set; }
     public Industry Industry { get; private set; } = null!;
+    
 
-    // Setters
+    private readonly List<Job> _jobs = [];
+    public IReadOnlyCollection<Job> Jobs => _jobs.AsReadOnly();
+
+    public void AddJob(Job job)
+    {
+        if (job is null)
+        {
+            throw new DomainException(
+                "Company.NullJob",
+                [new Error("Company.NullJob", "Job cannot be null.")]
+            );
+        }
+
+        job.SetCompany(Id);
+        _jobs.Add(job);
+    }
+    
     public void SetName(string name) =>
         Name = CompanyName.Create(name).Ensure<CompanyName, string>("Company.InvalidName")!;
 
@@ -79,16 +95,19 @@ public class Company : BaseAuditableEntity
         Size = CompanySize.Create(size)
             .Ensure<CompanySize, string?>("Company.InvalidSize");
 
-    internal void SetIndustry(long industryId)
+    internal void SetIndustry(int industryId)
     {
         IndustryId = industryId;
     }
+    
 
-    // Factory
     public static Company Create(CompanyInput input)
     {
-        var company =  ValidateAndCreate(input);
+        var company = ValidateAndCreate(input);
         company.SetIndustry(input.IndustryId);
+        company.Id = input.Id;
+        company.UId = input.UId;
+        EntityFactory.ApplyAudit(company, input.CreatedAt, input.CreatedBy);
         return company;
     }
 
@@ -102,32 +121,24 @@ public class Company : BaseAuditableEntity
 
         var description = CompanyDescription.Create(input.Description)
             .Collect<CompanyDescription, string?>(errors);
-
         var website = CompanyWebsite.Create(input.Website)
             .Collect<CompanyWebsite, string?>(errors);
-
         var logo = CompanyLogo.Create(input.Logo)
             .Collect<CompanyLogo, string?>(errors);
-
         var phone = CompanyPhone.Create(input.Phone)
             .Collect<CompanyPhone, string?>(errors);
-
         var about = CompanyAbout.Create(input.About)
             .Collect<CompanyAbout, string?>(errors);
-
         var eeo = CompanyEEO.Create(input.EEO)
             .Collect<CompanyEEO, string?>(errors);
-
         var founded = CompanyFounded.Create(input.Founded)
             .Collect<CompanyFounded, DateTime?>(errors);
-
         var size = CompanySize.Create(input.Size)
             .Collect<CompanySize, string?>(errors);
 
-        // validate IndustryId exists but DO NOT assign here
         DomainGuard.AgainstInvalidId(input.IndustryId, "Company.InvalidIndustryId", errors);
 
-        if (errors.Any())
+        if (errors.Count != 0)
             throw new DomainException("Company.InvalidEntity", errors);
 
         var company = new Company(name!, email!, status!)

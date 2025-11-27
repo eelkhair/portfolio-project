@@ -14,7 +14,7 @@ public class CreateCompanyValidator : Validator<CreateCompanyRequest>
         RuleFor(c => c.Name)
             .Cascade(CascadeMode.Stop)
             .NotEmpty().WithMessage("Company name is required")
-            .MaximumLength(100).WithMessage("Company name cannot exceed 100 characters");
+            .MaximumLength(250).WithMessage("Company name cannot exceed 250 characters");
 
         RuleFor(c => c.CompanyEmail)
             .Cascade(CascadeMode.Stop)
@@ -24,7 +24,7 @@ public class CreateCompanyValidator : Validator<CreateCompanyRequest>
 
         RuleFor(c => c.CompanyWebsite)
             .Cascade(CascadeMode.Stop)
-            .MaximumLength(100).WithMessage("Company website cannot exceed 100 characters")
+            .MaximumLength(200).WithMessage("Company website cannot exceed 200 characters")
             .Must(url => string.IsNullOrWhiteSpace(url) || Uri.IsWellFormedUriString(url, UriKind.Absolute))
             .WithMessage("Company website is not a valid URL");
 

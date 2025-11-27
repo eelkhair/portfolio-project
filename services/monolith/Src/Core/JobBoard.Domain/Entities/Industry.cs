@@ -6,13 +6,11 @@ namespace JobBoard.Domain.Entities;
 
 public class Industry : BaseAuditableEntity
 {
-    // EF Core constructor
     protected Industry()
     {
         Name = string.Empty;
     }
-
-    // Domain constructor
+    
     private Industry(string name)
     {
         Name = name;
@@ -33,30 +31,33 @@ public class Industry : BaseAuditableEntity
         {
             throw new DomainException(
                 "Industry.NullCompany",
-                new[]
-                {
+                [
                     new Error("Industry.NullCompany", "Company cannot be null.")
-                });
+                ]);
         }
 
-        // Duplicate check by NAME
         if (_companies.Any(c =>
                 c.Name.Equals(company.Name, StringComparison.OrdinalIgnoreCase)))
         {
             throw new DomainException(
                 "Industry.DuplicateCompany",
-                new[]
-                {
+                [
                     new Error(
                         "Industry.DuplicateCompany",
                         $"A company named '{company.Name}' already exists in this Industry.")
-                });
+                ]);
         }
 
-        // Assign IndustryId INSIDE the aggregate root only
-        company.SetIndustry(Id);
+        company.SetIndustry(0);
 
         _companies.Add(company);
+    }
+    public void RemoveCompany(Company company)
+    {
+        if (company is null) return;
+
+        if (_companies.Remove(company))
+            company.SetIndustry(0);
     }
 
     public static Industry Create(string name)

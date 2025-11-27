@@ -22,11 +22,13 @@ public class UserSyncService(
         
         if (user == null)
         {
+            var (id, uid) = await unitOfWork.GetNextValueFromSequenceAsync(typeof(User), cancellationToken);
             var entity = User.Create(
                 firstName: userAccessor.FirstName!,
                 lastName: userAccessor.LastName!,
                 email: userAccessor.Email!,
                 externalId: userId,
+                uId: uid, id: id,
                 createdAt:DateTime.UtcNow,
                 createdBy:userId
             );

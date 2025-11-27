@@ -3,22 +3,38 @@ using System.Diagnostics;
 namespace JobBoard.API.Infrastructure.Authorization;
 
 /// <summary>
-/// Middleware to append TraceId to response headers
+/// Middleware to append TraceId to response headers.
+/// Ensures that the Activity is created before writing the header.
 /// </summary>
-/// <param name="next"></param>
 public class TraceIdMiddleware(RequestDelegate next)
 {
     /// <summary>
-    /// Invokes the middleware to add TraceId to response headers
+    /// Default
     /// </summary>
     /// <param name="context"></param>
     public async Task InvokeAsync(HttpContext context)
-    {
-        var traceId = Activity.Current?.TraceId.ToString();
-        if (traceId != null)
+    { 
+        var activity = Activity.Current;
+
+        if (activity == null)
         {
-            context.Response.Headers.Append("X-Trace-Id", traceId);
+            activity = new Activity("HttpRequest").Start();
         }
-        await next(context);
+        context.Response.OnStarting(() =>
+        {
+            var traceId = activity.TraceId.ToString();
+            context.Response.Headers["x-trace-id"] = traceId;
+            return Task.CompletedTask;
+        });
+
+        try
+        {
+            await next(context);
+        }
+        finally
+        {
+            if (activity.Parent == null)
+                activity.Stop();
+        }
     }
 }

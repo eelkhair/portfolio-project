@@ -4,13 +4,16 @@ namespace JobBoard.Domain.ValueObjects.User;
 
 public class UserExternalId
 {
-    public string Value { get; }
+    public string? Value { get; }
 
-    private UserExternalId(string value) { Value = value; }
+    private UserExternalId(string? value) { Value = value; }
 
-    public static Result<UserExternalId> Create(string value)
+    public static Result<UserExternalId> Create(string? value)
     {
-        if (string.IsNullOrEmpty(value)) value = string.Empty;
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return Result<UserExternalId>.Success(new UserExternalId(null));
+        }
         value = value.Trim();
         
         var errors = new List<Error>();

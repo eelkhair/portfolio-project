@@ -7,9 +7,10 @@ public class UserConfiguration: IEntityTypeConfiguration<Domain.Entities.Users.U
 {
     public void Configure(EntityTypeBuilder<Domain.Entities.Users.User> builder)
     {
-        RelationalEntityTypeBuilderExtensions.ToTable((EntityTypeBuilder)builder, x => x.IsTemporal());
+        builder.ToTable("Users", "User");
         
-        builder.ConfigureInfrastructureEntity();
+        builder.ConfigureAuditableProperties();
+        builder.ConfigureBusinessEntity();
         
         builder.Property(u => u.FirstName)
             .IsRequired()

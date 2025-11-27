@@ -5,22 +5,9 @@ namespace JobBoard.IntegrationEvents;
 
 public interface IIntegrationEvent
 {
+    Guid EventId { get; }
     string EventType { get; }
+    string Action { get; }
     string TraceId { get; }
-}
-
-public static class EventAction
-{
-    public const string Created = "New";
-    public const string Updated = "Update";
-    public const string Deleted = "Delete";
-
-    public static string EventType(string action) => action switch
-    {
-        Created => "Created",
-        Updated => "Updated",
-        Deleted => "Deleted",
-        _ => string.Empty
-    };
-    // etc.
+    DateTime OccurredAt { get; }
 }

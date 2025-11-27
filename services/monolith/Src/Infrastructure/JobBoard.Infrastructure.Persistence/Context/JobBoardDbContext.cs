@@ -13,6 +13,12 @@ public partial class JobBoardDbContext
     public DbSet<OutboxMessage> OutboxMessages { get; set; }
     public DbSet<OutboxArchivedMessage> OutboxArchivedMessages { get; set; }
     public DbSet<OutboxDeadLetter> OutboxDeadLetters { get; set; }
+    public DbSet<Job> Jobs { get; set; }
+    public DbSet<Qualification> Qualifications { get; set; }
+    public DbSet<Responsibility> Responsibilities { get; set; }
+    public DbSet<Industry> Industries { get; set; }
+    public DbSet<UserCompany> UserCompanies { get; set; }
+    public DbSet<Company> Companies { get; set; }
 }
 
 public partial class JobBoardDbContext(DbContextOptions<JobBoardDbContext> options)
@@ -27,14 +33,14 @@ public partial class JobBoardDbContext(DbContextOptions<JobBoardDbContext> optio
         {
             var tableName = entityType.GetTableName();
             var schemaName = entityType.GetSchema();
-            if (string.IsNullOrEmpty(tableName) || string.Equals(schemaName, "outbox", StringComparison.OrdinalIgnoreCase) || string.Equals(tableName, "Users", StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrEmpty(tableName) || string.Equals(schemaName, "outbox", StringComparison.OrdinalIgnoreCase))
             {
                 continue;
             }
             
             var sequenceName = $"{tableName}_Sequence";
         
-            modelBuilder.HasSequence<long>(sequenceName);
+            modelBuilder.HasSequence<int>(sequenceName);
         }
         
         //modelBuilder.SeedData();
@@ -72,7 +78,7 @@ public partial class JobBoardDbContext(DbContextOptions<JobBoardDbContext> optio
     }
     public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken) => Database.BeginTransactionAsync(cancellationToken);
 
-    public async Task<(long id, Guid uid)> GetNextValueFromSequenceAsync(Type entityType,
+    public async Task<(int id, Guid uid)> GetNextValueFromSequenceAsync(Type entityType,
         CancellationToken cancellationToken)
     {
        
@@ -104,7 +110,7 @@ public partial class JobBoardDbContext(DbContextOptions<JobBoardDbContext> optio
         
         var result = await command.ExecuteScalarAsync(cancellationToken);
     
-        var id = (long)(result   ?? throw new InvalidOperationException());
+        var id = (int)(result   ?? throw new InvalidOperationException());
         var uid = Guid.CreateVersion7();
         return (id, uid);
     }

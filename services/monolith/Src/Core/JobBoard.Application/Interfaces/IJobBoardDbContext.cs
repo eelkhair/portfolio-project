@@ -1,3 +1,4 @@
+using JobBoard.Domain.Entities;
 using JobBoard.Domain.Entities.Infrastructure;
 using JobBoard.Domain.Entities.Users;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,12 @@ namespace JobBoard.Application.Interfaces;
 public interface IJobBoardQueryDbContext
 {
     DbSet<User> Users { get; set; }
+    DbSet<Job> Jobs { get; set; }
+    DbSet<Qualification> Qualifications { get; set; }
+    DbSet<Responsibility> Responsibilities { get; set; }
+    DbSet<Industry> Industries { get; set; }
+    DbSet<UserCompany> UserCompanies { get; set; }
+    DbSet<Company> Companies { get; set; }
 
 }
 
@@ -26,7 +33,7 @@ public interface IOutboxDbContext
 
 public interface IUnitOfWork
 { 
-    Task<(long id, Guid uid)> GetNextValueFromSequenceAsync(Type entityType, CancellationToken cancellationToken);
+    Task<(int id, Guid uid)> GetNextValueFromSequenceAsync(Type entityType, CancellationToken cancellationToken);
     Task<int> SaveChangesAsync(string userId, CancellationToken cancellationToken);
 }
 

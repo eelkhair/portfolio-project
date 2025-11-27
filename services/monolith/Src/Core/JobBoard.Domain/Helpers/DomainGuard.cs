@@ -10,6 +10,12 @@ public static class DomainGuard
         if (id <= 0)
             errors.Add(new Error(errorCode, $"{errorCode} must be greater than zero."));
     }
+    public static void AgainstInvalidId(
+        Guid id, string errorCode, List<Error> errors)
+    {
+        if (Guid.Empty == id)
+            errors.Add(new Error(errorCode, $"{errorCode} must be greater than zero."));
+    }
 
     public static void AgainstNullOrEmpty(
         string? value, string errorCode, List<Error> errors)
