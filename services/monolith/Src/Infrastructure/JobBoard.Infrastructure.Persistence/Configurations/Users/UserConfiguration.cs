@@ -22,7 +22,6 @@ public class UserConfiguration: IEntityTypeConfiguration<Domain.Entities.Users.U
             .IsRequired()
             .HasMaxLength(256);
         builder.Property(c=> c.ExternalId)
-            .IsRequired()
             .HasMaxLength(100);
         builder.HasIndex(u => u.ExternalId).IsUnique();
         builder.HasIndex(u=> u.Email).IsUnique();

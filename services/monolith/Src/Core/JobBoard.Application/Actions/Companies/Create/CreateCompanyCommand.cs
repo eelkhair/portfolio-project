@@ -67,7 +67,7 @@ public class CreateCompanyCommandHandler(IHandlerContext context
         UnitOfWorkEvents.Enqueue(() =>
         {
             parentActivity?.SetTag("CompanyUId", companyUId.ToString());
-            parentActivity?.SetTag("UserId", userId.ToString());
+            parentActivity?.SetTag("UserUId", userUId.ToString());
 
             Logger.LogInformation(
                 "Successfully created company {CompanyName} ({CompanyUId})",

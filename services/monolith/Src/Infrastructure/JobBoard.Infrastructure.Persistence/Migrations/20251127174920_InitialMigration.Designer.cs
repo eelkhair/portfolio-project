@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JobBoard.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(JobBoardDbContext))]
-    [Migration("20251127154730_InitialMigration")]
+    [Migration("20251127174920_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -675,7 +675,6 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("ExternalId")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -716,7 +715,8 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .IsUnique();
 
                     b.HasIndex("ExternalId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[ExternalId] IS NOT NULL");
 
                     b.ToTable("Users", "User");
 

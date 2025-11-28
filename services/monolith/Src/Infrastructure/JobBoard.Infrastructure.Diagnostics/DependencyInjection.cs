@@ -36,7 +36,7 @@ public static class DependencyInjection
                 .AddEntityFrameworkCoreInstrumentation(options => options.AddFilters())
 
                 .AddHttpClientInstrumentation(options => options.AddFilters())
-                .AddOtlpExporter(c => c.Endpoint = new Uri("http://localhost:17011"));
+                .AddOtlpExporter(c => c.Endpoint = new Uri("http://192.168.1.160:4317"));
         });
         openTelemetry.WithMetrics(meterProviderBuilder =>
         {
@@ -44,14 +44,14 @@ public static class DependencyInjection
                 .AddMeter(AppMetrics.Meter.Name)
                 .AddAspNetCoreInstrumentation()
                 .AddHttpClientInstrumentation()
-                .AddOtlpExporter(c => c.Endpoint = new Uri("http://localhost:17011"));
+                .AddOtlpExporter(c => c.Endpoint = new Uri("http://192.168.1.160:4317"));
         });
 
         services.AddLogging(loggingBuilder =>
         {
             loggingBuilder.AddOpenTelemetry(options =>
             {
-                options.AddOtlpExporter(c => c.Endpoint = new Uri("http://localhost:17011"));
+                options.AddOtlpExporter(c => c.Endpoint = new Uri("http://192.168.1.115:4317"));
                 
             });
             loggingBuilder.AddFilters();

@@ -3,6 +3,7 @@ using JobBoard.API.Infrastructure.Authorization;
 using JobBoard.API.Infrastructure.OpenApi;
 using JobBoard.Application;
 using JobBoard.Application.Interfaces.Users;
+using JobBoard.infrastructure.Dapr;
 using JobBoard.Infrastructure.Diagnostics;
 using JobBoard.Infrastructure.Outbox;
 using JobBoard.Infrastructure.Persistence;
@@ -18,10 +19,11 @@ builder.Services
     .AddScoped<IUserAccessor, HttpUserAccessor>()
     .AddOutboxServices()
     .AddODataServices()
+    .AddDaprServices()
     .AddAuthorizationService(builder.Configuration)
     .AddSmtpServices(builder.Configuration)
     .AddConfiguredSwagger(builder.Configuration)
-    .AddOpenTelemetryServices(builder.Configuration, "JobBoard.API")
+    .AddOpenTelemetryServices(builder.Configuration, "monolith-api")
     .AddHealthCheckServices(builder.Configuration)
     .AddHealthChecksUI(c=> c.SetHeaderText("JobBoard - Health Checks"))
     .AddInMemoryStorage();

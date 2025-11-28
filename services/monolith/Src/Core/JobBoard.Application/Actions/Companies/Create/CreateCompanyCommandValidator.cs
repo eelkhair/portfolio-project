@@ -43,6 +43,15 @@ public class CreateCompanyCommandValidator : AbstractValidator<CreateCompanyComm
             if (emailExists)
                 ctx.AddFailure(nameof(model.CompanyEmail), "Company email already exists");
 
+            
+            var userEmailExists =  await context.Users
+                .Where(i => EF.Property<DateTime>(i, "PeriodEnd") == DateTime.MaxValue)
+
+                .AnyAsync(x => x.Email == model.AdminEmail, ct);
+
+            if (userEmailExists)
+                ctx.AddFailure(nameof(model.AdminEmail), "Admin email already exists");
+           
             if (model.IndustryUId != Guid.Empty)
             {
                 var industryExists = await context.Industries

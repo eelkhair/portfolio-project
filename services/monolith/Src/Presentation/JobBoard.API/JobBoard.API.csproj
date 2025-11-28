@@ -35,6 +35,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\Infrastructure\JobBoard.Infrastructure.Configuration\JobBoard.Infrastructure.Configuration.csproj" />
+      <ProjectReference Include="..\..\Infrastructure\JobBoard.infrastructure.Dapr\JobBoard.infrastructure.Dapr.csproj" />
       <ProjectReference Include="..\..\Infrastructure\JobBoard.Infrastructure.Diagnostics\JobBoard.Infrastructure.Diagnostics.csproj" />
       <ProjectReference Include="..\..\Infrastructure\JobBoard.Infrastructure.Outbox\JobBoard.Infrastructure.Outbox.csproj" />
       <ProjectReference Include="..\..\Infrastructure\JobBoard.Infrastructure.Persistence\JobBoard.Infrastructure.Persistence.csproj" />

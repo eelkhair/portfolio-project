@@ -6,4 +6,16 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Dapr.Actors.AspNetCore" Version="1.16.1" />
+      <PackageReference Include="Dapr.AspNetCore" Version="1.16.1" />
+      <PackageReference Include="Dapr.Client" Version="1.16.1" />
+      <PackageReference Include="Dapr.Extensions.Configuration" Version="1.16.1" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.10" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Core\JobBoard.Application\JobBoard.Application.csproj" />
+    </ItemGroup>
+
 </Project>

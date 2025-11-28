@@ -672,7 +672,6 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("ExternalId")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -713,7 +712,8 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .IsUnique();
 
                     b.HasIndex("ExternalId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[ExternalId] IS NOT NULL");
 
                     b.ToTable("Users", "User");
 

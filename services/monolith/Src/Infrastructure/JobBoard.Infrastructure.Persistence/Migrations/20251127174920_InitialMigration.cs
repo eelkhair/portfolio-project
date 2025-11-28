@@ -153,7 +153,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                     FirstName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    ExternalId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    ExternalId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     PeriodEnd = table.Column<DateTime>(type: "datetime2", nullable: false)
                         .Annotation("SqlServer:TemporalIsPeriodEndColumn", true),
                     PeriodStart = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -451,7 +451,8 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                 schema: "User",
                 table: "Users",
                 column: "ExternalId",
-                unique: true);
+                unique: true,
+                filter: "[ExternalId] IS NOT NULL");
         }
 
         /// <inheritdoc />
