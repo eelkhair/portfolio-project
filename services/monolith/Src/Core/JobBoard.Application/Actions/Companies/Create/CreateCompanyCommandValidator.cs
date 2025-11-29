@@ -1,13 +1,15 @@
 ﻿using FluentValidation;
 using JobBoard.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace JobBoard.Application.Actions.Companies.Create;
 
 public class CreateCompanyCommandValidator : AbstractValidator<CreateCompanyCommand>
 {
-    public CreateCompanyCommandValidator(IJobBoardDbContext context)
+    public CreateCompanyCommandValidator(IJobBoardDbContext context, ILogger<CreateCompanyCommandValidator> logger)
     {
+        logger.LogInformation("Validating {ClassName}", nameof(CreateCompanyCommandValidator));
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Company name is required.")
             .MaximumLength(250);
@@ -28,6 +30,7 @@ public class CreateCompanyCommandValidator : AbstractValidator<CreateCompanyComm
 
         RuleFor(c => c).CustomAsync(async (model, ctx, ct) =>
         {
+            logger.LogInformation("Checking uniqueness of company {CompanyName}", model.Name);
             var baseQuery = context.Companies
                 .Where(x => EF.Property<DateTime>(x, "PeriodEnd") == DateTime.MaxValue);
 
@@ -37,6 +40,7 @@ public class CreateCompanyCommandValidator : AbstractValidator<CreateCompanyComm
             if (nameExists)
                 ctx.AddFailure(nameof(model.Name), "Company name already exists");
 
+            logger.LogInformation("Checking uniqueness of company email {CompanyEmail}", model.CompanyEmail);
             var emailExists = await baseQuery
                 .AnyAsync(x => x.Email == model.CompanyEmail, ct);
 
@@ -44,6 +48,7 @@ public class CreateCompanyCommandValidator : AbstractValidator<CreateCompanyComm
                 ctx.AddFailure(nameof(model.CompanyEmail), "Company email already exists");
 
             
+            logger.LogInformation("Checking uniqueness of admin email {AdminEmail}", model.AdminEmail);
             var userEmailExists =  await context.Users
                 .Where(i => EF.Property<DateTime>(i, "PeriodEnd") == DateTime.MaxValue)
 
@@ -54,6 +59,7 @@ public class CreateCompanyCommandValidator : AbstractValidator<CreateCompanyComm
            
             if (model.IndustryUId != Guid.Empty)
             {
+                logger.LogInformation("Checking existence of industry {IndustryUId}", model.IndustryUId);
                 var industryExists = await context.Industries
                     .Where(i => EF.Property<DateTime>(i, "PeriodEnd") == DateTime.MaxValue)
                     .AnyAsync(i => i.UId == model.IndustryUId, ct);

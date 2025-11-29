@@ -14,6 +14,7 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
 using Serilog.Enrichers.OpenTelemetry;
+using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Sinks.Elasticsearch;
 
@@ -104,15 +105,44 @@ public static class DependencyInjection
         this WebApplicationBuilder builder,
         string appTag)
     {
-        // Clear default providers to avoid duplication
         builder.Logging.ClearProviders();
-
-        // Reuse your existing filters
+        builder.Logging.SetMinimumLevel(LogLevel.Warning);
         builder.Logging.AddFilters();
 
-        // Setup Serilog
         Log.Logger = new LoggerConfiguration()
+            .Enrich.WithProperty("@timestamp", DateTime.UtcNow)
+            // FINAL: Remove all health, http ping, and authentication noise
+            .Filter.ByExcluding(log =>
+                (
+                    log.Properties.TryGetValue("SourceContext", out var ctx) &&
+                    (
+                        ctx.ToString().Contains("HttpClient.health-checks") ||
+                        ctx.ToString().Contains("HealthCheck") ||
+                        ctx.ToString().Contains("HealthReportCollector")
+                    )
+                )
+                ||
+                (
+                    log.Properties.TryGetValue("Uri", out var uri) &&
+                    uri.ToString().Contains("health")
+                )
+                ||
+                (
+                    log.MessageTemplate.Text.Contains("health-results") ||
+                    log.MessageTemplate.Text.Contains("/health") ||
+                    log.MessageTemplate.Text.Contains("Bearer was not authenticated") ||
+                    log.MessageTemplate.Text.Contains("does not match a supported file type") ||
+                    log.MessageTemplate.Text.Contains("POST requests are not supported") ||
+                    log.MessageTemplate.Text.Contains("OPTIONS requests are not supported")
+                )
+            )
+            .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+            .MinimumLevel.Override("System", LogEventLevel.Warning)
+            .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+            .MinimumLevel.Override("Microsoft.AspNetCore.DataProtection", LogEventLevel.Error)
+            .MinimumLevel.Override("Microsoft.AspNetCore.Server.Kestrel", LogEventLevel.Error)
             .ReadFrom.Configuration(builder.Configuration)
+            .Enrich.With<ElasticTimestampEnricher>()  
             .Enrich.FromLogContext()
             .Enrich.WithExceptionDetails()
             .Enrich.WithProperty("ApplicationName", appTag)
@@ -121,7 +151,6 @@ public static class DependencyInjection
             .Enrich.With(new OpenTelemetryActivityEnricher())
             .Enrich.With<OtelLinkEnricher>()
             .ApplyStandardFilters(builder.Environment)
-            
             .WriteTo.Console()
             .WriteTo.Seq("http://seq")
             .WriteTo.Elasticsearch(
@@ -129,6 +158,7 @@ public static class DependencyInjection
             .CreateLogger();
 
         builder.Host.UseSerilog();
+        builder.Logging.SetMinimumLevel(LogLevel.Warning);
         return builder;
     }
 

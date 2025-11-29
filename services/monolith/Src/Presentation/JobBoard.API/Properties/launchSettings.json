@@ -7,7 +7,7 @@
       "launchBrowser": true,
       "applicationUrl": "http://localhost:5280",
       "executablePath": "dapr.exe",
-      "commandLineArgs": "run --app-id monolith-api --resources-path ../../../../../Components/ --resources-path ./Dapr/Components/Secrets --resources-path ./Dapr/Components/Timers --resources-path ./Dapr/Components --config ./Dapr/Config/config.yaml --app-port 5280 --dapr-http-port 6099  --log-level debug dotnet run"
+      "commandLineArgs": "run --app-id monolith-api --resources-path ../../../../../Components/ --resources-path ./Dapr/Components/Secrets --resources-path ./Dapr/Components/Timers --resources-path ./Dapr/Components --config ./Dapr/Config/config.yaml --app-port 5280 --dapr-http-port 6099  --log-level warn dotnet run"
     },
     "http": {
       "commandName": "Project",

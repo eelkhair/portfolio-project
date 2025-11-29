@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Core;
 using Serilog.Events;
 
 
@@ -56,6 +57,19 @@ public static class LoggingFilters
     }
     public static ILoggingBuilder AddFilters(this ILoggingBuilder builder)
     {
+        
+        builder.AddFilter("Microsoft", LogLevel.Error);
+        builder.AddFilter("System", LogLevel.Error);
+
+        builder.AddFilter("Microsoft.AspNetCore", LogLevel.Error);
+        builder.AddFilter("Microsoft.AspNetCore.DataProtection", LogLevel.Critical);
+        builder.AddFilter("Microsoft.AspNetCore.Server.Kestrel", LogLevel.Critical);
+        builder.AddFilter("Microsoft.AspNetCore.Mvc.ModelBinding", LogLevel.Critical);
+        builder.AddFilter("Microsoft.AspNetCore.Routing", LogLevel.Error);
+        builder.AddFilter("Microsoft.AspNetCore.Authentication", LogLevel.Error);
+        builder.AddFilter("Microsoft.AspNetCore.Authorization", LogLevel.Error);
+        builder.AddFilter("Microsoft.AspNetCore.Mvc.Infrastructure", LogLevel.Error);
+        builder.AddFilter("Microsoft.AspNetCore.HttpsPolicy", LogLevel.Error);
         // Infrastructure logs
         builder.AddFilter("JobBoard.Infrastructure.Diagnostics", LogLevel.Information);
 
@@ -87,7 +101,58 @@ public static class LoggingFilters
         builder.AddFilter("JobBoard.Application", LogLevel.Information);
         builder.AddFilter("JobBoard.Infrastructure", LogLevel.Information);
 
+        builder.AddFilter("HealthChecks.UI", LogLevel.Warning);
+        builder.AddFilter("Microsoft.Extensions.Diagnostics.HealthChecks", LogLevel.Warning);
+        builder.AddFilter("Microsoft.Extensions.Http", LogLevel.Warning);
+        builder.AddFilter("System.Net.Http.HttpClient.health-checks", LogLevel.Warning);
+        builder.AddFilter("Microsoft.AspNetCore.Diagnostics.HealthChecks", LogLevel.Warning);
+        builder.AddFilter("Microsoft.AspNetCore.Mvc", LogLevel.Warning);
+        builder.AddFilter("Microsoft.AspNetCore.Authorization", LogLevel.Warning);
+        builder.AddFilter("Microsoft.AspNetCore.Cors", LogLevel.Warning);
+        builder.AddFilter("Microsoft.AspNetCore.Mvc.ModelBinding", LogLevel.Warning);
+        builder.AddFilter("Microsoft.AspNetCore.Mvc.Infrastructure", LogLevel.Warning);
+        builder.AddFilter("Microsoft.AspNetCore.Mvc.Filters", LogLevel.Warning);
+        builder.AddFilter("Microsoft.AspNetCore.Mvc.Controllers", LogLevel.Warning);
+        builder.AddFilter("Microsoft.AspNetCore.Server.Kestrel", LogLevel.Warning);
+        builder.AddFilter("Microsoft.AspNetCore.Diagnostics", LogLevel.Warning);
+        builder.AddFilter("Microsoft.AspNetCore.HttpLogging", LogLevel.Warning);
+        builder.AddFilter("Microsoft.AspNetCore.DataProtection", LogLevel.Warning);
+        builder.AddFilter("Microsoft.AspNetCore.Server", LogLevel.Warning);
+        builder.AddFilter("Microsoft.AspNetCore", LogLevel.Warning);
+        builder.AddFilter("Dapr", LogLevel.Warning);
+        builder.AddFilter("Dapr.Client", LogLevel.Warning);
+        builder.AddFilter("Dapr.Runtime", LogLevel.Warning);
+        builder.AddFilter("Dapr.Actors", LogLevel.Warning);
+        builder.AddFilter("Dapr.Sidecar", LogLevel.Warning);
+        builder.AddFilter("Microsoft.AspNetCore.Server.Kestrel", LogLevel.Warning);
+        builder.AddFilter("Microsoft.AspNetCore.Server", LogLevel.Warning);
+        builder.AddFilter("Microsoft.AspNetCore.HttpLogging", LogLevel.Warning);
+        builder.AddFilter("Microsoft.AspNetCore.Diagnostics", LogLevel.Warning);
+        builder.AddFilter("Microsoft.AspNetCore.DataProtection", LogLevel.Warning);
+        builder.AddFilter("Microsoft.AspNetCore", LogLevel.Warning);
+
+// Dapr
+        builder.AddFilter("Dapr", LogLevel.Warning);
+        builder.AddFilter("Dapr.Client", LogLevel.Warning);
+        builder.AddFilter("Dapr.Runtime", LogLevel.Warning);
+        builder.AddFilter("Dapr.Actors", LogLevel.Warning);
+        builder.AddFilter("Dapr.Sidecar", LogLevel.Warning);
+        builder.AddFilter("Dapr.Placement", LogLevel.Warning);
+        builder.AddFilter("Dapr.Contrib", LogLevel.Warning);
+
+// Hide Dapr → ASP.NET Core internal pings
+        builder.AddFilter("Microsoft.AspNetCore.Hosting.Internal", LogLevel.Warning);
+        builder.AddFilter("Microsoft.AspNetCore.Hosting", LogLevel.Warning);
+  
         return builder;
     }
     
+}
+public class ElasticTimestampEnricher : ILogEventEnricher
+{
+    public void Enrich(LogEvent logEvent, ILogEventPropertyFactory factory)
+    {
+        logEvent.AddOrUpdateProperty(
+            factory.CreateProperty("@timestamp", logEvent.Timestamp.UtcDateTime));
+    }
 }
