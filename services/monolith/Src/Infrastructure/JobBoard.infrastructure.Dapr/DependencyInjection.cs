@@ -2,11 +2,10 @@
 
 namespace JobBoard.infrastructure.Dapr;
 
-public static class DependencyInjection
-{
+public static class DependencyInjection {
     public static IServiceCollection AddDaprServices(this IServiceCollection services)
     {
-        
+        services.AddDaprClient();
         return services;
     }
 }

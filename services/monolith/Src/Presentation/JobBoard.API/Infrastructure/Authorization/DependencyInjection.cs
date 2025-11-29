@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using JobBoard.Domain;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Trace;
@@ -9,16 +9,18 @@ using OpenTelemetry.Trace;
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 namespace JobBoard.API.Infrastructure.Authorization;
-/// <summary>
-/// Extension methods for setting up authorization services in an IServiceCollection.
-/// </summary>
+
 public static class DependencyInjection
 {
-
-    public static IServiceCollection AddAuthorizationService(this IServiceCollection services,
+    public static IServiceCollection AddAuthorizationService(
+        this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddAuthentication(options =>
+        // ---------------------------------------------------------------------
+        // JWT Bearer Auth (Auth0)
+        // ---------------------------------------------------------------------
+        services
+            .AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -35,40 +37,74 @@ public static class DependencyInjection
                     ValidAudience = configuration["Auth0:Audience"],
                     ValidateLifetime = true
                 };
-            });
+            })
+
+            // -----------------------------------------------------------------
+            // Dapr Internal API Token Authentication
+            // -----------------------------------------------------------------
+            .AddScheme<AuthenticationSchemeOptions, DaprInternalAuthenticationHandler>(
+                "DaprInternalScheme", options => { });
+
+        // ---------------------------------------------------------------------
+        // CORS
+        // ---------------------------------------------------------------------
         services.AddCors(options =>
         {
-            options.AddPolicy("AllowMyFrontendApp",
-                policy =>
-                {
-                    policy.WithOrigins("http://localhost:4200")
-                        .AllowAnyHeader()
-                        .AllowAnyMethod();
-                });
+            options.AddPolicy("AllowMyFrontendApp", policy =>
+            {
+                policy.WithOrigins("http://localhost:4200")
+                      .AllowAnyHeader()
+                      .AllowAnyMethod();
+            });
         });
-        services.AddAuthorizationBuilder()
-            .AddPolicy(AuthorizationPolicies.Admin, policy => 
+
+        // ---------------------------------------------------------------------
+        // Authorization Policies
+        // ---------------------------------------------------------------------
+        services
+            .AddAuthorizationBuilder()
+
+            // Role-based policies
+            .AddPolicy(AuthorizationPolicies.Admin, policy =>
                 policy.RequireRole(UserRoles.LabAdmin))
-            .AddPolicy(AuthorizationPolicies.Member, policy => 
+
+            .AddPolicy(AuthorizationPolicies.Member, policy =>
                 policy.RequireRole(UserRoles.LabMember))
-            .AddPolicy(AuthorizationPolicies.AllUsers, policy => 
-                policy.RequireRole(UserRoles.LabAdmin,UserRoles.LabMember));
+
+            .AddPolicy(AuthorizationPolicies.AllUsers, policy =>
+                policy.RequireRole(UserRoles.LabAdmin, UserRoles.LabMember))
+
+            // -----------------------------------------------------------------
+            // Dapr Internal Policy (Dapr → App calls)
+            // -----------------------------------------------------------------
+            .AddPolicy("DaprInternal", policy =>
+            {
+                policy.AddAuthenticationSchemes("DaprInternalScheme");
+                policy.RequireAuthenticatedUser();
+            });
+
         return services;
     }
 
+    // -------------------------------------------------------------------------
+    // Application Middleware Pipeline
+    // -------------------------------------------------------------------------
     public static WebApplication UseApplicationServices(this WebApplication app)
     {
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseStaticFiles();
         app.UseRouting();
-        app.UseCors("AllowMyFrontendApp"); 
+        app.UseCors("AllowMyFrontendApp");
         app.UseAuthorization();
         app.MapControllers();
-    
-       return app;
+
+        return app;
     }
 
+    // -------------------------------------------------------------------------
+    // Graceful Shutdown for OTEL Providers
+    // -------------------------------------------------------------------------
     public static void Start(this WebApplication app)
     {
         var tracerProvider = app.Services.GetService<TracerProvider>();
@@ -83,19 +119,8 @@ public static class DependencyInjection
         }
         finally
         {
-            if (tracerProvider != null)
-            {
-                Console.WriteLine("Flushing and shutting down telemetry traces...");
-                tracerProvider.Shutdown();
-            }
-
-            if (loggerProvider != null)
-            {
-                Console.WriteLine("Flushing and shutting down telemetry logs...");
-                loggerProvider.Shutdown();
-            }
+            tracerProvider?.Shutdown();
+            loggerProvider?.Shutdown();
         }
-
     }
-
 }
