@@ -43,7 +43,7 @@ public static class DependencyInjection
             // Dapr Internal API Token Authentication
             // -----------------------------------------------------------------
             .AddScheme<AuthenticationSchemeOptions, DaprInternalAuthenticationHandler>(
-                "DaprInternalScheme", options => { });
+                "DaprInternalScheme", _ => { });
 
         // ---------------------------------------------------------------------
         // CORS
@@ -52,9 +52,16 @@ public static class DependencyInjection
         {
             options.AddPolicy("AllowMyFrontendApp", policy =>
             {
-                policy.WithOrigins("http://localhost:4200")
-                      .AllowAnyHeader()
-                      .AllowAnyMethod();
+                policy.WithOrigins(
+                        "http://localhost:4200",   // Angular dev
+                        "http://localhost:5280",   // Monolith dev URL (your logs show this origin)
+                        "https://localhost:5280",
+                        "http://127.0.0.1:4200",
+                        "http://127.0.0.1:5280"
+                    )
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
             });
         });
 

@@ -11,7 +11,7 @@ using JobBoard.Infrastructure.Smtp;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services
+builder.ConfigureLogging("monolith-api").Services
     .AddApplicationServices()    
     .AddPersistenceServices(builder.Configuration)
     .AddKafkaServices(builder.Configuration)
@@ -26,6 +26,7 @@ builder.Services
     .AddOpenTelemetryServices(builder.Configuration, "monolith-api")
     .AddHealthCheckServices(builder.Configuration)
     .AddHealthChecksUI(c=> c.SetHeaderText("JobBoard - Health Checks"))
+    
     .AddInMemoryStorage();
 
 builder.Build()

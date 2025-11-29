@@ -1,21 +1,14 @@
 ﻿using Dapr.Client;
-using JobBoard.Application.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using JobBoard.Application.Interfaces.Infrastructure;
+using JobBoard.Domain.Entities.Infrastructure;
 
 namespace JobBoard.infrastructure.Dapr;
 
-public class DaprOutboxProcessor(
-    DaprClient daprClient,
-    IOutboxDbContext outboxDbContext,
-    ILogger<DaprOutboxProcessor> logger
-)
-{
-    public async Task<int> PublishPendingEventsAsync(CancellationToken cancellationToken)
-    {
-        var pending = await outboxDbContext.OutboxMessages
-            .Where(c=> c.ProcessedAt == null).Take(25).ToListAsync(cancellationToken);
+public class DaprOutboxMessageProcessor(DaprClient client): IOutboxMessageProcessor
 
-        return 0;
+{
+    public async Task ProcessAsync(OutboxMessage message, CancellationToken cancellationToken)
+    {
+        await client.PublishEventAsync("pubsub.kafka", "outbox-events", message.Payload, cancellationToken: cancellationToken);
     }
 }

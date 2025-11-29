@@ -26,22 +26,22 @@ public class HttpUserAccessor : IUserAccessor
     /// <summary>
     /// Gets the user identifier.
     /// </summary>
-    public string? UserId { get; }
+    public string? UserId { get; set; }
     /// <summary>
     /// Gets the first name.
     /// </summary>
-    public string? FirstName { get; } 
+    public string? FirstName { get; set; } 
     /// <summary>
     /// Gets the last name.
     /// </summary>
-    public string? LastName { get; }
+    public string? LastName { get; set; }
     /// <summary>
     /// Gets the email.
     /// </summary>
-    public string? Email { get; }
+    public string? Email { get; set; }
 
     /// <summary>
     /// Gets the roles.
     /// </summary>
-    public List<string> Roles { get; } = [];
+    public List<string> Roles { get; set; } = [];
 }
