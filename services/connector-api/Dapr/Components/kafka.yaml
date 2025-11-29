@@ -1,0 +1,29 @@
+﻿apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: pubsub.kafka
+spec:
+  type: pubsub.kafka
+  version: v1
+  metadata:
+    - name: brokers
+      value: "192.168.1.115:29092"
+
+    - name: consumerGroup
+      value: "jobboard-consumer"
+
+    - name: authRequired
+      value: "false"
+
+
+    - name: maxMessageBytes
+      value: "1048576"
+
+    - name: disableTls
+      value: "true"
+
+    - name: consumeRetryInterval
+      value: "3s"
+
+    - name: maxConcurrentHandlers
+      value: "1"
