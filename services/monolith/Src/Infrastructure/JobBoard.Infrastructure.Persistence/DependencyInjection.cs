@@ -17,7 +17,6 @@ public static class DependencyInjection
         {
             throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         }
-        
         services.AddDbContext<JobBoardDbContext>(options =>
         {
             options.UseSqlServer(connectionString);
@@ -41,6 +40,8 @@ public static class DependencyInjection
             .AsImplementedInterfaces()
             .WithScopedLifetime());
         
+        
+   
         return services;
     }
 }

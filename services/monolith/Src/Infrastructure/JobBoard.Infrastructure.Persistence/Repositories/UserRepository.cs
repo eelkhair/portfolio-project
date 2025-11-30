@@ -23,4 +23,9 @@ public class UserRepository(IJobBoardQueryDbContext context): IUserRepository
     {
         await context.UserCompanies.AddAsync(companyUser, cancellationToken);
     }
+
+    public async  Task<bool> EmailExistsAsync(string email, CancellationToken ct)
+    {
+        return await context.Users.AnyAsync(x => EF.Property<DateTime>(x, "PeriodEnd") == DateTime.MaxValue && x.Email == email, ct);
+    }
 }

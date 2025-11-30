@@ -1,6 +1,4 @@
-﻿version: '3.9'
-
-services:
+﻿services:
   job-admin:
     image: registry.eelkhair.net/job-admin:latest
     ports:
@@ -25,7 +23,6 @@ services:
     environment:
       PORT: "6082"
       COSMOS_ENDPOINT: https://cosmos.eelkhair.net
-      COSMOS_KEY: ''
       COSMOS_DB: jobs
       COSMOS_CONTAINER: jobs
       OPENAI_MODEL: gpt-5-nano
@@ -122,6 +119,65 @@ services:
       "-config", "./Config/config.yaml"
     ]
 
+  monolith-api:
+    image: registry.eelkhair.net/monolith-api:latest
+    ports:
+      - "5280:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    networks:
+      - ai-job-board-net
+
+  monolith-api-sidecar:
+    image: "daprio/daprd:1.15.8"
+    container_name: "monolith-api-side-car"
+    depends_on:
+      - monolith-api
+    volumes:
+      - "/home/eelkhair/Dapr/shared/Config/:/Config"
+      - "/home/eelkhair/Dapr/shared/Components:/Components"
+      - "/home/eelkhair/Dapr/monolith-api/:/Dapr"
+    network_mode: "service:monolith-api"
+    command: [
+      "./daprd",
+      "--app-id", "monolith-api",
+      "--app-port", "8080",
+      "--resources-path", "./Components",
+      "--resources-path", "./Dapr/Components",
+      "--resources-path", "./Dapr/Components/Secrets",
+      "--resources-path", "./Dapr/Components/Timers",
+      "-config", "./Config/config.yaml"
+    ]
+    
+  connector-api:
+    image: registry.eelkhair.net/connector-api:latest
+    ports:
+      - "5284:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    networks:
+      - ai-job-board-net
+
+  connector-api-sidecar:
+    image: "daprio/daprd:1.15.8"
+    container_name: "connector-api-side-car"
+    depends_on:
+      - connector-api
+    volumes:
+      - "/home/eelkhair/Dapr/shared/Config/:/Config"
+      - "/home/eelkhair/Dapr/shared/Components:/Components"
+      - "/home/eelkhair/Dapr/connector-api/:/Dapr"
+    network_mode: "service:connector-api"
+    command: [
+      "./daprd",
+      "--app-id", "connector-api",
+      "--app-port", "8080",
+      "--resources-path", "./Components",
+      "--resources-path", "./Dapr/Components",
+      "--resources-path", "./Dapr/Components/Secrets",
+      "--resources-path", "./Dapr/Components/Timers",
+      "-config", "./Config/config.yaml"
+    ]
   company-api:
     build:
       context: ../services/company-api/

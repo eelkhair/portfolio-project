@@ -122,6 +122,8 @@ public static class DependencyInjection
 #if DEBUG
             Debugger.Launch();
 #endif
+            app.MapGet("/", (HttpContext ctx) => ctx.Response.Redirect("/swagger")).ExcludeFromDescription();
+
             app.Run();
         }
         finally

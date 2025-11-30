@@ -142,6 +142,7 @@ public class ProcessOutboxMessage(
     {
         try
         {
+            var hostActivity = Activity.Current;
             // Create consumer span
             var activity = activityFactory.StartActivity(
                 "ProcessOutboxMessage",
@@ -155,6 +156,7 @@ public class ProcessOutboxMessage(
             activity.AddTag("outbox.message.id", message.Id);
             activity.AddTag("outbox.message.eventType", message.EventType);
             activity.AddTag("outbox.message.payloadSize", message.Payload?.Length ?? 0);
+            activity.AddTag("processor.traceId", hostActivity?.TraceId.ToString() ?? activity.TraceId.ToString());
             activity.AddTag("outbox.parent.traceId", parentContext.TraceId.ToString());
             activity.AddTag("outbox.parent.spanId", parentContext.SpanId.ToString());
 

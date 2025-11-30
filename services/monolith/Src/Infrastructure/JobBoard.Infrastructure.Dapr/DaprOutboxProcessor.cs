@@ -1,4 +1,5 @@
-﻿using Dapr.Client;
+﻿using System.Text.Json;
+using Dapr.Client;
 using JobBoard.Application.Interfaces.Infrastructure;
 using JobBoard.Domain.Entities.Infrastructure;
 
@@ -9,6 +10,6 @@ public class DaprOutboxMessageProcessor(DaprClient client): IOutboxMessageProces
 {
     public async Task ProcessAsync(OutboxMessage message, CancellationToken cancellationToken)
     {
-        await client.PublishEventAsync("pubsub.kafka", "outbox-events", message.Payload, cancellationToken: cancellationToken);
+        await client.PublishEventAsync("rabbitmq", "outbox-events", JsonSerializer.Deserialize<object>(message.Payload), cancellationToken: cancellationToken);
     }
 }

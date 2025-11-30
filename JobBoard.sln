@@ -118,7 +118,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.HealthChecks", "se
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "monolith", "monolith", "{315D5079-3539-49CA-93AF-2614E2A84E44}"
 	ProjectSection(SolutionItems) = preProject
-		services\monolith\.dockerignore = services\monolith\.dockerignore
 		services\monolith\.gitignore = services\monolith\.gitignore
 	EndProjectSection
 EndProject
@@ -157,9 +156,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.API", "services\mo
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "micro-services", "micro-services", "{C188C6D3-42A7-48DB-82B2-15E67325DE94}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.infrastructure.Dapr", "services\monolith\Src\Infrastructure\JobBoard.infrastructure.Dapr\JobBoard.infrastructure.Dapr.csproj", "{63D880B4-88BA-4F02-9CE7-4AF5D49E42A3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.Infrastructure.Dapr", "services\monolith\Src\Infrastructure\JobBoard.Infrastructure.Dapr\JobBoard.Infrastructure.Dapr.csproj", "{63D880B4-88BA-4F02-9CE7-4AF5D49E42A3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "connector-api", "connector-api", "{5E0D2CFC-5C65-4046-9C74-2B06EA5B397C}"
+	ProjectSection(SolutionItems) = preProject
+		services\micro-services\admin-api\Nuget.Config = services\micro-services\admin-api\Nuget.Config
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "connector-api", "services\connector-api\connector-api.csproj", "{ECBB5C93-9D0E-43CE-BA02-E818B106414E}"
 EndProject

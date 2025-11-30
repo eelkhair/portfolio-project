@@ -17,6 +17,8 @@ declare -A services=(
   ["company-api"]="../services/micro-services/company-api"
   ["admin-api"]="../services/micro-services/admin-api"
   ["user-api"]="../services/micro-services/user-api"
+  ["monolith-api"]="../services/monolith"
+  ["connector-api"]="../services/connector-api"
   ["health-check"]="../services/micro-services/HealthChecks"
 )
 
@@ -24,8 +26,14 @@ for name in "${!services[@]}"; do
   path="${services[$name]}"
   image="registry.eelkhair.net/${name}:latest"
 
-  echo "🔨 Building image for $name at $path..."
+if [ "$name" = "monolith-api" ]; then
+  docker build \
+    -f "/c/Users/elkha/RiderProjects/portfolio project/services/monolith/Src/Presentation/JobBoard.API/Dockerfile" \
+    -t "$image" \
+    "/c/Users/elkha/RiderProjects/portfolio project/services/monolith"
+else
   docker build -t "$image" "$path"
+fi
 
   echo "📤 Pushing $image to registry.eelkhair.net..."
   docker push "$image"

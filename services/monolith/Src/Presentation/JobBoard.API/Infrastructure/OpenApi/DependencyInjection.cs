@@ -151,54 +151,53 @@ public static class DependencyInjection
 
         return services;
     }
-    
+
     public static WebApplication UseConfiguredSwagger(this WebApplication app, IConfiguration configuration)
     {
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI(options =>
-            {
-                options.SwaggerEndpoint("/swagger/v1/swagger.json", "JobBoard API v1");
-                options.SwaggerEndpoint("/swagger/odata-v1/swagger.json", "JobBoard OData v1");
-                options.RoutePrefix = string.Empty;
-                options.OAuthClientId(configuration["Auth0:SwaggerClientId"]);
-                options.OAuthClientSecret(configuration["Auth0:SwaggerClientSecret"]);
-                options.OAuthAppName("JobBoard API - Swagger UI");
-                options.OAuthUsePkce();
-            });
-            var clientId = configuration["Auth0:SwaggerClientId"];
-            var apiScopes = new []{"read:jobs", "read:companies"};
-            app.MapScalarApiReference("/scalar/v1", options =>
-            {
-                options.WithOpenApiRoutePattern("/swagger/v1/swagger.json"); 
-                options.WithTitle("JobBoard v1 (Scalar)");
-                options.AddAuthorizationCodeFlow("oauth2",
-                    o =>
-                    {
-                        o.ClientId = clientId;
-                        o.ClientSecret= configuration["Auth0:SwaggerClientSecret"];
-                        o.SelectedScopes = apiScopes ;
-                        o.Pkce = Pkce.Sha256;
-                    }
-                );
-            });
 
-            app.MapScalarApiReference("/scalar/odata", options =>
-            {
-                options.WithOpenApiRoutePattern("/swagger/odata-v1/swagger.json");
-                options.WithTitle("JobBoard OData v1 (Scalar)");
-                options.AddAuthorizationCodeFlow("oauth2",
-                    o =>
-                    {
-                        o.ClientId = clientId;
-                        o.ClientSecret= configuration["Auth0:SwaggerClientSecret"];
-                        o.SelectedScopes = apiScopes;
-                        o.Pkce = Pkce.Sha256;
-                    }
-                );
-            });
-        }
+        app.UseSwagger();
+        app.UseSwaggerUI(options =>
+        {
+            options.SwaggerEndpoint("/swagger/v1/swagger.json", "JobBoard API v1");
+            options.SwaggerEndpoint("/swagger/odata-v1/swagger.json", "JobBoard OData v1");
+            options.RoutePrefix = "swagger";
+            options.OAuthClientId(configuration["Auth0:SwaggerClientId"]);
+            options.OAuthClientSecret(configuration["Auth0:SwaggerClientSecret"]);
+            options.OAuthAppName("JobBoard API - Swagger UI");
+            options.OAuthUsePkce();
+        });
+        var clientId = configuration["Auth0:SwaggerClientId"];
+        var apiScopes = new[] { "read:jobs", "read:companies" };
+        app.MapScalarApiReference("/scalar", options =>
+        {
+            options.WithOpenApiRoutePattern("/swagger/v1/swagger.json");
+            options.WithTitle("JobBoard v1 (Scalar)");
+            options.AddAuthorizationCodeFlow("oauth2",
+                o =>
+                {
+                    o.ClientId = clientId;
+                    o.ClientSecret = configuration["Auth0:SwaggerClientSecret"];
+                    o.SelectedScopes = apiScopes;
+                    o.Pkce = Pkce.Sha256;
+                }
+            );
+        });
+
+        app.MapScalarApiReference("/scalar/odata", options =>
+        {
+            options.WithOpenApiRoutePattern("/swagger/odata-v1/swagger.json");
+            options.WithTitle("JobBoard OData v1 (Scalar)");
+            options.AddAuthorizationCodeFlow("oauth2",
+                o =>
+                {
+                    o.ClientId = clientId;
+                    o.ClientSecret = configuration["Auth0:SwaggerClientSecret"];
+                    o.SelectedScopes = apiScopes;
+                    o.Pkce = Pkce.Sha256;
+                }
+            );
+        });
+
         app.UseMiddleware<TraceIdMiddleware>();
         return app;
     }
