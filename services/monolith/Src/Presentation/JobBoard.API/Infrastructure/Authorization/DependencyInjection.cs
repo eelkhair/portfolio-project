@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using JobBoard.Domain;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -16,6 +15,7 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
+
         // ---------------------------------------------------------------------
         // JWT Bearer Auth (Auth0)
         // ---------------------------------------------------------------------
@@ -119,9 +119,7 @@ public static class DependencyInjection
 
         try
         {
-#if DEBUG
-            Debugger.Launch();
-#endif
+
             app.MapGet("/", (HttpContext ctx) => ctx.Response.Redirect("/swagger")).ExcludeFromDescription();
 
             app.Run();

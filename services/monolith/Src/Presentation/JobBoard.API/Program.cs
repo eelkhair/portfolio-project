@@ -1,3 +1,6 @@
+using System.Diagnostics;
+using Dapr.Client;
+using Dapr.Extensions.Configuration;
 using JobBoard.API.Infrastructure;
 using JobBoard.API.Infrastructure.Authorization;
 using JobBoard.API.Infrastructure.OpenApi;
@@ -10,8 +13,12 @@ using JobBoard.Infrastructure.Persistence;
 using JobBoard.Infrastructure.Smtp;
 
 var builder = WebApplication.CreateBuilder(args);
+#if DEBUG
+Debugger.Launch();
+#endif
 
-builder.ConfigureLogging("monolith-api").Services
+
+builder.AddDaprServices().ConfigureLogging("monolith-api").Services
     .AddApplicationServices()    
     .AddPersistenceServices(builder.Configuration)
     .AddKafkaServices(builder.Configuration)
@@ -19,7 +26,6 @@ builder.ConfigureLogging("monolith-api").Services
     .AddScoped<IUserAccessor, HttpUserAccessor>()
     .AddOutboxServices()
     .AddODataServices()
-    .AddDaprServices()
     .AddAuthorizationService(builder.Configuration)
     .AddSmtpServices(builder.Configuration)
     .AddConfiguredSwagger(builder.Configuration)

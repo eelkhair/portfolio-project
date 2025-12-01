@@ -1,13 +1,23 @@
-﻿using JobBoard.Application.Interfaces.Infrastructure;
+﻿using Dapr.Client;
+using Dapr.Extensions.Configuration;
+using JobBoard.Application.Interfaces.Infrastructure;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace JobBoard.infrastructure.Dapr;
 
 public static class DependencyInjection {
-    public static IServiceCollection AddDaprServices(this IServiceCollection services)
+    public static WebApplicationBuilder AddDaprServices(this WebApplicationBuilder builder)
     {
-        services.AddDaprClient();
-        services.AddTransient<IOutboxMessageProcessor, DaprOutboxMessageProcessor>();
-        return services;
+        builder.Services.AddDaprClient();
+        builder.Configuration.AddDaprSecretStore("vault", 
+            new DaprClientBuilder().Build(), 
+            new Dictionary<string, string>
+            {
+                { "secret/data/portfolio/monolith", "Monolith" }
+            });
+       
+        builder.Services.AddTransient<IOutboxMessageProcessor, DaprOutboxMessageProcessor>();
+        return builder;
     }
 }
