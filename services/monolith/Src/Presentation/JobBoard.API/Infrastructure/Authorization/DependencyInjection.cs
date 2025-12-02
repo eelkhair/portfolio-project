@@ -1,4 +1,6 @@
+using HealthChecks.UI.Client;
 using JobBoard.Domain;
+using JobBoard.HealthChecks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -119,7 +121,7 @@ public static class DependencyInjection
 
         try
         {
-
+            app.MapCustomHealthChecks("/healthzEndpoint", "/liveness", UIResponseWriter.WriteHealthCheckUIResponse);
             app.MapGet("/", (HttpContext ctx) => ctx.Response.Redirect("/swagger")).ExcludeFromDescription();
 
             app.Run();

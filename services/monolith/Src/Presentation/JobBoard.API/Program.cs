@@ -1,6 +1,4 @@
 using System.Diagnostics;
-using Dapr.Client;
-using Dapr.Extensions.Configuration;
 using JobBoard.API.Infrastructure;
 using JobBoard.API.Infrastructure.Authorization;
 using JobBoard.API.Infrastructure.OpenApi;
@@ -18,8 +16,8 @@ Debugger.Launch();
 #endif
 
 
-builder.AddDaprServices().ConfigureLogging("monolith-api").Services
-    .AddApplicationServices()    
+builder.AddDaprServices().ConfigureLogging("monolith-api").AddCustomHealthChecks().Services
+    .AddApplicationServices()
     .AddPersistenceServices(builder.Configuration)
     .AddKafkaServices(builder.Configuration)
     .AddHttpContextAccessor()
@@ -29,14 +27,9 @@ builder.AddDaprServices().ConfigureLogging("monolith-api").Services
     .AddAuthorizationService(builder.Configuration)
     .AddSmtpServices(builder.Configuration)
     .AddConfiguredSwagger(builder.Configuration)
-    .AddOpenTelemetryServices(builder.Configuration, "monolith-api")
-    .AddHealthCheckServices(builder.Configuration)
-    .AddHealthChecksUI(c=> c.SetHeaderText("JobBoard - Health Checks"))
-    
-    .AddInMemoryStorage();
+    .AddOpenTelemetryServices(builder.Configuration, "monolith-api");
 
 builder.Build()
     .UseConfiguredSwagger(builder.Configuration)
-    .UseHealthCheckServices()
     .UseApplicationServices()
     .Start();
