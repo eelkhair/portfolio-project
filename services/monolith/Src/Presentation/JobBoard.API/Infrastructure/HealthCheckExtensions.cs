@@ -37,7 +37,7 @@ internal static class HealthCheckExtensions
                         .AddSqlServer(
                               builder.Configuration.GetConnectionString("Monolith")
                               ?? throw new InvalidOperationException("DB connection missing"),
-                              name: "database-check",
+                              name: "Monolith Database Check",
                               timeout: TimeSpan.FromSeconds(10),
                               tags: new[] { "database", "critical" })
                         .AddDapr();
