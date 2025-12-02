@@ -1,6 +1,6 @@
-namespace AH.Metadata.Domain.Constants;
+namespace Elkhair.Dev.Common.Domain.Constants;
 
 public struct SecretStoreNames
 {
-    public const string Local = "local-secret-store";
+    public const string Local = "vault";
 }

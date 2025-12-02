@@ -14,47 +14,6 @@
     restart: unless-stopped
     networks:
       - ai-job-board-net
-
-  ai-service:
-    image: registry.eelkhair.net/ai-service:latest
-    container_name: ai-service
-    ports:
-      - "6082:6082"  # AI service itself
-    environment:
-      PORT: "6082"
-      COSMOS_ENDPOINT: https://cosmos.eelkhair.net
-      COSMOS_DB: jobs
-      COSMOS_CONTAINER: jobs
-      OPENAI_MODEL: gpt-5-nano
-      OTEL_EXPORTER_ZIPKIN_ENDPOINT: http://192.168.1.160:9411/api/v2/spans
-      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://192.168.1.160:4318/v1/traces
-      NODE_ENV: prod
-      OTEL_SERVICE_NAME: ai-service
-      OTEL_SERVICE_NAMESPACE: portfolio
-    networks:
-      - ai-job-board-net
-
-  ai-service-sidecar:
-    image: "daprio/daprd:1.15.8"
-    container_name: ai-services-sidecar
-    depends_on:
-      - ai-service
-    network_mode: "service:ai-service"
-    volumes:
-      - "/home/eelkhair/Dapr/shared/Config/:/Config"
-      - "/home/eelkhair/Dapr/shared/Components:/Components"
-      - "/home/eelkhair/Dapr/job-ai/:/Dapr"
-
-    command: [
-      "./daprd",
-      "--app-id", "ai-service",
-      "--app-port", "6082",
-      "--resources-path", "./Components",
-      "--resources-path", "./Dapr/Components",
-      "--resources-path", "./Dapr/Components/Secrets"
-    
-    ]
-
   job-api:
     build:
       context: ../services/job-api/
@@ -73,7 +32,6 @@
       - job-api
     network_mode: "service:job-api"
     volumes:
-      - "/home/eelkhair/Dapr/shared/Config/:/Config"
       - "/home/eelkhair/Dapr/shared/Components/:/Components"
       - "/home/eelkhair/Dapr/job-api/:/Dapr"
     command:
@@ -84,9 +42,43 @@
         "--resources-path", "./Components",
         "--resources-path", "./Dapr/Components",
         "--resources-path", "./Dapr/Components/Secrets",
-        "-config", "./Config/config.yaml"
+        "-config", "./Dapr/Config/config.yaml"
       ]
+  
+  ai-service:
+    image: registry.eelkhair.net/ai-service:latest
+    container_name: ai-service
+    
+    ports:
+      - "6082:6082"
+    environment:
+      PORT: "6082"
+      NODE_ENV: prod
+    networks:
+      - ai-job-board-net
 
+  ai-service-sidecar:
+    image: "daprio/daprd:1.15.8"
+    container_name: ai-service-sidecar
+    network_mode: "service:ai-service"
+    depends_on:
+      - ai-service
+    volumes:
+      - "/home/eelkhair/Dapr/shared/Components:/Components"
+      - "/home/eelkhair/Dapr/job-ai/:/Dapr"
+    command: [
+      "./daprd",
+      "--app-id", "ai-service",
+      "--app-port", "6082",
+      "--resources-path", "./Components",
+      "--resources-path", "./Dapr/Components",
+      "--resources-path", "./Dapr/Components/Secrets",
+      "-config", "./Dapr/Config/config.yaml"
+    ]
+  
+  
+  
+  
   user-api:
     build:
       context: ../services/user-api/
@@ -104,7 +96,6 @@
     depends_on:
       - user-api
     volumes:
-      - "/home/eelkhair/Dapr/shared/Config/:/Config"
       - "/home/eelkhair/Dapr/shared/Components:/Components"
       - "/home/eelkhair/Dapr/user-api/:/Dapr"
     network_mode: "service:user-api"
@@ -116,7 +107,7 @@
       "--resources-path", "./Dapr/Components",
       "--resources-path", "./Dapr/Components/Secrets",
       "--resources-path", "./Dapr/Components/Timers",
-      "-config", "./Config/config.yaml"
+      "-config", "./Dapr/Config/config.yaml"
     ]
 
   monolith-api:
@@ -193,7 +184,6 @@
     depends_on:
       - company-api
     volumes:
-      - "/home/eelkhair/Dapr/shared/Config/:/Config"
       - "/home/eelkhair/Dapr/shared/Components/:/Components"
       - "/home/eelkhair/Dapr/company-api/:/Dapr"
     network_mode: "service:company-api"
@@ -203,7 +193,7 @@
       "--app-port", "8080",
       "--resources-path", "./Components",
       "--resources-path", "./Dapr/Components/Secrets",
-      "-config", "./Config/config.yaml"
+      "-config", "./Dapr/Config/config.yaml"
     ]
   
   admin-api:
@@ -223,7 +213,6 @@
     depends_on:
       - admin-api
     volumes:
-      - "/home/eelkhair/Dapr/shared/Config/:/Config"
       - "/home/eelkhair/Dapr/shared/Components/:/Components"
       - "/home/eelkhair/Dapr/admin-api/:/Dapr"
     network_mode: "service:admin-api"
@@ -234,7 +223,7 @@
       "--resources-path", "./Components",
       "--resources-path", "./Dapr/Components",
       "--resources-path", "./Dapr/Components/Secrets",
-      "-config", "./Config/config.yaml"
+      "-config", "./Dapr/Config/config.yaml"
     ]
 
   job-board-status:

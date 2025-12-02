@@ -1,8 +1,20 @@
-import {z} from "zod";
+import { z } from "zod";
 
-const Env = z.object({
-    OPENAI_API_KEY: z.string().min(1),
-    OPENAI_MODEL: z.string().min(1),
-    PORT: z.coerce.number().default(6082),
+export const Env = z.object({
+    OPENAI_API_KEY: z.string(),
+    OPENAI_MODEL: z.string(),
+    OPENAI_EMBEDDINGS_MODEL: z.string(),
+
+    COSMOS_ENDPOINT: z.string(),
+    COSMOS_KEY: z.string(),
+    COSMOS_DB: z.string(),
+    COSMOS_JOBS_CONTAINER: z.string(),
+
+    PUBSUB_NAME: z.string(),
+    STATESTORE_NAME: z.string(),
+    SECRETSTORE_NAME: z.string(),
 });
-export const env = Env.parse(process.env);
+
+export function loadConfig() {
+    return Env.parse(process.env);
+}

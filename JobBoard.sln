@@ -70,6 +70,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ai-service", "ai-service", 
 		services\ai-service\tsconfig.json = services\ai-service\tsconfig.json
 		services\ai-service\package-lock.json = services\ai-service\package-lock.json
 		services\ai-service\run.sh = services\ai-service\run.sh
+		services\ai-service\Dapr\Components\Events\job-published-subscription.yaml = services\ai-service\Dapr\Components\Events\job-published-subscription.yaml
+		services\ai-service\Dapr\Components\Secrets\secret.yaml = services\ai-service\Dapr\Components\Secrets\secret.yaml
+		services\ai-service\Dapr\secrets.json = services\ai-service\Dapr\secrets.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BA3D8C05-0820-48F3-A42F-0CF4FB40BD4D}"

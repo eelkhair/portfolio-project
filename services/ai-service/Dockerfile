@@ -9,4 +9,4 @@ COPY . .
 RUN npm run build
 
 EXPOSE 4000
-CMD ["node", "--import", "./dist/otel.js", "./dist/index.js"]
+CMD ["node", "--import", "./dist/otel.js", "./dist/main.js"]
