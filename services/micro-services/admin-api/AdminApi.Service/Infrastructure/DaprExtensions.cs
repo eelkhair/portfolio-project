@@ -1,12 +1,10 @@
 ﻿using Dapr.Client;
 using Dapr.Extensions.Configuration;
-using JobBoard.Application.Interfaces.Infrastructure;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace JobBoard.infrastructure.Dapr;
+namespace AdminApi.Infrastructure;
 
-public static class DependencyInjection {
+public static class DaprExtensions
+{
     public static WebApplicationBuilder AddDaprServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddDaprClient();
@@ -14,7 +12,6 @@ public static class DependencyInjection {
             new DaprClientBuilder().Build(), 
             new Dictionary<string, string>());
        
-        builder.Services.AddTransient<IOutboxMessageProcessor, DaprOutboxMessageProcessor>();
         return builder;
     }
 }

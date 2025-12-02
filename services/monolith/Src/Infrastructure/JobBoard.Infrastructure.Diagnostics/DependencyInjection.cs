@@ -72,7 +72,7 @@ public static class DependencyInjection
     {
         services.AddHealthChecks()
             .AddSqlServer(
-                configuration.GetConnectionString("DefaultConnection")
+                configuration.GetConnectionString("Monolith")
                 ?? throw new InvalidOperationException("DB connection missing"),
                 name: "database-check",
                 timeout: TimeSpan.FromSeconds(10),

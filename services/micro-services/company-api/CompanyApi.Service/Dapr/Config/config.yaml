@@ -15,11 +15,8 @@ spec:
     handlers:
       - name: oauth2clientcredentials
         type: middleware.http.oauth2clientcredentials
-  apiTokens:
-    app-api-token: "MY_SUPER_SECURE_TOKEN_ABC_123"
   secrets:
     scopes:
       - storeName: vault
         defaultAccess: deny
-        allowedSecrets: [ "connector", "shared" ]
-     
+        allowedSecrets: [ "shared", "company" ]

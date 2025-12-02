@@ -22,7 +22,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.IdentityModel.Tokens;
 using NSwag;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args).AddDaprServices();
 
 var cfg = builder.Configuration;
 // Register FastEndpoints + Swagger

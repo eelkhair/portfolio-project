@@ -21,7 +21,7 @@ using UserApi.Infrastructure.Auth0;
 using UserApi.Infrastructure.Auth0.Interfaces;
 
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args).AddDaprServices();
 
 var cfg = builder.Configuration;
 // Register FastEndpoints + Swagger

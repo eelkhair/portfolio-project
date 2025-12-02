@@ -16,7 +16,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using NSwag;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args).AddDaprServices();
+
 
 var cfg = builder.Configuration;
 var domain = cfg["Auth0:Domain"];

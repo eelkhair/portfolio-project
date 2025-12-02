@@ -6,7 +6,7 @@
       "launchBrowser": true,
       "applicationUrl": "http://localhost:5262",
       "executablePath": "dapr.exe",
-      "commandLineArgs": "run --app-id admin-api --resources-path ../../../../Components/ --resources-path ./Dapr/Components/Secrets --resources-path ./Dapr/Components/Timers --resources-path ./Dapr/Components --config ../../../../Config/config.yaml --app-port 5262 --dapr-http-port 6045  --log-level debug dotnet run"
+      "commandLineArgs": "run --app-id admin-api --resources-path ../../../../Components/ --resources-path ./Dapr/Components/Secrets --resources-path ./Dapr/Components/Timers --resources-path ./Dapr/Components --config ./Dapr/Config/config.yaml --app-port 5262 --dapr-http-port 6045  --log-level debug dotnet run"
     },
     "http": {
       "commandName": "Project",

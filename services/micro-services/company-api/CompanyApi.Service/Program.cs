@@ -1,12 +1,10 @@
 using System.Diagnostics;
 using System.Reflection;
 using System.Security.Claims;
-using CompanyApi.Application;
 using CompanyApi.Application.Commands;
 using CompanyApi.Application.Commands.Interfaces;
 using CompanyApi.Application.Queries;
 using CompanyApi.Application.Queries.Interfaces;
-using CompanyApi.Features.Companies.Create;
 using CompanyApi.Infrastructure;
 using CompanyApi.Infrastructure.Data;
 using Elkhair.Dev.Common.Application;
@@ -23,7 +21,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.IdentityModel.Tokens;
 using NSwag;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args).AddDaprServices();
 
 var cfg = builder.Configuration;
 

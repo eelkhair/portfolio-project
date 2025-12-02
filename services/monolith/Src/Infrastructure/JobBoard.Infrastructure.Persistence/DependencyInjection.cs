@@ -12,11 +12,11 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddPersistenceServices(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        var connectionString = configuration.GetConnectionString("Monolith") ?? throw new InvalidOperationException("Connection string 'Monolith' not found.");
    
         if (string.IsNullOrEmpty(connectionString))
         {
-            throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+            throw new InvalidOperationException("Connection string 'Monolith' not found.");
         }
         services.AddDbContext<JobBoardDbContext>(options =>
         {

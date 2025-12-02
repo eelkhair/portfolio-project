@@ -53,13 +53,8 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddHealthChecks()
-            .AddSqlServer(
-                configuration.GetConnectionString("DefaultConnection")
-                ?? throw new InvalidOperationException("DB connection missing"),
-                name: "database-check",
-                timeout: TimeSpan.FromSeconds(10),
-                tags: new[] { "database", "critical" });
+        services.AddHealthChecks();
+            
 
         return services;
     }
@@ -162,7 +157,7 @@ public static class DependencyInjection
     
     public static WebApplicationBuilder AddDaprServices(this WebApplicationBuilder builder)
     {
-        builder.Services.AddDaprClient();
+        builder.Services.AddDaprClient(); 
         builder.Configuration.AddDaprSecretStore("vault", 
             new DaprClientBuilder().Build(), 
             new Dictionary<string, string>

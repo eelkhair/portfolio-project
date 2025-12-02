@@ -24,10 +24,10 @@ public class AlleleRepositoryDbContextFactory : IDesignTimeDbContextFactory<JobB
             .AddJsonFile("appsettings.Development.json", optional: true)
             .Build();
 
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        var connectionString = configuration.GetConnectionString("Monolith");
         if (string.IsNullOrEmpty(connectionString))
         {
-            throw new InvalidOperationException("The 'DefaultConnection' was not found in the API project's appsettings for design-time use.");
+            throw new InvalidOperationException("The 'Monolith' was not found in the API project's appsettings for design-time use.");
         }
 
         var optionsBuilder = new DbContextOptionsBuilder<JobBoardDbContext>();
