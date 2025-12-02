@@ -6,7 +6,7 @@ using JobBoard.IntegrationEvents.Company;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.ConfigureLogging("connector-api").Services.AddOpenApi();
+builder.AddDaprServices().ConfigureLogging("connector-api").Services.AddOpenApi();
 builder.Services.AddOpenTelemetryServices(builder.Configuration, "connector-api");
 builder.Services.AddHealthCheckServices(builder.Configuration)
     .AddHealthChecksUI(c => c.SetHeaderText("Connector - Health Checks")).AddInMemoryStorage();;

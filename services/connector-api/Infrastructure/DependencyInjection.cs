@@ -1,5 +1,7 @@
 using System.Reflection;
 using ConnectorAPI.Infrastructure.Observability;
+using Dapr.Client;
+using Dapr.Extensions.Configuration;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using OpenTelemetry.Resources;
@@ -156,5 +158,18 @@ public static class DependencyInjection
                 $"{environment.ToLower().Replace('.', '-')}-" +
                 $"{DateTime.UtcNow:yyyy-MM}"
         };
+    }
+    
+    public static WebApplicationBuilder AddDaprServices(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddDaprClient();
+        builder.Configuration.AddDaprSecretStore("vault", 
+            new DaprClientBuilder().Build(), 
+            new Dictionary<string, string>
+            {
+                { "secret/data/portfolio/monolith", "Monolith" }
+            });
+        
+        return builder;
     }
 }
