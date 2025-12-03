@@ -136,7 +136,30 @@ export default async function healthRoutes(app: FastifyInstance) {
             });
             return `Dapr secret store: ${SECRET} is healthy.`;
         });
+        // open ai
+        await check('openai', async () => {
 
+            const apiKey = process.env.OPENAI_API_KEY;
+            const baseUrl = process.env.OPENAI_BASE_URL ?? 'https://api.openai.com/v1';
+
+            if (!apiKey) {
+                throw new Error("Missing OPENAI_API_KEY");
+            }
+
+            await context.with(suppressTracing(context.active()), async () => {
+                const r = await fetch(`${baseUrl}/models`, {
+                    headers: {
+                        "Authorization": `Bearer ${apiKey}`
+                    }
+                });
+
+                if (!r.ok) {
+                    throw new Error(`OpenAI health check failed: ${r.status} ${r.statusText}`);
+                }
+            });
+
+            return "OpenAI API is reachable and credentials are valid.";
+        });
         // PubSub
         await check('pub sub', async () => {
             await context.with(suppressTracing(context.active()), async () => {
