@@ -69,14 +69,13 @@ builder.Services.AddCors(o =>
     o.AddPolicy(CorsPolicy, p => p
         .WithOrigins(
             "http://localhost:4200",
-            "https://job-admin.eelkhair.net"
-        )
+            "https://job-admin.eelkhair.net",
+            "http://192.168.1.112:9000",
+            "https://swagger.eelkhair.net")    
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials()
-        // (optional) if you want to read your trace id on the client
-        .WithExposedHeaders("trace-id")
-    );
+        .WithExposedHeaders("trace-id"));
 });
 builder.Services.AddScoped<IValidator<CreateJobRequest>, CreateJobValidator>();
 

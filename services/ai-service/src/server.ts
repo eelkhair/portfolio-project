@@ -23,9 +23,15 @@ export async function startServer(config: any) {
     const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
     app.setValidatorCompiler(validatorCompiler);
     app.setSerializerCompiler(serializerCompiler);
-
+    app.register(cors, {
+        origin: [
+            "http://192.168.1.112:9000",
+            "https://swagger.eelkhair.net"
+        ],
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        allowedHeaders: ["Content-Type", "Authorization"]
+    });
     await app.register(traceIdPlugin);
-    await app.register(cors, { origin: true });
     await app.register(swagger, {
         openapi: { info: { title: "AI Service", version: "1.0.0" } },
         transform: jsonSchemaTransform,

@@ -17,6 +17,28 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        // ---------------------------------------------------------------------
+        // CORS
+        // ---------------------------------------------------------------------
+        services.AddCors(options =>
+        {
+            options.AddPolicy("AllowMyFrontendApp", policy =>
+            {
+                policy.WithOrigins(
+                        "http://localhost:4200", 
+                        "http://localhost:5280",   
+                        "https://localhost:5280",
+                        "http://127.0.0.1:4200",
+                        "http://192.168.1.112:9000",
+                        "https://swagger.eelkhair.net",
+                        "http://127.0.0.1:5280"
+                    )
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .WithExposedHeaders("trace-id")
+                    .AllowCredentials();
+            });
+        });
 
         // ---------------------------------------------------------------------
         // JWT Bearer Auth (Auth0)
@@ -47,25 +69,7 @@ public static class DependencyInjection
             .AddScheme<AuthenticationSchemeOptions, DaprInternalAuthenticationHandler>(
                 "DaprInternalScheme", _ => { });
 
-        // ---------------------------------------------------------------------
-        // CORS
-        // ---------------------------------------------------------------------
-        services.AddCors(options =>
-        {
-            options.AddPolicy("AllowMyFrontendApp", policy =>
-            {
-                policy.WithOrigins(
-                        "http://localhost:4200",   // Angular dev
-                        "http://localhost:5280",   // Monolith dev URL (your logs show this origin)
-                        "https://localhost:5280",
-                        "http://127.0.0.1:4200",
-                        "http://127.0.0.1:5280"
-                    )
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-                    .AllowCredentials();
-            });
-        });
+
 
         // ---------------------------------------------------------------------
         // Authorization Policies
@@ -99,12 +103,13 @@ public static class DependencyInjection
     // Application Middleware Pipeline
     // -------------------------------------------------------------------------
     public static WebApplication UseApplicationServices(this WebApplication app)
-    {
+    { 
+    
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseStaticFiles();
         app.UseRouting();
-        app.UseCors("AllowMyFrontendApp");
+      
         app.UseAuthorization();
         app.MapControllers();
 

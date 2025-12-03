@@ -29,7 +29,6 @@ builder.AddDaprServices().ConfigureLogging("monolith-api").AddCustomHealthChecks
     .AddConfiguredSwagger(builder.Configuration)
     .AddOpenTelemetryServices(builder.Configuration, "monolith-api");
 
-builder.Build()
-    .UseConfiguredSwagger(builder.Configuration)
+builder.Build().UseConfiguredSwagger(builder.Configuration)
     .UseApplicationServices()
     .Start();

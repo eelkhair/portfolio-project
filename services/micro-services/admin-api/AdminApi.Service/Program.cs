@@ -61,10 +61,13 @@ builder.Services.AddFastEndpoints()
 const string CorsPolicy = "AllowJobAdmin";
 builder.Services.AddCors(options =>
 {
+
     options.AddPolicy(CorsPolicy, p => p
         .WithOrigins(
             "http://localhost:4200",
-            "https://job-admin.eelkhair.net")
+            "https://job-admin.eelkhair.net",
+            "http://192.168.1.112:9000",
+            "https://swagger.eelkhair.net")    
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials()
