@@ -9,22 +9,14 @@ builder.Logging.AddJsonConsole();
 
 var app = builder.Build();
 
-var pathBase = builder.Configuration["PATH_BASE"];
-if (!string.IsNullOrEmpty(pathBase))
-{
-    app.UsePathBase(pathBase);
-}
 
 app.UseHealthChecksUI(config =>
 {
-    config.ResourcesPath = string.IsNullOrEmpty(pathBase)
-        ? "/ui/resources"
-        : $"{pathBase}/ui/resources";
+    config.UIPath = "/health";
+    config.AddCustomStylesheet("wwwroot/css/style.css");
 });
+app.MapGet("/", (HttpContext ctx) => ctx.Response.Redirect("/health"));
 
-app.MapGet(string.IsNullOrEmpty(pathBase)
-    ? "/"
-    : pathBase, () => Results.LocalRedirect("~/healthchecks-ui"));
 app.MapHealthChecksUI();
 
 app.Run();

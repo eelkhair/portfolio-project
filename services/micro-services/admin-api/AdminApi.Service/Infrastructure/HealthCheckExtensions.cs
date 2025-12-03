@@ -29,11 +29,11 @@ internal static class HealthCheckExtensions
             Postfix = string.Empty,
             PubSubName = PubSubNames.RabbitMq
         };
-        
+
         builder.Services.AddSingleton(_ => new DaprPubSubHealthCheck(new DaprClientBuilder().Build(), pubSub));
         builder.Services
-            .AddHealthChecks()
-            .AddDapr()
-            .AddCheck("self", () => HealthCheckResult.Healthy());
+            .AddHealthChecks().AddCheck("self", () => HealthCheckResult.Healthy())
+            .AddDapr();
+
     }
 }

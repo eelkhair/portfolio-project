@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="9.0.0" />
         <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="8.0.1" />
         <PackageReference Include="Auth0.ManagementApi" Version="7.40.0" />
         <PackageReference Include="Dapr.Actors.AspNetCore" Version="1.15.4" />

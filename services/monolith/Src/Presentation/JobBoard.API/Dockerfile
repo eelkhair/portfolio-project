@@ -12,6 +12,7 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+COPY ["Src/Presentation/JobBoard.API/Nuget.Config", "."]
 COPY ["Src/Presentation/JobBoard.API/JobBoard.API.csproj", "Src/Presentation/JobBoard.API/"]
 COPY ["Src/Infrastructure/JobBoard.Infrastructure.Configuration/JobBoard.Infrastructure.Configuration.csproj", "Src/Infrastructure/JobBoard.Infrastructure.Configuration/"]
 COPY ["Src/Core/JobBoard.Application/JobBoard.Application.csproj", "Src/Core/JobBoard.Application/"]
@@ -22,7 +23,7 @@ COPY ["Src/Infrastructure/JobBoard.Infrastructure.Diagnostics/JobBoard.Infrastru
 COPY ["Src/Infrastructure/JobBoard.Infrastructure.Outbox/JobBoard.Infrastructure.Outbox.csproj", "Src/Infrastructure/JobBoard.Infrastructure.Outbox/"]
 COPY ["Src/Infrastructure/JobBoard.Infrastructure.Persistence/JobBoard.Infrastructure.Persistence.csproj", "Src/Infrastructure/JobBoard.Infrastructure.Persistence/"]
 COPY ["Src/Infrastructure/JobBoard.Infrastructure.Smtp/JobBoard.Infrastructure.Smtp.csproj", "Src/Infrastructure/JobBoard.Infrastructure.Smtp/"]
-RUN dotnet restore "./Src/Presentation/JobBoard.API/JobBoard.API.csproj"
+RUN dotnet restore "./Src/Presentation/JobBoard.API/JobBoard.API.csproj" --configfile "Nuget.Config"
 COPY . .
 WORKDIR "/src/Src/Presentation/JobBoard.API"
 RUN dotnet build "./JobBoard.API.csproj" -c $BUILD_CONFIGURATION -o /app/build

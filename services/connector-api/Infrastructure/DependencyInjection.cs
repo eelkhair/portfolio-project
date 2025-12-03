@@ -45,37 +45,7 @@ public static class DependencyInjection
 
         return services;
     }
-
-    // ------------------------------------------------------------
-    // HEALTH CHECKS
-    // ------------------------------------------------------------
-    public static IServiceCollection AddHealthCheckServices(
-        this IServiceCollection services,
-        IConfiguration configuration)
-    {
-        services.AddHealthChecks();
-            
-
-        return services;
-    }
-
-    public static WebApplication UseHealthCheckServices(this WebApplication app)
-    {
-        app.MapHealthChecks("/health-results", new HealthCheckOptions
-        {
-            Predicate = _ => true,
-            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-        });
-
-        app.MapHealthChecksUI(opt =>
-        {
-            opt.UIPath = "/health";
-            opt.AddCustomStylesheet("wwwroot/css/healthchecks-custom.css");
-        });
-
-        return app;
-    }
-
+    
     // ------------------------------------------------------------
     // LOGGING (SERILOG + FILTERS)
     // ------------------------------------------------------------

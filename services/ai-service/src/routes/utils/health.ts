@@ -2,11 +2,11 @@ import type { FastifyInstance } from 'fastify';
 import { performance } from 'node:perf_hooks';
 import { context } from '@opentelemetry/api';
 import { suppressTracing } from '@opentelemetry/core';
+import { CosmosClient } from '@azure/cosmos';
 
 const READINESS_TTL_MS = Number(process.env.READINESS_CACHE_MS ?? 2000);
 const BOOT_GRACE_MS = Number(process.env.READINESS_BOOT_GRACE_MS ?? 8000);
 const startedAt = Date.now();
-
 
 const SKIP_DAPR = process.env.SKIP_DAPR === 'true';
 
@@ -31,9 +31,8 @@ type HealthBody = {
 };
 
 export default async function healthRoutes(app: FastifyInstance) {
-    // Tag all routes in this module as "health" and hide them in Swagger if needed
     app.addHook('onRoute', (r) => {
-        r.schema ??= {hide:true};
+        r.schema ??= { hide: true };
         r.schema.tags ??= ['health'];
     });
 
@@ -45,7 +44,7 @@ export default async function healthRoutes(app: FastifyInstance) {
         const entries: Record<string, Entry> = {};
         const startAll = performance.now();
 
-        // Fast "self" row (HTTP server reachable)
+        // Self check
         entries['self'] = {
             data: {},
             description: 'HTTP server responding.',
@@ -54,7 +53,6 @@ export default async function healthRoutes(app: FastifyInstance) {
             tags: [],
         };
 
-        // Optional: skip Dapr entirely (for early dev / unit tests)
         if (SKIP_DAPR) {
             const body: HealthBody = {
                 status: 'Healthy',
@@ -114,8 +112,10 @@ export default async function healthRoutes(app: FastifyInstance) {
                     body: JSON.stringify([{ key, value: { ok: true, ts: Date.now() } }]),
                 });
                 if (!r.ok) throw new Error(`State upsert ${r.status}`);
+
                 r = await fetch(`${DAPR}/state/${encodeURIComponent(STATE)}/${key}`);
                 if (!r.ok) throw new Error(`State get ${r.status}`);
+
                 r = await fetch(`${DAPR}/state/${encodeURIComponent(STATE)}/${key}`, {
                     method: 'DELETE',
                 });
@@ -137,43 +137,83 @@ export default async function healthRoutes(app: FastifyInstance) {
             return `Dapr secret store: ${SECRET} is healthy.`;
         });
 
+        // PubSub
+        await check('pub sub', async () => {
+            await context.with(suppressTracing(context.active()), async () => {
+                const r = await fetch(
+                    `${DAPR}/publish/${encodeURIComponent(PUBSUB)}/${encodeURIComponent(TOPIC)}`,
+                    {
+                        method: 'POST',
+                        headers: { 'content-type': 'application/json' },
+                        body: JSON.stringify({ ping: Date.now() }),
+                    }
+                );
+                if (r.status !== 204) throw new Error(`Publish returned ${r.status}`);
+            });
+            return `Dapr pubsub: ${PUBSUB} for topic '${TOPIC}' is healthy.`;
+        });
 
-            await check('pub sub', async () => {
-                await context.with(suppressTracing(context.active()), async () => {
-                    const r = await fetch(
-                        `${DAPR}/publish/${encodeURIComponent(
-                            PUBSUB
-                        )}/${encodeURIComponent(TOPIC)}`,
-                        {
-                            method: 'POST',
-                            headers: { 'content-type': 'application/json' },
-                            body: JSON.stringify({ ping: Date.now() }),
-                        }
-                    );
-                    if (r.status !== 204) {
-                        throw new Error(`Publish returned ${r.status}`);
+        //
+        // Cosmos DB
+        //
+        await check("cosmosdb", async () => {
+            const endpoint = process.env.COSMOS_ENDPOINT;
+            const key = process.env.COSMOS_KEY;
+
+            const dbId = process.env.COSMOS_DB ?? process.env.COSMOS_DATABASE;
+            const containerId = process.env.COSMOS_JOBS_CONTAINER ?? process.env.COSMOS_CONTAINER;
+
+            if (!endpoint || !key || !dbId || !containerId) {
+                throw new Error(
+                    "Missing CosmosDB configuration. Expected COSMOS_ENDPOINT, COSMOS_KEY, COSMOS_DB, COSMOS_JOBS_CONTAINER."
+                );
+            }
+
+            await context.with(suppressTracing(context.active()), async () => {
+                // 👇 Required to bypass emulator's self-signed cert
+                process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
+                const client = new CosmosClient({
+                    endpoint,
+                    key,
+                    connectionPolicy: {
+                        enableEndpointDiscovery: false // emulator-safe
                     }
                 });
-                return `Dapr pubsub: ${PUBSUB} for topic '${TOPIC}' is healthy.`;
+
+                const { resource: db } = await client.database(dbId).read();
+                if (!db) throw new Error(`Database '${dbId}' metadata unreadable.`);
+
+                const { resource: container } =
+                    await client.database(dbId).container(containerId).read();
+
+                if (!container)
+                    throw new Error(`Container '${containerId}' metadata unreadable.`);
             });
 
+            return `CosmosDB database '${dbId}', container '${containerId}' is healthy.`;
+        });
 
+        // Determine health summary
         const unhealthy = Object.values(entries).some(
             (e) => e.status !== 'Healthy'
         );
+
         const body: HealthBody = {
             status: unhealthy ? 'Unhealthy' : 'Healthy',
             totalDuration: fmt(performance.now() - startAll),
             entries,
         };
-        const code = unhealthy ? 503 : 200;
-        return { code, body };
+
+        return {
+            code: unhealthy ? 503 : 200,
+            body,
+        };
     }
 
     async function readinessHandler(_req: any, reply: any) {
         const now = Date.now();
 
-        // 1) Startup grace window – avoid early flakiness on Windows/WSL
         if (now - startedAt < BOOT_GRACE_MS) {
             const body: HealthBody = {
                 status: 'Healthy',
@@ -191,25 +231,23 @@ export default async function healthRoutes(app: FastifyInstance) {
             return reply.code(200).send(body);
         }
 
-        // 2) Cache recent result
         if (lastReadyBody && now - lastReadyAt < READINESS_TTL_MS) {
             return reply.code(lastReadyCode).send(lastReadyBody);
         }
 
-        // 3) Run full readiness
         const { code, body } = await runReadiness();
         lastReadyAt = now;
         lastReadyBody = body;
         lastReadyCode = code;
+
         return reply.code(code).send(body);
     }
 
-    // HealthCheck UI endpoint – full readiness details
     app.get(
         '/healthzEndpoint',
         {
             schema: {
-                hide:true,
+                hide: true,
                 summary: 'Check if components of the system are up or down',
                 description:
                     'Health check to see if the components of the system are up or down. Used by the Health Check UI.',
@@ -219,12 +257,11 @@ export default async function healthRoutes(app: FastifyInstance) {
         readinessHandler
     );
 
-    // Liveness – just "is the process up"
     app.get(
         '/livez',
         {
             schema: {
-                hide:true,
+                hide: true,
                 summary: 'Check if the system is up or down',
                 description: 'Simple liveness check to see if the system is up or down',
                 tags: ['health'],
@@ -233,9 +270,5 @@ export default async function healthRoutes(app: FastifyInstance) {
         async (_req, reply) => reply.code(200).send({ status: 'live' })
     );
 
-    // Readiness – hidden from Swagger, used by Dapr + run.sh
-    app.get(
-        '/readyz',
-        readinessHandler
-    );
+    app.get('/readyz', readinessHandler);
 }

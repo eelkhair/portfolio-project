@@ -5,11 +5,11 @@ using JobBoard.HealthChecks;
 using JobBoard.HealthChecks.Dtos;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace UserApi.Infrastructure;
+namespace ConnectorAPI.Infrastructure;
 
 internal static class HealthCheckExtensions
 {
-    public static void AddCustomHealthChecks(this WebApplicationBuilder builder)
+    public static WebApplicationBuilder AddCustomHealthChecks(this WebApplicationBuilder builder)
     {
         var stateStore = new StateStoreOptions()
         {
@@ -34,12 +34,8 @@ internal static class HealthCheckExtensions
         builder.Services
             .AddHealthChecks()
             .AddCheck("self", () => HealthCheckResult.Healthy())
-            .AddSqlServer(
-                builder.Configuration.GetConnectionString("UserDbContext")
-                ?? throw new InvalidOperationException("DB connection missing"),
-                name: "User Database Check",
-                timeout: TimeSpan.FromSeconds(10),
-                tags: new[] { "database", "critical" })
             .AddDapr();
+
+        return builder;
     }
 }

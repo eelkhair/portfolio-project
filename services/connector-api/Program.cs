@@ -2,16 +2,17 @@ using System.Diagnostics;
 using System.Text.Json;
 using ConnectorAPI.Infrastructure;
 using Dapr;
+using HealthChecks.UI.Client;
+using JobBoard.HealthChecks;
 using JobBoard.IntegrationEvents.Company;
 
 var builder = WebApplication.CreateBuilder(args);
 #if DEBUG
 Debugger.Launch();
 #endif
-builder.AddDaprServices().ConfigureLogging("connector-api").Services.AddOpenApi();
+builder.AddDaprServices().ConfigureLogging("connector-api").AddCustomHealthChecks().Services.AddOpenApi();
 builder.Services.AddOpenTelemetryServices(builder.Configuration, "connector-api");
-builder.Services.AddHealthCheckServices(builder.Configuration)
-    .AddHealthChecksUI(c => c.SetHeaderText("Connector - Health Checks")).AddInMemoryStorage();;
+
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
@@ -35,7 +36,7 @@ app.MapPost("/connector/company",
 
 
 app.MapSubscribeHandler();
-app.UseHealthCheckServices();
+app.MapCustomHealthChecks("/healthzEndpoint", "/liveness", UIResponseWriter.WriteHealthCheckUIResponse);
 app.Run();
 
 

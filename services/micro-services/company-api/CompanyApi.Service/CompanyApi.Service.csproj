@@ -11,6 +11,8 @@
 
     <ItemGroup>
 
+      <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="9.0.0" />
+
       <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="8.0.1" />
 
       <PackageReference Include="Elkhair.Dev.Common" Version="1.0.17" />
@@ -26,6 +28,7 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
+      <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="8.0.22" />
       <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
     </ItemGroup>
 

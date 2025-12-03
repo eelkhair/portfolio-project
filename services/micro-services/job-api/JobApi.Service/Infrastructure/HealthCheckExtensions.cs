@@ -33,7 +33,13 @@ internal static class HealthCheckExtensions
         builder.Services.AddSingleton(_ => new DaprPubSubHealthCheck(new DaprClientBuilder().Build(), pubSub));
         builder.Services
             .AddHealthChecks()
-            .AddDapr()
-            .AddCheck("self", () => HealthCheckResult.Healthy());
+            .AddCheck("self", () => HealthCheckResult.Healthy())
+            .AddSqlServer(
+                builder.Configuration.GetConnectionString("JobDbContext")
+                ?? throw new InvalidOperationException("DB connection missing"),
+                name: "Job Database Check",
+                timeout: TimeSpan.FromSeconds(10),
+                tags: new[] { "database", "critical" })
+            .AddDapr();
     }
 }
