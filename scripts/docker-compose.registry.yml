@@ -75,10 +75,7 @@
       "--resources-path", "./Dapr/Components/Secrets",
       "-config", "./Dapr/Config/config.yaml"
     ]
-  
-  
-  
-  
+    
   user-api:
     build:
       context: ../services/user-api/
@@ -276,4 +273,5 @@
 networks:
   ai-job-board-net:
     name: ai-job-board-net
+
 
