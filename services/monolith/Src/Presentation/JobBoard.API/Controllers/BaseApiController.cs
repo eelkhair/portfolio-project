@@ -1,5 +1,6 @@
 // In: JobBoard.API.Controllers.BaseApiController.cs
 
+using System.Net;
 using FluentValidation;
 using JobBoard.API.Helpers;
 using JobBoard.Application.Actions.Base;
@@ -31,7 +32,7 @@ public abstract class BaseApiController : ControllerBase
         try
         {
             var result = await ExecuteCoreAsync(command);
-            return onSuccess(ApiResponse<TResult>.Success(result));
+            return onSuccess(ApiResponse.Success(result));
         }
         catch (Exception ex)
         {
@@ -49,7 +50,7 @@ public abstract class BaseApiController : ControllerBase
         try
         {
             var result = await ExecuteCoreAsync(query);
-            return onSuccess(ApiResponse<TResult>.Success(result));
+            return onSuccess(ApiResponse.Success(result));
         }
         catch (Exception ex)
         {
@@ -68,11 +69,37 @@ public abstract class BaseApiController : ControllerBase
     {
         return exception switch
         {
-            ValidationException ex => BadRequest(ApiResponse.Fail(ex.Errors.ToDictionary(e => e.PropertyName, e => new[] { e.ErrorMessage }))),
-            UnauthorizedAccessException ex => Unauthorized(ApiResponse.Fail(ex.Message)),
-            ForbiddenAccessException ex => StatusCode(StatusCodes.Status403Forbidden, ApiResponse.Fail(ex.Message)),
-            NotFoundException ex => NotFound(ApiResponse.Fail(ex.Message)),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, ApiResponse.Fail("An unexpected error occurred. Please contact support."))
+            ValidationException vex => BadRequest(
+                ApiResponse.Fail<object>(
+                    "Validation failed",
+                    HttpStatusCode.BadRequest,
+                    vex.Errors.ToDictionary(
+                        e => e.PropertyName,
+                        e => new[] { e.ErrorMessage }
+                    )
+                )
+            ),
+
+            UnauthorizedAccessException ex => Unauthorized(
+                ApiResponse.Fail<object>(ex.Message, HttpStatusCode.Unauthorized)
+            ),
+
+            ForbiddenAccessException ex => StatusCode(
+                403, ApiResponse.Fail<object>(ex.Message, HttpStatusCode.Forbidden)
+            ),
+
+            NotFoundException ex => NotFound(
+                ApiResponse.Fail<object>(ex.Message, HttpStatusCode.NotFound)
+            ),
+
+            _ => StatusCode(
+                500,
+                ApiResponse.Fail<object>(
+                    "An unexpected error occurred.",
+                    HttpStatusCode.InternalServerError
+                )
+            )
         };
+
     }
 }

@@ -4,49 +4,68 @@ using Swashbuckle.AspNetCore.Filters;
 namespace JobBoard.API.SwaggerExamples;
 
 /// <summary>
-/// 
+/// Provides an example of a validation failure response
 /// </summary>
-public class ValidationFailureResponseExample : IExamplesProvider<ApiResponse>
+public class ValidationFailureResponseExample : IExamplesProvider<ApiResponse<object>>
 {
     /// <summary>
-    /// Provides an example of a validation failure response
+    /// Provides an example response for a given scenario.
     /// </summary>
-    /// <returns></returns>
-    public ApiResponse GetExamples()
+    /// <returns>
+    /// An instance of <see cref="ApiResponse{T}"/> containing an example response.
+    /// </returns>
+    public ApiResponse<object> GetExamples()
     {
-        return new ApiResponse
-        {
-            IsSuccess = false,
-            Message = "One or more validation errors occurred.",
-            Errors = new Dictionary<string, string[]>
+        return ApiResponse.Fail<object>(
+            message: "Validation failed.",
+            status: System.Net.HttpStatusCode.BadRequest,
+            errors: new Dictionary<string, string[]>
             {
-                { "errors", ["Error 1 Details"] }
+                { "FieldName", new[] { "Error 1 details" } }
             }
-        };
+        );
     }
 }
+
 
 /// <summary>
 /// For 401 Unauthorized
 /// </summary>
-public class UnauthorizedResponseExample : IExamplesProvider<ApiResponse>
+public class UnauthorizedResponseExample : IExamplesProvider<ApiResponse<object>>
 {
     /// <summary>
-    /// Provides an example of an unauthorized response
+    /// Provides an example response for a given scenario.
     /// </summary>
-    /// <returns></returns>
-    public ApiResponse GetExamples() => ApiResponse.Fail("User is not authenticated.");
+    /// <returns>
+    /// An instance of <see cref="ApiResponse{T}"/> containing an example response.
+    /// </returns>
+    public ApiResponse<object> GetExamples()
+    {
+        return ApiResponse.Fail<object>(
+            message: "User is not authenticated.",
+            status: System.Net.HttpStatusCode.Unauthorized
+        );
+    }
 }
 
 
 /// <summary>
 /// Provides an example of a forbidden response
 /// </summary>
-public class ForbiddenResponseExample : IExamplesProvider<ApiResponse>
+
+public class ForbiddenResponseExample : IExamplesProvider<ApiResponse<object>>
 {
     /// <summary>
-    /// Provides an example of a forbidden response
+    /// Provides an example response for a given scenario.
     /// </summary>
-    /// <returns></returns>
-    public ApiResponse GetExamples() => ApiResponse.Fail("User does not have permission to perform this action.");
+    /// <returns>
+    /// An instance of <see cref="ApiResponse{T}"/> containing an example response.
+    /// </returns>
+    public ApiResponse<object> GetExamples()
+    {
+        return ApiResponse.Fail<object>(
+            message: "User does not have permission to perform this action.",
+            status: System.Net.HttpStatusCode.Forbidden
+        );
+    }
 }
