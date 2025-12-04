@@ -1,4 +1,5 @@
-﻿using JobBoard.API.Infrastructure.Authorization;
+﻿using JobBoard.API.Helpers;
+using JobBoard.API.Infrastructure.Authorization;
 using JobBoard.Application.Actions.Companies.Create;
 using JobBoard.Application.Actions.Companies.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +32,7 @@ public class CompanyController : BaseApiController
     /// <returns></returns>
     [HttpPost]
     [StandardApiResponses]
-    [ProducesResponseType(typeof(CompanyDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponse<CompanyDto>), StatusCodes.Status201Created)]
     public async Task<IActionResult> Create([FromBody] CreateCompanyCommand command)
         => await ExecuteCommandAsync(command, result =>
             CreatedAtAction(
