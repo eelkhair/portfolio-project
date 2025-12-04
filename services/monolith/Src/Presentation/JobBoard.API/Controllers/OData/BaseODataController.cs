@@ -1,5 +1,7 @@
 using JobBoard.Application.Actions.Base;
 using JobBoard.Application.Interfaces.Configurations;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 
 namespace JobBoard.API.Controllers.OData;
@@ -7,6 +9,8 @@ namespace JobBoard.API.Controllers.OData;
 /// <summary>
 /// Base OData controller.
 /// </summary>
+[Authorize]
+[Route("odata/[controller]")]
 public class BaseODataController : ODataController
 {
     /// <summary>

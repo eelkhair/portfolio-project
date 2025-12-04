@@ -15,7 +15,6 @@ var builder = WebApplication.CreateBuilder(args);
 Debugger.Launch();
 #endif
 
-
 builder.AddDaprServices().ConfigureLogging("monolith-api").AddCustomHealthChecks().Services
     .AddApplicationServices()
     .AddPersistenceServices(builder.Configuration)

@@ -29,7 +29,7 @@ public class ODataQueryOperationFilter : IOperationFilter
         {
             Name = "$select",
             In = ParameterLocation.Query,
-            Description = "Specifies a subset of properties to return (e.g., $select=Name,Sequence).",
+            Description = "Specifies a subset of properties to return (e.g., $select=Name,UId).",
             Schema = new OpenApiSchema { Type = "string" }
         });
         
@@ -37,7 +37,7 @@ public class ODataQueryOperationFilter : IOperationFilter
         {
             Name = "$expand",
             In = ParameterLocation.Query,
-            Description = "Expands related entities in the response (e.g., $expand=ExactAlleles).",
+            Description = "Expands related entities in the response (e.g., $expand=Industries).",
             Schema = new OpenApiSchema { Type = "string" }
         });
 
@@ -45,7 +45,7 @@ public class ODataQueryOperationFilter : IOperationFilter
         {
             Name = "$filter",
             In = ParameterLocation.Query,
-            Description = "Filters the results based on a Boolean condition (e.g., $filter=Name eq 'MyAllele').",
+            Description = "Filters the results based on a Boolean condition (e.g., $filter=Name eq 'Avengers').",
             Schema = new OpenApiSchema { Type = "string" }
         });
 

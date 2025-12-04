@@ -10,6 +10,8 @@ public class DaprOutboxMessageProcessor(DaprClient client): IOutboxMessageProces
 {
     public async Task ProcessAsync(OutboxMessage message, CancellationToken cancellationToken)
     {
-        await client.PublishEventAsync("rabbitmq.pubsub", "outbox-events", JsonSerializer.Deserialize<object>(message.Payload), cancellationToken: cancellationToken);
+        var payload = JsonSerializer.Deserialize<object>(message.Payload);
+        var e = new EventDto<object>(message.CreatedBy, Guid.CreateVersion7().ToString(), payload!);
+        await client.PublishEventAsync("rabbitmq.pubsub", "outbox-events", e , cancellationToken: cancellationToken);
     }
 }

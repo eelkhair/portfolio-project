@@ -1,3 +1,5 @@
+using JobBoard.Application.Actions.Companies.Models;
+using JobBoard.Domain.Entities;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 
@@ -15,7 +17,9 @@ public static class EdmModel
     public static IEdmModel Get()
     {
         var builder = new ODataConventionModelBuilder();
-        builder.EnableLowerCamelCase(); 
+        builder.EnableLowerCamelCase();
+        builder.EntitySet<CompanyDto>("Companies");
+        builder.EntitySet<IndustryDto>("Industries");
         return builder.GetEdmModel();
     }
 }

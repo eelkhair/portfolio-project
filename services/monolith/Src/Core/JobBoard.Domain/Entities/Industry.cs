@@ -1,4 +1,5 @@
-﻿using JobBoard.Domain.Exceptions;
+﻿using System.Text.Json.Serialization;
+using JobBoard.Domain.Exceptions;
 using JobBoard.Domain.Helpers;
 using JobBoard.Domain.ValueObjects.Industry;
 
@@ -19,6 +20,7 @@ public class Industry : BaseAuditableEntity
     public string Name { get; private set; }
 
     private readonly List<Company> _companies = [];
+    [JsonIgnore]
     public IReadOnlyCollection<Company> Companies => _companies.AsReadOnly();
 
     public void SetName(string name) =>

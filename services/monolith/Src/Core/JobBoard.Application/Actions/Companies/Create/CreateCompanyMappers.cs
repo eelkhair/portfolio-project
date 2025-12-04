@@ -28,16 +28,12 @@ public static class CreateCompanyMappers
         => UserCompany.Create(userId, companyId, id, uid);
 
     public static CompanyCreatedV1Event ToIntegrationEvent(this CreateCompanyCommand command, Guid companyUId,
-        Guid userUId)
+        Guid adminUId)
         => new (
             companyUId,
-            command.Name,
-            command.CompanyEmail,
-            "Provisioning",
-            command.CompanyWebsite,
             command.IndustryUId,
-            new AdminUserInfo(userUId, command.AdminFirstName, command.AdminLastName, command.AdminEmail)
-        );
+            adminUId
+   );
     
     public static void SetActivityTagsForCompany(this CreateCompanyCommand request, Activity? activity)
     {

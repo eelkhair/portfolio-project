@@ -48,13 +48,13 @@ public class CreateCompanyCommandHandler(IHandlerContext context
         var (companyId,companyUId) = await Context.GetNextValueFromSequenceAsync(typeof(Company), cancellationToken);
         var (userId, userUId) = await Context.GetNextValueFromSequenceAsync(typeof(User), cancellationToken);
         var (userCompanyId, userCompanyUId) = await Context.GetNextValueFromSequenceAsync(typeof(UserCompany), cancellationToken);
+       
         var industryId = await companyRepository.GetIndustryIdByUId(request.IndustryUId, cancellationToken);
 
         var company = request.ToCompanyEntity(companyUId, companyId, industryId);
         var user = request.ToUserEntity(userUId, userId);
         var companyUser = request.ToUserCompanyEntity(userCompanyUId, userCompanyId, companyId, userId);
-            
-
+        
         await companyRepository.AddAsync(company, cancellationToken);
         await userRepository.AddAsync(user, cancellationToken);
         await userRepository.AddCompanyUser(companyUser, cancellationToken);

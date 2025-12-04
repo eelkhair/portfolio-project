@@ -1,8 +1,7 @@
 ﻿namespace JobBoard.Application.Actions.Companies.Models;
 
-public class CompanyDto
+public class CompanyDto : BaseDto
 {
-    public Guid UId { get; set; }
     public required string Name { get; set; }
 
     public string? Description { get; set; }
@@ -24,4 +23,7 @@ public class CompanyDto
     public string? Logo { get; set; }
 
     public string Status { get; set; } = string.Empty;
+    
+    public IndustryDto? Industry { get; set; }
+
 }
