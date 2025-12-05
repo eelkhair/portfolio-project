@@ -23,6 +23,11 @@ public class CompaniesController : BaseODataController
     /// <returns>A task that represents an asynchronous operation. The task result contains an <see cref="IQueryable{T}"/> of <see cref="CompanyDto"/> representing the company with the specified UId.</returns>
     [HttpGet("{uId:guid}")]
     [EnableQuery]
-    public async Task<IQueryable<CompanyDto>> GetCompanyByUId(Guid uId) =>
-        await ExecuteODataQueryAsync(new GetCompanyByUIdQuery{UId = uId});
+    public async Task<SingleResult> GetCompanyByUId(Guid uId)
+    {
+       var r = await ExecuteODataQueryAsync(new GetCompanyByUIdQuery{UId = uId});
+       
+       return SingleResult.Create(r);
+    }
+        
   }
