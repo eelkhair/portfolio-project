@@ -75,7 +75,6 @@
       "--resources-path", "./Dapr/Components/Secrets",
       "-config", "./Dapr/Config/config.yaml"
     ]
-    
   user-api:
     build:
       context: ../services/user-api/
@@ -228,16 +227,21 @@
       context: ../services/HealthChecks
     image: registry.eelkhair.net/health-check:latest
     environment:
-      - HealthChecksUI__HealthChecks__0__Name=Admin API
-      - HealthChecksUI__HealthChecks__0__Uri=https://job-admin-api.eelkhair.net/healthzEndpoint
-      - HealthChecksUI__HealthChecks__1__Name=Company API
-      - HealthChecksUI__HealthChecks__1__Uri=https://job-company-api.eelkhair.net/healthzEndpoint
-      - HealthChecksUI__HealthChecks__2__Name=Job API
-      - HealthChecksUI__HealthChecks__2__Uri=https://job-api.eelkhair.net/healthzEndpoint
-      - HealthChecksUI__HealthChecks__3__Name=User API
-      - HealthChecksUI__HealthChecks__3__Uri=https://job-users-api.eelkhair.net/healthzEndpoint
-      - HealthChecksUI__HealthChecks__4__Name=AI API
-      - HealthChecksUI__HealthChecks__4__Uri=https://job-ai.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__0__Name=Monolith API
+      - HealthChecksUI__HealthChecks__0__Uri=https://job-monolith.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__1__Name=Connector API
+      - HealthChecksUI__HealthChecks__1__Uri=https://job-connector.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__2__Name=AI Service
+      - HealthChecksUI__HealthChecks__2__Uri=https://job-ai.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__3__Name=Admin API
+      - HealthChecksUI__HealthChecks__3__Uri=https://job-admin-api.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__4__Name=Company API
+      - HealthChecksUI__HealthChecks__4__Uri=https://job-company-api.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__5__Name=Job API
+      - HealthChecksUI__HealthChecks__5__Uri=https://job-api.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__6__Name=User API
+      - HealthChecksUI__HealthChecks__6__Uri=https://job-users-api.eelkhair.net/healthzEndpoint
+
     ports:
       - "5107:8080"
   
@@ -270,8 +274,8 @@
     networks:
       - ai-job-board-net
 
+
 networks:
   ai-job-board-net:
     name: ai-job-board-net
-
 
