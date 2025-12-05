@@ -21,6 +21,7 @@ public static class DependencyInjection
     {
         const string odataRoutePrefix = "odata";
 
+        
         services.AddControllers(options =>
             {
                 options.Conventions.Add(new KebabCaseRoutingConvention());
@@ -29,9 +30,9 @@ public static class DependencyInjection
             })
             .AddOData(options =>
             {
-
+                
                 options
-                    
+
                     .Select()
                     .Filter()
                     .OrderBy()
@@ -40,6 +41,10 @@ public static class DependencyInjection
                     .SetMaxTop(100)
                     .AddRouteComponents(odataRoutePrefix, EdmModel.Get());
 
+            }).AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
+                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
             });
         return services;
     }
