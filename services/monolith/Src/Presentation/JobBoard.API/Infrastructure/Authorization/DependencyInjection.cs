@@ -3,6 +3,7 @@ using JobBoard.Domain;
 using JobBoard.HealthChecks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.OData;
 using Microsoft.IdentityModel.Tokens;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Trace;
@@ -108,11 +109,11 @@ public static class DependencyInjection
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseStaticFiles();
+        app.UseODataRouteDebug();
         app.UseRouting();
       
         app.UseAuthorization();
         app.MapControllers();
-
         return app;
     }
 

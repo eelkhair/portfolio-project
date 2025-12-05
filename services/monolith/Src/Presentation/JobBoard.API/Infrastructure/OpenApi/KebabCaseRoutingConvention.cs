@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
@@ -14,9 +15,12 @@ public partial class KebabCaseRoutingConvention : IApplicationModelConvention
     {
         foreach (var controller in application.Controllers)
         {
+
             if (controller == null) continue;
+         
             foreach (var action in controller.Actions)
             {
+
                 if (action.Selectors == null) continue;
                 foreach (var selector in action.Selectors)
                 {

@@ -18,8 +18,8 @@ public static class EdmModel
     {
         var builder = new ODataConventionModelBuilder();
         builder.EnableLowerCamelCase();
-       var companySet = builder.EntitySet<CompanyDto>("Companies");
-       var industrySet = builder.EntitySet<IndustryDto>("Industries");
+       var companySet = builder.EntitySet<CompanyDto>("companies");
+       var industrySet = builder.EntitySet<IndustryDto>("industries");
        
        companySet.EntityType.HasKey(c => c.UId);
        industrySet.EntityType.HasKey(c => c.UId);

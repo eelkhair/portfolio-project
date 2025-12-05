@@ -29,7 +29,7 @@ public static class DependencyInjection
             })
             .AddOData(options =>
             {
-               
+
                 options
                     
                     .Select()
@@ -39,10 +39,7 @@ public static class DependencyInjection
                     .Count()
                     .SetMaxTop(100)
                     .AddRouteComponents(odataRoutePrefix, EdmModel.Get());
-                
-            }) .AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+
             });
         return services;
     }
