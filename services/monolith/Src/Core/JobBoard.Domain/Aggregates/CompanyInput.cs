@@ -1,8 +1,8 @@
 ﻿namespace JobBoard.Domain.Aggregates;
 
 public sealed record CompanyInput(
-    int Id,
-    Guid UId,
+    int InternalId,
+    Guid Id,
     string Name,
     string Email,
     string Status,

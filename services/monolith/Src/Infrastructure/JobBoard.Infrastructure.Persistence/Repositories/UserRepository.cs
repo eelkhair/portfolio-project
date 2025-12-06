@@ -9,9 +9,15 @@ namespace JobBoard.Infrastructure.Persistence.Repositories;
 // ReSharper disable once UnusedType.Global
 public class UserRepository(IJobBoardQueryDbContext context): IUserRepository
 {
-    public async Task<User?> FindUserByExternalIdAsync(string externalId, CancellationToken cancellationToken)
+    public async Task<User?> FindUserByIdAsync(string userId, CancellationToken cancellationToken)
     {
-        return await context.Users.FirstOrDefaultAsync(u => u.ExternalId == externalId, cancellationToken);
+        return await context.Users.FirstOrDefaultAsync(u => u.InternalId.ToString() == userId, cancellationToken);
+    }
+
+    public async Task<User?> FindUserByExternalIdOrIdAsync(string externalId, CancellationToken cancellationToken)
+    {
+        return await context.Users.FirstOrDefaultAsync(u => u.ExternalId == externalId
+    || u.InternalId.ToString() == externalId, cancellationToken);
     }
 
     public async Task AddAsync(User user, CancellationToken cancellationToken)

@@ -61,7 +61,7 @@ public class Job : BaseAuditableEntity
                 "Job.NullResponsibility",
                 [ new Error("Job.NullResponsibility", "Responsibility cannot be null.") ]);
         }
-        responsibility.SetJob(Id);
+        responsibility.SetJob(InternalId);
         _responsibilities.Add(responsibility);
     }
 
@@ -74,7 +74,7 @@ public class Job : BaseAuditableEntity
                 [ new Error("Job.NullQualification", "Qualification cannot be null.") ]);
         }
 
-        qualification.SetJob(Id);
+        qualification.SetJob(InternalId);
         _qualifications.Add(qualification);
     }
 

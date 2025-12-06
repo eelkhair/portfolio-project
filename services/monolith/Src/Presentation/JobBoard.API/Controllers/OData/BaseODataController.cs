@@ -10,8 +10,6 @@ namespace JobBoard.API.Controllers.OData;
 /// Base OData controller.
 /// </summary>
 [Authorize]
-[ApiController]
-[Route("odata/[controller]")]
 public class BaseODataController : ODataController
 {
     /// <summary>

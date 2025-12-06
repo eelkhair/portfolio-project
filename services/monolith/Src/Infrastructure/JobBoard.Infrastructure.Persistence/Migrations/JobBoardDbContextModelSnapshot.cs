@@ -38,7 +38,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("JobBoard.Domain.Entities.Company", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("InternalId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValueSql("NEXT VALUE FOR Companies_Sequence");
@@ -70,6 +70,9 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
 
                     b.Property<DateTime?>("Founded")
                         .HasColumnType("datetime2");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("IndustryId")
                         .HasColumnType("int");
@@ -106,9 +109,6 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
-                    b.Property<Guid>("UId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -121,7 +121,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.HasKey("Id");
+                    b.HasKey("InternalId");
 
                     b.HasIndex("IndustryId");
 
@@ -144,7 +144,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("JobBoard.Domain.Entities.Industry", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("InternalId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValueSql("NEXT VALUE FOR Industries_Sequence");
@@ -156,6 +156,9 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -172,9 +175,6 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("PeriodStart");
 
-                    b.Property<Guid>("UId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -183,7 +183,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("Id");
+                    b.HasKey("InternalId");
 
                     b.HasIndex("Name")
                         .IsUnique();
@@ -204,11 +204,11 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("JobBoard.Domain.Entities.Infrastructure.OutboxArchivedMessage", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("InternalId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InternalId"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -222,6 +222,11 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
+
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("newsequentialid()");
 
                     b.Property<string>("LastError")
                         .HasMaxLength(4000)
@@ -245,11 +250,6 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<Guid>("UId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("newsequentialid()");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -258,18 +258,18 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("Id");
+                    b.HasKey("InternalId");
 
                     b.ToTable("ArchivedMessages", "outbox");
                 });
 
             modelBuilder.Entity("JobBoard.Domain.Entities.Infrastructure.OutboxDeadLetter", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("InternalId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InternalId"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -283,6 +283,11 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
+
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("newsequentialid()");
 
                     b.Property<bool>("IsEmailSent")
                         .HasColumnType("bit");
@@ -303,11 +308,6 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<Guid>("UId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("newsequentialid()");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -316,18 +316,18 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("Id");
+                    b.HasKey("InternalId");
 
                     b.ToTable("DeadLetters", "outbox");
                 });
 
             modelBuilder.Entity("JobBoard.Domain.Entities.Infrastructure.OutboxMessage", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("InternalId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InternalId"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -341,6 +341,11 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
+
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("newsequentialid()");
 
                     b.Property<string>("LastError")
                         .HasMaxLength(4000)
@@ -361,11 +366,6 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<Guid>("UId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("newsequentialid()");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -374,14 +374,14 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("Id");
+                    b.HasKey("InternalId");
 
                     b.ToTable("Messages", "outbox");
                 });
 
             modelBuilder.Entity("JobBoard.Domain.Entities.Job", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("InternalId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValueSql("NEXT VALUE FOR Jobs_Sequence");
@@ -401,6 +401,9 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("JobType")
                         .HasColumnType("int");
@@ -429,9 +432,6 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<Guid>("UId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -440,7 +440,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("Id");
+                    b.HasKey("InternalId");
 
                     b.HasIndex("CompanyId");
 
@@ -464,7 +464,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("JobBoard.Domain.Entities.Qualification", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("InternalId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValueSql("NEXT VALUE FOR Qualifications_Sequence");
@@ -476,6 +476,9 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("JobId")
                         .HasColumnType("int");
@@ -490,9 +493,6 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("PeriodStart");
 
-                    b.Property<Guid>("UId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -506,7 +506,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.HasKey("Id");
+                    b.HasKey("InternalId");
 
                     b.HasIndex("JobId", "Value");
 
@@ -526,7 +526,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("JobBoard.Domain.Entities.Responsibility", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("InternalId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValueSql("NEXT VALUE FOR Responsibilities_Sequence");
@@ -538,6 +538,9 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("JobId")
                         .HasColumnType("int");
@@ -552,9 +555,6 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("PeriodStart");
 
-                    b.Property<Guid>("UId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -568,7 +568,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.HasKey("Id");
+                    b.HasKey("InternalId");
 
                     b.HasIndex("JobId", "Value");
 
@@ -588,7 +588,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("JobBoard.Domain.Entities.UserCompany", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("InternalId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValueSql("NEXT VALUE FOR UserCompanies_Sequence");
@@ -604,6 +604,9 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("PeriodEnd")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
@@ -613,9 +616,6 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasColumnName("PeriodStart");
-
-                    b.Property<Guid>("UId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -628,7 +628,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("InternalId");
 
                     b.HasIndex("CompanyId");
 
@@ -653,7 +653,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("JobBoard.Domain.Entities.Users.User", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("InternalId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValueSql("NEXT VALUE FOR Users_Sequence");
@@ -680,6 +680,9 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -695,9 +698,6 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("PeriodStart");
 
-                    b.Property<Guid>("UId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -706,7 +706,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("Id");
+                    b.HasKey("InternalId");
 
                     b.HasIndex("Email")
                         .IsUnique();

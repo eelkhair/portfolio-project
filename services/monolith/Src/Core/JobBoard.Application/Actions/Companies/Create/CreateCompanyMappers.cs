@@ -14,7 +14,7 @@ public static class CreateCompanyMappers
             Name: command.Name,
             Email: command.CompanyEmail,
             Status: "Provisioning",
-            Id: id, UId: uid,
+            InternalId: id, Id: uid,
             IndustryId: industryId));
         
         company.SetWebsite(command.CompanyWebsite);
@@ -33,7 +33,7 @@ public static class CreateCompanyMappers
             companyUId,
             command.IndustryUId,
             adminUId
-   );
+   ){UserId = command.UserId};
     
     public static void SetActivityTagsForCompany(this CreateCompanyCommand request, Activity? activity)
     {

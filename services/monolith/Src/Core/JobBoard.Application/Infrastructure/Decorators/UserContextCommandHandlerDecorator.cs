@@ -12,7 +12,6 @@ public class UserContextCommandHandlerDecorator<TRequest, TResult>(
     public async Task<TResult> HandleAsync(TRequest request, CancellationToken cancellationToken)
     {
         var authenticatedUserId = userAccessor.UserId;
-
         if (string.IsNullOrEmpty(authenticatedUserId))
         {
             throw new UnauthorizedAccessException("User is not authenticated for this request.");

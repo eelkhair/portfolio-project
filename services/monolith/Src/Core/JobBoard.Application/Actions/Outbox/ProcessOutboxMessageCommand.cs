@@ -72,7 +72,7 @@ public class ProcessOutboxMessage(
             {
                 Logger.LogInformation(
                     "Processing outbox message ID: {MessageId}, ParentTraceId: {ParentTrace}",
-                    message.Id,
+                    message.InternalId,
                     parentContext.TraceId.ToString());
 
                 await outboxMessageProcessor.ProcessAsync(message, cancellationToken);
@@ -99,7 +99,7 @@ public class ProcessOutboxMessage(
     private void HandleException(OutboxMessage message, Exception ex, string? activityId)
     {
         Logger.LogError(ex, "Failed to process outbox message ID: {MessageId}. Updating retry logic",
-            message.Id);
+            message.InternalId);
 
         message.RetryCount++;
         message.LastError = ex.Message;
@@ -115,7 +115,7 @@ public class ProcessOutboxMessage(
     {
         Logger.LogCritical(
             "Message ID {MessageId} has reached max retries. Sending to DeadLetter and sending alert",
-            message.Id);
+            message.InternalId);
 
         var deadLetterMessage = new OutboxDeadLetter
         {
@@ -127,7 +127,7 @@ public class ProcessOutboxMessage(
             CreatedBy = message.CreatedBy,
             UpdatedBy = message.UpdatedBy,
             UpdatedAt = DateTime.UtcNow,
-            OutboxMessageId = message.Id
+            OutboxMessageId = message.InternalId
         };
 
         outboxDbContext.OutboxDeadLetters.Add(deadLetterMessage);
@@ -153,7 +153,7 @@ public class ProcessOutboxMessage(
                 return null;
 
             // Main metadata
-            activity.AddTag("outbox.message.id", message.Id);
+            activity.AddTag("outbox.message.id", message.InternalId);
             activity.AddTag("outbox.message.eventType", message.EventType);
             activity.AddTag("outbox.message.payloadSize", message.Payload?.Length ?? 0);
             activity.AddTag("processor.traceId", hostActivity?.TraceId.ToString() ?? activity.TraceId.ToString());

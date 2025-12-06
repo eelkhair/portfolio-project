@@ -10,7 +10,7 @@ public class CompanyRepository(IJobBoardQueryDbContext context): ICompanyReposit
     public async Task<int> GetIndustryIdByUId(Guid uid, CancellationToken cancellationToken)
     {
        
-        return await context.Industries.Where(c => c.UId == uid).Select(c => c.Id)
+        return await context.Industries.Where(c => c.Id == uid).Select(c => c.InternalId)
             .FirstAsync(cancellationToken);
     }
 
@@ -36,6 +36,6 @@ public class CompanyRepository(IJobBoardQueryDbContext context): ICompanyReposit
     {
         return await context.Industries
             .Where(x => EF.Property<DateTime>(x, "PeriodEnd") == DateTime.MaxValue)
-            .AnyAsync(x => x.UId == uid, ct);
+            .AnyAsync(x => x.Id == uid, ct);
     }
 }

@@ -79,7 +79,7 @@ public class CreateCompanyCommandHandler(IHandlerContext context
 
         return new CompanyDto
         {
-            UId = companyUId,
+            Id = companyUId,
             Name = company.Name,
             Email= company.Email,
             Website = company.Website,

@@ -62,7 +62,7 @@ public class CreateCompanyCommandValidator : AbstractValidator<CreateCompanyComm
                 logger.LogInformation("Checking existence of industry {IndustryUId}", model.IndustryUId);
                 var industryExists = await context.Industries
                     .Where(i => EF.Property<DateTime>(i, "PeriodEnd") == DateTime.MaxValue)
-                    .AnyAsync(i => i.UId == model.IndustryUId, ct);
+                    .AnyAsync(i => i.Id == model.IndustryUId, ct);
 
                 if (!industryExists)
                     ctx.AddFailure(nameof(model.IndustryUId), "Industry does not exist");

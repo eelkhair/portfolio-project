@@ -37,7 +37,7 @@ public class CompanyController : BaseApiController
         => await ExecuteCommandAsync(command, result =>
             CreatedAtAction(
                 nameof(Get), 
-                new { uId = result.Data!.UId },
+                new { uId = result.Data!.Id },
                 result
             ));
 }

@@ -3,6 +3,7 @@ using JobBoard.Application.Actions.Companies.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Results;
+using Microsoft.AspNetCore.OData.Routing.Attributes;
 
 namespace JobBoard.API.Controllers.OData;
 
@@ -11,6 +12,7 @@ namespace JobBoard.API.Controllers.OData;
 /// with company-related resources. This controller inherits from the BaseODataController
 /// to enable common OData functionality.
 /// </summary>
+
 public class CompaniesController : BaseODataController
 {
     /// <summary>
@@ -18,26 +20,21 @@ public class CompaniesController : BaseODataController
     /// </summary>
     /// <param name="uId">The unique identifier of the company to retrieve.</param>
     /// <returns>A filtered <see cref="SingleResult"/> containing the company matching the specified UId.</returns>
+    [EnableQuery]
     [HttpGet]
-    [EnableQuery]
-    public IQueryable<CompanyDto> GetCompanies()
+    public IActionResult Get()
     {
-        var companies = ExecuteODataQueryAsync(new GetCompanyQuery()).Result;
+        var companies = ExecuteODataQueryAsync(new GetCompaniesQuery()).Result;
        
-        return companies;
+        return Ok(companies);
     }
-    /// <summary>
-    /// Retrieves a company by its unique identifier (UId).
-    /// </summary>
-    /// <param name="uId">The unique identifier of the company to retrieve.</param>
-    /// <returns>A task that represents an asynchronous operation. The task result contains an <see cref="IQueryable{T}"/> of <see cref="CompanyDto"/> representing the company with the specified UId.</returns>
-    [HttpGet("{uId:guid}")]
-    [EnableQuery]
-    public SingleResult GetCompanyById(Guid uId)
-    {
-       var companies = ExecuteODataQueryAsync(new GetCompanyQuery()).Result;
-       
-       return SingleResult.Create(companies.Where(c => c.UId == uId));
-    }
+    // [EnableQuery]
+    // [HttpGet("odata/Companies({uId})")]
+    // public ActionResult Get(Guid uId)
+    // {
+    //    var companies = ExecuteODataQueryAsync(new GetCompaniesQuery()).Result;
+    //    var company = companies.FirstOrDefault(c => c.UId == uId);
+    //    return Ok(company);
+    // }
         
   }

@@ -1,4 +1,4 @@
-﻿namespace JobBoard.Application.Actions.Companies.Models;
+﻿namespace ConnectorAPI.Models;
 
 public class BaseDto
 {

@@ -20,7 +20,7 @@ public class CreateCompanyExample : IExamplesProvider<ApiResponse<CompanyDto>>
         var response = ApiResponse.Success(
             new CompanyDto
             {
-                UId = new Guid("019ad2af-3a93-7c0d-bfaf-aa44f50bfa2e"),
+                Id = new Guid("019ad2af-3a93-7c0d-bfaf-aa44f50bfa2e"),
                 Name = "TechNova Solutions",
                 Email = "info@technova.com",
                 Website = "https://technova.com",

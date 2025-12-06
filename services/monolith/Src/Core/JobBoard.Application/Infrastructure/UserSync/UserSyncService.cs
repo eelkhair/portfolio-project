@@ -15,7 +15,7 @@ public class UserSyncService(
 {
     public async Task EnsureUserExistsAsync(string userId, CancellationToken cancellationToken)
     {
-        var user = await userRepository.FindUserByExternalIdAsync(
+        var user = await userRepository.FindUserByExternalIdOrIdAsync(
             userId,
             cancellationToken
         );
@@ -28,7 +28,7 @@ public class UserSyncService(
                 lastName: userAccessor.LastName!,
                 email: userAccessor.Email!,
                 externalId: userId,
-                uId: uid, id: id,
+                id: uid, internalId: id,
                 createdAt:DateTime.UtcNow,
                 createdBy:userId
             );
@@ -37,18 +37,19 @@ public class UserSyncService(
         }
         else
         {
-            if (!user.FirstName.Equals(userAccessor.FirstName, StringComparison.InvariantCultureIgnoreCase) ||
-                !user.LastName.Equals(userAccessor.LastName, StringComparison.InvariantCultureIgnoreCase)||
-                !user.Email.Equals(userAccessor.Email, StringComparison.InvariantCultureIgnoreCase)
-                )
+            if (!string.IsNullOrWhiteSpace(userAccessor.FirstName) && !string.IsNullOrWhiteSpace(userAccessor.LastName) && !string.IsNullOrWhiteSpace(userAccessor.Email) 
+                && (!user.FirstName.Equals(userAccessor.FirstName, StringComparison.InvariantCultureIgnoreCase) ||
+                    !user.LastName.Equals(userAccessor.LastName, StringComparison.InvariantCultureIgnoreCase) ||
+                    !user.Email.Equals(userAccessor.Email, StringComparison.InvariantCultureIgnoreCase)))
             {
                 user.SetFirstName(userAccessor.FirstName!);
                 user.SetLastName(userAccessor.LastName!);
                 user.SetEmail(userAccessor.Email!);
                 user.UpdatedAt = DateTime.UtcNow;
-                user.UpdatedBy =  userId;
+                user.UpdatedBy = userId;
             }
         }
+
         await unitOfWork.SaveChangesAsync(userId, cancellationToken);
 
     }

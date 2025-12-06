@@ -17,12 +17,23 @@ public class HttpUserAccessor : IUserAccessor
     {
         var user = httpContextAccessor.HttpContext?.User;
         if (user?.Identity?.IsAuthenticated != true) return;
-        UserId = user.FindFirstValue(ClaimConstants.NameIdentifierId);
-        FirstName = user.FindFirstValue( "https://eelkhair.net/first_name")?? string.Empty;
-        LastName = user.FindFirstValue("https://eelkhair.net/last_name")?? string.Empty;
-        Email = user.FindFirstValue( "https://eelkhair.net/email")?? string.Empty;
+        if (httpContextAccessor.HttpContext?.Request.Headers.ContainsKey("x-user-id") == true)
+        {
+            UserId = httpContextAccessor.HttpContext.Request.Headers["x-user-id"];
+        }
+        else
+        {
+            UserId = user.FindFirstValue(ClaimConstants.NameIdentifierId);
+        }
+
+
+        FirstName = user.FindFirstValue("https://eelkhair.net/first_name") ?? string.Empty;
+        LastName = user.FindFirstValue("https://eelkhair.net/last_name") ?? string.Empty;
+        Email = user.FindFirstValue("https://eelkhair.net/email") ?? string.Empty;
         Roles = user.FindAll("https://eelkhair.net/roles").Select(c => c.Value).ToList();
+
     }
+
     /// <summary>
     /// Gets the user identifier.
     /// </summary>

@@ -1,6 +1,4 @@
-﻿using JobBoard.Application.Actions.Base;
-
-namespace JobBoard.Application.Actions.Companies.Models;
+﻿namespace ConnectorAPI.Models;
 
 public class CompanyDto : BaseDto
 {
@@ -27,5 +25,5 @@ public class CompanyDto : BaseDto
     public string Status { get; set; } = string.Empty;
     
     public IndustryDto? Industry { get; set; }
-    public Guid IndustryId { get; set; }
+
 }

@@ -39,7 +39,13 @@ public static class DependencyInjection
                     .Expand()
                     .Count()
                     .SetMaxTop(100)
-                    .AddRouteComponents(odataRoutePrefix, EdmModel.Get());
+                    .EnableQueryFeatures()
+                    .AddRouteComponents(odataRoutePrefix, EdmModel.Get(),
+                        configureServices: (services) =>
+                        {
+                            services.AddScoped<Microsoft.OData.Json.IJsonWriterFactory>(
+                                sp => new Microsoft.OData.Json.ODataJsonWriterFactory());
+                        });
 
             }).AddJsonOptions(options =>
             {

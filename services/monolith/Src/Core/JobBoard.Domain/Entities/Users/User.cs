@@ -53,14 +53,14 @@ public class User : BaseAuditableEntity
         string lastName,
         string email,
         string? externalId,
-        Guid uId,
-        int id,
+        Guid id,
+        int internalId,
         DateTime? createdAt = null,
         string? createdBy = null)
     {
         var user = ValidateAndCreate(firstName, lastName, email, externalId);
+        user.InternalId = internalId;
         user.Id = id;
-        user.UId = uId;
         EntityFactory.ApplyAudit(user, createdAt, createdBy);
 
         return user;

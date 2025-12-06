@@ -7,5 +7,7 @@ public record CompanyCreatedV1Event(
 ) : IIntegrationEvent
 {
     public string EventType => "company.created.v1";
+    public required string UserId { get; set; }
+  
 }
 

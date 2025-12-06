@@ -49,7 +49,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                 schema: "outbox",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    InternalId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     OutboxMessageId = table.Column<long>(type: "bigint", nullable: false),
                     EventType = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
@@ -58,7 +58,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                     RetryCount = table.Column<int>(type: "int", nullable: false),
                     LastError = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true),
                     TraceParent = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
-                    UId = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "newsequentialid()"),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "newsequentialid()"),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -66,7 +66,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ArchivedMessages", x => x.Id);
+                    table.PrimaryKey("PK_ArchivedMessages", x => x.InternalId);
                 });
 
             migrationBuilder.CreateTable(
@@ -74,7 +74,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                 schema: "outbox",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    InternalId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     OutboxMessageId = table.Column<long>(type: "bigint", nullable: false),
                     EventType = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
@@ -82,7 +82,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                     LastError = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true),
                     TraceParent = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     IsEmailSent = table.Column<bool>(type: "bit", nullable: false),
-                    UId = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "newsequentialid()"),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "newsequentialid()"),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -90,7 +90,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DeadLetters", x => x.Id);
+                    table.PrimaryKey("PK_DeadLetters", x => x.InternalId);
                 });
 
             migrationBuilder.CreateTable(
@@ -98,13 +98,13 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                 schema: "Company",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false, defaultValueSql: "NEXT VALUE FOR Industries_Sequence"),
+                    InternalId = table.Column<int>(type: "int", nullable: false, defaultValueSql: "NEXT VALUE FOR Industries_Sequence"),
                     Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     PeriodEnd = table.Column<DateTime>(type: "datetime2", nullable: false)
                         .Annotation("SqlServer:TemporalIsPeriodEndColumn", true),
                     PeriodStart = table.Column<DateTime>(type: "datetime2", nullable: false)
                         .Annotation("SqlServer:TemporalIsPeriodStartColumn", true),
-                    UId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -112,7 +112,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Industries", x => x.Id);
+                    table.PrimaryKey("PK_Industries", x => x.InternalId);
                 })
                 .Annotation("SqlServer:IsTemporal", true)
                 .Annotation("SqlServer:TemporalHistoryTableName", "IndustriesHistory")
@@ -125,7 +125,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                 schema: "outbox",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    InternalId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     EventType = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     Payload = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: false),
@@ -133,7 +133,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                     RetryCount = table.Column<int>(type: "int", nullable: false),
                     LastError = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true),
                     TraceParent = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
-                    UId = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "newsequentialid()"),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "newsequentialid()"),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -141,7 +141,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Messages", x => x.Id);
+                    table.PrimaryKey("PK_Messages", x => x.InternalId);
                 });
 
             migrationBuilder.CreateTable(
@@ -149,7 +149,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                 schema: "User",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false, defaultValueSql: "NEXT VALUE FOR Users_Sequence"),
+                    InternalId = table.Column<int>(type: "int", nullable: false, defaultValueSql: "NEXT VALUE FOR Users_Sequence"),
                     FirstName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
@@ -158,7 +158,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .Annotation("SqlServer:TemporalIsPeriodEndColumn", true),
                     PeriodStart = table.Column<DateTime>(type: "datetime2", nullable: false)
                         .Annotation("SqlServer:TemporalIsPeriodStartColumn", true),
-                    UId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -166,7 +166,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_Users", x => x.InternalId);
                 })
                 .Annotation("SqlServer:IsTemporal", true)
                 .Annotation("SqlServer:TemporalHistoryTableName", "UsersHistory")
@@ -179,7 +179,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                 schema: "Company",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false, defaultValueSql: "NEXT VALUE FOR Companies_Sequence"),
+                    InternalId = table.Column<int>(type: "int", nullable: false, defaultValueSql: "NEXT VALUE FOR Companies_Sequence"),
                     Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true),
                     Website = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
@@ -196,7 +196,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .Annotation("SqlServer:TemporalIsPeriodEndColumn", true),
                     PeriodStart = table.Column<DateTime>(type: "datetime2", nullable: false)
                         .Annotation("SqlServer:TemporalIsPeriodStartColumn", true),
-                    UId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -204,13 +204,13 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Companies", x => x.Id);
+                    table.PrimaryKey("PK_Companies", x => x.InternalId);
                     table.ForeignKey(
                         name: "FK_Companies_Industries_IndustryId",
                         column: x => x.IndustryId,
                         principalSchema: "Company",
                         principalTable: "Industries",
-                        principalColumn: "Id",
+                        principalColumn: "InternalId",
                         onDelete: ReferentialAction.Restrict);
                 })
                 .Annotation("SqlServer:IsTemporal", true)
@@ -224,7 +224,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                 schema: "Job",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false, defaultValueSql: "NEXT VALUE FOR Jobs_Sequence"),
+                    InternalId = table.Column<int>(type: "int", nullable: false, defaultValueSql: "NEXT VALUE FOR Jobs_Sequence"),
                     Title = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     Location = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     JobType = table.Column<int>(type: "int", nullable: false),
@@ -235,7 +235,7 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .Annotation("SqlServer:TemporalIsPeriodEndColumn", true),
                     PeriodStart = table.Column<DateTime>(type: "datetime2", nullable: false)
                         .Annotation("SqlServer:TemporalIsPeriodStartColumn", true),
-                    UId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -243,13 +243,13 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Jobs", x => x.Id);
+                    table.PrimaryKey("PK_Jobs", x => x.InternalId);
                     table.ForeignKey(
                         name: "FK_Jobs_Companies_CompanyId",
                         column: x => x.CompanyId,
                         principalSchema: "Company",
                         principalTable: "Companies",
-                        principalColumn: "Id",
+                        principalColumn: "InternalId",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("SqlServer:IsTemporal", true)
@@ -263,14 +263,14 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                 schema: "User",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false, defaultValueSql: "NEXT VALUE FOR UserCompanies_Sequence"),
+                    InternalId = table.Column<int>(type: "int", nullable: false, defaultValueSql: "NEXT VALUE FOR UserCompanies_Sequence"),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     CompanyId = table.Column<int>(type: "int", nullable: false),
                     PeriodEnd = table.Column<DateTime>(type: "datetime2", nullable: false)
                         .Annotation("SqlServer:TemporalIsPeriodEndColumn", true),
                     PeriodStart = table.Column<DateTime>(type: "datetime2", nullable: false)
                         .Annotation("SqlServer:TemporalIsPeriodStartColumn", true),
-                    UId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -278,20 +278,20 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserCompanies", x => x.Id);
+                    table.PrimaryKey("PK_UserCompanies", x => x.InternalId);
                     table.ForeignKey(
                         name: "FK_UserCompanies_Companies_CompanyId",
                         column: x => x.CompanyId,
                         principalSchema: "Company",
                         principalTable: "Companies",
-                        principalColumn: "Id",
+                        principalColumn: "InternalId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_UserCompanies_Users_UserId",
                         column: x => x.UserId,
                         principalSchema: "User",
                         principalTable: "Users",
-                        principalColumn: "Id",
+                        principalColumn: "InternalId",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("SqlServer:IsTemporal", true)
@@ -305,14 +305,14 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                 schema: "Job",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false, defaultValueSql: "NEXT VALUE FOR Qualifications_Sequence"),
+                    InternalId = table.Column<int>(type: "int", nullable: false, defaultValueSql: "NEXT VALUE FOR Qualifications_Sequence"),
                     Value = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     JobId = table.Column<int>(type: "int", nullable: false),
                     PeriodEnd = table.Column<DateTime>(type: "datetime2", nullable: false)
                         .Annotation("SqlServer:TemporalIsPeriodEndColumn", true),
                     PeriodStart = table.Column<DateTime>(type: "datetime2", nullable: false)
                         .Annotation("SqlServer:TemporalIsPeriodStartColumn", true),
-                    UId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -320,13 +320,13 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Qualifications", x => x.Id);
+                    table.PrimaryKey("PK_Qualifications", x => x.InternalId);
                     table.ForeignKey(
                         name: "FK_Qualifications_Jobs_JobId",
                         column: x => x.JobId,
                         principalSchema: "Job",
                         principalTable: "Jobs",
-                        principalColumn: "Id",
+                        principalColumn: "InternalId",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("SqlServer:IsTemporal", true)
@@ -340,14 +340,14 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                 schema: "Job",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false, defaultValueSql: "NEXT VALUE FOR Responsibilities_Sequence"),
+                    InternalId = table.Column<int>(type: "int", nullable: false, defaultValueSql: "NEXT VALUE FOR Responsibilities_Sequence"),
                     Value = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     JobId = table.Column<int>(type: "int", nullable: false),
                     PeriodEnd = table.Column<DateTime>(type: "datetime2", nullable: false)
                         .Annotation("SqlServer:TemporalIsPeriodEndColumn", true),
                     PeriodStart = table.Column<DateTime>(type: "datetime2", nullable: false)
                         .Annotation("SqlServer:TemporalIsPeriodStartColumn", true),
-                    UId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -355,13 +355,13 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Responsibilities", x => x.Id);
+                    table.PrimaryKey("PK_Responsibilities", x => x.InternalId);
                     table.ForeignKey(
                         name: "FK_Responsibilities_Jobs_JobId",
                         column: x => x.JobId,
                         principalSchema: "Job",
                         principalTable: "Jobs",
-                        principalColumn: "Id",
+                        principalColumn: "InternalId",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("SqlServer:IsTemporal", true)

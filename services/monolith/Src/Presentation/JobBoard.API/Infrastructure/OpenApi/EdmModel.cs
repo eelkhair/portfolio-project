@@ -1,5 +1,5 @@
 using JobBoard.Application.Actions.Companies.Models;
-using JobBoard.Domain.Entities;
+using JobBoard.Application.Actions.Users.Models;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 
@@ -13,16 +13,19 @@ public static class EdmModel
     /// <summary>
     /// Gets the EDM model.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The configured EDM model for OData endpoints.</returns>
     public static IEdmModel Get()
     {
         var builder = new ODataConventionModelBuilder();
         builder.EnableLowerCamelCase();
-       var companySet = builder.EntitySet<CompanyDto>("companies");
-       var industrySet = builder.EntitySet<IndustryDto>("industries");
+        var companySet = builder.EntitySet<CompanyDto>("Companies");
+        
+        var industrySet = builder.EntitySet<IndustryDto>("Industries");
+        var userSet = builder.EntitySet<UserDto>("Users");
+
+        
        
-       companySet.EntityType.HasKey(c => c.UId);
-       industrySet.EntityType.HasKey(c => c.UId);
-        return builder.GetEdmModel();
+        companySet.EntityType.HasRequired(c=>c.Industry);
+       return builder.GetEdmModel();
     }
 }

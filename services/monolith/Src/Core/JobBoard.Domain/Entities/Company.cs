@@ -50,7 +50,7 @@ public class Company : BaseAuditableEntity
             );
         }
 
-        job.SetCompany(Id);
+        job.SetCompany(InternalId);
         _jobs.Add(job);
     }
     
@@ -105,8 +105,8 @@ public class Company : BaseAuditableEntity
     {
         var company = ValidateAndCreate(input);
         company.SetIndustry(input.IndustryId);
+        company.InternalId = input.InternalId;
         company.Id = input.Id;
-        company.UId = input.UId;
         EntityFactory.ApplyAudit(company, input.CreatedAt, input.CreatedBy);
         return company;
     }

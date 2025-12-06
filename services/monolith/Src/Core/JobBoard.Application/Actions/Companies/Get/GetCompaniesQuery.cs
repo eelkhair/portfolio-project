@@ -6,14 +6,14 @@ using Microsoft.Extensions.Logging;
 
 namespace JobBoard.Application.Actions.Companies.Get;
 
-public class GetCompanyQuery: BaseQuery<IQueryable<CompanyDto>>
+public class GetCompaniesQuery: BaseQuery<IQueryable<CompanyDto>>
 {
     public Guid UId { get; set; }
 }
-public class GetCompanyQueryHandler(IJobBoardDbContext context, ILogger<GetCompanyQueryHandler> logger)
-    : BaseQueryHandler(context, logger), IHandler<GetCompanyQuery, IQueryable<CompanyDto>>
+public class GetCompaniesQueryHandler(IJobBoardDbContext context, ILogger<GetCompaniesQueryHandler> logger)
+    : BaseQueryHandler(context, logger), IHandler<GetCompaniesQuery, IQueryable<CompanyDto>>
 {
-    public Task<IQueryable<CompanyDto>> HandleAsync(GetCompanyQuery request, CancellationToken cancellationToken)
+    public Task<IQueryable<CompanyDto>> HandleAsync(GetCompaniesQuery request, CancellationToken cancellationToken)
     {
         var result = Context.Companies.Select(x=> new CompanyDto
         {
@@ -28,14 +28,15 @@ public class GetCompanyQueryHandler(IJobBoardDbContext context, ILogger<GetCompa
             Phone = x.Phone,
             Size = x.Size,
             Status = x.Status,
-            UId = x.UId,
+            Id = x.Id,
             CreatedAt = x.CreatedAt,
             CreatedBy = x.CreatedBy,
             UpdatedAt = x.UpdatedAt,
             UpdatedBy = x.UpdatedBy,
+            IndustryId = x.Industry.Id,
             Industry = new IndustryDto
             {
-                UId = x.Industry.UId,
+                Id = x.Industry.Id,
                 Name = x.Industry.Name,
                 CreatedBy = x.CreatedBy,
                 CreatedAt = x.CreatedAt,

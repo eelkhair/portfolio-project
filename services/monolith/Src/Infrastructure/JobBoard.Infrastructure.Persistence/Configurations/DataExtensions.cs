@@ -12,13 +12,13 @@ public static class DataExtensions
         var schema = builder.Metadata.GetSchema() ?? "dbo";
         var sequence = $"{table}_Sequence";
 
-        builder.HasKey("Id");
+        builder.HasKey("InternalId");
 
-        builder.Property<int>("Id")
+        builder.Property<int>("InternalId")
             .ValueGeneratedOnAdd()
             .HasDefaultValueSql($"NEXT VALUE FOR {sequence}");
 
-        builder.Property<Guid>("UId")
+        builder.Property<Guid>("Id")
             .IsRequired()
             .ValueGeneratedNever();
         
@@ -50,12 +50,12 @@ public static class DataExtensions
     public static void ConfigureInfrastructureEntity<TEntity>(this EntityTypeBuilder<TEntity> builder)
         where TEntity : class
     {
-        builder.HasKey("Id");
+        builder.HasKey("InternalId");
 
-        builder.Property<int>("Id")
+        builder.Property<int>("InternalId")
             .UseIdentityColumn();
 
-        builder.Property<Guid>("UId")
+        builder.Property<Guid>("Id")
             .IsRequired()
             .HasDefaultValueSql("newsequentialid()");
     }

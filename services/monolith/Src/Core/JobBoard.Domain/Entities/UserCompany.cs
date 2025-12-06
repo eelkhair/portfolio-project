@@ -18,12 +18,12 @@ public class UserCompany : BaseAuditableEntity
 
     public User User { get; private set; } = null!;
     public Company Company { get; private set; } = null!;
-    public static UserCompany Create(int userId, int companyId, int id, Guid uid, DateTime? createdAt = null, string? createdBy = null)
+    public static UserCompany Create(int userId, int companyId, int internalId, Guid id, DateTime? createdAt = null, string? createdBy = null)
     {
         var link = new UserCompany(userId, companyId)
         {
-            Id = id,
-            UId = uid
+            InternalId = internalId,
+            Id = id
         };
         if (createdAt.HasValue)
         {
