@@ -1,7 +1,7 @@
 using System.Diagnostics;
-using ConnectorAPI.Endpoints;
 using ConnectorAPI.Endpoints.Company;
 using ConnectorAPI.Infrastructure;
+using Elkhair.Common.Observability;
 
 #if DEBUG
 Debugger.Launch();

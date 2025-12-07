@@ -125,7 +125,6 @@ builder.Services.ConfigureHttpJsonOptions(opts =>
         new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
     );
 });
-builder.Services.AddDaprClient();
 var app = builder.Build();
 app.UseCors(CorsPolicy);
 app.UseAuthentication();    

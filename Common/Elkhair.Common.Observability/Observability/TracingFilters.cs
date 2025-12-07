@@ -3,7 +3,7 @@ using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Instrumentation.EntityFrameworkCore;
 using OpenTelemetry.Instrumentation.Http;
 
-namespace ConnectorAPI.Infrastructure.Observability;
+namespace Elkhair.Common.Observability.Observability;
 public static class TracingFilters
 {
     public static readonly ActivitySource Source = new("ConnectorAPi.Service");

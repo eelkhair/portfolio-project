@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace ConnectorAPI.Infrastructure.Observability;
+namespace Elkhair.Common.Observability.Observability;
 
 public interface IActivityFactory
 {

@@ -1,8 +1,10 @@
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 
-namespace ConnectorAPI.Infrastructure.Observability;
+namespace Elkhair.Common.Observability.Observability;
 
 public static class LoggingFilters
 {

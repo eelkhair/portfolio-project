@@ -2,7 +2,7 @@
 using Serilog.Core;
 using Serilog.Events;
 
-namespace ConnectorAPI.Infrastructure.Observability;
+namespace Elkhair.Common.Observability.Observability;
 
 public sealed class OpenTelemetryActivityEnricher : ILogEventEnricher
 {

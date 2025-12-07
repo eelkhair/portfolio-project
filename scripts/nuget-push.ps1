@@ -8,6 +8,7 @@ $packages = @(
   Join-Path $rootPath 'services\micro-services\Elkhair.Dev.Common'
   Join-Path $rootPath 'services\micro-services\HealthChecks\JobBoard.HealthChecks'
   Join-Path $rootPath 'services\monolith\Src\Core\JobBoard.IntegrationEvents'
+  Join-Path $rootPath 'Common\Elkhair.Common.Observability\'
 )
 
 $sourceUrl = 'https://nuget.eelkhair.net/v3/index.json'
