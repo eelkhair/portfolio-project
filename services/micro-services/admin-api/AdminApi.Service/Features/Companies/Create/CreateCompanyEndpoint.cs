@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using AdminApi.Application.Commands.Interfaces;
 using AdminAPI.Contracts.Models;
 using AdminAPI.Contracts.Models.Companies.Requests;
@@ -10,7 +11,9 @@ using UserAPI.Contracts.Models.Events;
 
 namespace AdminApi.Features.Companies.Create;
 
-public class CreateCompanyEndpoint(ICompanyCommandService service, IMessageSender sender)
+public class CreateCompanyEndpoint(ICompanyCommandService service, 
+    IMessageSender sender,
+    ILogger<CreateCompanyEndpoint> logger)
     : Endpoint<CreateCompanyRequest, ApiResponse<CompanyResponse>>
 {
     public override void Configure()
@@ -21,6 +24,10 @@ public class CreateCompanyEndpoint(ICompanyCommandService service, IMessageSende
 
     public override async Task HandleAsync(CreateCompanyRequest request, CancellationToken ct)
     {
+        logger.LogInformation("Creating company {@Request}", request);
+        Activity.Current?.SetTag("input.companyId", request.CompanyId);
+        Activity.Current?.SetTag("input.admin.user.id", request.AdminUserId);
+        Activity.Current?.SetTag("input.user.companyId", request.UserCompanyId);
         var company = await service.CreateAsync(request, ct);
 
         if (company.Success)

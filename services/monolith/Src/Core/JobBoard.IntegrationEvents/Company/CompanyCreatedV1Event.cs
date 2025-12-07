@@ -3,7 +3,8 @@
 public record CompanyCreatedV1Event(
     Guid CompanyUId,
     Guid IndustryUId,
-    Guid AdminUId
+    Guid AdminUId,
+    Guid UserCompanyUId
 ) : IIntegrationEvent
 {
     public string EventType => "company.created.v1";

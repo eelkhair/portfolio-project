@@ -82,7 +82,7 @@ builder.Services.AddScoped<IJobQueryService, JobQueryService>();
 builder.Services.AddScoped<IOpenAICommandService, OpenAICommandService>();
 builder.Services.AddScoped<IJobCommandService, JobCommandService>();
 
-builder.ConfigureLoggingAndTracing("admin-api");
+
 
 builder.Services.AddAuthentication(options =>
     {

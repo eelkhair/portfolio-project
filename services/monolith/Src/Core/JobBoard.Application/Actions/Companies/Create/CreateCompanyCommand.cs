@@ -44,7 +44,7 @@ public class CreateCompanyCommandHandler(IHandlerContext context
     public async Task<CompanyDto> HandleAsync(CreateCompanyCommand request, CancellationToken cancellationToken)
     {        
         request.SetActivityTagsForCompany(Activity.Current);
-
+        Logger.LogInformation("Creating company {CompanyName}...", request.Name);
         var (companyId,companyUId) = await Context.GetNextValueFromSequenceAsync(typeof(Company), cancellationToken);
         var (userId, userUId) = await Context.GetNextValueFromSequenceAsync(typeof(User), cancellationToken);
         var (userCompanyId, userCompanyUId) = await Context.GetNextValueFromSequenceAsync(typeof(UserCompany), cancellationToken);
@@ -59,7 +59,7 @@ public class CreateCompanyCommandHandler(IHandlerContext context
         await userRepository.AddAsync(user, cancellationToken);
         await userRepository.AddCompanyUser(companyUser, cancellationToken);
 
-        var integrationEvent = request.ToIntegrationEvent(companyUId, userUId);
+        var integrationEvent = request.ToIntegrationEvent(companyUId, userUId, userCompanyUId);
         await OutboxPublisher.PublishAsync(integrationEvent, cancellationToken);
         await Context.SaveChangesAsync(request.UserId, cancellationToken);
         
@@ -68,6 +68,7 @@ public class CreateCompanyCommandHandler(IHandlerContext context
         {
             parentActivity?.SetTag("CompanyUId", companyUId.ToString());
             parentActivity?.SetTag("UserUId", userUId.ToString());
+            parentActivity?.SetTag("UserCompanyUId", userCompanyUId.ToString());
 
             Logger.LogInformation(
                 "Successfully created company {CompanyName} ({CompanyUId})",

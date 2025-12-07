@@ -22,10 +22,12 @@ public static class CompanyCreatedEndpoint
             {
                 var traceId = Activity.Current?.TraceId.ToString() ?? string.Empty;
 
-                logger.LogInformation("Received CompanyCreatedV1Event {TraceId} for Company {CompanyId}, Admin {AdminId}",
+                logger.LogInformation("Received CompanyCreatedV1Event {TraceId} for Company {CompanyId}, Admin {AdminId}, UserId {@UserId}, UserCompanyId {@UserCompanyId}",
                     traceId,
                     @event.Data.CompanyUId,
-                    @event.Data.AdminUId);
+                    @event.Data.AdminUId,
+                    @event.Data.UserId,
+                    @event.Data.UserCompanyUId);
 
                 var (company, admin) = await monolithODataClient.GetCompanyAndAdminForCreatedEventAsync(
                     @event.Data.CompanyUId,

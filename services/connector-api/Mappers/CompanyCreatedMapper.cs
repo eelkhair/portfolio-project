@@ -20,7 +20,8 @@ public static class CompanyCreatedMapper
             AdminUserId = admin.Id,
             AdminFirstName = admin.FirstName,
             AdminLastName = admin.LastName,
-            AdminEmail = admin.Email
+            AdminEmail = admin.Email,
+            UserCompanyId = evt.UserCompanyUId
         };
     }
 }

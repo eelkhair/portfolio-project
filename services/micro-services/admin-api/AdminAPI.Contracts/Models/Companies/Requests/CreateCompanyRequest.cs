@@ -27,4 +27,10 @@ public class CreateCompanyRequest
     [EmailAddress]
     public string AdminEmail { get; set; } = string.Empty;
     
+    public Guid? AdminUserId { get; init; }
+    public Guid? CompanyId { get; init; }
+    public Guid? UserCompanyId { get; set; }
+    
+    public string? UserId { get; set; }
+
 }
