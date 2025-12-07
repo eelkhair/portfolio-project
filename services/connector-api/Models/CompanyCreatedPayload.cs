@@ -3,10 +3,10 @@
 public class CompanyCreatedPayload
 {
     public Guid CompanyId { get; init; }
-    public string CompanyName { get; init; } = string.Empty;
+    public string Name { get; init; } = string.Empty;
     public string CompanyEmail { get; init; } = string.Empty;
-    public string? Website { get; init; }
-    public Guid IndustryId { get; init; }
+    public string? CompanyWebsite { get; init; }
+    public Guid IndustryUId { get; init; }
 
     public Guid AdminUserId { get; init; }
     public string AdminFirstName { get; init; } = string.Empty;

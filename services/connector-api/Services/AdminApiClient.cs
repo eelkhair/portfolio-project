@@ -1,22 +1,16 @@
 ﻿using ConnectorAPI.Models;
+using Dapr.Client;
 
 namespace ConnectorAPI.Services;
 
-public class AdminApiClient(IHttpClientFactory httpClientFactory, ILogger<AdminApiClient> logger)
+public class AdminApiClient(ILogger<AdminApiClient> logger, DaprClient daprClient)
     : IAdminApiClient
 {
-    private readonly HttpClient _httpClient = httpClientFactory.CreateClient("admin-api");
-    
-
     public async Task SendCompanyCreatedAsync(CompanyCreatedPayload payload, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Sending CompanyCreated payload to Admin API for Company {CompanyId}", payload.CompanyId);
-
-        var response = await _httpClient.PostAsJsonAsync(
-            "/api/companies/created",
-            payload,
-            cancellationToken);
-
-        response.EnsureSuccessStatusCode();
+        logger.LogInformation("Sending company created event to admin-api");
+        var message = daprClient.CreateInvokeMethodRequest(HttpMethod.Post, "admin-api", "companies");
+        message.Content= JsonContent.Create(payload);
+        await daprClient.InvokeMethodAsync(message, cancellationToken);
     }
 }

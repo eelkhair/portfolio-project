@@ -12,15 +12,15 @@ public static class CompanyCreatedMapper
     {
         return new CompanyCreatedPayload
         {
-            CompanyId      = evt.CompanyUId,
-            CompanyName    = company.Name,
-            CompanyEmail   = company.Email,
-            Website        = company.Website,
-            IndustryId     = company.IndustryId,
-            AdminUserId    = admin.Id,
+            CompanyId = evt.CompanyUId,
+            Name = company.Name,
+            CompanyEmail = company.Email,
+            CompanyWebsite = company.Website,
+            IndustryUId = company.IndustryId,
+            AdminUserId = admin.Id,
             AdminFirstName = admin.FirstName,
-            AdminLastName  = admin.LastName,
-            AdminEmail     = admin.Email
+            AdminLastName = admin.LastName,
+            AdminEmail = admin.Email
         };
     }
 }
