@@ -36,7 +36,7 @@ public static class DependencyInjection
                     )
                     .AllowAnyHeader()
                     .AllowAnyMethod()
-                    .WithExposedHeaders("trace-id")
+                    .WithExposedHeaders("x-trace-id")
                     .AllowCredentials();
             });
         });

@@ -131,7 +131,8 @@ public static class DependencyInjection
 
             c.OperationFilter<ODataQueryOperationFilter>();
             c.OperationFilter<StandardResponsesOperationFilter>();
-           
+            c.OperationFilter<TraceIdHeaderOperationFilter>();
+
 
             var httpMethodOrder = new Dictionary<string, int>
             {
