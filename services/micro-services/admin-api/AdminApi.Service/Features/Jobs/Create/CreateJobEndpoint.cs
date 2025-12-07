@@ -46,6 +46,6 @@ public class CreateJobEndpoint(IJobCommandService service,
         }
        
     
-        await SendOkAsync(response, ct);
+        await Send.OkAsync(response, ct);
     }
 }

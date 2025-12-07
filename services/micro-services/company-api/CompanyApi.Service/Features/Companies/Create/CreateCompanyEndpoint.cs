@@ -5,7 +5,7 @@ using FastEndpoints;
 
 namespace CompanyApi.Features.Companies.Create;
 
-public class CreateCompanyEndpoint(ICompanyCommandService service)
+public class CreateCompanyEndpoint(ICompanyCommandService service, ILogger<CreateCompanyEndpoint> logger)
     : Endpoint<CreateCompanyRequest, CompanyResponse>
 {
     public override void Configure()
@@ -16,8 +16,9 @@ public class CreateCompanyEndpoint(ICompanyCommandService service)
 
     public override async Task HandleAsync(CreateCompanyRequest request, CancellationToken ct)
     {
+        logger.LogInformation("Creating Company: {Name}", request.Name);
         var company = await service.CreateAsync(request, User, ct);
-        await SendAsync(company, cancellation:ct);
+        await Send.OkAsync(company, cancellation:ct);
     }
     
 }

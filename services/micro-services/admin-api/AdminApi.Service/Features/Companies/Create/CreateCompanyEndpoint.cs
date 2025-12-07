@@ -45,6 +45,6 @@ public class CreateCompanyEndpoint(ICompanyCommandService service,
                 
             }, ct);
         }
-        await SendAsync(company, (int) company.StatusCode, ct);
+        await Send.OkAsync(company, ct);
     }
 }

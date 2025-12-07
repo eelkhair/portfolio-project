@@ -24,7 +24,7 @@ public sealed class UpsertDraftEndpoint(IJobCommandService service):
     {
         var companyId = Route<string>("companyId")!;
         var result = await service.CreateDraft(companyId, req, ct);
-        await SendOkAsync(result, ct);
+        await Send.OkAsync(result, ct);
 
 
     }

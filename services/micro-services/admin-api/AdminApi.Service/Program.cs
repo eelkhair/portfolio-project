@@ -6,7 +6,7 @@ using AdminApi.Application.Commands.Interfaces;
 using AdminApi.Application.Queries;
 using AdminApi.Application.Queries.Interfaces;
 using AdminApi.Infrastructure;
-using Elkhair.Dev.Common.Application;
+using Elkhair.Common.Observability;
 using Elkhair.Dev.Common.Dapr;
 using FastEndpoints;
 using FastEndpoints.Swagger;
@@ -16,8 +16,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using NSwag;
 
-var builder = WebApplication.CreateBuilder(args).AddDaprServices();
-
+var builder = WebApplication.CreateBuilder(args).AddDaprServices().ConfigureLogging("admin-api");
+builder.Services.AddOpenTelemetryServices(builder.Configuration, "admin-api");
 
 var cfg = builder.Configuration;
 var domain = cfg["Auth0:Domain"];

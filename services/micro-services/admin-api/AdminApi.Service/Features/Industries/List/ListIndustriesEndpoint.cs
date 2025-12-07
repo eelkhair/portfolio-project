@@ -17,6 +17,6 @@ public class ListIndustriesEndpoint(IIndustryQueryService service) : EndpointWit
     public override async Task HandleAsync(CancellationToken ct)
     {
         var industries = await service.ListAsync(ct);
-        await SendAsync( industries , cancellation: ct);
+        await Send.OkAsync( industries , cancellation: ct);
     }
 }

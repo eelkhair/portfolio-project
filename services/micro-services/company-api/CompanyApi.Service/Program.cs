@@ -7,7 +7,7 @@ using CompanyApi.Application.Queries;
 using CompanyApi.Application.Queries.Interfaces;
 using CompanyApi.Infrastructure;
 using CompanyApi.Infrastructure.Data;
-using Elkhair.Dev.Common.Application;
+using Elkhair.Common.Observability;
 using Elkhair.Dev.Common.Dapr;
 using FastEndpoints;
 using FastEndpoints.Swagger;
@@ -21,10 +21,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.IdentityModel.Tokens;
 using NSwag;
 
-var builder = WebApplication.CreateBuilder(args).AddDaprServices();
+var builder = WebApplication.CreateBuilder(args).AddDaprServices().ConfigureLogging("company-api");
 
 var cfg = builder.Configuration;
-
+builder.Services.AddOpenTelemetryServices(builder.Configuration, "company-api");
 builder.Services.AddFastEndpoints()
     .SwaggerDocument(o =>
     {
@@ -91,7 +91,6 @@ builder.Services.AddDbContext<CompanyDbContext>(options =>
         });
 });
 builder.Services.AddScoped<ICompanyDbContext, CompanyDbContext>();
-builder.ConfigureLoggingAndTracing("company-api");
 // Add Authorization support (even if not using yet)
 
 builder.Services.AddAuthentication(options =>

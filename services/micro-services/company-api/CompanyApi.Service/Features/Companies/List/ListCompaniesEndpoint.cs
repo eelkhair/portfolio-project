@@ -15,6 +15,6 @@ public class ListCompaniesEndpoint(ICompanyQueryService service) : EndpointWitho
     public override async Task HandleAsync(CancellationToken ct)
     {
         var companies = await service.ListAsync( HttpContext, ct);
-        await SendAsync( companies , cancellation: ct);
+        await Send.OkAsync( companies , cancellation: ct);
     }
 }

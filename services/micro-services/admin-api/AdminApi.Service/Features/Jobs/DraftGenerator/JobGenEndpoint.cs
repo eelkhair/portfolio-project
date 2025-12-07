@@ -44,6 +44,6 @@ public sealed class JobGenEndpoint(IOpenAICommandService _ai)
 
         var result = await _ai.GenerateJobAsync(companyId, normalized, ct);
 
-        await SendOkAsync(result, ct);
+        await Send.OkAsync(result, ct);
     }
 }

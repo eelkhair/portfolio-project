@@ -16,7 +16,7 @@ public class CreateJobEndpoint(IJobCommandService service) :  Endpoint<CreateJob
     public override async Task HandleAsync(CreateJobRequest request, CancellationToken ct)
     {
         var response = await service.CreateJobAsync(request, User, ct);
-        await SendAsync(response, cancellation:ct);
+        await Send.OkAsync(response, cancellation:ct);
     }
 }
 

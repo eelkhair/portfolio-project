@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Security.Claims;
+using Elkhair.Common.Observability;
 using Elkhair.Dev.Common.Application;
 using Elkhair.Dev.Common.Dapr;
 using FastEndpoints;
@@ -21,8 +22,9 @@ using UserApi.Infrastructure.Auth0;
 using UserApi.Infrastructure.Auth0.Interfaces;
 
 
-var builder = WebApplication.CreateBuilder(args).AddDaprServices();
+var builder = WebApplication.CreateBuilder(args).AddDaprServices().ConfigureLogging("user-api");
 
+builder.Services.AddOpenTelemetryServices(builder.Configuration, "user-api");
 var cfg = builder.Configuration;
 // Register FastEndpoints + Swagger
 builder.Services.AddFastEndpoints()
@@ -121,7 +123,6 @@ builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.User ?? new ClaimsPrincipal());
 builder.Services.AddDaprClient();
-builder.ConfigureLoggingAndTracing("user-api");
 var app = builder.Build();
 app.UseCors(CorsPolicy);
 

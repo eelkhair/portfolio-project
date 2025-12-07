@@ -50,6 +50,6 @@ public class CompanyActivatedSubscriber(
             log.LogError(ex, "Failed to push CompanyActivated to user {UserId} for {CompanyUId}", e.UserId, e.Data.CompanyUId);
         }
 
-        await SendOkAsync(ct);
+        await Send.OkAsync(ct);
     }
 }

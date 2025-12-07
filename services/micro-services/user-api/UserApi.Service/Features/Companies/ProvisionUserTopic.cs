@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using AH.Metadata.Domain.Constants;
-using Auth0.ManagementApi.Models;
 using Dapr.Client;
 using Elkhair.Dev.Common.Application;
 using Elkhair.Dev.Common.Dapr;
@@ -12,86 +11,157 @@ using UserAPI.Contracts.Models.Requests;
 
 namespace UserApi.Features.Companies;
 
-public class ProvisionUserTopic(ActivitySource activitySource, DaprClient client, IAuth0CommandService aut0Service, IMessageSender sender, ICompanyCommandService commandService) : Endpoint<EventDto<ProvisionUserEvent>>
+public class ProvisionUserTopic(
+    ActivitySource activitySource,
+    DaprClient client,
+    IAuth0CommandService aut0Service,
+    IMessageSender sender,
+    ICompanyCommandService commandService,
+    ILogger<ProvisionUserTopic> logger)
+    : Endpoint<EventDto<ProvisionUserEvent>>
 {
     public override void Configure()
     {
         Post("events/company/create");
         AllowAnonymous();
-         Options(c => 
-             c.WithTopic(PubSubNames.RabbitMq, "company.created"));
+        Options(o => o.WithTopic(PubSubNames.RabbitMq, "company.created"));
     }
 
     public override async Task HandleAsync(EventDto<ProvisionUserEvent> request, CancellationToken ct)
     {
-        using var activity = activitySource.StartActivity("Checking Idempotency.");
-        var existing = await client.GetStateAsync<string>(StateStores.Redis,$"Processed:{request.IdempotencyKey}", cancellationToken:ct);
-        if (existing is not null) { await SendOkAsync(ct); return; }
-        await client.SaveStateAsync(StateStores.Redis, $"Processed:{request.IdempotencyKey}", "Processing",
-            metadata: new Dictionary<string, string> { ["ttlInSeconds"] = "120" },
+        using var scope = logger.BeginScope(new
+        {
+            request.IdempotencyKey,
+            request.UserId,
+            request.Data.Email,
+            request.Data.CompanyUId,
+            request.Data.CompanyName
+        });
+
+        logger.LogInformation("Starting user provisioning workflow for {Email}", request.Data.Email);
+        
+        using var spanIdempotency =
+            activitySource.StartActivity("provision.user.idempotency");
+
+        var stateKey = $"{IdempotencyOptions.Prefix}{request.IdempotencyKey}";
+        var existing = await client.GetStateAsync<string>(StateStores.Redis, stateKey, cancellationToken: ct);
+
+        if (existing is not null)
+        {
+            logger.LogInformation("Skipping provisioning. Idempotency key already processed");
+            await Send.OkAsync(request, ct);
+            return;
+        }
+
+        await client.SaveStateAsync(
+            StateStores.Redis,
+            stateKey,
+            "processing",
+            metadata: new Dictionary<string, string> { ["ttlInSeconds"] = IdempotencyOptions.PendingTTLSeconds.ToString() },
             cancellationToken: ct);
-        activity?.SetTag("user.email", request.Data.Email);
-        activity?.SetTag("company.uid", request.Data.CompanyUId);
-        activity?.SetTag("user.first-name", request.Data.FirstName);
-        
-        
+
+
         try
         {
-            using var activity2 = activitySource.StartActivity("Provisioning User.");
-            var (auth0User, auth0Company)= await aut0Service.ProvisionUserAsync(request.Data, ct);
-        
-            if (auth0User is not null &&  auth0Company is not null)
+            using var spanAuth0 =
+                activitySource.StartActivity("provision.user.auth0", ActivityKind.Client);
+
+            logger.LogInformation("Provisioning user in Auth0…");
+
+            var (auth0User, auth0Company) = await aut0Service.ProvisionUserAsync(request.Data, ct);
+
+            if (auth0User is null || auth0Company is null)
             {
-                using var activity4 = activitySource.StartActivity("Saving to database.");
-                var principal = DaprExtensions.CreateUser(request.UserId);
-                var userId = await commandService.CreateUser(new CreateUserRequest
-                {
-                    Auth0Id = auth0User.UserId,
-                    FirstName = auth0User.FirstName,
-                    LastName = auth0User.LastName,
-                    Email = auth0User.Email
-                }, principal, ct);
-                var companyId = await commandService.CreateCompany(new CreateCompanyRequest()
-                {
-                    Auth0OrganizationId = auth0Company.Id,
-                    Name = auth0Company.DisplayName,
-                    UId = request.Data.CompanyUId,
-                }, principal, ct);
-                await commandService.AddUserToCompany(userId, companyId, principal, ct);
-                
-                activity4?.SetTag("user.id", userId);
-                activity4?.SetTag("company.id", companyId);
-                activity4?.SetTag("auth0.user.id", auth0User.UserId);
-                activity4?.SetTag("auth0.company.id", auth0Company.Id);
-                activity2?.SetTag("user.email", request.Data.Email);
-                activity2?.SetTag("company.uid", request.Data.CompanyUId);
-                await sender.SendEventAsync(PubSubNames.RabbitMq, "provision.user.success", request.UserId, request.Data, ct);
-
+                throw new InvalidOperationException("Auth0 provisioning returned null values.");
             }
+
+            spanAuth0?.SetTag("auth0.user.id", auth0User.UserId);
+            spanAuth0?.SetTag("auth0.company.id", auth0Company.Id);
+
+        
+            using var spanDb =
+                activitySource.StartActivity("provision.user.persistence");
+
+            logger.LogInformation("Persisting new user and company records…");
+
+            var principal = DaprExtensions.CreateUser(request.UserId);
+
+            var userId = await commandService.CreateUser(new CreateUserRequest
+            {
+                Auth0Id = auth0User.UserId,
+                FirstName = auth0User.FirstName,
+                LastName = auth0User.LastName,
+                Email = auth0User.Email
+            }, principal, ct);
+
+            var companyId = await commandService.CreateCompany(new CreateCompanyRequest
+            {
+                Auth0OrganizationId = auth0Company.Id,
+                Name = auth0Company.DisplayName,
+                UId = request.Data.CompanyUId,
+            }, principal, ct);
+
+            await commandService.AddUserToCompany(userId, companyId, principal, ct);
+
+            spanDb?.SetTag("db.user.id", userId);
+            spanDb?.SetTag("db.company.id", companyId);
+
+
+            logger.LogInformation("Emitting success event for user provisioning");
+            await sender.SendEventAsync(
+                PubSubNames.RabbitMq,
+                "provision.user.success",
+                request.UserId,
+                request.Data,
+                ct);
         }
-        catch (ArgumentException e)
+        catch (Exception ex)
         {
-            activity?.SetTag("error", e.Message);
-            activity?.SetTag("user.email", request.Data.Email);
-            activity?.SetTag("company.uid", request.Data.CompanyUId);
-            await sender.SendEventAsync(PubSubNames.RabbitMq, "provision.user.error", request.UserId, e.Message, ct);
+            using var spanError =
+                activitySource.StartActivity("provision.user.error");
+
+            spanError?.SetTag("exception", true);
+            spanError?.SetTag("exception.message", ex.Message);
+
+            logger.LogError(ex, "Unhandled error while provisioning user");
+
+            await sender.SendEventAsync(
+                PubSubNames.RabbitMq,
+                "provision.user.error",
+                request.UserId,
+                ex.Message,
+                ct);
+
+            throw; // Let upper layers or OTel handle this
         }
-       
-        using var activity3 = activitySource.StartActivity("Marking as Processed.");
-        await client.SaveStateAsync(
-            storeName: StateStores.Redis,
-            key: $"Processed:{request.IdempotencyKey}",
-            value: "done",
-            metadata: new Dictionary<string, string> { ["ttlInSeconds"] = (7*24*3600).ToString() },
-            cancellationToken: ct);
 
-        activity3?.SetTag("user.email", request.Data.Email);
-        activity3?.SetTag("company.uid", request.Data.CompanyUId);
+        // -----------------------
+        // 5️⃣ Mark Idempotency Complete
+        // -----------------------
+        using (activitySource.StartActivity("provision.user.finalize"))
+        {
+            logger.LogInformation("Marking provisioning workflow as completed");
 
-       
-        
-        
-        
-        await SendOkAsync(ct);
+            await client.SaveStateAsync(
+                StateStores.Redis,
+                stateKey,
+                "done",
+                metadata: new Dictionary<string, string>
+                {
+                    ["ttlInSeconds"] = IdempotencyOptions.CompletedTTLSeconds.ToString()
+                },
+                cancellationToken: ct);
+        }
+
+        logger.LogInformation("User {Email} provisioned successfully", request.Data.Email);
+
+        await Send.OkAsync(request, ct);
     }
+}
+
+internal static class IdempotencyOptions
+{
+    public const string Prefix = "Provisioned:";
+    public const int PendingTTLSeconds = 120;
+    public const int CompletedTTLSeconds = 7 * 24 * 3600;
 }

@@ -24,6 +24,6 @@ public class RewriteEndpoint(IJobCommandService jobCommandService, ILogger<Rewri
     {
         logger.LogInformation("rewriting item {@Request}", req);
         var response = await jobCommandService.RewriteItem(req, ct);
-        await SendOkAsync(response, ct);
+        await Send.OkAsync(response, ct);
     }
 }

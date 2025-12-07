@@ -8,7 +8,7 @@ using UserAPI.Contracts.Models.Events;
 
 namespace JobApi.Features.Companies.Events;
 
-public class CreateCompanyTopic(ICompanyCommandService service):  Endpoint<EventDto<ProvisionUserEvent>>
+public class CreateCompanyTopic(ICompanyCommandService service, ILogger<CreateCompanyTopic> logger):  Endpoint<EventDto<ProvisionUserEvent>>
 {
     public override void Configure()
     {
@@ -20,6 +20,7 @@ public class CreateCompanyTopic(ICompanyCommandService service):  Endpoint<Event
     
     public override async  Task HandleAsync(EventDto<ProvisionUserEvent> request, CancellationToken ct)
     {
+        logger.LogInformation("Creating company - {CompanyName}", request.Data?.CompanyName);
         await service.CreateCompanyAsync(new CreateCompanyRequest
         {
             UId = request.Data?.CompanyUId ?? Guid.Empty,

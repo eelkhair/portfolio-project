@@ -24,6 +24,6 @@ public sealed class ListDraftEndpoint(IJobQueryService service) :
     {
         var companyId = Route<string>("companyId")!;
         var response = await service.ListDrafts(companyId, ct);
-        await SendOkAsync(response, ct);
+        await Send.OkAsync(response, ct);
     }
 }

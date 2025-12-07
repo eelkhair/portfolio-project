@@ -1,11 +1,8 @@
-﻿using Elkhair.Dev.Common.Application;
-using FastEndpoints;
+﻿using FastEndpoints;
 using JobApi.Application.Interfaces;
 using JobAPI.Contracts.Models.Jobs.Responses;
 
 namespace JobApi.Features.Jobs;
-
-
 
 public class ListJobsEndpoint(IJobQueryService service): Endpoint<ListJobsRequest,List<JobResponse>>
 {
@@ -19,7 +16,7 @@ public class ListJobsEndpoint(IJobQueryService service): Endpoint<ListJobsReques
     public override async Task HandleAsync(ListJobsRequest request, CancellationToken ct)
     {
         var jobs = await service.ListAsync(request.CompanyUId, ct);
-        await SendAsync( jobs , cancellation: ct);
+        await Send.OkAsync( jobs , cancellation: ct);
     }
 }
 

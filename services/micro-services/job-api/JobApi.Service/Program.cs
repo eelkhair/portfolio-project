@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Reflection;
 using System.Security.Claims;
+using Elkhair.Common.Observability;
 using Elkhair.Dev.Common.Application;
 using FastEndpoints;
 using FastEndpoints.Swagger;
@@ -22,8 +23,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.IdentityModel.Tokens;
 using NSwag;
 
-var builder = WebApplication.CreateBuilder(args).AddDaprServices();
-
+var builder = WebApplication.CreateBuilder(args).AddDaprServices().ConfigureLogging("job-api");
+builder.Services.AddOpenTelemetryServices(builder.Configuration, "job-api");
 var cfg = builder.Configuration;
 // Register FastEndpoints + Swagger
 var mapsterConfig = TypeAdapterConfig.GlobalSettings;
@@ -96,7 +97,6 @@ builder.Services.AddScoped<IJobDbContext, JobDbContext>();
 builder.Services.AddScoped<ICompanyCommandService, CompanyCommandService>();
 builder.Services.AddScoped<IJobQueryService, JobQueryService>();
 builder.Services.AddScoped<IJobCommandService, JobCommandService>();
-builder.ConfigureLoggingAndTracing("job-api");
 
 builder.Services.AddAuthentication(options =>
     {

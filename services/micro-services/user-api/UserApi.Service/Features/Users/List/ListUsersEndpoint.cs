@@ -17,6 +17,6 @@ public class ListUsersEndpoint(IUserDbContext dbContext) : EndpointWithoutReques
     public override async Task HandleAsync(CancellationToken ct)
     {
         var companies = await dbContext.Users.AsNoTracking().ToListAsync(cancellationToken: ct);
-        await SendAsync(  companies.Select(Map.FromEntity).ToList(), cancellation: ct);
+        await Send.OkAsync(  companies.Select(Map.FromEntity).ToList(), cancellation: ct);
     }
 }
