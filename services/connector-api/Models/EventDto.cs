@@ -1,4 +1,4 @@
-﻿namespace ConnectorAPI.Helpers;
+﻿namespace ConnectorAPI.Models;
 
 public class EventDto<T>(string userId, string idempotencyKey, T data)
  {

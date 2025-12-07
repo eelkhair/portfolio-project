@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using ConnectorAPI.Endpoints;
+using ConnectorAPI.Endpoints.Company;
 using ConnectorAPI.Infrastructure;
 
 #if DEBUG
@@ -13,11 +14,11 @@ builder
     .AddCustomHealthChecks()
     .Services
     .AddOpenTelemetryServices(builder.Configuration, "connector-api")
-    .AddApplicationServices(CorsPolicy);
+    .AddApplicationServices();
 
 var app = builder.Build();
     app.UseCors(CorsPolicy);
-    app.SetupCompanyEndpoints()
+    app.MapCompanyCreatedEndpoint()
         .MapSubscribeHandler();
 
     app.MapServices().Run();

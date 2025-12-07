@@ -43,8 +43,4 @@
       <ProjectReference Include="..\..\Infrastructure\JobBoard.Infrastructure.Smtp\JobBoard.Infrastructure.Smtp.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Dapr\Components\Timers\" />
-    </ItemGroup>
-
 </Project>

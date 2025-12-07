@@ -1,5 +1,7 @@
 using System.Reflection;
+using System.Text.Json;
 using ConnectorAPI.Infrastructure.Observability;
+using ConnectorAPI.Services;
 using Dapr.Client;
 using Dapr.Extensions.Configuration;
 using HealthChecks.UI.Client;
@@ -74,6 +76,15 @@ public static class DependencyInjection
                 Description = "Standard RESTful endpoints."
             });
         });
+        
+        services.ConfigureHttpJsonOptions(options =>
+        {
+            options.SerializerOptions.PropertyNameCaseInsensitive = true;
+            options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        });
+        
+        services.AddScoped<IMonolithClient, MonolithOClient>();
+        services.AddScoped<IAdminApiClient, AdminApiClient>();
         return services;
     }
     // ------------------------------------------------------------

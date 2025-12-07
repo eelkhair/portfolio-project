@@ -11,7 +11,7 @@ internal static class HealthCheckExtensions
 {
     public static WebApplicationBuilder AddCustomHealthChecks(this WebApplicationBuilder builder)
     {
-        var stateStore = new StateStoreOptions()
+        var stateStore = new StateStoreOptions
         {
             StoreName = StateStores.Redis
         };

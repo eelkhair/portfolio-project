@@ -21,20 +21,20 @@ public class CompaniesController : BaseODataController
     /// <param name="uId">The unique identifier of the company to retrieve.</param>
     /// <returns>A filtered <see cref="SingleResult"/> containing the company matching the specified UId.</returns>
     [EnableQuery]
-    [HttpGet]
+    [HttpGet("")]
     public IActionResult Get()
     {
         var companies = ExecuteODataQueryAsync(new GetCompaniesQuery()).Result;
        
         return Ok(companies);
     }
-    // [EnableQuery]
-    // [HttpGet("odata/Companies({uId})")]
-    // public ActionResult Get(Guid uId)
-    // {
-    //    var companies = ExecuteODataQueryAsync(new GetCompaniesQuery()).Result;
-    //    var company = companies.FirstOrDefault(c => c.UId == uId);
-    //    return Ok(company);
-    // }
+    [EnableQuery]
+    [HttpGet("odata/companies({id})")]
+    public ActionResult GetById(Guid id)
+    {
+       var companies = ExecuteODataQueryAsync(new GetCompaniesQuery()).Result;
+       var company = companies.FirstOrDefault(c => c.Id == id);
+       return Ok(company);
+    }
         
   }
