@@ -49,10 +49,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Infrastructure\Data\Migrations\" />
-    </ItemGroup>
-
-    <ItemGroup>
         <None Remove="..\.dockerignore" />
     </ItemGroup>
 

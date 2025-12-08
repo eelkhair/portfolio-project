@@ -7,9 +7,17 @@
         <RootNamespace>UserAPI.Contracts</RootNamespace>
         <PackageId>JobBoard.UserAPI.Contracts</PackageId>
         <Authors>Elkhair Elkhair</Authors>
-        <Version>1.0.2</Version>
+        <Version>1.0.3</Version>
         <Description>Shared components for User Api</Description>
         <IsPackable>true</IsPackable>
     </PropertyGroup>
+
+    <ItemGroup>
+      <Content Update="global.json">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+    </ItemGroup>
 
 </Project>

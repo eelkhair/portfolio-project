@@ -8,7 +8,7 @@ using UserApi.Infrastructure.Data;
 
 #nullable disable
 
-namespace UserApi.infrastructure.Data.Migrations
+namespace UserApi.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(UserDbContext))]
     partial class UserDbContextModelSnapshot : ModelSnapshot
@@ -18,7 +18,7 @@ namespace UserApi.infrastructure.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("Users")
-                .HasAnnotation("ProductVersion", "9.0.7")
+                .HasAnnotation("ProductVersion", "9.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);

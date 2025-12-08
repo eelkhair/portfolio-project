@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 // ReSharper disable UnusedType.Global
 namespace JobBoard.Infrastructure.Persistence.Context;
 
-public class AlleleRepositoryDbContextFactory : IDesignTimeDbContextFactory<JobBoardDbContext>
+public class JobBoardDbContextFactory : IDesignTimeDbContextFactory<JobBoardDbContext>
 {
     public JobBoardDbContext CreateDbContext(string[] args)
     {

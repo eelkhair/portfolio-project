@@ -13,4 +13,5 @@ public class CompanyCreatedPayload
     public string AdminLastName { get; init; } = string.Empty;
     public string AdminEmail { get; init; } = string.Empty;
     public Guid UserCompanyId { get; set; }
+    public string? UserId { get; set; }
 }

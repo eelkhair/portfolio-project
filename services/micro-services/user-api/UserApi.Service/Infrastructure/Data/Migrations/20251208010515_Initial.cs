@@ -3,47 +3,16 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace UserApi.infrastructure.Data.Migrations
+namespace UserApi.Infrastructure.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class AddUserTables : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<string>(
-                name: "Email",
-                schema: "Users",
-                table: "Users",
-                type: "nvarchar(100)",
-                maxLength: 100,
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(max)");
-
-            migrationBuilder.AddColumn<string>(
-                name: "Auth0UserId",
-                schema: "Users",
-                table: "Users",
-                type: "nvarchar(50)",
-                maxLength: 50,
-                nullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "FirstName",
-                schema: "Users",
-                table: "Users",
-                type: "nvarchar(50)",
-                maxLength: 50,
-                nullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "LastName",
-                schema: "Users",
-                table: "Users",
-                type: "nvarchar(50)",
-                maxLength: 50,
-                nullable: true);
+            migrationBuilder.EnsureSchema(
+                name: "Users");
 
             migrationBuilder.CreateTable(
                 name: "Companies",
@@ -71,6 +40,38 @@ namespace UserApi.infrastructure.Data.Migrations
                 })
                 .Annotation("SqlServer:IsTemporal", true)
                 .Annotation("SqlServer:TemporalHistoryTableName", "CompaniesHistory")
+                .Annotation("SqlServer:TemporalHistoryTableSchema", "Users")
+                .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
+                .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart");
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                schema: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FirstName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Auth0UserId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    PeriodEnd = table.Column<DateTime>(type: "datetime2", nullable: false)
+                        .Annotation("SqlServer:TemporalIsPeriodEndColumn", true),
+                    PeriodStart = table.Column<DateTime>(type: "datetime2", nullable: false)
+                        .Annotation("SqlServer:TemporalIsPeriodStartColumn", true),
+                    UId = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "newsequentialid()"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    RecordStatus = table.Column<string>(type: "nvarchar(25)", maxLength: 25, nullable: false, defaultValue: "Active")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                })
+                .Annotation("SqlServer:IsTemporal", true)
+                .Annotation("SqlServer:TemporalHistoryTableName", "UsersHistory")
                 .Annotation("SqlServer:TemporalHistoryTableSchema", "Users")
                 .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
                 .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart");
@@ -161,30 +162,14 @@ namespace UserApi.infrastructure.Data.Migrations
                 .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
                 .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart");
 
-            migrationBuilder.DropColumn(
-                name: "Auth0UserId",
-                schema: "Users",
-                table: "Users");
-
-            migrationBuilder.DropColumn(
-                name: "FirstName",
-                schema: "Users",
-                table: "Users");
-
-            migrationBuilder.DropColumn(
-                name: "LastName",
-                schema: "Users",
-                table: "Users");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "Email",
-                schema: "Users",
-                table: "Users",
-                type: "nvarchar(max)",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(100)",
-                oldMaxLength: 100);
+            migrationBuilder.DropTable(
+                name: "Users",
+                schema: "Users")
+                .Annotation("SqlServer:IsTemporal", true)
+                .Annotation("SqlServer:TemporalHistoryTableName", "UsersHistory")
+                .Annotation("SqlServer:TemporalHistoryTableSchema", "Users")
+                .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
+                .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart");
         }
     }
 }

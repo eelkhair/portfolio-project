@@ -17,6 +17,11 @@ public class CompanyCommandService(ICompanyDbContext context): ICompanyCommandSe
         company.Status = "Provisioning";
         company.IndustryId = await context.Industries.Where(c => c.UId == request.IndustryUId).Select(c => c.Id)
             .FirstAsync(ct);
+        if (request.CompanyId.HasValue)
+        {
+            company.UId = request.CompanyId.Value;
+        }
+        
         context.Companies.Add(company);
 
         await context.SaveChangesAsync(user, ct);

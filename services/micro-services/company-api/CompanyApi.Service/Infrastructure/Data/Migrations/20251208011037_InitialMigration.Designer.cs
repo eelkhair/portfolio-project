@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CompanyApi.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(CompanyDbContext))]
-    [Migration("20250908145100_SeedIndustries")]
-    partial class SeedIndustries
+    [Migration("20251208011037_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,7 +21,7 @@ namespace CompanyApi.Infrastructure.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("Company")
-                .HasAnnotation("ProductVersion", "9.0.7")
+                .HasAnnotation("ProductVersion", "9.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -65,9 +65,6 @@ namespace CompanyApi.Infrastructure.Data.Migrations
                     b.Property<int>("IndustryId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Logo")
                         .HasMaxLength(400)
                         .HasColumnType("nvarchar(400)");
@@ -88,7 +85,6 @@ namespace CompanyApi.Infrastructure.Data.Migrations
                         .HasColumnName("PeriodStart");
 
                     b.Property<string>("Phone")
-                        .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
@@ -100,6 +96,11 @@ namespace CompanyApi.Infrastructure.Data.Migrations
                         .HasDefaultValue("Active");
 
                     b.Property<string>("Size")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 

@@ -21,7 +21,7 @@ public class CompaniesController : BaseODataController
     /// <param name="uId">The unique identifier of the company to retrieve.</param>
     /// <returns>A filtered <see cref="SingleResult"/> containing the company matching the specified UId.</returns>
     [EnableQuery]
-    [HttpGet("/data/companies")]
+    [HttpGet("/api/companies")]
     public IActionResult Get()
     {
         var companies = ExecuteODataQueryAsync(new GetCompaniesQuery()).Result;

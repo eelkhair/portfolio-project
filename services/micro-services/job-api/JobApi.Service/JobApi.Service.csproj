@@ -40,7 +40,6 @@
 
     <ItemGroup>
         <Folder Include="Dapr\Components\Timers\" />
-        <Folder Include="Infrastructure\Data\Migrations\" />
     </ItemGroup>
 
     <ItemGroup>
