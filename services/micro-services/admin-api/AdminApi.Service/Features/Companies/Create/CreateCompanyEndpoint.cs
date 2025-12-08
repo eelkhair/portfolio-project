@@ -32,7 +32,8 @@ public class CreateCompanyEndpoint(ICompanyCommandService service,
 
         if (company.Success)
         {
-            await sender.SendEventAsync(PubSubNames.RabbitMq, "company.created", User.GetUserId(), new
+            await sender.SendEventAsync(PubSubNames.RabbitMq, "company.created", request.UserId ??
+            User.GetUserId(), new
                 ProvisionUserEvent
             {
                 CompanyName = company.Data?.Name!,
@@ -41,7 +42,9 @@ public class CreateCompanyEndpoint(ICompanyCommandService service,
                 Email= request.AdminEmail,
                 WebSite = request.CompanyWebsite,
                 CompanyUId = company.Data?.UId ?? Guid.Empty,
-                CompanyEmail = request.CompanyEmail
+                CompanyEmail = request.CompanyEmail, 
+                UId = request.AdminUserId,
+                UserCompanyUId = request.UserCompanyId
                 
             }, ct);
         }

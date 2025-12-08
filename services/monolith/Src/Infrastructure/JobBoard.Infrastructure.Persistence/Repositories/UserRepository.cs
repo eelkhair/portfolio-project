@@ -14,6 +14,11 @@ public class UserRepository(IJobBoardQueryDbContext context): IUserRepository
         return await context.Users.FirstOrDefaultAsync(u => u.InternalId.ToString() == userId, cancellationToken);
     }
 
+    public async Task<User> FindUserByUIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await context.Users.FirstAsync(u => u.Id == id, cancellationToken);
+    }
+
     public async Task<User?> FindUserByExternalIdOrIdAsync(string externalId, CancellationToken cancellationToken)
     {
         return await context.Users.FirstOrDefaultAsync(u => u.ExternalId == externalId

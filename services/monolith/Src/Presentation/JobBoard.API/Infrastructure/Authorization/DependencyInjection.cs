@@ -129,7 +129,8 @@ public static class DependencyInjection
         {
             app.MapCustomHealthChecks("/healthzEndpoint", "/liveness", UIResponseWriter.WriteHealthCheckUIResponse);
             app.MapGet("/", (HttpContext ctx) => ctx.Response.Redirect("/swagger")).ExcludeFromDescription();
-
+            app.UseCloudEvents();
+            app.MapSubscribeHandler();
             app.Run();
         }
         finally

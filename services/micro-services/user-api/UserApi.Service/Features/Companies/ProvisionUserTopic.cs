@@ -83,29 +83,33 @@ public class ProvisionUserTopic(
                 activitySource.StartActivity("provision.user.persistence");
 
             logger.LogInformation("Persisting new user and company records…");
-
-            var principal = DaprExtensions.CreateUser(request.UserId);
+            
 
             var userId = await commandService.CreateUser(new CreateUserRequest
             {
                 Auth0Id = auth0User.UserId,
                 FirstName = auth0User.FirstName,
                 LastName = auth0User.LastName,
-                Email = auth0User.Email
-            }, principal, ct);
+                Email = auth0User.Email,
+                UId = request.Data.UId
+                
+            }, request.UserId, ct);
 
             var companyId = await commandService.CreateCompany(new CreateCompanyRequest
             {
                 Auth0OrganizationId = auth0Company.Id,
                 Name = auth0Company.DisplayName,
                 UId = request.Data.CompanyUId,
-            }, principal, ct);
+            }, request.UserId, ct);
 
-            await commandService.AddUserToCompany(userId, companyId, principal, ct);
+            await commandService.AddUserToCompany(userId, companyId, request.UserId, request.Data.UserCompanyUId, ct);
 
             spanDb?.SetTag("db.user.id", userId);
             spanDb?.SetTag("db.company.id", companyId);
 
+            
+            request.Data.Auth0OrganizationId = auth0Company.Id;
+            request.Data.Auth0UserId = auth0User.UserId;
 
             logger.LogInformation("Emitting success event for user provisioning");
             await sender.SendEventAsync(

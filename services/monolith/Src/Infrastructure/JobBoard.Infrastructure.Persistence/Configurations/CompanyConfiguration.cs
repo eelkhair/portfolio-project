@@ -22,7 +22,8 @@ public class CompanyConfiguration : IEntityTypeConfiguration<Company>
         builder.Property(e => e.Founded).HasColumnType("datetime2");
         builder.Property(j => j.About)
             .HasMaxLength(2000);
-
+        builder.Property(j => j.ExternalId)
+            .HasMaxLength(50);
         builder.Property(j => j.EEO)
             .HasMaxLength(500);
         

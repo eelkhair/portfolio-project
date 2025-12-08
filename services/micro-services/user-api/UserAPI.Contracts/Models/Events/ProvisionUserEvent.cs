@@ -9,4 +9,8 @@ public class ProvisionUserEvent
     public string WebSite { get; set; } = string.Empty;
     public Guid CompanyUId { get; set; }
     public string CompanyEmail { get; set; } = string.Empty;
+    public Guid? UserCompanyUId { get; set; }
+    public Guid? UId { get; set; }
+    public string Auth0UserId { get; set; } = string.Empty;
+    public string Auth0OrganizationId { get; set; } = string.Empty;
 }

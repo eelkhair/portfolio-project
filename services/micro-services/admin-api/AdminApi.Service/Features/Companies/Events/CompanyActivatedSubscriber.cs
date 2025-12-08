@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using AdminApi.Infrastructure;
+using CompanyAPI.Contracts.Models.Companies;
 using Elkhair.Dev.Common.Dapr;
 using Elkhair.Dev.Common.Domain.Constants;
 using FastEndpoints;
@@ -12,7 +13,7 @@ namespace AdminApi.Features.Companies.Events;
 public class CompanyActivatedSubscriber(
     ILogger<CompanyActivatedSubscriber> log,
     IHubContext<NotificationsHub> hub, ActivitySource activitySource) 
-    : Endpoint<EventDto<ProvisionUserEvent>, OkObjectResult>
+    : Endpoint<EventDto<CompanyCreatedSuccess>, OkObjectResult>
 {
     public override void Configure()
     {
@@ -21,7 +22,7 @@ public class CompanyActivatedSubscriber(
         Options(o => o.WithTopic(PubSubNames.RabbitMq, "company.create.success"));
     }
 
-    public override async Task HandleAsync(EventDto<ProvisionUserEvent> e, CancellationToken ct)
+    public override async Task HandleAsync(EventDto<CompanyCreatedSuccess> e, CancellationToken ct)
     {
         try
         {

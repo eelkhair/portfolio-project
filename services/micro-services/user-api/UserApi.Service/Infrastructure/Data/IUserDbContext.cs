@@ -9,5 +9,5 @@ public interface IUserDbContext
     DbSet<User> Users { get; set; }
     DbSet<Company> Companies { get; set; }
     DbSet<UserCompany> UserCompanies { get; set; }
-    Task<int> SaveChangesAsync(ClaimsPrincipal user, CancellationToken cancellationToken);
+    Task<int> SaveChangesAsync(string userId, CancellationToken cancellationToken);
 }

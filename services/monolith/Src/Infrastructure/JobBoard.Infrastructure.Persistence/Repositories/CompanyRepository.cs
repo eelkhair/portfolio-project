@@ -38,4 +38,9 @@ public class CompanyRepository(IJobBoardQueryDbContext context): ICompanyReposit
             .Where(x => EF.Property<DateTime>(x, "PeriodEnd") == DateTime.MaxValue)
             .AnyAsync(x => x.Id == uid, ct);
     }
+
+    public async Task<Company> GetCompanyById(Guid companyUId, CancellationToken cancellationToken)
+    {
+        return await context.Companies.FirstAsync(c => c.Id == companyUId, cancellationToken);
+    }
 }

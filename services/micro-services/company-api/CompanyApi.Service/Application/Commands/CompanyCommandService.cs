@@ -22,6 +22,11 @@ public class CompanyCommandService(ICompanyDbContext context): ICompanyCommandSe
             company.UId = request.CompanyId.Value;
         }
         
+        if (!string.IsNullOrWhiteSpace(request.UserId))
+        {
+            company.CreatedBy = request.UserId;
+            company.UpdatedBy = request.UserId;
+        }
         context.Companies.Add(company);
 
         await context.SaveChangesAsync(user, ct);

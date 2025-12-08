@@ -7,7 +7,7 @@ namespace UserApi.Application.Commands.Interfaces;
 
 public interface ICompanyCommandService
 {
-    Task<int> CreateUser(CreateUserRequest request, ClaimsPrincipal principal, CancellationToken ct);
-    Task<int> CreateCompany(CreateCompanyRequest request, ClaimsPrincipal principal, CancellationToken ct);
-    Task AddUserToCompany(int userId, int companyId, ClaimsPrincipal principal, CancellationToken ct);
+    Task<int> CreateUser(CreateUserRequest request, string userId, CancellationToken ct);
+    Task<int> CreateCompany(CreateCompanyRequest request, string userId, CancellationToken ct);
+    Task AddUserToCompany(int userId, int companyId, string createdBy, Guid? userCompanyUId, CancellationToken ct);
 }

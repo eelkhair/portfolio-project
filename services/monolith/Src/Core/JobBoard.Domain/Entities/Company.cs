@@ -33,6 +33,7 @@ public class Company : BaseAuditableEntity
     public string? Logo { get; private set; }
     public string Status { get; private set; }
 
+    public string? ExternalId { get; private set; } = string.Empty;
     public int IndustryId { get; private set; }
     public Industry Industry { get; private set; } = null!;
     
@@ -63,6 +64,8 @@ public class Company : BaseAuditableEntity
     public void SetStatus(string status) =>
         Status = CompanyStatus.Create(status).Ensure<CompanyStatus, string>("Company.InvalidStatus")!;
 
+    public void SetExternalId(string externalId) =>
+        ExternalId = CompanyExternalId.Create(externalId).Ensure<CompanyExternalId, string?>("Company.InvalidExternalId")!;
     public void SetDescription(string? description) =>
         Description = CompanyDescription.Create(description)
             .Ensure<CompanyDescription, string?>("Company.InvalidDescription");
@@ -128,7 +131,9 @@ public class Company : BaseAuditableEntity
         var phone = CompanyPhone.Create(input.Phone)
             .Collect<CompanyPhone, string?>(errors);
         var about = CompanyAbout.Create(input.About)
-            .Collect<CompanyAbout, string?>(errors);
+            .Collect<CompanyAbout, string?>(errors); 
+        var externalId = CompanyExternalId.Create(input.ExternalId)
+            .Collect<CompanyExternalId, string?>(errors);
         var eeo = CompanyEEO.Create(input.EEO)
             .Collect<CompanyEEO, string?>(errors);
         var founded = CompanyFounded.Create(input.Founded)
@@ -150,7 +155,8 @@ public class Company : BaseAuditableEntity
             About = about,
             EEO = eeo,
             Founded = founded,
-            Size = size
+            Size = size,
+            ExternalId = externalId
         };
 
         return company;

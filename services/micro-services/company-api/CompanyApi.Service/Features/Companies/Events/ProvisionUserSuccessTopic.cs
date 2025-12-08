@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using CompanyApi.Application.Commands.Interfaces;
+using CompanyAPI.Contracts.Models.Companies;
 using Elkhair.Dev.Common.Application;
 using Elkhair.Dev.Common.Dapr;
 using Elkhair.Dev.Common.Domain.Constants;
@@ -27,7 +28,15 @@ public class ProvisionUserSuccessTopic(ICompanyCommandService service, IMessageS
         
         if (await service.ActivateAsync(request.Data?.CompanyUId ?? Guid.Empty, DaprExtensions.CreateUser(request.UserId), ct))
         {
-            await sender.SendEventAsync(PubSubNames.RabbitMq, "company.create.success", request.UserId, request.Data, ct);
+            await sender.SendEventAsync(PubSubNames.RabbitMq, "company.create.success", request.UserId, new CompanyCreatedSuccess
+            {
+                CompanyEmail = request.Data?.Email ?? string.Empty,
+                CompanyName = request.Data?.CompanyName ?? string.Empty,
+                CompanyUId = request.Data?.CompanyUId ?? Guid.Empty,
+                UserUId = request.Data?.UId?? Guid.Empty,
+                Auth0CompanyId = request.Data?.Auth0OrganizationId ?? string.Empty,
+                Auth0UserId = request.Data?.Auth0UserId ?? string.Empty
+            }, ct);
         }
         else
         {

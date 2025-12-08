@@ -51,17 +51,17 @@ public partial class CompanyDbContext : DbContext, ICompanyDbContext
             {
                 case EntityState.Added:
                     entry.Entity.CreatedAt = now;
-                    entry.Entity.CreatedBy = user.GetUserId();
+                    entry.Entity.CreatedBy ??= user.GetUserId();
                     entry.Entity.UpdatedAt = now;
-                    entry.Entity.UpdatedBy = user.GetUserId();
+                    entry.Entity.UpdatedBy ??= user.GetUserId();
                     break;
                 case EntityState.Modified:
                     entry.Entity.UpdatedAt = now;
-                    entry.Entity.UpdatedBy = user.GetUserId();
+                    entry.Entity.UpdatedBy ??= user.GetUserId();
                     break;
                 case EntityState.Deleted:
                     entry.Entity.UpdatedAt = now;
-                    entry.Entity.UpdatedBy = user.GetUserId();
+                    entry.Entity.UpdatedBy ??= user.GetUserId();
                     entry.Entity.RecordStatus = RecordStatuses.Deleted;
                     entry.State = EntityState.Modified;
                     break;

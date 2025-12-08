@@ -29,7 +29,7 @@ public partial class UserDbContext : DbContext, IUserDbContext
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(UserDbContext).Assembly);
     }
 
-    public Task<int> SaveChangesAsync(ClaimsPrincipal user, CancellationToken cancellationToken)
+    public Task<int> SaveChangesAsync(string userId, CancellationToken cancellationToken)
     {
         var now = DateTime.UtcNow;
 
@@ -39,17 +39,17 @@ public partial class UserDbContext : DbContext, IUserDbContext
             {
                 case EntityState.Added:
                     entry.Entity.CreatedAt = now;
-                    entry.Entity.CreatedBy = user.GetUserId();
+                    entry.Entity.CreatedBy = userId;
                     entry.Entity.UpdatedAt = now;
-                    entry.Entity.UpdatedBy = user.GetUserId();
+                    entry.Entity.UpdatedBy = userId;
                     break;
                 case EntityState.Modified:
                     entry.Entity.UpdatedAt = now;
-                    entry.Entity.UpdatedBy = user.GetUserId();
+                    entry.Entity.UpdatedBy = userId;
                     break;
                 case EntityState.Deleted:
                     entry.Entity.UpdatedAt = now;
-                    entry.Entity.UpdatedBy = user.GetUserId();
+                    entry.Entity.UpdatedBy = userId;
                     entry.Entity.RecordStatus = RecordStatuses.Deleted;
                     entry.State = EntityState.Modified; // soft delete
                     break;

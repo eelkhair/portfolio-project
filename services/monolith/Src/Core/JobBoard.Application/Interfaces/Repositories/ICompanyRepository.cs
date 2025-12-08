@@ -10,5 +10,6 @@ public interface ICompanyRepository : IRepository
     Task<bool> NameExistsAsync(string name, CancellationToken ct);
     Task<bool> EmailExistsAsync(string email, CancellationToken ct);
     Task<bool> IndustryExistsAsync(Guid uid, CancellationToken ct);
-    
+
+    Task<Company> GetCompanyById(Guid companyUId, CancellationToken cancellationToken);
 }

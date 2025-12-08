@@ -15,6 +15,6 @@ public sealed record CompanyInput(
     string? EEO = null,
     DateTime? Founded = null,
     string? Size = null,
-
+    string? ExternalId = null,
     DateTime? CreatedAt = null,
     string? CreatedBy = null);
