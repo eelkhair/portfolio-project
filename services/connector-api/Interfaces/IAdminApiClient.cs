@@ -1,6 +1,6 @@
 ﻿using ConnectorAPI.Models;
 
-namespace ConnectorAPI.Services;
+namespace ConnectorAPI.Interfaces;
 
 public interface IAdminApiClient
 {

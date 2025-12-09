@@ -1,7 +1,11 @@
 ﻿using JobBoard.API.Helpers;
 using JobBoard.API.Infrastructure.Authorization;
+using JobBoard.Application.Actions.Companies.Activate;
 using JobBoard.Application.Actions.Companies.Create;
 using JobBoard.Application.Actions.Companies.Models;
+using JobBoard.Application.Interfaces.Users;
+using JobBoard.infrastructure.Dapr;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoard.API.Controllers;
@@ -9,7 +13,7 @@ namespace JobBoard.API.Controllers;
 /// <summary>
 /// Company Controller 
 /// </summary>
-public class CompanyController : BaseApiController
+public class CompanyController(IUserAccessor accessor) : BaseApiController
 {
 
     /// <summary>
@@ -40,4 +44,21 @@ public class CompanyController : BaseApiController
                 new { uId = result.Data!.Id },
                 result
             ));
+
+    /// <summary>
+    /// Processes a request indicating that a company has been successfully created
+    /// and activates the company using the provided data.
+    /// </summary>
+    /// <param name="request">The model containing details about the created company.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>An IActionResult indicating the result of the activation operation.</returns>
+    [HttpPost("company-created-success")]
+    [Authorize(Policy = "DaprInternal")]
+    public async Task<IActionResult> CompanyCreatedSuccess(CompanyCreatedModel request, CancellationToken cancellationToken)
+    {
+        accessor.UserId = request.CreatedBy;
+
+        await ExecuteCommandAsync(new ActivateCompanyCommand(request), Ok);
+        return Ok();
+    }
 }

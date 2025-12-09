@@ -1,5 +1,5 @@
 using System.Text.Json;
-
+using ConnectorAPI.Interfaces;
 using ConnectorAPI.Services;
 using Dapr.Client;
 using Dapr.Extensions.Configuration;

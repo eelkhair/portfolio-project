@@ -1,4 +1,5 @@
-﻿using ConnectorAPI.Models;
+﻿using ConnectorAPI.Interfaces;
+using ConnectorAPI.Models;
 using Dapr.Client;
 
 namespace ConnectorAPI.Services;

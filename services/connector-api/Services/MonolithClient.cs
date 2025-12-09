@@ -1,4 +1,5 @@
 ﻿using ConnectorAPI.Helpers;
+using ConnectorAPI.Interfaces;
 using ConnectorAPI.Models;
 using Dapr.Client;
 

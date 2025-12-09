@@ -9,4 +9,5 @@ public class CompanyCreatedModel
     public string Auth0CompanyId { get; set; } = string.Empty;
     public string Auth0UserId { get; set; } = string.Empty;
     public Guid UserUId { get; set; }
+    public string CreatedBy { get; set; } = string.Empty;
 }
