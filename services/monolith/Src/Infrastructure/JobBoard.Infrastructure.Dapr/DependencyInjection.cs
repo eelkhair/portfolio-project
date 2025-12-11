@@ -4,6 +4,7 @@ using JobBoard.Application.Interfaces.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+// ReSharper disable FunctionNeverReturns
 
 namespace JobBoard.infrastructure.Dapr;
 
