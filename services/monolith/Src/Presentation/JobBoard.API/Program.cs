@@ -18,7 +18,6 @@ Debugger.Launch();
 (await builder.AddDaprServices("monolith-api")).ConfigureLogging("monolith-api").AddCustomHealthChecks().Services
     .AddApplicationServices()
     .AddPersistenceServices(builder.Configuration)
-    .AddKafkaServices(builder.Configuration)
     .AddHttpContextAccessor()
     .AddScoped<IUserAccessor, HttpUserAccessor>()
     .AddOutboxServices()

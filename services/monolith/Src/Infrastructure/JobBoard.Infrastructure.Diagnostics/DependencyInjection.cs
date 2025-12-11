@@ -1,14 +1,10 @@
 using System.Reflection;
-using HealthChecks.UI.Client;
 using JobBoard.Application.Interfaces.Observability;
-using JobBoard.Infrastructure.Diagnostics.HealthChechs;
 using JobBoard.Infrastructure.Diagnostics.Observability;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
