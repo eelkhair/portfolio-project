@@ -8,8 +8,7 @@ Debugger.Launch();
 #endif
 const string CorsPolicy = "AllowJobAdmin";
 var builder = WebApplication.CreateBuilder(args);
-builder
-    .AddDaprServices()
+(await builder.AddDaprServices("connector-api"))
     .ConfigureLogging("connector-api")
     .AddCustomHealthChecks()
     .Services

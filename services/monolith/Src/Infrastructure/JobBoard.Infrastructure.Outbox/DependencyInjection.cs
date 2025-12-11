@@ -9,7 +9,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddOutboxServices(this IServiceCollection services)
     {
-        services.AddScoped<IOutboxPublisher, OutboxPublisher>();
+        services.AddTransient<IOutboxPublisher, OutboxPublisher>();
             
             return services;
     }

@@ -2,19 +2,74 @@
 using Dapr.Extensions.Configuration;
 using JobBoard.Application.Interfaces.Infrastructure;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace JobBoard.infrastructure.Dapr;
 
 public static class DependencyInjection {
-    public static WebApplicationBuilder AddDaprServices(this WebApplicationBuilder builder)
+    public static async Task<WebApplicationBuilder> AddDaprServices(
+        this WebApplicationBuilder builder,
+        string serviceName)
     {
         builder.Services.AddDaprClient();
-        builder.Configuration.AddDaprSecretStore("vault", 
-            new DaprClientBuilder().Build(), 
-            new Dictionary<string, string>());
-       
+
+        builder.Configuration.AddDaprSecretStore(
+            "vault",
+            new DaprClientBuilder().Build(),
+            new Dictionary<string, string>()
+        );
+
+        // Load configuration from Dapr store
+        var daprClient = new DaprClientBuilder().Build();
+        var cfg = await daprClient.GetConfiguration("appconfig-" + serviceName, new List<string>());
+
+        // Apply config
+        ApplyScopedConfig(builder.Configuration, cfg, "jobboard:config:global:", serviceName);
+        ApplyScopedConfig(builder.Configuration, cfg, $"jobboard:config:{serviceName}:", serviceName);
+
+        // Subscribe for auto-refresh
+        var storeName = $"appconfig-{serviceName}";
+        await daprClient.SubscribeConfiguration(storeName, new List<string> { "*" });
+
+        _ = Task.Run(async () =>
+        {
+            while (true)
+            {
+                var config = await daprClient.GetConfiguration(storeName, new List<string>());
+
+                foreach (var kvp in config.Items)
+                {
+                    var cleanedKey = CleanKey(kvp.Key, serviceName);
+                    builder.Configuration[cleanedKey] = kvp.Value.Value;
+
+                    Console.WriteLine($"🔄 Updated {cleanedKey} = {kvp.Value.Value}");
+                }
+
+                await Task.Delay(TimeSpan.FromSeconds(3));
+            }
+        });
         builder.Services.AddTransient<IOutboxMessageProcessor, DaprOutboxMessageProcessor>();
         return builder;
+    }
+
+    private static void ApplyScopedConfig(
+        ConfigurationManager config,
+        GetConfigurationResponse cfg,
+        string prefix,
+        string serviceName)
+    {
+        foreach (var item in cfg.Items.Where(k => k.Key.StartsWith(prefix)))
+        {
+            var cleanKey = CleanKey(item.Key, serviceName);
+            config[cleanKey] = item.Value.Value;
+        }
+    }
+
+    private static string CleanKey(string key, string serviceName)
+    {
+        key = key.Replace($"jobboard:config:{serviceName}:", "");
+        key = key.Replace("jobboard:config:global:", "");
+        return key;
     }
 }

@@ -13,7 +13,7 @@ namespace JobBoard.API.Controllers;
 /// <summary>
 /// Company Controller 
 /// </summary>
-public class CompanyController(IUserAccessor accessor) : BaseApiController
+public class CompanyController(IUserAccessor accessor, IConfiguration config) : BaseApiController
 {
 
     /// <summary>
@@ -23,10 +23,12 @@ public class CompanyController(IUserAccessor accessor) : BaseApiController
     /// <returns></returns>
     [HttpGet("{uId:guid}")]
     [StandardApiResponses]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(CompanyDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> Get(Guid uId)
     {
-        return Ok();
+        
+        return Ok(config["AAAAAAAA"]);
     }
     
     /// <summary>

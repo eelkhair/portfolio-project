@@ -15,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 Debugger.Launch();
 #endif
 
-builder.AddDaprServices().ConfigureLogging("monolith-api").AddCustomHealthChecks().Services
+(await builder.AddDaprServices("monolith-api")).ConfigureLogging("monolith-api").AddCustomHealthChecks().Services
     .AddApplicationServices()
     .AddPersistenceServices(builder.Configuration)
     .AddKafkaServices(builder.Configuration)

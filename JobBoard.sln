@@ -94,6 +94,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Components", "Components", 
 		Components\jaeger.yaml = Components\jaeger.yaml
 		Components\rabbitmq.yaml = Components\rabbitmq.yaml
 		Components\statestore.yaml = Components\statestore.yaml
+		Components\config.redis.yaml = Components\config.redis.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{3CE6F25C-5B37-4BA7-AFF8-8952DBA0A575}"

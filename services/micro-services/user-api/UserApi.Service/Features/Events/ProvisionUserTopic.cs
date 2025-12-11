@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using AH.Metadata.Domain.Constants;
 using Dapr.Client;
-using Elkhair.Dev.Common.Application;
 using Elkhair.Dev.Common.Dapr;
 using Elkhair.Dev.Common.Domain.Constants;
 using FastEndpoints;
@@ -9,7 +8,7 @@ using UserApi.Application.Commands.Interfaces;
 using UserAPI.Contracts.Models.Events;
 using UserAPI.Contracts.Models.Requests;
 
-namespace UserApi.Features.Companies;
+namespace UserApi.Features.Events;
 
 public class ProvisionUserTopic(
     ActivitySource activitySource,
