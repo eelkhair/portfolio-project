@@ -94,7 +94,7 @@ public static class DependencyInjection
 
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(3));
+                await Task.Delay(TimeSpan.FromMinutes(1));
             }
         });
         return builder;
