@@ -9,7 +9,7 @@ spec:
     - name: redisHost
       value: 192.168.1.160:6379
     - name: redisDb
-    - value: "1"
+      value: "1"
 scopes:
   - admin-api
   - connector-api
