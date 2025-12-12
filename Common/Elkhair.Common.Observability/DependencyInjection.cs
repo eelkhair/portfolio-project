@@ -31,7 +31,10 @@ public static class DependencyInjection
 
         otel.WithTracing(t =>
         {
+            t.SetSampler(new DaprConfigSampler());
+
             t.AddSource(TracingFilters.Source.Name)
+                .AddProcessor(new DaprInternalSpanFilter())  
                 .AddAspNetCoreInstrumentation(o => o.AddFilters())
                 .AddEntityFrameworkCoreInstrumentation(o => o.AddFilters())
                 .AddHttpClientInstrumentation(o => o.AddFilters())
