@@ -23,7 +23,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.IdentityModel.Tokens;
 using NSwag;
 
-var builder = WebApplication.CreateBuilder(args).AddDaprServices().ConfigureLogging("job-api");
+var builder = WebApplication.CreateBuilder(args);
+    (await builder.AddDaprServices("job-api")).ConfigureLogging("job-api");
 builder.Services.AddOpenTelemetryServices(builder.Configuration, "job-api");
 var cfg = builder.Configuration;
 // Register FastEndpoints + Swagger

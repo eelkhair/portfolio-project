@@ -1,5 +1,6 @@
 ﻿using ConnectorAPI.Interfaces;
 using ConnectorAPI.Models;
+using ConnectorAPI.Models.CompanyCreated;
 using Dapr.Client;
 
 namespace ConnectorAPI.Services;
@@ -7,7 +8,7 @@ namespace ConnectorAPI.Services;
 public class AdminApiClient(ILogger<AdminApiClient> logger, DaprClient daprClient)
     : IAdminApiClient
 {
-    public async Task SendCompanyCreatedAsync(CompanyCreatedPayload payload, CancellationToken cancellationToken)
+    public async Task SendCompanyCreatedAsync(CompanyCreatedCompanyApiPayload payload, CancellationToken cancellationToken)
     {
         logger.LogInformation("Sending company created event to admin-api");
         var message = daprClient.CreateInvokeMethodRequest(HttpMethod.Post, "admin-api", "companies");

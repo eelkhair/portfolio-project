@@ -21,7 +21,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.IdentityModel.Tokens;
 using NSwag;
 
-var builder = WebApplication.CreateBuilder(args).AddDaprServices().ConfigureLogging("company-api");
+var builder = WebApplication.CreateBuilder(args);
+   ( await builder.AddDaprServices("company-api")).ConfigureLogging("company-api");
 
 var cfg = builder.Configuration;
 builder.Services.AddOpenTelemetryServices(builder.Configuration, "company-api");

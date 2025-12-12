@@ -16,7 +16,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using NSwag;
 
-var builder = WebApplication.CreateBuilder(args).AddDaprServices().ConfigureLogging("admin-api");
+var builder = WebApplication.CreateBuilder(args);
+    
+(await builder.AddDaprServices("admin-api")).ConfigureLogging("admin-api");
 builder.Services.AddOpenTelemetryServices(builder.Configuration, "admin-api");
 
 var cfg = builder.Configuration;

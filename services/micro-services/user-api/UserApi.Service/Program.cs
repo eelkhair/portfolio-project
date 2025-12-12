@@ -22,7 +22,8 @@ using UserApi.Infrastructure.Auth0;
 using UserApi.Infrastructure.Auth0.Interfaces;
 
 
-var builder = WebApplication.CreateBuilder(args).AddDaprServices().ConfigureLogging("user-api");
+var builder = WebApplication.CreateBuilder(args);
+   (await builder.AddDaprServices("user-api")).ConfigureLogging("user-api");
 
 builder.Services.AddOpenTelemetryServices(builder.Configuration, "user-api");
 var cfg = builder.Configuration;

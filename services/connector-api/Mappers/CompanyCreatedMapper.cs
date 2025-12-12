@@ -1,27 +1,22 @@
 ﻿using ConnectorAPI.Models;
+using ConnectorAPI.Models.CompanyCreated;
 using JobBoard.IntegrationEvents.Company;
 
 namespace ConnectorAPI.Mappers;
 
 public static class CompanyCreatedMapper
 {
-    public static CompanyCreatedPayload Map(
+    public static CompanyCreatedCompanyApiPayload Map(
         CompanyCreatedV1Event evt,
-        CompanyCreateCompanyResult company,
-        CompanyCreateUserResult admin)
+        CompanyCreateCompanyResult company)
     {
-        return new CompanyCreatedPayload
+        return new CompanyCreatedCompanyApiPayload
         {
             CompanyId = evt.CompanyUId,
             Name = company.Name,
             CompanyEmail = company.Email,
             CompanyWebsite = company.Website,
             IndustryUId = company.IndustryId,
-            AdminUserId = admin.Id,
-            AdminFirstName = admin.FirstName,
-            AdminLastName = admin.LastName,
-            AdminEmail = admin.Email,
-            UserCompanyId = evt.UserCompanyUId, 
             UserId = evt.UserId
         };
     }

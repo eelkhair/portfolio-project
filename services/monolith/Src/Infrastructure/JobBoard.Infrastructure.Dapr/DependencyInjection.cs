@@ -2,6 +2,7 @@
 using Dapr.Extensions.Configuration;
 using JobBoard.Application.Interfaces.Infrastructure;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 // ReSharper disable FunctionNeverReturns
@@ -33,6 +34,7 @@ public static class DependencyInjection {
         var storeName = $"appconfig-{serviceName}";
         await daprClient.SubscribeConfiguration(storeName, new List<string> { "*" });
 
+    
         _ = Task.Run(async () =>
         {
             while (true)
@@ -41,10 +43,11 @@ public static class DependencyInjection {
 
                 foreach (var kvp in config.Items)
                 {
+                    if (!kvp.Key.StartsWith($"jobboard:config:{serviceName}") 
+                        && !kvp.Key.StartsWith($"jobboard:config:global")) continue;
                     var cleanedKey = CleanKey(kvp.Key, serviceName);
                     builder.Configuration[cleanedKey] = kvp.Value.Value;
 
-                    Console.WriteLine($"🔄 Updated {cleanedKey} = {kvp.Value.Value}");
                 }
 
                 await Task.Delay(TimeSpan.FromSeconds(3));

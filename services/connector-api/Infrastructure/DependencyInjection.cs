@@ -48,6 +48,7 @@ public static class DependencyInjection
         
         services.AddScoped<IMonolithClient, MonolithOClient>();
         services.AddScoped<IAdminApiClient, AdminApiClient>();
+        services.AddScoped<ICompanyApiClient, CompanyApiClient>();
         return services;
     }
     // ------------------------------------------------------------
@@ -55,7 +56,7 @@ public static class DependencyInjection
     // ------------------------------------------------------------
     
     
-           public static async Task<WebApplicationBuilder> AddDaprServices(
+    public static async Task<WebApplicationBuilder> AddDaprServices(
         this WebApplicationBuilder builder,
         string serviceName)
     {
@@ -85,10 +86,12 @@ public static class DependencyInjection
 
                 foreach (var kvp in config.Items)
                 {
+                    if (!kvp.Key.StartsWith($"jobboard:config:{serviceName}") 
+                        && !kvp.Key.StartsWith($"jobboard:config:global")) continue;
+                    
                     var cleanedKey = CleanKey(kvp.Key, serviceName);
                     builder.Configuration[cleanedKey] = kvp.Value.Value;
 
-                    Console.WriteLine($"🔄 Updated {cleanedKey} = {kvp.Value.Value}");
                 }
 
                 await Task.Delay(TimeSpan.FromSeconds(3));

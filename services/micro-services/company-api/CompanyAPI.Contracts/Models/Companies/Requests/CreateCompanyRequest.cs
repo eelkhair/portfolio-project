@@ -15,9 +15,7 @@ public class CreateCompanyRequest
 
     [Required]
     public Guid IndustryUId { get; set; }
-    public Guid? AdminUserId { get; init; }
     public Guid? CompanyId { get; init; }
-    public Guid? UserCompanyId { get; set; }
     
     public string? UserId { get; set; }
     

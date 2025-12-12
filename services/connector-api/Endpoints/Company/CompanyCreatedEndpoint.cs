@@ -2,7 +2,6 @@
 using ConnectorAPI.Interfaces;
 using ConnectorAPI.Mappers;
 using ConnectorAPI.Models;
-using ConnectorAPI.Services;
 using Dapr;
 using JobBoard.IntegrationEvents.Company;
 
@@ -17,7 +16,7 @@ public static class CompanyCreatedEndpoint
             async (
                 EventDto<CompanyCreatedV1Event> @event,
                 IMonolithClient monolithODataClient,
-                IAdminApiClient adminApiClient,
+                ICompanyApiClient companyApiClient,
                 ILogger<CompanyCreatedV1Event> logger,
                 CancellationToken cancellationToken) =>
             {
@@ -36,9 +35,9 @@ public static class CompanyCreatedEndpoint
                     @event.Data.UserId,
                     cancellationToken);
 
-                var payload = CompanyCreatedMapper.Map(@event.Data, company, admin);
+                var companyApiPayload = CompanyCreatedMapper.Map(@event.Data, company);
 
-                await adminApiClient.SendCompanyCreatedAsync(payload, cancellationToken);
+                await companyApiClient.SendCompanyCreatedAsync(companyApiPayload, cancellationToken);
 
                 logger.LogInformation("Successfully processed CompanyCreatedV1Event {TraceId}", traceId);
 
