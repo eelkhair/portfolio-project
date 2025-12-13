@@ -4,7 +4,6 @@ using JobBoard.Application.Actions.Companies.Activate;
 using JobBoard.Application.Actions.Companies.Create;
 using JobBoard.Application.Actions.Companies.Models;
 using JobBoard.Application.Interfaces.Users;
-using JobBoard.infrastructure.Dapr;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,7 +12,7 @@ namespace JobBoard.API.Controllers;
 /// <summary>
 /// Company Controller 
 /// </summary>
-public class CompanyController(IUserAccessor accessor, IConfiguration config) : BaseApiController
+public class CompaniesController(IUserAccessor accessor, IConfiguration config) : BaseApiController
 {
 
     /// <summary>
@@ -56,7 +55,7 @@ public class CompanyController(IUserAccessor accessor, IConfiguration config) : 
     /// <returns>An IActionResult indicating the result of the activation operation.</returns>
     [HttpPost("company-created-success")]
     [Authorize(Policy = "DaprInternal")]
-    public async Task<IActionResult> CompanyCreatedSuccess(CompanyCreatedModel request, CancellationToken cancellationToken)
+    public async Task<IActionResult> CompanyCreatedSuccess([FromBody] CompanyCreatedModel request, CancellationToken cancellationToken)
     {
         accessor.UserId = request.CreatedBy;
 

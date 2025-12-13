@@ -1,7 +1,10 @@
 ﻿using ConnectorAPI.Helpers;
 using ConnectorAPI.Interfaces;
+using ConnectorAPI.Interfaces.Clients;
 using ConnectorAPI.Models;
+using ConnectorAPI.Models.CompanyCreated;
 using Dapr.Client;
+using JobBoard.IntegrationEvents.Company;
 
 namespace ConnectorAPI.Services;
 
@@ -44,6 +47,25 @@ public class MonolithOClient(DaprClient daprClient, ILogger<MonolithOClient> log
         var admin   = await adminTask;
 
         return (company, admin);
+    }
+
+    public async Task ActivateCompanyAsync(CompanyCreatedV1Event eventData, CompanyCreateCompanyResult company,
+        CompanyCreatedUserApiPayload userApiResponse, CancellationToken cancellationToken)
+    {
+        var model = new ActivateCompanyRequest
+        {
+            Auth0CompanyId = userApiResponse.Auth0OrganizationId,
+            Auth0UserId = userApiResponse.Auth0UserId,
+            CompanyEmail = company.Email,
+            CompanyName = company.Name,
+            CompanyUId = eventData.CompanyUId,
+            CreatedBy = eventData.UserId,
+            UserUId = eventData.AdminUId
+        };
+        logger.LogInformation("Activating company in the monolith api");
+        var message = daprClient.CreateInvokeMethodRequest(HttpMethod.Post, MonolithAppId, "api/companies/company-created-success");
+        message.Content= JsonContent.Create(model);
+        await daprClient.InvokeMethodAsync(message, cancellationToken);
     }
 
     private HttpRequestMessage CreateGetRequest(string route, string userId)

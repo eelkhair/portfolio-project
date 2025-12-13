@@ -1,4 +1,4 @@
-﻿namespace ConnectorAPI.Models;
+﻿namespace ConnectorAPI.Models.CompanyCreated;
 public class CompanyCreateCompanyResult
 {
     public string Name { get; set; } = string.Empty;

@@ -1,36 +1,27 @@
 ﻿using System.Diagnostics;
-using AH.Metadata.Domain.Constants;
-using Dapr.Client;
 using Elkhair.Dev.Common.Dapr;
-using Elkhair.Dev.Common.Domain.Constants;
 using FastEndpoints;
 using UserApi.Application.Commands.Interfaces;
 using UserAPI.Contracts.Models.Events;
 using UserAPI.Contracts.Models.Requests;
+namespace UserApi.Features.Companies;
 
-namespace UserApi.Features.Events;
-
-public class ProvisionUserTopic(
+public class CompanyCreateEndpoint(
     ActivitySource activitySource,
-    DaprClient client,
     IAuth0CommandService aut0Service,
-    IMessageSender sender,
     ICompanyCommandService commandService,
-    ILogger<ProvisionUserTopic> logger)
+    ILogger<CompanyCreateEndpoint> logger)
     : Endpoint<EventDto<ProvisionUserEvent>>
 {
     public override void Configure()
     {
-        Post("events/company/create");
-        AllowAnonymous();
-        Options(o => o.WithTopic(PubSubNames.RabbitMq, "company.created"));
+        Post("companies"); 
     }
 
     public override async Task HandleAsync(EventDto<ProvisionUserEvent> request, CancellationToken ct)
     {
         using var scope = logger.BeginScope(new
         {
-            request.IdempotencyKey,
             request.UserId,
             request.Data.Email,
             request.Data.CompanyUId,
@@ -38,28 +29,6 @@ public class ProvisionUserTopic(
         });
 
         logger.LogInformation("Starting user provisioning workflow for {Email}", request.Data.Email);
-        
-        using var spanIdempotency =
-            activitySource.StartActivity("provision.user.idempotency");
-
-        var stateKey = $"{IdempotencyOptions.Prefix}{request.IdempotencyKey}";
-        var existing = await client.GetStateAsync<string>(StateStores.Redis, stateKey, cancellationToken: ct);
-
-        if (existing is not null)
-        {
-            logger.LogInformation("Skipping provisioning. Idempotency key already processed");
-            await Send.OkAsync(request, ct);
-            return;
-        }
-
-        await client.SaveStateAsync(
-            StateStores.Redis,
-            stateKey,
-            "processing",
-            metadata: new Dictionary<string, string> { ["ttlInSeconds"] = IdempotencyOptions.PendingTTLSeconds.ToString() },
-            cancellationToken: ct);
-
-
         try
         {
             using var spanAuth0 =
@@ -105,18 +74,9 @@ public class ProvisionUserTopic(
 
             spanDb?.SetTag("db.user.id", userId);
             spanDb?.SetTag("db.company.id", companyId);
-
             
             request.Data.Auth0OrganizationId = auth0Company.Id;
             request.Data.Auth0UserId = auth0User.UserId;
-
-            logger.LogInformation("Emitting success event for user provisioning");
-            await sender.SendEventAsync(
-                PubSubNames.RabbitMq,
-                "provision.user.success",
-                request.UserId,
-                request.Data,
-                ct);
         }
         catch (Exception ex)
         {
@@ -128,41 +88,11 @@ public class ProvisionUserTopic(
 
             logger.LogError(ex, "Unhandled error while provisioning user");
 
-            await sender.SendEventAsync(
-                PubSubNames.RabbitMq,
-                "provision.user.error",
-                request.UserId,
-                ex.Message,
-                ct);
-
+           
             throw; 
         }
-
-      
-        using (activitySource.StartActivity("provision.user.finalize"))
-        {
-            logger.LogInformation("Marking provisioning workflow as completed");
-
-            await client.SaveStateAsync(
-                StateStores.Redis,
-                stateKey,
-                "done",
-                metadata: new Dictionary<string, string>
-                {
-                    ["ttlInSeconds"] = IdempotencyOptions.CompletedTTLSeconds.ToString()
-                },
-                cancellationToken: ct);
-        }
-
         logger.LogInformation("User {Email} provisioned successfully", request.Data.Email);
 
-        await Send.OkAsync(request, ct);
+        await Send.OkAsync(request.Data, ct);
     }
-}
-
-internal static class IdempotencyOptions
-{
-    public const string Prefix = "Provisioned:";
-    public const int PendingTTLSeconds = 120;
-    public const int CompletedTTLSeconds = 7 * 24 * 3600;
 }

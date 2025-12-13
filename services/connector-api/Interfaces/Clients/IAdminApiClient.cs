@@ -1,7 +1,6 @@
-﻿using ConnectorAPI.Models;
-using ConnectorAPI.Models.CompanyCreated;
+﻿using ConnectorAPI.Models.CompanyCreated;
 
-namespace ConnectorAPI.Interfaces;
+namespace ConnectorAPI.Interfaces.Clients;
 
 public interface IAdminApiClient
 {

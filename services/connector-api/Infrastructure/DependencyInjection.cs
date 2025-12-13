@@ -1,11 +1,14 @@
 using System.Text.Json;
 using ConnectorAPI.Interfaces;
+using ConnectorAPI.Interfaces.Clients;
+using ConnectorAPI.Sagas;
 using ConnectorAPI.Services;
 using Dapr.Client;
 using Dapr.Extensions.Configuration;
 using HealthChecks.UI.Client;
 using JobBoard.HealthChecks;
 using Microsoft.OpenApi.Models;
+// ReSharper disable FunctionNeverReturns
 
 namespace ConnectorAPI.Infrastructure;
 
@@ -49,6 +52,10 @@ public static class DependencyInjection
         services.AddScoped<IMonolithClient, MonolithOClient>();
         services.AddScoped<IAdminApiClient, AdminApiClient>();
         services.AddScoped<ICompanyApiClient, CompanyApiClient>();
+        services.AddScoped<IJobApiClient, JobApiClient>();
+        services.AddScoped<IUserApiClient, UserApiClient>();
+        services.AddScoped<CompanyProvisioningSaga>();
+        
         return services;
     }
     // ------------------------------------------------------------

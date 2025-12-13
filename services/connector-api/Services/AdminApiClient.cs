@@ -1,4 +1,5 @@
 ﻿using ConnectorAPI.Interfaces;
+using ConnectorAPI.Interfaces.Clients;
 using ConnectorAPI.Models;
 using ConnectorAPI.Models.CompanyCreated;
 using Dapr.Client;

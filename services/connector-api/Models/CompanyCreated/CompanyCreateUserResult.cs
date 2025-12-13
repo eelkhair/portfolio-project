@@ -1,4 +1,4 @@
-﻿namespace ConnectorAPI.Models;
+﻿namespace ConnectorAPI.Models.CompanyCreated;
 
 public class CompanyCreateUserResult
 {
