@@ -179,6 +179,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{EA007C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elkhair.Common.Observability", "Common\Elkhair.Common.Observability\Elkhair.Common.Observability.csproj", "{E222CA10-E2B1-40BA-9F1C-067212D08F7B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "monolith-sync", "monolith-sync", "{A9B0D052-9CC4-44EE-803D-9D6DDE62F5EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "monolith-sync", "services\monolith-sync\monolith-sync.csproj", "{DC5D5B75-8316-4677-ADF6-EBF38C17363A}"
+EndProject
 Global
 				GlobalSection(SolutionConfigurationPlatforms) = preSolution
 								Debug|Any CPU = Debug|Any CPU
@@ -277,6 +281,10 @@ Global
 					{E222CA10-E2B1-40BA-9F1C-067212D08F7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 					{E222CA10-E2B1-40BA-9F1C-067212D08F7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 					{E222CA10-E2B1-40BA-9F1C-067212D08F7B}.Release|Any CPU.Build.0 = Release|Any CPU
+					{DC5D5B75-8316-4677-ADF6-EBF38C17363A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{DC5D5B75-8316-4677-ADF6-EBF38C17363A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{DC5D5B75-8316-4677-ADF6-EBF38C17363A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{DC5D5B75-8316-4677-ADF6-EBF38C17363A}.Release|Any CPU.Build.0 = Release|Any CPU
 				EndGlobalSection
 				GlobalSection(SolutionProperties) = preSolution
 								HideSolutionNode = FALSE
@@ -325,5 +333,7 @@ Global
 		{5E0D2CFC-5C65-4046-9C74-2B06EA5B397C} = {6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}
 		{ECBB5C93-9D0E-43CE-BA02-E818B106414E} = {5E0D2CFC-5C65-4046-9C74-2B06EA5B397C}
 		{E222CA10-E2B1-40BA-9F1C-067212D08F7B} = {EA007C0E-E085-4F85-903B-087E954D0CA4}
+		{A9B0D052-9CC4-44EE-803D-9D6DDE62F5EF} = {6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}
+		{DC5D5B75-8316-4677-ADF6-EBF38C17363A} = {A9B0D052-9CC4-44EE-803D-9D6DDE62F5EF}
 	EndGlobalSection
 EndGlobal

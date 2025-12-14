@@ -64,7 +64,7 @@ participant "Outbox Processor" as Outbox
 FE -> Admin : Create Company
 Admin -> CompanyAPI : Create Company (Intent)
 
-Company CompanyAPI : Validate local rules
+CompanyAPI -> CompanyAPI : Validate local rules
 CompanyAPI -> Dapr : Publish company.creation.requested.v1
 
 == Intent Normalization ==
