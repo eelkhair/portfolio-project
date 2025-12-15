@@ -6,7 +6,7 @@
         <RootNamespace>JobBoard.HealthChecks</RootNamespace>
         <PackageId>JobBoard.HealthChecks</PackageId>
         <Authors>Elkhair Elkhair</Authors>
-        <Version>1.0.4</Version>
+        <Version>1.0.6</Version>
         <Description>Health Checks for microservices</Description>
         <IsPackable>true</IsPackable>
     </PropertyGroup>

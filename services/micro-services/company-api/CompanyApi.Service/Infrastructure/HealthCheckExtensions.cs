@@ -40,6 +40,11 @@ internal static class HealthCheckExtensions
                 name: "Company Database Check",
                 timeout: TimeSpan.FromSeconds(10),
                 tags: new[] { "database", "critical" })
-            .AddDapr();
+            .AddDapr()     
+            .AddDaprConfigurationStore("global", o =>
+                o.StoreName = "appconfig-global")
+            .AddDaprConfigurationStore("company", o =>
+                o.StoreName = "appconfig-company-api");
+
     }
 }

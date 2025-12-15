@@ -40,7 +40,11 @@ internal static class HealthCheckExtensions
                               name: "Monolith Database Check",
                               timeout: TimeSpan.FromSeconds(10),
                               tags: new[] { "database", "critical" })
-                        .AddDapr();
+                        .AddDapr()      .AddDaprConfigurationStore("global", o =>
+                            o.StoreName = "appconfig-global")
+                        .AddDaprConfigurationStore("monolith", o =>
+                            o.StoreName = "appconfig-monolith-api");
+
    
           
     

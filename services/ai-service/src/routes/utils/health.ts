@@ -40,11 +40,31 @@ export default async function healthRoutes(app: FastifyInstance) {
     let lastReadyBody: HealthBody | null = null;
     let lastReadyCode = 503;
 
+    async function loadConfigStoresFromDapr(DAPR: string): Promise<string[]> {
+        const STORE = 'appconfig-ai-service';
+
+        try {
+            const r = await fetch(`${DAPR}/configuration/${encodeURIComponent(STORE)}`);
+            if (!r.ok) return ['appconfig-global'];
+
+            const json = (await r.json()) as Record<string, { value?: string }>;
+
+            const match = Object.entries(json).find(([k]) => k.endsWith(':CONFIGURATION_STORES'));
+            const value = match?.[1]?.value;
+
+            return typeof value === 'string'
+                ? value.split(',').map(s => s.trim()).filter(Boolean)
+                : ['appconfig-global'];
+        } catch {
+            return ['appconfig-global'];
+        }
+    }
+
+
     async function runReadiness(): Promise<{ code: number; body: HealthBody }> {
         const entries: Record<string, Entry> = {};
         const startAll = performance.now();
 
-        // Self check
         entries['self'] = {
             data: {},
             description: 'HTTP server responding.',
@@ -54,12 +74,14 @@ export default async function healthRoutes(app: FastifyInstance) {
         };
 
         if (SKIP_DAPR) {
-            const body: HealthBody = {
-                status: 'Healthy',
-                totalDuration: fmt(performance.now() - startAll),
-                entries,
+            return {
+                code: 200,
+                body: {
+                    status: 'Healthy',
+                    totalDuration: fmt(performance.now() - startAll),
+                    entries,
+                },
             };
-            return { code: 200, body };
         }
 
         const DAPR = `http://127.0.0.1:${process.env.DAPR_HTTP_PORT ?? 3500}/v1.0`;
@@ -80,10 +102,9 @@ export default async function healthRoutes(app: FastifyInstance) {
                     tags: [],
                 };
             } catch (e: any) {
-                const msg = e?.message ?? String(e);
                 entries[name] = {
                     data: {},
-                    description: msg,
+                    description: e?.message ?? String(e),
                     duration: fmt(performance.now() - start),
                     status: 'Unhealthy',
                     tags: [],
@@ -102,14 +123,14 @@ export default async function healthRoutes(app: FastifyInstance) {
             return 'Dapr sidecar is healthy.';
         });
 
-        // State store (Redis)
+        // State store
         await check('state store', async () => {
             await context.with(suppressTracing(context.active()), async () => {
                 const key = `health:${Date.now()}`;
                 let r = await fetch(`${DAPR}/state/${encodeURIComponent(STATE)}`, {
                     method: 'POST',
                     headers: { 'content-type': 'application/json' },
-                    body: JSON.stringify([{ key, value: { ok: true, ts: Date.now() } }]),
+                    body: JSON.stringify([{ key, value: { ok: true } }]),
                 });
                 if (!r.ok) throw new Error(`State upsert ${r.status}`);
 
@@ -136,29 +157,46 @@ export default async function healthRoutes(app: FastifyInstance) {
             });
             return `Dapr secret store: ${SECRET} is healthy.`;
         });
-        // open ai
-        await check('openai', async () => {
 
-            const apiKey = process.env.OPENAI_API_KEY;
-            const baseUrl = process.env.OPENAI_BASE_URL ?? 'https://api.openai.com/v1';
+        // Configuration stores (FIXED)
+        const configStores = await loadConfigStoresFromDapr(DAPR);
+        console.log(configStores);
 
-            if (!apiKey) {
-                throw new Error("Missing OPENAI_API_KEY");
-            }
+        for (const store of configStores) {
+            await check(`config store:${store}`, async () => {
+                await context.with(suppressTracing(context.active()), async () => {
+                    const r = await fetch(
+                        `${DAPR}/configuration/${encodeURIComponent(store)}`
+                    );
 
-            await context.with(suppressTracing(context.active()), async () => {
-                const r = await fetch(`${baseUrl}/models`, {
-                    headers: {
-                        "Authorization": `Bearer ${apiKey}`
+                    if (!(r.status === 200 || r.status === 204)) {
+                        throw new Error(
+                            `Configuration store '${store}' returned ${r.status}`
+                        );
                     }
                 });
 
+                return `Dapr configuration store '${store}' is healthy.`;
+            });
+        }
+
+        // OpenAI
+        await check('openai', async () => {
+            const apiKey = process.env.OPENAI_API_KEY;
+            const baseUrl = process.env.OPENAI_BASE_URL ?? 'https://api.openai.com/v1';
+
+            if (!apiKey) throw new Error('Missing OPENAI_API_KEY');
+
+            await context.with(suppressTracing(context.active()), async () => {
+                const r = await fetch(`${baseUrl}/models`, {
+                    headers: { Authorization: `Bearer ${apiKey}` },
+                });
                 if (!r.ok) {
-                    throw new Error(`OpenAI health check failed: ${r.status} ${r.statusText}`);
+                    throw new Error(`OpenAI returned ${r.status}`);
                 }
             });
 
-            return "OpenAI API is reachable and credentials are valid.";
+            return 'OpenAI API is reachable and credentials are valid.';
         });
         // PubSub
         await check('pub sub', async () => {
@@ -176,61 +214,45 @@ export default async function healthRoutes(app: FastifyInstance) {
             return `Dapr pubsub: ${PUBSUB} for topic '${TOPIC}' is healthy.`;
         });
 
-        //
         // Cosmos DB
-        //
-        await check("cosmosdb", async () => {
+        await check('cosmosdb', async () => {
             const endpoint = process.env.COSMOS_ENDPOINT;
             const key = process.env.COSMOS_KEY;
-
             const dbId = process.env.COSMOS_DB ?? process.env.COSMOS_DATABASE;
-            const containerId = process.env.COSMOS_JOBS_CONTAINER ?? process.env.COSMOS_CONTAINER;
+            const containerId =
+                process.env.COSMOS_JOBS_CONTAINER ?? process.env.COSMOS_CONTAINER;
 
             if (!endpoint || !key || !dbId || !containerId) {
-                throw new Error(
-                    "Missing CosmosDB configuration. Expected COSMOS_ENDPOINT, COSMOS_KEY, COSMOS_DB, COSMOS_JOBS_CONTAINER."
-                );
+                throw new Error('Missing CosmosDB configuration.');
             }
 
             await context.with(suppressTracing(context.active()), async () => {
-                // 👇 Required to bypass emulator's self-signed cert
-                process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+                process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
                 const client = new CosmosClient({
                     endpoint,
                     key,
-                    connectionPolicy: {
-                        enableEndpointDiscovery: false // emulator-safe
-                    }
+                    connectionPolicy: { enableEndpointDiscovery: false },
                 });
 
-                const { resource: db } = await client.database(dbId).read();
-                if (!db) throw new Error(`Database '${dbId}' metadata unreadable.`);
-
-                const { resource: container } =
-                    await client.database(dbId).container(containerId).read();
-
-                if (!container)
-                    throw new Error(`Container '${containerId}' metadata unreadable.`);
+                await client.database(dbId).read();
+                await client.database(dbId).container(containerId).read();
             });
 
             return `CosmosDB database '${dbId}', container '${containerId}' is healthy.`;
         });
 
-        // Determine health summary
         const unhealthy = Object.values(entries).some(
             (e) => e.status !== 'Healthy'
         );
 
-        const body: HealthBody = {
-            status: unhealthy ? 'Unhealthy' : 'Healthy',
-            totalDuration: fmt(performance.now() - startAll),
-            entries,
-        };
-
         return {
             code: unhealthy ? 503 : 200,
-            body,
+            body: {
+                status: unhealthy ? 'Unhealthy' : 'Healthy',
+                totalDuration: fmt(performance.now() - startAll),
+                entries,
+            },
         };
     }
 
@@ -238,7 +260,7 @@ export default async function healthRoutes(app: FastifyInstance) {
         const now = Date.now();
 
         if (now - startedAt < BOOT_GRACE_MS) {
-            const body: HealthBody = {
+            return reply.code(200).send({
                 status: 'Healthy',
                 totalDuration: fmt(0),
                 entries: {
@@ -250,8 +272,7 @@ export default async function healthRoutes(app: FastifyInstance) {
                         tags: ['startup', 'grace'],
                     },
                 },
-            };
-            return reply.code(200).send(body);
+            });
         }
 
         if (lastReadyBody && now - lastReadyAt < READINESS_TTL_MS) {
@@ -266,32 +287,9 @@ export default async function healthRoutes(app: FastifyInstance) {
         return reply.code(code).send(body);
     }
 
-    app.get(
-        '/healthzEndpoint',
-        {
-            schema: {
-                hide: true,
-                summary: 'Check if components of the system are up or down',
-                description:
-                    'Health check to see if the components of the system are up or down. Used by the Health Check UI.',
-                tags: ['health'],
-            },
-        },
-        readinessHandler
-    );
-
-    app.get(
-        '/livez',
-        {
-            schema: {
-                hide: true,
-                summary: 'Check if the system is up or down',
-                description: 'Simple liveness check to see if the system is up or down',
-                tags: ['health'],
-            },
-        },
-        async (_req, reply) => reply.code(200).send({ status: 'live' })
-    );
-
+    app.get('/healthzEndpoint', readinessHandler);
     app.get('/readyz', readinessHandler);
+    app.get('/livez', async (_req, reply) =>
+        reply.code(200).send({ status: 'live' })
+    );
 }

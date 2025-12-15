@@ -31,10 +31,15 @@ internal static class HealthCheckExtensions
         };
         
         builder.Services.AddSingleton(_ => new DaprPubSubHealthCheck(new DaprClientBuilder().Build(), pubSub));
+        
         builder.Services
             .AddHealthChecks()
             .AddCheck("self", () => HealthCheckResult.Healthy())
-            .AddDapr();
+            .AddDapr()
+            .AddDaprConfigurationStore("global", o =>
+                o.StoreName = "appconfig-global")
+            .AddDaprConfigurationStore("connector", o =>
+                o.StoreName = "appconfig-connector-api");
 
         return builder;
     }
