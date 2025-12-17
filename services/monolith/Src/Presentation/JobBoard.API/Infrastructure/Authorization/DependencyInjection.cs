@@ -1,4 +1,5 @@
 using HealthChecks.UI.Client;
+using JobBoard.API.Infrastructure.SignalR;
 using JobBoard.Domain;
 using JobBoard.HealthChecks;
 using Microsoft.AspNetCore.Authentication;
@@ -61,6 +62,21 @@ public static class DependencyInjection
                     ValidateAudience = true,
                     ValidAudience = configuration["Auth0:Audience"],
                     ValidateLifetime = true
+                };
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var path = context.HttpContext.Request.Path;
+                        var token = context.Request.Query["access_token"];
+
+                        if (!string.IsNullOrEmpty(token) &&
+                            path.StartsWithSegments("/hubs/notifications"))
+                        {
+                            context.Token = token;
+                        }
+                        return Task.CompletedTask;
+                    }
                 };
             })
 
@@ -131,6 +147,7 @@ public static class DependencyInjection
             app.MapGet("/", (HttpContext ctx) => ctx.Response.Redirect("/swagger")).ExcludeFromDescription();
             app.UseCloudEvents();
             app.MapSubscribeHandler();
+            app.MapHub<NotificationsHub>("/hubs/notifications").RequireAuthorization();
             app.Run();
         }
         finally

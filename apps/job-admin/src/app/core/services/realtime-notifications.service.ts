@@ -5,6 +5,8 @@ import { NotificationService } from './notification.service';
 import {AccountService} from './account.service';
 import {environment} from '../../../environments/environment';
 import {propagation, ROOT_CONTEXT, SpanKind, SpanStatusCode, trace} from '@opentelemetry/api';
+import {FeatureFlagsDto} from '../types/Dtos/FeatureFlagsDto';
+import {FeatureFlagsService} from './feature-flags.service';
 
 export interface CompanyActivatedMsg {
   companyUId: string;
@@ -20,6 +22,7 @@ export class RealtimeNotificationsService {
   private notify = inject(NotificationService);
   private account = inject(AccountService);
   private tracer = trace.getTracer('admin-fe')
+  private featureFlagService = inject(FeatureFlagsService)
   connected = signal(false);
   companyActivated = signal<CompanyActivatedMsg | null>(null);
   private starting = false;
@@ -39,7 +42,9 @@ export class RealtimeNotificationsService {
       .configureLogging(signalR.LogLevel.Warning) // change to Information for debugging
       .build();
 
-
+    this.hub.on('featureFlagsUpdated', (msg: {flags: FeatureFlagsDto})=>{
+      this.featureFlagService.setFlags(msg.flags);
+    });
     this.hub.on('CompanyActivated', (msg: CompanyActivatedMsg) => {
       const carrier: Record<string, string> = {};
       if (msg.traceParent) carrier['traceparent'] = msg.traceParent;

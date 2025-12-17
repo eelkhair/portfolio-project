@@ -1,58 +1,48 @@
 ﻿using Dapr.Client;
 using Dapr.Extensions.Configuration;
 using JobBoard.Application.Interfaces.Infrastructure;
+using JobBoard.infrastructure.Dapr;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-// ReSharper disable FunctionNeverReturns
 
-namespace JobBoard.infrastructure.Dapr;
+namespace JobBoard.Infrastructure.Dapr;
 
-public static class DependencyInjection {
+public static class DependencyInjection
+{
     public static async Task<WebApplicationBuilder> AddDaprServices(
         this WebApplicationBuilder builder,
         string serviceName)
     {
+        // Dapr client
         builder.Services.AddDaprClient();
 
+        // Vault secrets
         builder.Configuration.AddDaprSecretStore(
             "vault",
             new DaprClientBuilder().Build(),
             new Dictionary<string, string>()
         );
 
-        // Load configuration from Dapr store
+        // Initial config load (startup)
         var daprClient = new DaprClientBuilder().Build();
-        var cfg = await daprClient.GetConfiguration("appconfig-" + serviceName, new List<string>());
+        var storeName = $"appconfig-{serviceName}";
 
-        // Apply config
+        var cfg = await daprClient.GetConfiguration(storeName, new List<string>());
+
         ApplyScopedConfig(builder.Configuration, cfg, "jobboard:config:global:", serviceName);
         ApplyScopedConfig(builder.Configuration, cfg, $"jobboard:config:{serviceName}:", serviceName);
 
-        // Subscribe for auto-refresh
-        var storeName = $"appconfig-{serviceName}";
-        await daprClient.SubscribeConfiguration(storeName, new List<string> { "*" });
+        // Background watcher (CORRECT)
+        builder.Services.AddHostedService(sp =>
+            new FeatureFlagWatcher(
+                sp.GetRequiredService<DaprClient>(),
+                sp.GetRequiredService<IConfiguration>(),
+                sp.GetRequiredService<IFeatureFlagNotifier>(),
+                serviceName));
 
-    
-        _ = Task.Run(async () =>
-        {
-            while (true)
-            {
-                var config = await daprClient.GetConfiguration(storeName, new List<string>());
-
-                foreach (var kvp in config.Items)
-                {
-                    if (!kvp.Key.StartsWith($"jobboard:config:{serviceName}") 
-                        && !kvp.Key.StartsWith($"jobboard:config:global")) continue;
-                    var cleanedKey = CleanKey(kvp.Key, serviceName);
-                    builder.Configuration[cleanedKey] = kvp.Value.Value;
-
-                }
-
-                await Task.Delay(TimeSpan.FromMinutes(1));
-            }
-        });
         builder.Services.AddTransient<IOutboxMessageProcessor, DaprOutboxMessageProcessor>();
+
         return builder;
     }
 

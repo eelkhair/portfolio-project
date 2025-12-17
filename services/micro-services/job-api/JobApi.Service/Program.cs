@@ -2,7 +2,6 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Security.Claims;
 using Elkhair.Common.Observability;
-using Elkhair.Dev.Common.Application;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using FluentValidation;
