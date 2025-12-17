@@ -24,7 +24,7 @@ public class CompaniesController(IUserAccessor accessor, IConfiguration config) 
     [StandardApiResponses]
     [AllowAnonymous]
     [ProducesResponseType(typeof(CompanyDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Get(Guid uId)
+    public async Task<IActionResult> GetData(Guid uId)
     {
         
         return Ok(config["AAAAAAAA"]);
@@ -41,7 +41,7 @@ public class CompaniesController(IUserAccessor accessor, IConfiguration config) 
     public async Task<IActionResult> Create([FromBody] CreateCompanyCommand command)
         => await ExecuteCommandAsync(command, result =>
             CreatedAtAction(
-                nameof(Get), 
+                nameof(GetData), 
                 new { uId = result.Data!.Id },
                 result
             ));
