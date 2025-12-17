@@ -28,6 +28,7 @@ public class CompaniesController : BaseODataController
         return Ok(companies);
     }
     [EnableQuery]
+    [HttpGet("odata/companies({id})")]
     public ActionResult GetById(Guid id)
     {
        var companies = ExecuteODataQueryAsync(new GetCompaniesQuery()).Result;
