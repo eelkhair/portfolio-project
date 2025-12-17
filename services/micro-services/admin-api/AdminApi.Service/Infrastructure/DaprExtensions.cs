@@ -1,4 +1,5 @@
-﻿using Dapr.Client;
+﻿using AdminApi.Infrastructure.FeatureFlags;
+using Dapr.Client;
 using Dapr.Extensions.Configuration;
 
 namespace AdminApi.Infrastructure;
@@ -25,29 +26,14 @@ public static class DaprExtensions
         ApplyScopedConfig(builder.Configuration, cfg, "jobboard:config:global:", serviceName);
         ApplyScopedConfig(builder.Configuration, cfg, $"jobboard:config:{serviceName}:", serviceName);
 
-        // Subscribe for auto-refresh
-        var storeName = $"appconfig-{serviceName}";
-        await daprClient.SubscribeConfiguration(storeName, new List<string> { "*" });
+        builder.Services.AddSingleton<IFeatureFlagNotifier, SignalRFeatureFlagNotifier>();
+        builder.Services.AddHostedService(sp =>
+            new FeatureFlagWatcher(
+                sp.GetRequiredService<DaprClient>(),
+                sp.GetRequiredService<IConfiguration>(),
+                sp.GetRequiredService<IFeatureFlagNotifier>(),
+                serviceName));
 
-    
-        _ = Task.Run(async () =>
-        {
-            while (true)
-            {
-                var config = await daprClient.GetConfiguration(storeName, new List<string>());
-
-                foreach (var kvp in config.Items)
-                {
-                    if (!kvp.Key.StartsWith($"jobboard:config:{serviceName}") 
-                        && !kvp.Key.StartsWith($"jobboard:config:global")) continue;
-                    var cleanedKey = CleanKey(kvp.Key, serviceName);
-                    builder.Configuration[cleanedKey] = kvp.Value.Value;
-
-                }
-
-                await Task.Delay(TimeSpan.FromMinutes(1));
-            }
-        });
         return builder;
     }
 
