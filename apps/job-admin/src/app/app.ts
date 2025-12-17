@@ -7,7 +7,6 @@ import {AccountService} from './core/services/account.service';
 import {ToastModule} from 'primeng/toast';
 import {RealtimeNotificationsService} from './core/services/realtime-notifications.service';
 import {environment} from '../environments/environment';
-import {JsonPipe} from '@angular/common';
 import {FeatureFlagsService} from './core/services/feature-flags.service';
 
 @Component({
@@ -17,8 +16,7 @@ import {FeatureFlagsService} from './core/services/feature-flags.service';
     Footer,
     RouterOutlet,
     ToastModule,
-    Nav,
-    JsonPipe
+    Nav
   ],
   templateUrl: './app.html',
   styleUrl: './app.css'

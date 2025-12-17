@@ -10,8 +10,8 @@ export class FeatureFlagsService {
   setFlags(flags: FeatureFlagsDto) {
     this._featureFlags.set(flags);
   }
-  isTest1Enabled = computed(
-    () => this._featureFlags()['Test1'] ?? false
+  isMonolith = computed(
+    () => this._featureFlags()['Monolith'] ?? false
   );
 
 }
