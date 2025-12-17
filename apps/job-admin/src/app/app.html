@@ -9,7 +9,7 @@
         <app-nav class="w-full"/>
       </aside>
       <section class=" px-8 pt-10 overflow-auto w-4/5" style="width: 100%">
-        {{ featureFlagService.isTest1Enabled() }}
+        {{ featureFlagService.isMonolith() }}
         <router-outlet></router-outlet>
       </section>
     </main>
