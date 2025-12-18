@@ -24,8 +24,8 @@ public static class EdmModel
         var userSet = builder.EntitySet<UserDto>("Users");
 
         
-       
         companySet.EntityType.HasRequired(c=>c.Industry);
+      
        return builder.GetEdmModel();
     }
 }

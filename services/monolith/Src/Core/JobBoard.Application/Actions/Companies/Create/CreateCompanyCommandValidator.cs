@@ -19,11 +19,16 @@ public class CreateCompanyCommandValidator : AbstractValidator<CreateCompanyComm
             .EmailAddress()
             .MaximumLength(100);
 
-        RuleFor(c => c.CompanyWebsite)
-            .MaximumLength(200)
-            .Must(url => string.IsNullOrWhiteSpace(url) 
-                         || Uri.IsWellFormedUriString(url, UriKind.Absolute))
-            .WithMessage("Company website is not a valid URL");
+        When(c => !string.IsNullOrWhiteSpace(c.CompanyWebsite), () =>
+        {
+            RuleFor(c => c.CompanyWebsite)
+                .MaximumLength(200)
+                .Must(url => string.IsNullOrWhiteSpace(url)
+                             || Uri.IsWellFormedUriString(url, UriKind.Absolute))
+                .WithMessage("Company website is not a valid URL");
+        });
+      
+       
 
         RuleFor(c => c.IndustryUId)
             .NotEmpty().WithMessage("Industry is required");

@@ -3,7 +3,7 @@ import {FeatureFlagsDto} from '../types/Dtos/FeatureFlagsDto';
 
 @Injectable({ providedIn: 'root' })
 export class FeatureFlagsService {
-  private readonly _featureFlags = signal<FeatureFlagsDto>({});
+  private readonly _featureFlags = signal<FeatureFlagsDto|null>(null);
 
   readonly featureFlags = this._featureFlags.asReadonly();
 
@@ -11,7 +11,7 @@ export class FeatureFlagsService {
     this._featureFlags.set(flags);
   }
   isMonolith = computed(
-    () => this._featureFlags()['Monolith'] ?? false
+    () => this._featureFlags()?.['Monolith'] ?? false,
   );
 
 }

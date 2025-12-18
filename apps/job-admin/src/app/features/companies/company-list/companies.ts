@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {CompanyStore} from '../company.store';
 import {AgGridAngular} from 'ag-grid-angular';
 import {ColDef, themeQuartz} from 'ag-grid-community';
@@ -18,7 +18,7 @@ import {Router} from '@angular/router';
   templateUrl: './companies.html',
   styleUrl: './companies.css'
 })
-export class Companies implements OnInit {
+export class Companies {
   store = inject(CompanyStore);
   companies = this.store.companies;
   theme = themeQuartz;
@@ -72,7 +72,5 @@ export class Companies implements OnInit {
     },
   ];
 
-  ngOnInit(): void {
-    this.store.load();
-  }
+
 }

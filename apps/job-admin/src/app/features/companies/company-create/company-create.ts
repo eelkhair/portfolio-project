@@ -29,7 +29,7 @@ export class CompanyCreate {
   form = new FormGroup({
     name: new FormControl<string>('', Validators.required),
     companyEmail: new FormControl('', [Validators.required, Validators.email]),
-    companyWebsite: new FormControl(''),
+    companyWebsite: new FormControl(undefined),
     industry: new FormControl('', Validators.required),
     adminFirstName: new FormControl('', Validators.required),
     adminLastName: new FormControl('', Validators.required),

@@ -63,7 +63,7 @@ public class MonolithOClient(DaprClient daprClient, ILogger<MonolithOClient> log
             UserUId = eventData.AdminUId
         };
         logger.LogInformation("Activating company in the monolith api");
-        var message = daprClient.CreateInvokeMethodRequest(HttpMethod.Post, MonolithAppId, "api/companies/company-created-success");
+        var message = daprClient.CreateInvokeMethodRequest(HttpMethod.Post, MonolithAppId, "companies/company-created-success");
         message.Content= JsonContent.Create(model);
         await daprClient.InvokeMethodAsync(message, cancellationToken);
     }
