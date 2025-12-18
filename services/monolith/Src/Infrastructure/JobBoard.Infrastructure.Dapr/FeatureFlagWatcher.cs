@@ -1,6 +1,7 @@
 ﻿using Dapr.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace JobBoard.infrastructure.Dapr;
 
@@ -13,6 +14,7 @@ public sealed class FeatureFlagWatcher : BackgroundService
     private readonly DaprClient _daprClient;
     private readonly IConfiguration _configuration;
     private readonly IFeatureFlagNotifier _notifier;
+    private readonly ILogger<FeatureFlagWatcher> _logger;
     private readonly string _serviceName;
 
     /// <summary>
@@ -23,11 +25,13 @@ public sealed class FeatureFlagWatcher : BackgroundService
         DaprClient daprClient,
         IConfiguration configuration,
         IFeatureFlagNotifier notifier,
+        ILogger<FeatureFlagWatcher> logger,
         string serviceName)
     {
         _daprClient = daprClient;
         _configuration = configuration;
         _notifier = notifier;
+        _logger = logger;
         _serviceName = serviceName;
     }
 
@@ -42,31 +46,39 @@ public sealed class FeatureFlagWatcher : BackgroundService
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            var featureFlags = new Dictionary<string, bool>();
-            var config = await _daprClient.GetConfiguration(
-                storeName,
-                new List<string>(),
-                cancellationToken: stoppingToken);
-
-            foreach (var kvp in config.Items)
+            try
             {
-                if (!kvp.Key.StartsWith($"jobboard:config:{_serviceName}") &&
-                    !kvp.Key.StartsWith("jobboard:config:global"))
-                    continue;
+                var featureFlags = new Dictionary<string, bool>();
+                var config = await _daprClient.GetConfiguration(
+                    storeName,
+                    new List<string>(),
+                    cancellationToken: stoppingToken);
 
-                var cleanedKey = CleanKey(kvp.Key, _serviceName);
-
-                if (cleanedKey.StartsWith("FeatureFlags:"))
+                foreach (var kvp in config.Items)
                 {
-                    var isEnabled = bool.TryParse(kvp.Value.Value, out var enabled) && enabled;
-                    featureFlags[cleanedKey.Replace("FeatureFlags:", "")] = isEnabled;
+                    if (!kvp.Key.StartsWith($"jobboard:config:{_serviceName}") &&
+                        !kvp.Key.StartsWith("jobboard:config:global"))
+                        continue;
+
+                    var cleanedKey = CleanKey(kvp.Key, _serviceName);
+
+                    if (cleanedKey.StartsWith("FeatureFlags:"))
+                    {
+                        var isEnabled = bool.TryParse(kvp.Value.Value, out var enabled) && enabled;
+                        featureFlags[cleanedKey.Replace("FeatureFlags:", "")] = isEnabled;
+                    }
+
+                    _configuration[cleanedKey] = kvp.Value.Value;
                 }
 
-                _configuration[cleanedKey] = kvp.Value.Value;
+                await _notifier.NotifyAsync(featureFlags);
+                await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
             }
-
-            await _notifier.NotifyAsync(featureFlags);
-            await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while watching for feature flag changes");
+            }
+           
         }
     }
 

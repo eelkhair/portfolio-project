@@ -30,7 +30,7 @@ export class CompanyStore {
     effect(() => {
       const activated = this.realtimeNotificationService.companyActivated();
       if (!activated) return;
-
+     console.log("Activated company", activated);
       this.companies.update(list =>
         list.map(c =>
           c.uId === activated.companyUId
@@ -76,7 +76,7 @@ export class CompanyStore {
           if (response?.data) {
             this.companies.update(list => [response.data!, ...list]);
           }
-
+          console.log(this.companies());
           this.showCreateCompanyDialog.set(false);
           this.notificationService.success(
             'Success',

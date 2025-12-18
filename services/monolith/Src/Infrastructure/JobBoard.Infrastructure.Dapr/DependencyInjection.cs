@@ -5,6 +5,7 @@ using JobBoard.infrastructure.Dapr;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace JobBoard.Infrastructure.Dapr;
 
@@ -39,6 +40,7 @@ public static class DependencyInjection
                 sp.GetRequiredService<DaprClient>(),
                 sp.GetRequiredService<IConfiguration>(),
                 sp.GetRequiredService<IFeatureFlagNotifier>(),
+                sp.GetRequiredService<ILogger<FeatureFlagWatcher>>(),
                 serviceName));
 
         builder.Services.AddTransient<IOutboxMessageProcessor, DaprOutboxMessageProcessor>();

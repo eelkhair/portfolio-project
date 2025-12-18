@@ -25,8 +25,10 @@ public class ProvisionUserSuccessTopic(ICompanyCommandService service, IMessageS
         using var activity = activitySource.StartActivity("Activating Company");
         activity?.SetTag("CompanyUId", request.Data.CompanyUId.ToString());
         activity?.SetTag("Name", request.Data?.CompanyName);
-        
-        if (await service.ActivateAsync(request.Data?.CompanyUId ?? Guid.Empty, DaprExtensions.CreateUser(request.UserId), ct))
+
+        var activated = await service.ActivateAsync(request.Data?.CompanyUId ?? Guid.Empty,
+            DaprExtensions.CreateUser(request.UserId), ct);
+        if (activated && request.Data is not null && request.Data.SourceSystem=="AdminApi")
         {
             await sender.SendEventAsync(PubSubNames.RabbitMq, "company.create.success", request.UserId, new CompanyCreatedSuccess
             {

@@ -13,4 +13,5 @@ public class ProvisionUserEvent
     public Guid? UId { get; set; }
     public string Auth0UserId { get; set; } = string.Empty;
     public string Auth0OrganizationId { get; set; } = string.Empty;
+    public string SourceSystem { get; set; } = "AdminApi";
 }

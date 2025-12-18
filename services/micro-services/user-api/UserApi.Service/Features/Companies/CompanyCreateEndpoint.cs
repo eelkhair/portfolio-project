@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Elkhair.Dev.Common.Dapr;
+using Elkhair.Dev.Common.Domain.Constants;
 using FastEndpoints;
 using UserApi.Application.Commands.Interfaces;
 using UserAPI.Contracts.Models.Events;
@@ -10,6 +11,7 @@ public class CompanyCreateEndpoint(
     ActivitySource activitySource,
     IAuth0CommandService aut0Service,
     ICompanyCommandService commandService,
+    IMessageSender sender,
     ILogger<CompanyCreateEndpoint> logger)
     : Endpoint<EventDto<ProvisionUserEvent>>
 {
@@ -77,6 +79,15 @@ public class CompanyCreateEndpoint(
             
             request.Data.Auth0OrganizationId = auth0Company.Id;
             request.Data.Auth0UserId = auth0User.UserId;
+            
+            logger.LogInformation("Emitting success event for user provisioning");
+            request.Data.SourceSystem = "Monolith";
+            await sender.SendEventAsync(
+                PubSubNames.RabbitMq,
+                "provision.user.success",
+                request.UserId,
+                request.Data,
+                ct);
         }
         catch (Exception ex)
         {

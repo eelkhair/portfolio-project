@@ -5,6 +5,7 @@ public class BaseDto
 {
 
     public Guid Id { get; set; }
+    public Guid UId => Id;
 
     public DateTime CreatedAt { get; set; }
     public string CreatedBy { get; set; } = string.Empty;

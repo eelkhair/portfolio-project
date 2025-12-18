@@ -20,7 +20,7 @@
         <PackageReference Include="FastEndpoints.Swagger" Version="7.1.1" />
         <PackageReference Include="JobBoard.CompanyAPI.Contracts" Version="1.0.3" />
         <PackageReference Include="JobBoard.HealthChecks" Version="1.0.6" />
-        <PackageReference Include="JobBoard.UserAPI.Contracts" Version="1.0.2" />
+        <PackageReference Include="JobBoard.UserAPI.Contracts" Version="1.0.9" />
         <PackageReference Include="Mapster" Version="7.4.0" />
         <PackageReference Include="Mapster.Core" Version="1.2.1" />
 

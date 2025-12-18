@@ -2,6 +2,7 @@ using System.Diagnostics;
 using JobBoard.API.Infrastructure;
 using JobBoard.API.Infrastructure.Authorization;
 using JobBoard.API.Infrastructure.OpenApi;
+using JobBoard.API.Infrastructure.SignalR.CompanyActivation;
 using JobBoard.API.Infrastructure.SignalR.FeatureFlags;
 using JobBoard.Application;
 using JobBoard.Application.Interfaces.Users;
@@ -17,6 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 Debugger.Launch();
 #endif
 builder.Services.AddSingleton<IFeatureFlagNotifier, SignalRFeatureFlagNotifier>();
+builder.Services.AddSingleton<ICompanyActivationNotifier, CompanyActivationNotifier>();
 (await builder.AddDaprServices("monolith-api")).ConfigureLogging("monolith-api").AddCustomHealthChecks().Services
     .AddApplicationServices()
     .AddPersistenceServices(builder.Configuration)

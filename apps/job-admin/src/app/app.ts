@@ -7,7 +7,6 @@ import {AccountService} from './core/services/account.service';
 import {ToastModule} from 'primeng/toast';
 import {RealtimeNotificationsService} from './core/services/realtime-notifications.service';
 import {environment} from '../environments/environment';
-import {FeatureFlagsService} from './core/services/feature-flags.service';
 
 @Component({
   selector: 'app-root',
@@ -23,7 +22,6 @@ import {FeatureFlagsService} from './core/services/feature-flags.service';
 })
 export class App implements OnInit {
   accountService = inject(AccountService);
-  featureFlagService = inject(FeatureFlagsService);
   destroyRef = inject(DestroyRef);
   protected rt = inject(RealtimeNotificationsService);
   ngOnInit() {

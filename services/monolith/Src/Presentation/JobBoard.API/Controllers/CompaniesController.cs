@@ -1,5 +1,6 @@
 ﻿using JobBoard.API.Helpers;
 using JobBoard.API.Infrastructure.Authorization;
+using JobBoard.API.Infrastructure.SignalR.CompanyActivation;
 using JobBoard.Application.Actions.Companies.Activate;
 using JobBoard.Application.Actions.Companies.Create;
 using JobBoard.Application.Actions.Companies.Models;
@@ -12,7 +13,7 @@ namespace JobBoard.API.Controllers;
 /// <summary>
 /// Company Controller 
 /// </summary>
-public class CompaniesController(IUserAccessor accessor, IConfiguration config) : BaseApiController
+public class CompaniesController(IUserAccessor accessor, ICompanyActivationNotifier notifier, IConfiguration config) : BaseApiController
 {
 
     /// <summary>
@@ -60,6 +61,8 @@ public class CompaniesController(IUserAccessor accessor, IConfiguration config) 
         accessor.UserId = request.CreatedBy;
 
         await ExecuteCommandAsync(new ActivateCompanyCommand(request), Ok);
+        
+        await notifier.NotifyAsync(request, cancellationToken);
         return Ok();
     }
 }
