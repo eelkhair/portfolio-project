@@ -6,12 +6,14 @@ import {CreateCompanyDto} from '../../core/types/Dtos/CreateCompanyDto';
 import {NotificationService} from '../../core/services/notification.service';
 import {tap} from 'rxjs/operators';
 import {RealtimeNotificationsService} from '../../core/services/realtime-notifications.service';
+import {FeatureFlagsService} from '../../core/services/feature-flags.service';
 
 
 @Injectable({ providedIn: 'root' })
 export class CompanyStore{
   companyService = inject(CompanyService);
   notificationService = inject(NotificationService);
+  featureflagsService = inject(FeatureFlagsService)
   realtimeNotificationService = inject(RealtimeNotificationsService);
   companies = signal<Company[]>([])
   industries = signal<Industry[]>([])
@@ -31,18 +33,31 @@ export class CompanyStore{
     })
   }
   load = () => {
-    this.loadCompanies().subscribe(response => {
-      this.companies.set(response.data!);
-    })
-    this.loadIndustries().subscribe(response => {
-      this.industries.set(response.data!);
-    })
+    this.loadCompanies().subscribe();
+    this.loadIndustries().subscribe();
   }
+
   loadCompanies = () => {
-    return this.companyService.list()
+    if(this.featureflagsService.isMonolith()){
+      return this.companyService.list().pipe(tap(response=>{
+        this.companies.set(response.data!);
+      }))
+    }else{
+      return this.companyService.list().pipe(tap(response=>{
+        this.companies.set(response.data!);
+      }))
+    }
   }
   loadIndustries = () => {
-    return this.companyService.listIndustries()
+    if(this.featureflagsService.isMonolith()){
+      return this.companyService.listIndustries().pipe(tap(response=>{
+        this.industries.set(response.data!);
+      }))
+    }else{
+      return this.companyService.listIndustries().pipe(tap(response=>{
+        this.industries.set(response.data!);
+      }))
+    }
   }
 
   createCompany(company: CreateCompanyDto) {
@@ -61,13 +76,10 @@ export class CompanyStore{
   }
 
   loadCompany(id: string) {
-    this.loadIndustries().subscribe(response => {
-      this.industries.set(response.data!);
-    })
-    this.loadCompanies().subscribe(response => {
-        this.companies.set(response.data!);
-        this.selectCompany(id);
 
+    this.loadIndustries().subscribe()
+    this.loadCompanies().subscribe(() => {
+        this.selectCompany(id);
     })
   }
 }
