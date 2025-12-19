@@ -25,22 +25,24 @@ public class ObservabilityCommandHandlerDecorator<TRequest, TResult>(
         Activity.Current?.SetTag("email", userAccessor.Email);
 
         // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-        if (request is BaseCommand<TResult>)
-        {
-             logger.LogInformation("Executing command {Request}...", requestType);
+        if(typeof(TRequest).Name != "ProcessOutboxMessageCommand"){
+            if (request is BaseCommand<TResult>)
+            {
+                 logger.LogInformation("Executing command {Request}...", requestType);
+            }
+            else
+            {
+                logger.LogInformation("Executing query {Request}...", requestType);
+            }
         }
-        else
-        {
-            logger.LogInformation("Executing query {Request}...", requestType);
-        }
-        
         try
         {
             var result = await innerHandler.HandleAsync(request, cancellationToken);
             metricsService.IncrementCommandSuccess(requestType);
             
+            if (typeof(TRequest).Name == "ProcessOutboxMessageCommand") return result;
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-            if(request is BaseCommand<TResult>)
+            if (request is BaseCommand<TResult>)
             {
                 logger.LogInformation("Successfully executed command {Request}", requestType);
             }
@@ -48,7 +50,6 @@ public class ObservabilityCommandHandlerDecorator<TRequest, TResult>(
             {
                 logger.LogInformation("Successfully executed query {Request}", requestType);
             }
-
 
             return result;
         }
