@@ -11,7 +11,7 @@ export class CompanySelectionStore {
   companiesList = signal<Company[]>([]);
 
   populateCompanies() {
-    this.companyService.list().subscribe(companies => {
+    this.companyService.listCompanies().subscribe(companies => {
       if(companies.data){
         if(companies.data.length == 1){
           this.selectedCompany.set(companies.data[0])

@@ -1,4 +1,4 @@
-import { Injectable, signal, inject } from '@angular/core';
+import { Injectable, signal, inject, effect } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { firstValueFrom } from 'rxjs';
 import { NotificationService } from './notification.service';
@@ -26,11 +26,31 @@ export class RealtimeNotificationsService {
   connected = signal(false);
   companyActivated = signal<CompanyActivatedMsg | null>(null);
   private starting = false;
+  private currentTopology: 'monolith' | 'micro' | null = null;
 
-  async start(hubUrl = environment.apiUrl + 'hubs/notifications') {
+  constructor() {
+    effect(()=>{
+      if (!this.featureFlagService.featureFlags()) return;
+
+      const topology = this.featureFlagService.isMonolith()
+        ? 'monolith'
+        : 'micro';
+
+      if (this.currentTopology === topology) return;
+
+      this.currentTopology = topology;
+
+      void this.stop();
+      void this.start();
+    })
+  }
+  async start() {
     if (this.hub || this.starting) return; // idempotent
     this.starting = true;
-
+    const baseUrl = this.featureFlagService.isMonolith()
+      ? environment.monolithUrl
+      : environment.microserviceUrl;
+    const hubUrl = `${baseUrl}hubs/notifications`;
     this.hub = new signalR.HubConnectionBuilder()
       .withUrl(hubUrl, {
         accessTokenFactory: async () =>

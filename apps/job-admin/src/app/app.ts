@@ -26,7 +26,7 @@ export class App implements OnInit {
   protected rt = inject(RealtimeNotificationsService);
   ngOnInit() {
     const sub =this.accountService.auth.getAccessTokenSilently().subscribe(()=>
-      this.rt.start(environment.apiUrl + 'hubs/notifications' )
+      this.rt.start()
     );
     this.destroyRef.onDestroy(()=>{
       void this.rt.stop();

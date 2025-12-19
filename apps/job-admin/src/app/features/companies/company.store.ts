@@ -101,7 +101,7 @@ export class CompanyStore {
     this.loading.set(true);
     this.error.set(null);
 
-    return this.companyService.listUnified().pipe(
+    return this.companyService.listCompanies().pipe(
       tap({
         next: response => {
           this.companies.set(response.data ?? [])
@@ -114,7 +114,7 @@ export class CompanyStore {
   }
 
   private loadIndustries() {
-    return this.companyService.listIndustriesUnified().pipe(
+    return this.companyService.listIndustries().pipe(
       tap(response =>{
         this.industries.set(response.data ?? [])
         console.log(this.industries())

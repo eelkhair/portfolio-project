@@ -1,4 +1,4 @@
-import {effect, inject, Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { Company } from '../types/models/Company';
@@ -16,34 +16,35 @@ export class CompanyService {
 
   // ---- public API ----
 
-  listUnified(): Observable<ApiResponse<Company[]>> {
+  listCompanies(): Observable<ApiResponse<Company[]>> {
 
     return this.featureFlags.isMonolith()
       ? this.listOData()
-      : this.list();
-  }
-
-  listIndustriesUnified() {
-    return this.featureFlags.isMonolith()
-      ? this.listIndustriesOData()
-      : this.listIndustries();
-  }
-
-  list(): Observable<ApiResponse<Company[]>> {
-    return this.http.get<ApiResponse<Company[]>>(
-      `${environment.apiUrl}companies`
-    );
+      : this.listMicro();
   }
 
   listIndustries(): Observable<ApiResponse<Industry[]>> {
+    return this.featureFlags.isMonolith()
+      ? this.listIndustriesOData()
+      : this.listIndustriesMicro();
+  }
+
+  listMicro(): Observable<ApiResponse<Company[]>> {
+    return this.http.get<ApiResponse<Company[]>>(
+      `${environment.microserviceUrl}companies`
+    );
+  }
+
+  listIndustriesMicro(): Observable<ApiResponse<Industry[]>> {
     return this.http.get<ApiResponse<Industry[]>>(
-      `${environment.apiUrl}industries`
+      `${environment.microserviceUrl}industries`
     );
   }
 
   createCompany(dto: CreateCompanyDto): Observable<ApiResponse<Company>> {
+    const base = this.featureFlags.isMonolith()? environment.monolithUrl : environment.microserviceUrl;
     return this.http.post<ApiResponse<Company>>(
-      `${environment.apiUrl}companies`,
+      `${base}companies`,
       dto
     );
   }
@@ -52,7 +53,7 @@ export class CompanyService {
 
   private listOData(): Observable<ApiResponse<Company[]>> {
     return this.http
-      .get<ODataResponse<Company>>(`${environment.apiUrl}odata/companies`)
+      .get<ODataResponse<Company>>(`${environment.monolithUrl}odata/companies`)
       .pipe(
         map(res => this.normalizeOData(res))
       );
@@ -60,7 +61,7 @@ export class CompanyService {
 
   private listIndustriesOData(): Observable<ApiResponse<Industry[]>> {
     return this.http
-      .get<ODataResponse<Industry>>(`${environment.apiUrl}odata/industries`)
+      .get<ODataResponse<Industry>>(`${environment.monolithUrl}odata/industries`)
       .pipe(
         map(res => this.normalizeOData(res))
       );
