@@ -1,4 +1,5 @@
 using JobBoard.Application.Actions.Base;
+using JobBoard.Application.Actions.Outbox;
 using JobBoard.Application.Interfaces;
 using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Application.Interfaces.Observability;
@@ -20,7 +21,10 @@ public class TransactionCommandHandlerDecorator<TCommand, TResult>(
     {
         if(request is INoTransaction || dbContext.Database.CurrentTransaction is not null)
         {
-            logger.LogInformation("Skipping database transaction for {CommandName}", typeof(TCommand).Name);
+            if (typeof(TCommand) != typeof(ProcessOutboxMessageCommand))
+            { 
+                logger.LogInformation("Skipping database transaction for {CommandName}", typeof(TCommand).Name);
+            }
             return await innerHandler.HandleAsync(request, cancellationToken);
         }
         

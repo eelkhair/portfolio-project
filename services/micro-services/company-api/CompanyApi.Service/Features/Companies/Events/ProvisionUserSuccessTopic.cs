@@ -28,21 +28,26 @@ public class ProvisionUserSuccessTopic(ICompanyCommandService service, IMessageS
 
         var activated = await service.ActivateAsync(request.Data?.CompanyUId ?? Guid.Empty,
             DaprExtensions.CreateUser(request.UserId), ct);
-        if (activated && request.Data is not null && request.Data.SourceSystem=="AdminApi")
+        if (request.Data is not null && request.Data.SourceSystem == "AdminApi")
         {
-            await sender.SendEventAsync(PubSubNames.RabbitMq, "company.create.success", request.UserId, new CompanyCreatedSuccess
+            if (activated)
             {
-                CompanyEmail = request.Data?.Email ?? string.Empty,
-                CompanyName = request.Data?.CompanyName ?? string.Empty,
-                CompanyUId = request.Data?.CompanyUId ?? Guid.Empty,
-                UserUId = request.Data?.UId?? Guid.Empty,
-                Auth0CompanyId = request.Data?.Auth0OrganizationId ?? string.Empty,
-                Auth0UserId = request.Data?.Auth0UserId ?? string.Empty
-            }, ct);
-        }
-        else
-        {
-            await sender.SendEventAsync(PubSubNames.RabbitMq, "company.create.fail", request.UserId, request.Data, ct);
+                await sender.SendEventAsync(PubSubNames.RabbitMq, "company.create.success", request.UserId,
+                    new CompanyCreatedSuccess
+                    {
+                        CompanyEmail = request.Data?.Email ?? string.Empty,
+                        CompanyName = request.Data?.CompanyName ?? string.Empty,
+                        CompanyUId = request.Data?.CompanyUId ?? Guid.Empty,
+                        UserUId = request.Data?.UId ?? Guid.Empty,
+                        Auth0CompanyId = request.Data?.Auth0OrganizationId ?? string.Empty,
+                        Auth0UserId = request.Data?.Auth0UserId ?? string.Empty
+                    }, ct);
+            }
+            else
+            {
+                await sender.SendEventAsync(PubSubNames.RabbitMq, "company.create.fail", request.UserId, request.Data,
+                    ct);
+            }
         }
     }
 }
