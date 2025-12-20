@@ -18,7 +18,6 @@ public class CompaniesController : BaseODataController
     /// <summary>
     /// Retrieves a company by its unique identifier (UId).
     /// </summary>
-    /// <param name="uId">The unique identifier of the company to retrieve.</param>
     /// <returns>A filtered <see cref="SingleResult"/> containing the company matching the specified UId.</returns>
     [EnableQuery]
     public IActionResult Get()

@@ -25,11 +25,7 @@ public class CompaniesController(IUserAccessor accessor, ICompanyActivationNotif
     [ProducesResponseType(typeof(ApiResponse<CompanyDto>), StatusCodes.Status201Created)]
     public async Task<IActionResult> Create([FromBody] CreateCompanyCommand command)
         => await ExecuteCommandAsync(command, result =>
-            CreatedAtAction(
-                nameof(OData.CompaniesController.GetById),  
-                new { uId = result.Data!.Id },
-                result
-            ));
+            CreatedOData("companies", result.Data!.Id, result));
 
     /// <summary>
     /// Processes a request indicating that a company has been successfully created

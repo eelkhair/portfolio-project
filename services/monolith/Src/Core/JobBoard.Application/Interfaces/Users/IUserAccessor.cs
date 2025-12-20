@@ -8,5 +8,5 @@ public interface IUserAccessor
     string? LastName { get; set; }
     string? Email { get; set; }
     List<string> Roles { get; set; }
-    string Token { get; set; }
+    string? Token { get; set; }
 }

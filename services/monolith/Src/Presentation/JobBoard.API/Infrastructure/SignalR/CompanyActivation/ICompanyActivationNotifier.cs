@@ -11,6 +11,7 @@ public interface ICompanyActivationNotifier
     /// Sends a notification about the creation of a new company.
     /// </summary>
     /// <param name="request">The details of the created company encapsulated in a <see cref="CompanyCreatedModel"/> instance.</param>
+    /// <param name="cancellationToken"></param>
     /// <returns>A task that represents the asynchronous operation.</returns>
     Task NotifyAsync(CompanyCreatedModel request, CancellationToken cancellationToken);
 }

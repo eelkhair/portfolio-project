@@ -2,22 +2,14 @@
 
 namespace JobBoard.Application.Infrastructure.Exceptions;
 
-public sealed class ExternalServiceException : Exception
+public sealed class ExternalServiceException(
+    string service,
+    string operation,
+    HttpStatusCode statusCode,
+    string responseBody)
+    : Exception($"{service} {operation} failed with {statusCode}: {responseBody}")
 {
-    public string Service { get; }
-    public string Operation { get; }
-    public HttpStatusCode StatusCode { get; }
-
-    private ExternalServiceException(){}
-    public ExternalServiceException(
-        string service,
-        string operation,
-        HttpStatusCode statusCode,
-        string responseBody)
-        : base($"{service} {operation} failed with {statusCode}: {responseBody}")
-    {
-        Service = service;
-        Operation = operation;
-        StatusCode = statusCode;
-    }
+    public string Service { get; } = service;
+    public string Operation { get; } = operation;
+    public HttpStatusCode StatusCode { get; } = statusCode;
 }
