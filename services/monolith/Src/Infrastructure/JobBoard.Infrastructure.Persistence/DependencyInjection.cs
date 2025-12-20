@@ -35,14 +35,11 @@ public static class DependencyInjection
             provider.GetRequiredService<JobBoardDbContext>());
 
         services.Scan(scan => scan
-            .FromAssemblyOf<IUserRepository>()
             .FromAssemblyOf<UserRepository>()
-            .AddClasses(classes => classes.AssignableTo<IRepository>())
+            .AddClasses(classes => classes.AssignableTo<BaseRepository>())
             .AsImplementedInterfaces()
             .WithScopedLifetime());
         
-        
-   
         return services;
     }
 }
