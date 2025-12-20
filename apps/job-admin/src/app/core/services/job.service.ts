@@ -7,10 +7,12 @@ import {JobGenRequest, JobGenResponse} from '../types/Dtos/JobGen';
 import {Draft} from '../types/Dtos/draft';
 import {EnhancementRequest, EnhancementResponse} from '../types/Dtos/EnhancementDto';
 import {CreateJobDto} from '../types/Dtos/CreateJobRequest';
+import {FeatureFlagsService} from './feature-flags.service';
 
 @Injectable({ providedIn: 'root' })
 export class JobService {
   private http: HttpClient = inject(HttpClient);
+  private featureFlagService = inject(FeatureFlagsService);
 
   list(companyUId: string){
     return this.http.get<ApiResponse<Job[]>>(environment.apiUrl+ 'jobs/'+companyUId);
@@ -24,8 +26,8 @@ export class JobService {
   }
 
   loadDrafts(companyId: string) {
-    return this.http.get<ApiResponse<Draft[]>>(environment.apiUrl+ 'jobs/'+companyId +'/list-drafts');
-
+    const baseUrl = this.featureFlagService.isMonolith()?environment.monolithUrl: environment.microserviceUrl;
+    return this.http.get<ApiResponse<Draft[]>>(baseUrl+ 'jobs/'+companyId +'/list-drafts');
   }
 
   rewrite(model: EnhancementRequest) {

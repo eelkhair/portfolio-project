@@ -31,7 +31,7 @@ public class HttpUserAccessor : IUserAccessor
         LastName = user.FindFirstValue("https://eelkhair.net/last_name") ?? string.Empty;
         Email = user.FindFirstValue("https://eelkhair.net/email") ?? string.Empty;
         Roles = user.FindAll("https://eelkhair.net/roles").Select(c => c.Value).ToList();
-
+        Token = (httpContextAccessor.HttpContext?.Request.Headers["Authorization"] ?? string.Empty);
     }
 
     /// <summary>
@@ -50,6 +50,11 @@ public class HttpUserAccessor : IUserAccessor
     /// Gets the email.
     /// </summary>
     public string? Email { get; set; }
+
+    /// <summary>
+    /// Gets or sets the security token associated with the current HTTP request.
+    /// </summary>
+    public string? Token { get; set; }
 
     /// <summary>
     /// Gets the roles.

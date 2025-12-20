@@ -45,6 +45,7 @@ public static class DependencyInjection
 
         builder.Services.AddTransient<IOutboxMessageProcessor, DaprOutboxMessageProcessor>();
 
+        builder.Services.AddScoped<IAiServiceClient, AiServiceClient>();
         return builder;
     }
 
