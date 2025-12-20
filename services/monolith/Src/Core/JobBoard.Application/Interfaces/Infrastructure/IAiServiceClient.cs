@@ -6,5 +6,5 @@ namespace JobBoard.Application.Interfaces.Infrastructure;
 public interface IAiServiceClient
 {
     Task<List<JobDraftResponse>> ListDrafts(Guid companyId, CancellationToken cancellationToken);
-    Task<JobRewriteResponse> RewriteItem(JobRewriteRequest jobRewriteRequest, CancellationToken cancellationToken);
+    Task<JobRewriteResponse> RewriteItem(JobRewriteRequest requestModel, CancellationToken cancellationToken);
 }

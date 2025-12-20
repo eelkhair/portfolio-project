@@ -10,7 +10,7 @@ using JobBoard.Application.Interfaces.Infrastructure;
 using JobBoard.Application.Interfaces.Users;
 using Microsoft.Extensions.Logging;
 
-namespace JobBoard.Infrastructure.Dapr;
+namespace JobBoard.infrastructure.Dapr;
 
 public sealed class AiServiceClient(
     DaprClient client,
@@ -19,7 +19,6 @@ public sealed class AiServiceClient(
     : IAiServiceClient
 {
     private const string ServiceName = "ai-service";
-
 
     private static readonly JsonSerializerOptions JsonOpts = new()
     {
@@ -32,114 +31,98 @@ public sealed class AiServiceClient(
         Guid companyId,
         CancellationToken cancellationToken)
     {
-        var activity = Activity.Current;
-        
-        activity?.SetTag("company.id", companyId);
-        activity?.SetTag("rpc.system", "dapr");
-        activity?.SetTag("rpc.service", ServiceName);
-        activity?.SetTag("rpc.method", "drafts.list");
-        activity?.SetTag("operation.type", "integration");
+        EnrichActivity(companyId, "drafts.list");
 
-        var request = client.CreateInvokeMethodRequest(
+        var request = CreateRequest(
             HttpMethod.Get,
+            $"drafts/{companyId}");
+
+        using var response =
+            await client.InvokeMethodWithResponseAsync(request, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+            await ThrowExternalServiceError(response, "drafts.list", cancellationToken);
+
+        var drafts = await response.Content
+                         .ReadFromJsonAsync<List<JobDraftResponse>>(JsonOpts, cancellationToken)
+                     ?? throw new InvalidOperationException("ai-service returned empty JSON payload.");
+
+        Activity.Current?.SetTag("ai.drafts.count", drafts.Count);
+
+        logger.LogInformation(
+            "ai-service returned {DraftCount} drafts for company {CompanyId}",
+            drafts.Count,
+            companyId);
+
+        return drafts;
+    }
+
+    public async Task<JobRewriteResponse> RewriteItem(
+        JobRewriteRequest requestModel,
+        CancellationToken cancellationToken)
+    {
+        EnrichActivity(null, "drafts.rewrite.item");
+
+        var request = CreateRequest(
+            HttpMethod.Put,
+            "drafts/rewrite/item");
+
+        request.Content = JsonContent.Create(requestModel, options: JsonOpts);
+
+        using var response =
+            await client.InvokeMethodWithResponseAsync(request, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+            await ThrowExternalServiceError(response, "drafts.rewrite.item", cancellationToken);
+
+        var result = await response.Content
+                         .ReadFromJsonAsync<JobRewriteResponse>(JsonOpts, cancellationToken)
+                     ?? throw new InvalidOperationException("ai-service returned empty JSON payload.");
+
+        return result;
+    }
+
+    private HttpRequestMessage CreateRequest(HttpMethod method, string path)
+    {
+        var request = client.CreateInvokeMethodRequest(
+            method,
             appId: ServiceName,
-            methodName: $"drafts/{companyId}"
-        );
+            methodName: path);
 
         request.Headers.TryAddWithoutValidation("Authorization", accessor.Token);
-
-        try
-        {
-            using var response =
-                await client.InvokeMethodWithResponseAsync(request, cancellationToken);
-
-            if (!response.IsSuccessStatusCode)
-                await ThrowExternalServiceError(response,"drafts.list",cancellationToken);
-
-            var drafts = await response.Content.ReadFromJsonAsync<List<JobDraftResponse>>(
-                             JsonOpts, cancellationToken)
-                         ?? throw new InvalidOperationException(
-                             "ai-service returned empty JSON payload.");
-
-            Activity.Current?.SetTag("ai.drafts.count", drafts.Count);
-
-            logger.LogInformation(
-                "ai-service returned {DraftCount} drafts for company {CompanyId}",
-                drafts.Count,
-                companyId);
-
-            return drafts;
-        }
-        catch (Exception ex)
-        {
-            Activity.Current?.SetStatus(ActivityStatusCode.Error, ex.Message);
-            logger.LogError(ex,
-                "Failed to list drafts from ai-service for company {CompanyId}",
-                companyId);
-            throw;
-        }
+        return request;
     }
 
-    public async Task<JobRewriteResponse> RewriteItem(JobRewriteRequest jobRewriteRequest, CancellationToken cancellationToken)
+    private static void EnrichActivity(Guid? companyId, string operation)
     {
-        try
-        {
-            var req = client.CreateInvokeMethodRequest(
-                HttpMethod.Put,
-                appId: "ai-service",
-                methodName: $"drafts/rewrite/item"
-            );
+        var activity = Activity.Current;
+        if (activity is null) return;
 
-            req.Headers.TryAddWithoutValidation("Authorization", accessor.Token);
-            req.Content = JsonContent.Create(jobRewriteRequest, options: JsonOpts);
-            
-            using var resp = await client.InvokeMethodWithResponseAsync(req, cancellationToken);
+        if (companyId.HasValue)
+            activity.SetTag("company.id", companyId);
 
-            var raw = await resp.Content.ReadAsStringAsync(cancellationToken);
-
-            if (!resp.IsSuccessStatusCode)
-            {
-
-                logger.LogError("ai-service returned {StatusCode}: {Body}", (int)resp.StatusCode, raw);
-
-                throw new HttpRequestException(
-                    $"ai-service {resp.StatusCode}: {raw}", null, resp.StatusCode);
-            }
-
-            var result = JsonSerializer.Deserialize<JobRewriteResponse>(raw, JsonOpts);
-
-            if (result is null)
-                throw new InvalidOperationException("Empty or invalid JSON from ai-service.");
-
-            return result;
-        }
-        catch (Exception ex)
-        {
-            
-            Activity.Current?.SetStatus(ActivityStatusCode.Error, ex.Message);
-            logger.LogError(ex,
-                "Failed to rewrite item" );
-            throw;
-        }
+        activity.SetTag("rpc.system", "dapr");
+        activity.SetTag("rpc.service", ServiceName);
+        activity.SetTag("rpc.method", operation);
+        activity.SetTag("operation.type", "integration");
     }
-
-  
 
     private async Task ThrowExternalServiceError(
         HttpResponseMessage response,
-        string operationName,
+        string operation,
         CancellationToken cancellationToken)
     {
         var raw = await response.Content.ReadAsStringAsync(cancellationToken);
 
         logger.LogError(
-            "ai-service failed with status {StatusCode}: {Body}",
+            "ai-service failed {Operation} with status {StatusCode}: {Body}",
+            operation,
             (int)response.StatusCode,
             raw);
 
         throw new ExternalServiceException(
             service: ServiceName,
-            operation: operationName,
+            operation: operation,
             statusCode: response.StatusCode,
             responseBody: raw);
     }
