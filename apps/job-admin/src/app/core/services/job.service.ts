@@ -31,7 +31,8 @@ export class JobService {
   }
 
   rewrite(model: EnhancementRequest) {
-    return this.http.put<ApiResponse<EnhancementResponse>>(environment.apiUrl +"jobs/drafts/rewrite", model);
+    const baseUrl = this.featureFlagService.isMonolith()?environment.monolithUrl: environment.microserviceUrl;
+    return this.http.put<ApiResponse<EnhancementResponse>>(baseUrl +"jobs/drafts/rewrite", model);
   }
 
   createJob(model: CreateJobDto) {

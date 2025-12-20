@@ -13,24 +13,8 @@ namespace JobBoard.API.Controllers;
 /// <summary>
 /// Company Controller 
 /// </summary>
-public class CompaniesController(IUserAccessor accessor, ICompanyActivationNotifier notifier, IConfiguration config) : BaseApiController
+public class CompaniesController(IUserAccessor accessor, ICompanyActivationNotifier notifier) : BaseApiController
 {
-
-    /// <summary>
-    /// Get Company by UId
-    /// </summary>
-    /// <param name="uId"></param>
-    /// <returns></returns>
-    [HttpGet("{uId:guid}")]
-    [StandardApiResponses]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(CompanyDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetData(Guid uId)
-    {
-        
-        return Ok(config["AAAAAAAA"]);
-    }
-    
     /// <summary>
     /// Create Company
     /// </summary>
@@ -42,7 +26,7 @@ public class CompaniesController(IUserAccessor accessor, ICompanyActivationNotif
     public async Task<IActionResult> Create([FromBody] CreateCompanyCommand command)
         => await ExecuteCommandAsync(command, result =>
             CreatedAtAction(
-                nameof(GetData), 
+                nameof(OData.CompaniesController.GetById),  
                 new { uId = result.Data!.Id },
                 result
             ));

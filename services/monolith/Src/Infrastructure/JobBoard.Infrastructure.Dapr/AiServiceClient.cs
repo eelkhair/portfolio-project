@@ -1,14 +1,13 @@
 ﻿using System.Diagnostics;
-using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using AdminAPI.Contracts.Models.Jobs.Requests;
 using Dapr.Client;
 using JobBoard.Application.Actions.Jobs.Models;
 using JobBoard.Application.Infrastructure.Exceptions;
 using JobBoard.Application.Interfaces.Infrastructure;
 using JobBoard.Application.Interfaces.Users;
-using JobBoard.infrastructure.Dapr;
 using Microsoft.Extensions.Logging;
 
 namespace JobBoard.Infrastructure.Dapr;
@@ -33,7 +32,13 @@ public sealed class AiServiceClient(
         Guid companyId,
         CancellationToken cancellationToken)
     {
-        EnrichActivity(companyId, "drafts.list");
+        var activity = Activity.Current;
+        
+        activity?.SetTag("company.id", companyId);
+        activity?.SetTag("rpc.system", "dapr");
+        activity?.SetTag("rpc.service", ServiceName);
+        activity?.SetTag("rpc.method", "drafts.list");
+        activity?.SetTag("operation.type", "integration");
 
         var request = client.CreateInvokeMethodRequest(
             HttpMethod.Get,
@@ -75,17 +80,50 @@ public sealed class AiServiceClient(
         }
     }
 
-    private static void EnrichActivity(Guid companyId, string operationName)
+    public async Task<JobRewriteResponse> RewriteItem(JobRewriteRequest jobRewriteRequest, CancellationToken cancellationToken)
     {
-        var activity = Activity.Current;
-        if (activity is null) return;
+        try
+        {
+            var req = client.CreateInvokeMethodRequest(
+                HttpMethod.Put,
+                appId: "ai-service",
+                methodName: $"drafts/rewrite/item"
+            );
 
-        activity.SetTag("company.id", companyId);
-        activity.SetTag("rpc.system", "dapr");
-        activity.SetTag("rpc.service", ServiceName);
-        activity.SetTag("rpc.method", operationName);
-        activity.SetTag("operation.type", "integration");
+            req.Headers.TryAddWithoutValidation("Authorization", accessor.Token);
+            req.Content = JsonContent.Create(jobRewriteRequest, options: JsonOpts);
+            
+            using var resp = await client.InvokeMethodWithResponseAsync(req, cancellationToken);
+
+            var raw = await resp.Content.ReadAsStringAsync(cancellationToken);
+
+            if (!resp.IsSuccessStatusCode)
+            {
+
+                logger.LogError("ai-service returned {StatusCode}: {Body}", (int)resp.StatusCode, raw);
+
+                throw new HttpRequestException(
+                    $"ai-service {resp.StatusCode}: {raw}", null, resp.StatusCode);
+            }
+
+            var result = JsonSerializer.Deserialize<JobRewriteResponse>(raw, JsonOpts);
+
+            if (result is null)
+                throw new InvalidOperationException("Empty or invalid JSON from ai-service.");
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            
+            Activity.Current?.SetStatus(ActivityStatusCode.Error, ex.Message);
+            logger.LogError(ex,
+                "Failed to rewrite item" );
+            throw;
+        }
     }
+
+  
 
     private async Task ThrowExternalServiceError(
         HttpResponseMessage response,

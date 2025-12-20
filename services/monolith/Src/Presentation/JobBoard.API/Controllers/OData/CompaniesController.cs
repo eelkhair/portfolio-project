@@ -27,6 +27,12 @@ public class CompaniesController : BaseODataController
        
         return Ok(companies);
     }
+
+    /// <summary>
+    /// Retrieves a company by its unique identifier (id).
+    /// </summary>
+    /// <param name="id">The unique identifier of the company to retrieve.</param>
+    /// <returns>An HTTP response containing the company matching the specified identifier, or a not found result if no matching company is found.</returns>
     [EnableQuery]
     [HttpGet("odata/companies({id})")]
     public ActionResult GetById(Guid id)
