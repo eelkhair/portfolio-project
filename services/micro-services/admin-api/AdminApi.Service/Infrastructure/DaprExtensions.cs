@@ -32,6 +32,7 @@ public static class DaprExtensions
                 sp.GetRequiredService<DaprClient>(),
                 sp.GetRequiredService<IConfiguration>(),
                 sp.GetRequiredService<IFeatureFlagNotifier>(),
+                sp.GetRequiredService<ILogger<FeatureFlagWatcher>>(),
                 serviceName));
 
         return builder;
