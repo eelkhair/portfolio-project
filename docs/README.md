@@ -2,17 +2,19 @@
 
 A **distributed Job Board platform** built to showcase modern backend architecture, event-driven workflows, and production-grade observability.
 
-This repo demonstrates three evolution paths **side-by-side**:
+This repository demonstrates **three architectural evolution paths side-by-side**:
 
-1. **Monolith API** (Clean Architecture + DDD + CQRS)
-2. **Microservices** (service-per-bounded-context)
-3. **Strangler-Fig transition layer** via **Connector API** (incremental migration from monolith to services)
+1. **Monolith API** – Clean Architecture + DDD + CQRS
+2. **Microservices** – service-per-bounded-context
+3. **Strangler-Fig transition layer** via a **Connector API** (incremental migration)
 
-It also includes **first-class observability**, **health checks**, and an **operationally-realistic homelab deployment** (reverse proxy + containerized infra).
+Architectural decisions are documented explicitly using **Architecture Decision Records (ADRs)** to capture trade-offs, constraints, and rationale.
+
+📁 **ADR Index:** [`docs/ADRs`](./ADRs)
 
 ---
 
-## Table of contents
+## Table of Contents
 
 - [What you can do in the system](#what-you-can-do-in-the-system)
 - [Architecture at a glance](#architecture-at-a-glance)
@@ -20,7 +22,7 @@ It also includes **first-class observability**, **health checks**, and an **oper
 - [Observability](#observability)
 - [Health checks](#health-checks)
 - [Running locally](#running-locally)
-- [Docs](#docs)
+- [Architecture Decision Records](#architecture-decision-records)
 - [Screenshots](#screenshots)
 - [Roadmap](#roadmap)
 - [Notes](#notes)
@@ -30,128 +32,214 @@ It also includes **first-class observability**, **health checks**, and an **oper
 ## What you can do in the system
 
 - Create and manage **companies**, **jobs**, and related workflows
-- Provision company users (example: through an external identity provider)
-- Trigger async workflows via pub/sub and track them end-to-end
-- Generate / rewrite job descriptions via an AI service (optional)
+- Provision company users via an external identity provider
+- Trigger asynchronous workflows via pub/sub and trace them end-to-end
+- Generate and rewrite job descriptions using an AI service (optional)
 
 ---
 
 ## Architecture at a glance
 
 **Frontend**
-- **Admin UI** (SPA) calls Admin API and/or Monolith API
+- **Admin UI (SPA)** calling either the Monolith API or Admin API
 
 **APIs**
-- **Monolith API**: the “primary” application for the monolith path
-- **Connector API**: the strangler layer; routes/coordinates between monolith and microservices
-- **Admin API / Company API / Job API / User API**: microservice path (bounded contexts)
+- **Monolith API** – primary application for the monolith path
+- **Connector API** – strangler layer coordinating monolith and services
+- **Admin / Company / Job / User APIs** – microservice bounded contexts
 
 **Infrastructure**
-- **SQL Server** for transactional data (monolith + microservices DBs)
-- **RabbitMQ** for pub/sub (topics + DLQs)
-- **Redis** for state/config (and optional caches)
-- **Vault** (or equivalent) for secrets in non-dev deployments
-- **OpenTelemetry + Jaeger + Grafana** for tracing & querying by TraceId
+- **SQL Server** – transactional persistence
+- **RabbitMQ** – local pub/sub with topics and DLQs
+- **Redis** – state, config, optional caching
+- **Vault** – secrets (non-dev environments)
+- **OpenTelemetry + Jaeger + Grafana** – distributed tracing & diagnostics
 
-> The goal is not just “it works,” but that you can **operate** and **debug** it like a real system.
+📄 Rationale:
+- Architecture scope → [ADR-001](./ADRs/ADR-001-Architecture-Showcase-Scope.md)
+- Messaging choice → [ADR-006](./ADRs/ADR-006-RabbitMQ-vs-Azure-Service-Bus.md)
 
 ---
 
 ## Key patterns
 
 ### Clean Architecture + DDD
-- Domain model with clear invariants
-- Application layer with use-case handlers (CQRS)
-- Infrastructure boundary for persistence/integration
+
+- Explicit domain model with invariants
+- Application layer with use-case handlers
+- Infrastructure isolated behind interfaces
+
+📄 Decision rationale:
+- Overall architecture boundaries → [ADR-001](./ADRs/ADR-001-Architecture-Showcase-Scope.md)
+
+---
+
+### CQRS + Decorator Pipeline
+
+Commands and queries are explicitly separated and processed through a decorator pipeline for:
+
+- Validation
+- Transactions
+- Observability
+- Error handling
+
+📄 Decision rationale:
+- CQRS and handler pipeline → [ADR-005](./ADRs/ADR-005-CQRS-and-Decorator-Pipeline.md)
+
+---
 
 ### Transactional Outbox
-Reliable event publishing without losing events on crashes / retries.
 
-### Strangler-Fig migration
-An incremental migration technique:
-- keep the monolith “alive”
-- introduce a **Connector API** as a transition layer
-- slowly extract capabilities into services without a big-bang rewrite
+Integration events are written transactionally alongside state changes and published asynchronously to prevent dual-write failures.
 
-### Idempotency + Sagas
-Async workflows are modeled with explicit steps and guardrails:
-- idempotency keys
-- retry safety
-- DLQ visibility
+📄 Decision rationale:
+- Reliable event publishing → [ADR-003](./ADRs/ADR-003-Transactional-Outbox.md)
+
+---
+
+### Strangler-Fig Migration
+
+The system supports **incremental migration** from monolith to microservices by introducing a **Connector API** as a transition layer.
+
+- No big-bang rewrite
+- Monolith remains operational
+- Capabilities are extracted gradually
+
+📄 Decision rationale:
+- Migration strategy → [ADR-001](./ADRs/ADR-001-Architecture-Showcase-Scope.md)
+
+---
+
+### Messaging Strategy
+
+- **RabbitMQ** is used locally for fast iteration and DLQ visibility
+- **Azure Service Bus** is the cloud target for guaranteed delivery and operational maturity
+
+📄 Decision rationale:
+- RabbitMQ vs Service Bus → [ADR-006](./ADRs/ADR-006-RabbitMQ-vs-Azure-Service-Bus.md)
+
+---
+
+### Dapr (Homelab / Local Only)
+
+Dapr is used **intentionally for homelab and local parity**, not as a production dependency.
+
+It enables:
+- Local emulation of cloud primitives
+- Config and secret abstraction
+- Event-driven experimentation without cloud lock-in
+
+**Target Azure replacements**
+- Dapr Config → Azure App Configuration
+- Dapr Secrets → Azure Key Vault
+- Dapr Pub/Sub → Azure Service Bus
+- Dapr Invocation → Azure SignalR (where applicable)
+
+📄 Decision rationale:
+- Dapr usage boundaries → [ADR-002](./ADRs/ADR-002-Dapr-Usage-Boundaries.md)
+
+---
+
+### Trace Context Propagation
+
+Trace context is propagated consistently across:
+- HTTP calls
+- Async messaging
+- Background processors
+
+This enables full end-to-end traceability.
+
+📄 Decision rationale:
+- Trace propagation → [ADR-007](./ADRs/ADR-007-Trace-Context-Propagation.md)
 
 ---
 
 ## Observability
 
-This system is instrumented end-to-end:
+The platform is instrumented **end-to-end**:
 
-- **Distributed tracing** across frontend → APIs → DB → async pub/sub
-- **Trace correlation in logs**
-- A practical **“find by TraceId”** workflow in Grafana
+- Distributed tracing across frontend → APIs → DB → async workflows
+- Correlated logs with TraceId
+- Practical “find by TraceId” debugging workflow in Grafana
 
-See: **[Observability](./observability.md)**
+📄 Decision rationale:
+- Observability-first design → [ADR-004](./ADRs/ADR-004-Observability-First.md)
+
+See also:
+- [`observability.md`](./observability.md)
 
 ---
 
 ## Health checks
 
-A dedicated health dashboard shows:
-- app-level health (liveness/readiness)
-- dependency checks (DB, pub/sub, state, config, secret store, external APIs)
+A centralized health dashboard exposes:
 
-See: **[Health checks](./health-checks.md)**
+- Liveness & readiness
+- Dependency health (DB, messaging, config, secrets, external APIs)
+
+📄 Decision rationale:
+- Dependency-aware health modeling → [ADR-004](./ADRs/ADR-004-Observability-First.md)
+
+See also:
+- [`health-checks.md`](./health-checks.md)
 
 ---
 
 ## Running locally
 
-This repo is designed to be runnable with containers.
+The platform is designed to run via containers.
 
 Typical flow:
 1. Start infrastructure (SQL, RabbitMQ, Redis, tracing stack)
-2. Start services (monolith and/or microservices)
+2. Start monolith and/or microservices
 3. Open:
    - Admin UI
    - Jaeger / Grafana
    - Health dashboard
 
-> Exact commands vary by environment; use the compose files / scripts in the repo.  
-> If you share your current compose layout, I can align this section to your exact commands.
+📄 Decision rationale:
+- Local vs cloud parity → [ADR-002](./ADRs/ADR-002-Dapr-Usage-Boundaries.md)
 
 ---
 
-## Docs
+## Architecture Decision Records
 
-- **[Observability](./observability.md)** – traces, logs, and “find by TraceId”
-- **[Strangler-Fig Migration](./strangler-fig.md)** – stages, Connector API, safe extraction
-- **[Health checks](./health-checks.md)** – how health is modeled and what’s checked
-- **[Screenshots](./screenshots.md)** – curated evidence (traces, dashboards, queues, config)
+All significant architectural decisions are documented as ADRs:
+
+- [ADR-001 – Architecture Showcase Scope](./ADRs/ADR-001-Architecture-Showcase-Scope.md)
+- [ADR-002 – Dapr Usage Boundaries](./ADRs/ADR-002-Dapr-Usage-Boundaries.md)
+- [ADR-003 – Transactional Outbox](./ADRs/ADR-003-Transactional-Outbox.md)
+- [ADR-004 – Observability First](./ADRs/ADR-004-Observability-First.md)
+- [ADR-005 – CQRS and Decorator Pipeline](./ADRs/ADR-005-CQRS-and-Decorator-Pipeline.md)
+- [ADR-006 – RabbitMQ vs Azure Service Bus](./ADRs/ADR-006-RabbitMQ-vs-Azure-Service-Bus.md)
+- [ADR-007 – Trace Context Propagation](./ADRs/ADR-007-Trace-Context-Propagation.md)
 
 ---
 
 ## Screenshots
 
-Curated screenshots live under `images/` (grouped by topic):
+Curated screenshots live under `images/`:
 
-- `images/Observability/*`
-- `images/Strangler Fig/*`
-- `images/Http/*`
+- `images/Observability/`
+- `images/StranglerFig/`
+- `images/Http/`
 
-See: **[Screenshots](./screenshots.md)**
+See: [`screenshots.md`](./screenshots.md)
 
 ---
 
 ## Roadmap
-> NOTE: A Docker Compose reference will be added to document the local
-> orchestration strategy used for development and testing.
-- Expand docs (ADRs, architecture diagrams)
-- Harden async workflows (more DLQ tooling, replay utilities)
-- Add IaC (Bicep / Terraform) for cloud portability
-- Improve AI service (streaming, structured outputs, evals)
+
+- Expand ADR coverage (OData constraints, security boundaries)
+- Add C4-style architecture diagrams
+- Improve DLQ tooling and replay utilities
+- Add IaC (Bicep / Terraform) for Azure portability
+- Enhance AI service (streaming, structured output, evaluation)
 
 ---
 
 ## Notes
 
-This is a portfolio project; some names/endpoints are simplified.  
-If you want this README tailored to the exact repository structure (folders, compose names, scripts), upload the repo tree or paste `ls -R` for the root.
+This is a **portfolio project** designed to demonstrate architectural thinking, trade-offs, and operational readiness.
+
+The emphasis is on **why decisions were made**, not just implementation details.
