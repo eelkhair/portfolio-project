@@ -203,10 +203,33 @@ When deployed to Azure, the intent is to gradually replace Dapr components with 
 
 - **Dapr Configuration Store** → **Azure App Configuration**
 - **Dapr Secret Store** → **Azure Key Vault**
-- **Dapr Pub/Sub** → **Azure Event Grid**
-- **Dapr Service Invocation / Messaging** → **Azure SignalR (where applicable)**
+- **Dapr Pub/Sub** → **Azure Service Bus**
+- **Dapr Service Invocation / Messaging** → **Azure SignalR (where applicable)****
 
 This transition is designed to be **incremental**, preserving application boundaries while swapping infrastructure concerns.
+
+---
+
+## Messaging & Integration Strategy
+
+### Azure Service Bus (Target State)
+
+For cloud deployments, **Azure Service Bus** is the preferred messaging backbone.
+
+It is chosen for:
+
+- Guaranteed delivery and at-least-once semantics
+- Support for queues and topics
+- Dead-lettering and retry policies
+- Strong integration with Azure-native services
+
+Service Bus aligns naturally with the **outbox pattern**, allowing reliable event publishing while preserving transactional consistency.
+
+In the monolith, integration events are:
+
+- Written to the database as part of the primary transaction
+- Published asynchronously via background processing
+- Designed to be consumed by external services without tight coupling
 
 ---
 
