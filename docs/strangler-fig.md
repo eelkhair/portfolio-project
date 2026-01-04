@@ -26,7 +26,7 @@ This architecture is designed to show:
 The monolith owns most behaviors and data.
 
 Screenshot:
-- ![images/Strangler Fig/strangler-fig-stage-1-monolith-primary.png](Images/Strangler%20Fig/strangler-fig-stage-1-monolith-primary.png)
+![images/Strangler Fig/strangler-fig-stage-1-monolith-primary.png](Images/Strangler%20Fig/strangler-fig-stage-1-monolith-primary.png)
 
 ### Stage 2 — Introduce Connector API
 A Connector API becomes a controlled transition layer:
@@ -35,7 +35,7 @@ A Connector API becomes a controlled transition layer:
 - orchestrates workflows spanning both
 
 Screenshot:
-- ![images/Strangler Fig/strangler-fig-stage-2-connector-introduced.png](Images/Strangler%20Fig/strangler-fig-stage-2-connector-introduced.png)
+![images/Strangler Fig/strangler-fig-stage-2-connector-introduced.png](Images/Strangler%20Fig/strangler-fig-stage-2-connector-introduced.png)
 
 ### Stage 3 — Extract services gradually
 Capabilities move from monolith modules/endpoints into services.
@@ -44,15 +44,14 @@ The Connector:
 - coordinates between old and new
 
 Screenshot:
-- ![images/Strangler%20Fig/strangler-fig-stage-3-service-extraction.png](Images/Strangler%20Fig/strangler-fig-stage-3-service-extraction.png)
+![images/Strangler%20Fig/strangler-fig-stage-3-service-extraction.png](Images/Strangler%20Fig/strangler-fig-stage-3-service-extraction.png)
 
 ### Stage 4 — Deprecate monolith paths
 After confidence is high, legacy paths are removed or disabled.
 The monolith becomes slimmer or can be retired for that slice.
 
 Screenshot:
-- `images/Strangler%20Fig/strangler-fig-stage-4-monolith-deprecated-paths.png`
-
+![images/Strangler%20Fig/strangler-fig-stage-4-monolith-deprecated-paths.png](Images/Strangler%20Fig/strangler-fig-stage-4-monolith-deprecated-paths.png)
 ---
 
 ## Connector API responsibilities
