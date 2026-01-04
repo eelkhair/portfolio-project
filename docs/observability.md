@@ -43,7 +43,7 @@ A dedicated Grafana workflow allows pasting a **TraceId** and immediately viewin
 When a request is triggered in the Admin UI, the backend returns a `Trace-Id` response header.  
 This makes the TraceId visible immediately to frontend developers and operators.
 
-![TraceId exposed in browser response headers](images/Observability/ui-browser-trace-id-header.png)
+![TraceId exposed in browser response headers](Images/Observability/ui-browser-trace-id-header.png)
 
 ---
 
@@ -55,9 +55,9 @@ Pasting the TraceId into Jaeger shows the **complete distributed trace**, includ
 - Parent/child span relationships
 - Latency hotspots and slow dependencies
 
-![Jaeger end-to-end distributed trace](images/Observability/jaeger-end-to-end-trace.png)
+![Jaeger end-to-end distributed trace](Images/Observability/jaeger-end-to-end-trace.png)
 
-![Detailed distributed trace timeline](images/Observability/distributed-trace-end-to-end-jaeger.png)
+![Detailed distributed trace timeline](Images/Observability/distributed-trace-end-to-end-jaeger.png)
 
 ---
 
@@ -92,7 +92,7 @@ This allows answering questions like:
 - *Did retries occur?*
 - *Where did the workflow slow down or fail?*
 
-![Async saga and pub/sub visibility](images/Observability/async-saga-and-pubsub-visibility.png)
+![Async saga and pub/sub visibility](Images/Observability/async-saga-and-pubsub-visibility.png)
 
 ---
 
