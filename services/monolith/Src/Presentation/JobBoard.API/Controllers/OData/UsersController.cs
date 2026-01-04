@@ -37,9 +37,9 @@ public class UsersController : BaseODataController
     /// </returns>
     [HttpGet("odata/users({id})")]
     [EnableQuery]
-    public SingleResult GetUserById(Guid id)
+    public async Task<SingleResult> GetUserById(Guid id)
     {
-        var users =  ExecuteODataQueryAsync(new GetUsersQuery()).Result;
+        var users =  await ExecuteODataQueryAsync(new GetUsersQuery());
 
         return SingleResult.Create(users.Where(c => c.Id == id));
     }

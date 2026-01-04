@@ -1,10 +1,6 @@
-﻿using JobBoard.Application.Actions.Companies.Get;
-using JobBoard.Application.Actions.Companies.Industries;
-using JobBoard.Application.Actions.Companies.Models;
+﻿using JobBoard.Application.Actions.Companies.Industries;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
-using Microsoft.AspNetCore.OData.Results;
-using Microsoft.AspNetCore.OData.Routing.Attributes;
 
 namespace JobBoard.API.Controllers.OData;
 
@@ -18,9 +14,9 @@ public class IndustriesController : BaseODataController
     /// </summary>
     /// <returns>An IActionResult containing the retrieved collection of industries in response to an OData query.</returns>
     [EnableQuery]
-    public IActionResult Get()
+    public async Task<IActionResult> Get()
     {
-        var industries = ExecuteODataQueryAsync(new GetIndustriesQuery()).Result;
+        var industries = await ExecuteODataQueryAsync(new GetIndustriesQuery());
        
         return Ok(industries);
     }

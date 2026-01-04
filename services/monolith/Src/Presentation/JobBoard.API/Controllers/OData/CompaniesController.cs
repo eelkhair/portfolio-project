@@ -1,9 +1,7 @@
 ﻿using JobBoard.Application.Actions.Companies.Get;
-using JobBoard.Application.Actions.Companies.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Results;
-using Microsoft.AspNetCore.OData.Routing.Attributes;
 
 namespace JobBoard.API.Controllers.OData;
 
@@ -20,9 +18,9 @@ public class CompaniesController : BaseODataController
     /// </summary>
     /// <returns>A filtered <see cref="SingleResult"/> containing the company matching the specified UId.</returns>
     [EnableQuery]
-    public IActionResult Get()
+    public async Task<IActionResult> Get()
     {
-        var companies = ExecuteODataQueryAsync(new GetCompaniesQuery()).Result;
+        var companies = await ExecuteODataQueryAsync(new GetCompaniesQuery());
        
         return Ok(companies);
     }
@@ -34,9 +32,9 @@ public class CompaniesController : BaseODataController
     /// <returns>An HTTP response containing the company matching the specified identifier, or a not found result if no matching company is found.</returns>
     [EnableQuery]
     [HttpGet("odata/companies({id})")]
-    public ActionResult GetById(Guid id)
+    public async Task<ActionResult> GetById(Guid id)
     {
-       var companies = ExecuteODataQueryAsync(new GetCompaniesQuery()).Result;
+       var companies = await ExecuteODataQueryAsync(new GetCompaniesQuery());
        var company = companies.FirstOrDefault(c => c.Id == id);
        return Ok(company);
     }
