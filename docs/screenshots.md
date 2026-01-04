@@ -2,8 +2,6 @@
 
 This repository includes **curated screenshots** to make the architecture and operational story easy to validate **without reading every line of code**.
 
-> **Interview tip:** Walk through a single business flow (e.g. *Create Company → Publish Event → Downstream Processing*) and use these screenshots as proof points.
-
 ---
 
 ## Observability
