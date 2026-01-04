@@ -55,7 +55,6 @@ Pasting the TraceId into Jaeger shows the **complete distributed trace**, includ
 - Parent/child span relationships
 - Latency hotspots and slow dependencies
 
-![Jaeger end-to-end distributed trace](Images/Observability/jaeger-end-to-end-trace.png)
 
 ![Detailed distributed trace timeline](Images/Observability/distributed-trace-end-to-end-jaeger.png)
 
