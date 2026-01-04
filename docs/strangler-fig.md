@@ -85,8 +85,12 @@ What matters is not the exact business flow — it's the **visibility and safety
 
 These screenshots are useful when explaining the approach to reviewers:
 
-- Centralized logs: [Images/Strangler Fig/strangler-fig-centralized-logs-elastic.png](Images/Strangler%20Fig/strangler-fig-centralized-logs-elastic.png)
-- Saga log sequence: `images/Strangler Fig/strangler-fig-saga-log-sequence.png`
+- Centralized logs: 
+
+![Images/Strangler%20Fig/strangler-fig-centralized-logs-elastic.png](Images/Strangler%20Fig/strangler-fig-centralized-logs-elastic.png)
+- Saga log sequence:
+
+![Images/Strangler%20Fig/strangler-fig-saga-log-sequence.png](Images/Strangler%20Fig/strangler-fig-saga-log-sequence.png)
 
 ---
 
