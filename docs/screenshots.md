@@ -104,9 +104,9 @@ These screenshots are captured from a **running environment**, not mocks.
 
 Aggregated health across APIs and critical dependencies.
 
-![Health overview – all services](Images/Healthchecks/healthchecks-overview-all-services.png)
+![Health overview – all services](Images/healthchecks/healthchecks-overview-all-services.png)
 
-![Monolith dependency health](Images/Healthchecks/healthchecks-monolith-dependencies.png)
+![Monolith dependency health](Images/healthchecks/healthchecks-monolith-dependencies.png)
 
 ---
 
