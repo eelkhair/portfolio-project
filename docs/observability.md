@@ -69,7 +69,6 @@ This is especially useful when debugging:
 - Retries
 - Async processing delays
 
-![Grafana main observability dashboard](Images/Observability/grafana.png)
 
 ![Grafana find-by-TraceId workflow](Images/Observability/grafana-find-by-trace-id.png)
 
