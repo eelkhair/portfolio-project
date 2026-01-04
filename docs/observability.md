@@ -1,95 +1,125 @@
 # Observability
 
-This platform is instrumented **end-to-end** using **OpenTelemetry** and a tracing + logs workflow designed for real-world debugging.
+This platform is instrumented **end-to-end** using **OpenTelemetry**, with a tracing and logging workflow designed for **real-world debugging**, not demos.
 
-The main idea:
+The core idea is simple:
+
 - Every request is traceable from **browser → API → database → async pub/sub → downstream services**
-- A single **TraceId** can be used to pivot between **Jaeger** and **Grafana** (logs/events view)
+- A single **TraceId** lets you pivot seamlessly between **Jaeger (distributed traces)** and **Grafana (logs and events)**
 
 ---
 
 ## What’s included
 
 ### Distributed tracing (OpenTelemetry)
-- HTTP spans for inbound/outbound requests
-- Dependency spans (DB calls)
-- Pub/Sub spans (publish + consume)
-- Correlated attributes/tags to make traces searchable
+
+- HTTP spans for inbound and outbound requests
+- Dependency spans (database, external services)
+- Pub/Sub spans (publish and consume)
+- Rich attributes/tags to make traces searchable and meaningful
 
 ### Trace correlation in logs
-Logs include trace context so you can:
-- filter logs by TraceId
-- group by service
-- replay the story of a request
+
+All logs include trace context, making it possible to:
+
+- Filter logs by `TraceId`
+- Group logs by service
+- Reconstruct the full story of a request across sync and async boundaries
 
 ### “Find by TraceId” in Grafana
-A dashboard that lets you paste a TraceId and immediately see:
-- the request path
-- the services involved
-- time-ordered logs/events correlated to the trace
+
+A dedicated Grafana workflow allows pasting a **TraceId** and immediately viewing:
+
+- The request path
+- The services involved
+- Time-ordered logs and events correlated to that trace
 
 ---
 
 ## Walkthrough: Browser → API → Jaeger → Grafana
 
 ### 1) Get the TraceId from the browser
-When you trigger a request in the Admin UI, the API returns a `Trace-Id` response header.
 
-Example screenshot:
-- `images/Observability/ui-browser-trace-id-header.png`
+When a request is triggered in the Admin UI, the backend returns a `Trace-Id` response header.  
+This makes the TraceId visible immediately to frontend developers and operators.
 
-### 2) Jump into Jaeger
-Paste that TraceId into Jaeger to view the distributed trace:
-- service map / timeline
-- parent/child spans
-- hotspots and slow dependencies
+![TraceId exposed in browser response headers](images/Observability/ui-browser-trace-id-header.png)
 
-Example screenshots:
-- `images/Observability/jaeger-end-to-end-trace.png`
-- `images/Observability/distributed-trace-end-to-end-jaeger.png`
+---
 
-### 3) Pivot to logs/events in Grafana
-Use the same TraceId in Grafana to view correlated logs/events across services.
+### 2) Follow the trace in Jaeger
 
-Example screenshots:
-- `images/Observability/grafana-find-by-trace-id.png`
-- `images/Observability/logs-trace-correlation-grafana.png`
+Pasting the TraceId into Jaeger shows the **complete distributed trace**, including:
+
+- Service-to-service calls
+- Parent/child span relationships
+- Latency hotspots and slow dependencies
+
+![Jaeger end-to-end distributed trace](images/Observability/jaeger-end-to-end-trace.png)
+
+![Detailed distributed trace timeline](images/Observability/distributed-trace-end-to-end-jaeger.png)
+
+---
+
+### 3) Pivot to logs and events in Grafana
+
+Using the same TraceId in Grafana allows you to pivot from traces to **correlated logs and events** across all services.
+
+This is especially useful when debugging:
+- Partial failures
+- Retries
+- Async processing delays
+
+![Grafana main observability dashboard](Images/Observability/grafana.png)
+
+![Grafana find-by-TraceId workflow](Images/Observability/grafana-find-by-trace-id.png)
+
+![Logs correlated by TraceId](Images/Observability/logs-trace-correlation-grafana.png)
 
 ---
 
 ## Async visibility (Saga + pub/sub)
 
-Async work is visible as part of the overall request story:
-- initial request publishes an integration event
-- consumers process it in downstream services
-- saga steps are logged for a time-ordered narrative
+Asynchronous workflows are fully observable and appear as part of the same request narrative.
 
-Example screenshot:
-- `images/Observability/async-saga-and-pubsub-visibility.png`
+This includes:
+- Integration events published by the initial request
+- Downstream consumers processing those events
+- Saga steps logged with ordering and correlation
+
+This allows answering questions like:
+- *Which service processed this event?*
+- *Did retries occur?*
+- *Where did the workflow slow down or fail?*
+
+![Async saga and pub/sub visibility](images/Observability/async-saga-and-pubsub-visibility.png)
 
 ---
 
 ## Recommended conventions
 
-These conventions make the observability UX excellent:
+These conventions are intentionally enforced to keep the observability experience consistent and usable:
 
-- **Expose TraceId** to the UI as a response header (`Trace-Id`), and expose it via CORS headers.
-- **Use consistent service names** (e.g., `monolith-api`, `connector-api`, `company-api`, etc.).
-- Add **domain tags** to spans/logs:
-  - company id / company name
-  - user email
-  - saga id / idempotency key
-- Ensure **retry-aware logging** (e.g., attempt number, message id, DLQ routing when relevant).
+- **Expose TraceId to the UI** as a response header (`Trace-Id`) and allow it via CORS.
+- **Use consistent service names** (e.g. `monolith-api`, `connector-api`, `company-api`).
+- Attach **domain-level tags** to spans and logs:
+  - Company ID / company name
+  - User email
+  - Saga ID / idempotency key
+- Ensure **retry-aware logging**:
+  - Attempt number
+  - Message ID
+  - Dead-letter routing when applicable
 
 ---
 
-## Screenshots index
+## Why this matters
 
-- TraceId in browser headers: `images/Observability/ui-browser-trace-id-header.png`
-- Trace propagation: `images/Observability/trace-id-propagation-browser-to-backend.png`
-- Jaeger end-to-end: `images/Observability/jaeger-end-to-end-trace.png`
-- Distributed trace view: `images/Observability/distributed-trace-end-to-end-jaeger.png`
-- Grafana main: `images/Observability/grafana.png`
-- Grafana “find by TraceId”: `images/Observability/grafana-find-by-trace-id.png`
-- Trace ↔ logs correlation: `images/Observability/logs-trace-correlation-grafana.png`
-- Async saga visibility: `images/Observability/async-saga-and-pubsub-visibility.png`
+This observability setup makes it possible to:
+
+- Debug production issues quickly
+- Understand system behavior across sync and async boundaries
+- Reason about performance and reliability using real signals
+- Treat observability as a **first-class architectural concern**, not an afterthought
+
+This is the same approach used in production-grade, distributed systems operating at scale.

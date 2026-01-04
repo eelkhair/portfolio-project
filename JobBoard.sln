@@ -198,9 +198,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ADRs", "ADRs", "{97769D49-1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{5206DCD5-98FA-4BD9-BF78-26DBDCA37EF0}"
-	ProjectSection(SolutionItems) = preProject
-		docs\Images\grafana.png = docs\Images\grafana.png
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Strangler Fig", "Strangler Fig", "{CE90738C-FC59-4E52-887F-12F3B46FC2D4}"
 	ProjectSection(SolutionItems) = preProject
@@ -217,7 +214,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Observability", "Observabil
 		docs\Images\Observability\distributed-trace-end-to-end-jaeger.png = docs\Images\Observability\distributed-trace-end-to-end-jaeger.png
 		docs\Images\Observability\logs-trace-correlation-grafana.png = docs\Images\Observability\logs-trace-correlation-grafana.png
 		docs\Images\Observability\trace-id-propagation-browser-to-backend.png = docs\Images\Observability\trace-id-propagation-browser-to-backend.png
-		docs\Images\grafana.png = docs\Images\grafana.png
 		docs\Images\Observability\async-saga-and-pubsub-visibility.png = docs\Images\Observability\async-saga-and-pubsub-visibility.png
 		docs\Images\Observability\grafana-find-by-trace-id.png = docs\Images\Observability\grafana-find-by-trace-id.png
 		docs\Images\Observability\jaeger-end-to-end-trace.png = docs\Images\Observability\jaeger-end-to-end-trace.png
