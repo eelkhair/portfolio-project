@@ -237,6 +237,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Healthchecks", "Healthcheck
 		docs\Images\healthchecks\redis-config-and-feature-flags.png = docs\Images\healthchecks\redis-config-and-feature-flags.png
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "medium", "medium", "{72BB44CB-1474-4AC7-9661-6A0668A8D17A}"
+	ProjectSection(SolutionItems) = preProject
+		docs\medium\01-building-a-production-grade-system-in-public.md = docs\medium\01-building-a-production-grade-system-in-public.md
+	EndProjectSection
+EndProject
 Global
 				GlobalSection(SolutionConfigurationPlatforms) = preSolution
 								Debug|Any CPU = Debug|Any CPU
@@ -395,5 +400,6 @@ Global
 		{85437C52-90D1-46A3-B1F8-13B01E100B24} = {5206DCD5-98FA-4BD9-BF78-26DBDCA37EF0}
 		{EDDEDB77-8AA5-4CFA-A3EA-6C4F02BFF36A} = {5206DCD5-98FA-4BD9-BF78-26DBDCA37EF0}
 		{6D1DF1C6-414E-4FA1-8A43-96E1AC67B1AC} = {5206DCD5-98FA-4BD9-BF78-26DBDCA37EF0}
+		{72BB44CB-1474-4AC7-9661-6A0668A8D17A} = {8F216E64-AB1B-4402-A602-B20D7B4C470F}
 	EndGlobalSection
 EndGlobal
