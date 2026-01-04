@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="JobBoard.CompanyAPI.Contracts" Version="1.0.5" />
+      <PackageReference Include="JobBoard.JobAPI.Contracts" Version="1.0.3" />
+      <PackageReference Include="JobBoard.UserAPI.Contracts" Version="1.0.9" />
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,91 @@
+﻿@startuml
+title Existing Flow — Monolith ➜ Microservices (Company Creation)
+
+actor "Frontend (FE)" as FE
+participant "Admin API" as Admin
+participant "Monolith" as Monolith
+participant "Outbox Processor" as Outbox
+participant "Dapr Pub/Sub" as Dapr
+participant "Connector API\n(CompanyProvisioningSaga)" as Saga
+participant "Company API" as CompanyAPI
+participant "User API" as UserAPI
+participant "Job API" as JobAPI
+
+== Command Entry ==
+
+FE -> Admin : Create Company
+Admin -> Monolith : CreateCompanyCommand
+activate Monolith
+
+Monolith -> Monolith : Validate invariants
+Monolith -> Monolith : INSERT Company + User
+Monolith -> Monolith : INSERT Outbox(company.created.v1)
+Monolith -> Monolith : COMMIT TX
+deactivate Monolith
+
+== Event Publication ==
+
+Outbox -> Dapr : Publish company.created.v1
+Dapr -> Saga : Deliver CompanyCreatedV1Event
+
+== Saga Orchestration ==
+
+activate Saga
+Saga -> CompanyAPI : Create projection
+Saga -> UserAPI : Provision user + Auth0
+Saga -> JobAPI : Create projection
+
+Saga -> Monolith : ActivateCompanyCommand
+activate Monolith
+Monolith -> Monolith : UPDATE Company.Status = Active
+Monolith -> Monolith : EMIT company.provisioned.v1
+deactivate Monolith
+
+Saga -> Saga : Log "Saga completed"
+deactivate Saga
+
+== Fact Propagation ==
+
+Monolith -> Outbox : company.provisioned.v1
+@enduml
+@startuml
+title New Flow — Microservices ➜ Monolith (Intent → Command)
+
+actor "Frontend (FE)" as FE
+participant "Admin API" as Admin
+participant "Company API" as CompanyAPI
+participant "Dapr Pub/Sub" as Dapr
+participant "MonolithSync\n(Intent Normalizer)" as Sync
+participant "Monolith" as Monolith
+participant "Outbox Processor" as Outbox
+
+== Alternative Entry Point ==
+
+FE -> Admin : Create Company
+Admin -> CompanyAPI : Create Company (Intent)
+
+CompanyAPI -> CompanyAPI : Validate local rules
+CompanyAPI -> Dapr : Publish company.creation.requested.v1
+
+== Intent Normalization ==
+
+Dapr -> Sync : Deliver CompanyCreationRequestedV1Event
+activate Sync
+
+Sync -> Sync : Check origin + idempotency
+Sync -> Monolith : CreateCompanyCommand
+deactivate Sync
+
+== Authoritative Creation ==
+
+activate Monolith
+Monolith -> Monolith : Validate invariants
+Monolith -> Monolith : INSERT Company + User
+Monolith -> Monolith : INSERT Outbox(company.created.v1)
+Monolith -> Monolith : COMMIT TX
+deactivate Monolith
+
+== Canonical Fact ==
+
+Outbox -> Dapr : Publish company.created.v1
+@enduml

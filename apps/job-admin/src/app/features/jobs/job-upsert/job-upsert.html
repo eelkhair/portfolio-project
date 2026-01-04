@@ -1,0 +1,116 @@
+<form [formGroup]="form" (ngSubmit)="submit()">
+  @if(store.selectedCompany(); as c){
+    <div class="flex justify-between">
+      <app-company-selection title="Create job for"/>
+      <div class="flex gap-3">
+        <button pButton label="Prefill with AI"
+                  class="bg-white border-purple-600 hover:bg-purple-100 text-purple-600"
+
+                icon="pi pi-sparkles" type="button" (click)="store.showGenerate.set(true)"></button>
+        <p-button label="Save Draft" icon="pi pi-bookmark" type="button" (click)="saveDraft()"/>
+        <p-button label="Publish Job" icon="pi pi-save" type="submit"/>
+      </div>
+    </div>
+    <app-job-generate [companyName] = "c.name??''"/>
+  }@else{
+    <app-company-selection title="Create job for"/>
+  }
+
+  @if(store.selectedCompany()){
+      <div class="flex mt-8 w-full justify-between gap-10">
+        <div class="flex w-full flex-col gap-4">
+          <div class="w-full flex gap-5 items-center">
+            <label for="title" class="text-lg w-28">Title</label>
+            <input pInputText name="title" id="title" placeholder="Title" class="w-full" formControlName="title"/>
+          </div>
+          <div >
+            <div class="w-full flex gap-5 items-center">
+              <label for="aboutRole" class="text-lg w-28">About Role</label>
+              <textarea   rows="8" pTextarea name="aboutRole" id="aboutRole" placeholder="About Role" class="w-full" formControlName="aboutRole"></textarea>
+            </div>
+            <div class=" text-blue-600 cursor-pointer font-bold justify-end flex w-full" (click)="enhanceAboutMe()">Enhance with AI</div>
+          </div>
+
+          <div class="w-full flex gap-5 items-center">
+            <label for="location" class="text-lg w-28">Location</label>
+            <input pInputText name="location" id="location" placeholder="Location" class="w-full" formControlName="location"/>
+          </div>
+          <div class="w-full flex gap-5 items-center">
+            <label for="jobType" class="text-lg w-28">Job Type</label>
+            <p-select inputId="jobType"
+                        class="w-full"
+                        [options]="jobTypes"
+                        optionLabel="label"
+                        optionValue="value"
+                        formControlName="jobType"
+                        placeholder="Select a job type">
+            </p-select>
+          </div>
+          <div class="w-full flex gap-5 items-center">
+            <label for="salaryRange" class="text-lg w-28">Salary Range</label>
+            <input pInputText name="salaryRange" id="salaryRange" placeholder="Salary Range" formControlName="salaryRange" class="w-full"/>
+          </div>
+        </div>
+        <div class="w-full flex flex-col gap-8">
+          <div>
+            <label class="text-lg block mb-2">Responsibilities</label>
+            <div formArrayName="responsibilities" class="flex flex-col gap-3">
+              @for (ctrl of responsibilities().controls; track $index) {
+                <div class="flex items-center gap-2">
+                  <textarea pTextarea class="w-full" [formControlName]="$index" placeholder="Responsibility"  rows="1" [autoResize]="true"
+                            (keydown.enter)="addResponsibility(); $event.preventDefault()"
+                  ></textarea>
+                  <button
+                    pButton
+                    type="button"
+                    class="bg-white border-purple-600 hover:bg-purple-50 text-purple-600"
+                    icon="pi pi-sparkles"
+                    severity="warn"
+                    (click)="enhanceResponsibility($index)"
+                    [pTooltip]="'Enhance this item with AI'"
+                    tooltipPosition="left">
+                  </button>
+                  <button pButton type="button" icon="pi pi-times" (click)="removeResponsibility($index)"
+                          class="p-button-text" aria-label="Remove responsibility"></button>
+                </div>
+              }
+            </div>
+            <div class="flex justify-between mt-2">
+              <button pButton type="button" icon="pi pi-plus" label="Add"
+                      (click)="addResponsibility()"></button>
+            </div>
+          </div>
+          <div>
+            <label class="text-lg block mb-2">Qualifications</label>
+            <div formArrayName="qualifications" class="flex flex-col gap-3">
+              @for (ctrl of qualifications().controls; track $index) {
+                <div class="flex items-center gap-2">
+                  <textarea pTextarea class="w-full" [formControlName]="$index" placeholder="Qualification" rows="1" [autoResize]="true"
+                            (keydown.enter)="addQualification(); $event.preventDefault()"
+                  ></textarea>
+                  <button
+                    pButton
+                    type="button"
+                    class="bg-white border-purple-600 hover:bg-purple-50 text-purple-600"
+                    icon="pi pi-sparkles"
+
+                    (click)="enhanceQualification($index)"
+                    [pTooltip]="'Enhance this item with AI'"
+                    tooltipPosition="left">
+                  </button>
+                  <button pButton type="button" icon="pi pi-times" (click)="removeQualification($index)"
+                          class="p-button-text" aria-label="Remove qualification"></button>
+                </div>
+              }
+            </div>
+            <div class="flex justify-between mt-2">
+              <button pButton type="button" icon="pi pi-plus" label="Add"
+                      (click)="addQualification()"></button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+  }
+</form>
+

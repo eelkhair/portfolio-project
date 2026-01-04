@@ -1,0 +1,13 @@
+<div class="flex w-full justify-between mb-5">
+  <h1 class="text-3xl pl-2">Companies</h1>
+  <p-button label="Create Company" icon="pi pi-plus" (click)="store.showCreateCompanyDialog.set(true)" />
+</div>
+
+<ag-grid-angular class="w-full" style="height:650px"
+  [rowData]="companies()"
+  [columnDefs]="colDefs"
+                 [pagination]="true"
+  [theme]="theme">
+</ag-grid-angular>
+
+<app-company-create/>

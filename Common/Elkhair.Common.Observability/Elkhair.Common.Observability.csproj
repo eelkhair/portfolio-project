@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <PackageId>Elkhair.Common.Observability</PackageId>
+        <Authors>Elkhair Elkhair</Authors>
+        <Version>1.0.3</Version>
+        <Description>Logging and Tracing</Description>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Elkhair.Dev.Common" Version="1.0.17" />
+        <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.13.1" />
+        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.13.1" />
+        <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.13.1" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.13.0" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.13.0-beta.1" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.13.0" />
+        <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+        <PackageReference Include="Serilog.Enrichers.OpenTelemetry" Version="1.0.1" />
+        <PackageReference Include="Serilog.Exceptions" Version="8.4.0" />
+        <PackageReference Include="Serilog.Exceptions.EntityFrameworkCore" Version="8.4.0" />
+        <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="10.0.0" />
+        <PackageReference Include="Serilog.Sinks.Seq" Version="9.0.0" />        
+        <PackageReference Include="Azure.Monitor.OpenTelemetry.Exporter" Version="1.4.0" />
+
+    </ItemGroup>
+</Project>

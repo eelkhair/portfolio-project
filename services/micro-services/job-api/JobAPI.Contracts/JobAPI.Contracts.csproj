@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>JobAPI.Contracts</RootNamespace>
+        <PackageId>JobBoard.JobAPI.Contracts</PackageId>
+        <Authors>Elkhair Elkhair</Authors>
+        <Version>1.0.3</Version>
+        <Description>Shared components for Job API project</Description>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Folder Include="Models\" />
+    </ItemGroup>
+
+</Project>

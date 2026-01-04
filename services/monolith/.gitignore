@@ -1,0 +1,9 @@
+.idea
+bin/
+obj/
+debug/
+*.DotSettings.user
+*.log
+*.tmp
+*.user
+.vs

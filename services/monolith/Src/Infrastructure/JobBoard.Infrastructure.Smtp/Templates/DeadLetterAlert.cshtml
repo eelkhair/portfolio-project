@@ -1,0 +1,38 @@
+@using JobBoard.Domain.Entities.Infrastructure
+@model IEnumerable<OutboxDeadLetter>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        body { font-family: sans-serif; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #dddddd; text-align: left; padding: 8px; }
+        th { background-color: #f2f2f2; }
+        h1 { color: red}
+    </style>
+</head>
+<body>
+    <h1>CRITICAL: Dead-Letter Alert for JobBoard</h1>
+    <p>Found <strong>@Model.Count()</strong> new messages in the dead-letter table that require investigation.</p>
+    
+    <h2>Failed Messages Summary</h2>
+    <table>
+        <tr>
+            <th>Event Type</th>
+            <th>Error</th>
+            <th>Failed At (UTC)</th>
+            <th>Trace Parent</th>
+        </tr>
+        @foreach (var message in Model)
+        {
+            <tr>
+                <td>@message.EventType</td>
+                <td>@message.LastError</td>
+                <td>@message.UpdatedAt</td>
+                <td>@message.TraceParent</td>
+            </tr>
+        }
+    </table>
+</body>
+</html>

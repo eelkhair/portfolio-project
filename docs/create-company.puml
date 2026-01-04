@@ -1,0 +1,71 @@
+﻿@startuml
+title Company Create & Admin Provisioning (RabbitMQ topics after company provisioning)
+
+actor Client
+participant "Admin API\n(Orchestrator)" as Admin
+participant "Company API" as Company
+participant "User API" as User
+participant "Auth0 Mgmt API" as Auth0
+queue "RabbitMQ\n(topic exchange)" as MQ
+database "Company DB" as CDB
+database "User DB" as UDB
+
+== Request & Company provisioning (sync) ==
+Client -> Admin: POST /companies (CreateCompanyRequest)\n+ correlationId
+activate Admin
+
+Admin -> Company: POST /companies\nIdempotency-Key: correlationId
+activate Company
+Company -> CDB: Insert Company { Status=Provisioning }
+Company --> Admin: 201 { companyId, status=Provisioning }
+deactivate Company
+
+== From here on: async via RabbitMQ topics ==
+Admin -> MQ: publish(topic=\"admin.provision.request\",\n headers={correlationId, idempotencyKey},\n payload={ companyId, companyName,\n adminFirst/Last/Email })
+deactivate Admin
+
+MQ --> User: consume(topic=\"admin.provision.request\")\n(dedup by idempotencyKey)
+activate User
+
+User -> UDB: Inbox dedupe check (idempotencyKey)
+User -> Auth0: Ensure Org(companyName→slug)
+activate Auth0
+Auth0 --> User: orgId
+User -> Auth0: Create/Ensure Invitation(adminEmail)
+Auth0 --> User: inviteId
+deactivate Auth0
+
+User -> UDB: Upsert IdentityLink\n{ companyId, orgId, adminEmail, inviteId }
+User -> MQ: publish(topic=\"admin.provision.succeeded\",\n headers={correlationId},\n payload={ companyId, orgId, adminEmail, inviteId })
+deactivate User
+
+MQ --> Company: consume(topic=\"admin.provision.succeeded\")
+activate Company
+Company -> CDB: Update Company.Status = Active\n+ (optional) persist Auth0OrgId
+Company -> MQ: publish(topic=\"company.activated\",\n headers={correlationId}, payload={ companyId })
+deactivate Company
+
+== Client UX (optional) ==
+Client -> Admin: GET /operations/{correlationId}
+Admin --> Client: { status: Provisioning | Active | Failed }
+
+== Error paths & retries ==
+alt Transient failure in User/Auth0
+  User -> MQ: publish(topic=\"admin.provision.retry\",\n headers={correlationId}, payload={ companyId, reason })\n(handled by retry consumer / delayed exchange)
+end
+
+alt Permanent failure (4xx fatal or retries exceeded)
+  User -> MQ: publish(topic=\"admin.provision.failed\",\n headers={correlationId}, payload={ companyId, reason })
+  MQ --> Company: consume(topic=\"admin.provision.failed\")
+  Company -> CDB: Update Company.Status = Failed
+  Company -> MQ: publish(topic=\"company.provisioning.failed\",\n headers={correlationId}, payload={ companyId, reason })
+end
+
+== Notes ==
+note over Admin,User
+All messages carry correlationId and idempotencyKey in headers.
+Inbox/Outbox patterns recommended for dedupe & reliability.
+Use delayed exchange / DLQ for backoff retries.
+end note
+
+@enduml

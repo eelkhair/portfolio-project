@@ -1,0 +1,114 @@
+<form [formGroup]="form">
+<p-stepper [value]="1" class="basis-[50rem]">
+  <p-step-list>
+    <p-step [value]="1" [disabled]="loading()">Settings</p-step>
+    <p-step [value]="2" [disabled]="!loading()">Selection</p-step>
+  </p-step-list>
+  <p-step-panels>
+    <p-step-panel [value]="1">
+      <ng-template #content let-activateCallback="activateCallback">
+        <div class="flex w-full gap-10">
+          <div class="flex flex-col gap-2 w-full">
+            <div class="flex w-full items-center">
+              <label class="w-32">Tone</label>
+              <p-select class="w-full" formControlName="tone" appendTo="body" [options]="['Neutral', 'Professional', 'Friendly', 'Concise', 'Enthusiastic']"></p-select>
+            </div>
+            <div class="flex w-full items-center">
+              <label class="w-32">Formality</label>
+              <p-select class="w-full" formControlName="formality" appendTo="body" [options]="['Neutral','Casual','Formal']"></p-select>
+            </div>
+
+          </div>
+          <div class="w-full">
+            <div class="flex flex-col gap-2 w-full">
+              <div class="flex w-full items-center">
+                <label class="w-32">Max words</label>
+                <p-inputNumber [min]="10" [max]="2000" formControlName="maxWords" class="w-full" [showButtons]="true"/>
+              </div>
+
+            </div>
+          </div>
+        </div>
+        <div class="mt-4">
+          <label class="block mb-2 font-medium">Avoid Phrases</label>
+
+          <div class="flex flex-wrap gap-2 mb-2" formArrayName="avoidPhrases">
+            @for (ctrl of avoidPhrases.controls; track $index) {
+              <div class="flex items-center">
+                <p-tag [value]="ctrl.value" class="mr-1"></p-tag>
+                <p-button
+                  type="button"
+                  icon="pi pi-times"
+                  class="p-button-text text-gray-500 -ml-1"
+                  (click)="removeAvoidPhrase($index)"
+                  pTooltip="Remove phrase"
+                  tooltipPosition="top">
+                </p-button>
+              </div>
+            }
+          </div>
+
+          <div class="flex items-center gap-2">
+            <input
+              pInputText
+              #phraseInput
+              placeholder="Type a phrase, press Enter or comma"
+              class="w-full"
+              (keydown)="onPhraseKeydown($event, phraseInput)"
+              (blur)="addAvoidPhrase(phraseInput.value); phraseInput.value=''" />
+            <p-button
+              type="button"
+              icon="pi pi-plus"
+              label="Add"
+              (click)="addAvoidPhrase(phraseInput.value); phraseInput.value=''">
+            </p-button>
+          </div>
+
+          <small class="text-gray-500">Max 20 phrases. Each must be ≥ 2 characters.</small>
+        </div>
+        <div class="flex pt-6 justify-end">
+          <p-button label="Enhance" icon="pi pi-arrow-right" iconPos="right" (onClick)="activateCallback(2); save()" />
+        </div>
+      </ng-template>
+    </p-step-panel>
+    <p-step-panel [value]="2">
+      <ng-template #content let-activateCallback="activateCallback">
+        @if(loading()){
+          <div class="flex w-full flex-col gap-3 mb-24 mt-12">
+            <p-progress-spinner strokeWidth="3" fill="transparent" animationDuration=".5s" [style]="{ width: '175px', height: '175px' }">
+            </p-progress-spinner>
+            <span style="position:relative; margin: -125px auto auto; text-align:center; font-size:18px">Enhancing<br/>Text</span>
+          </div>
+        }@else{
+          @if (options(); as opts) {
+            <div class="flex  gap-10 w-full">
+              @for (option of opts; track $index) {
+                <div class="option cursor-pointer hover:bg-gray-100 p-3">
+                  <input
+                    type="radio"
+                    [id]="'option' + $index"
+                    name="aboutRoleChoice"
+                    [checked]="$index==0"
+                    [value]="option"
+                    formControlName="aboutRoleChoice"
+                  />
+                  <label [attr.for]="'option' + $index">
+                    <span class="font-bold cursor-pointer ml-2">Option {{$index+1}}</span>
+                    <div class="option-text cursor-pointer pt-6" [textContent]="option"></div>
+                  </label>
+                </div>
+              }
+            </div>
+
+          }
+
+        }
+        <div class="flex pt-6 justify-end">
+          <p-button label="Select" severity="primary" icon="pi pi-save" (onClick)="close()" />
+        </div>
+      </ng-template>
+    </p-step-panel>
+  </p-step-panels>
+</p-stepper>
+
+</form>

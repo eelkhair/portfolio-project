@@ -1,0 +1,15 @@
+@if(store.selectedCompany()){
+  <div class="flex justify-between">
+    <app-company-selection title="Drafts for "/>
+  </div>
+  <div class="flex w-full mt-4">
+    <ag-grid-angular class="w-full" style="height:650px"
+                     [rowData]="store.drafts()"
+                     [columnDefs]="colDefs"
+                     [pagination]="true"
+                     [theme]="theme">
+    </ag-grid-angular>
+  </div>
+}@else{
+  <app-company-selection title="Create job for"/>
+}

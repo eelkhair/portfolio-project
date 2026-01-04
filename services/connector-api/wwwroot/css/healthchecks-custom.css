@@ -1,0 +1,67 @@
+:root {
+    --primaryColor: #0072ce;
+    --secondaryColor: #0072ce;
+    --bgMenuActive: #459AFF;
+    --bgButton: #0072ce;
+    --bgMain: #121212;
+    --bgSecondary: #222222;
+    --fcBase: #FFFFFF;
+    --bgTable: #222222;
+    --logoImageUrl: url('https://i.imgur.com/KdqywvF.png');
+    --bgAside: #222222;
+    --bgTableSecondary: #2c2c2c;
+    --bcTable: #000000;
+    --bgLineTimeline: #444444;
+}
+.is-open .hc-aside__logo{
+    content: '';
+    display: block;
+    width: 160px !important;
+    filter: brightness(0) invert(1);
+  //  background-image: url('/images/corteva_logo.png'); 
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    margin-top:15px !important;
+    margin-bottom:15px !important;
+}
+.hc-aside__logo{
+    width: 26px !important; 
+    height: 26px;
+  //  background-image: url('/images/corteva-logo-sm.png');
+    filter: brightness(0) invert(1);
+    min-width:0;
+    margin-top:15px !important;
+    margin-bottom:15px !important;
+}
+.tag {
+    background-color: var(--primaryColor);
+    color: var(--fcBase);
+    display: inline-block;
+    padding: 0.25em 0.4em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+    border: none;
+}
+
+.hc-table__row:hover {
+    background-image: none;
+}
+
+.hc-refesh-group > span {
+    display: none;
+}
+
+.vertical-timeline-element-content {
+    background-color: #222222 !important;
+    border-color: #444444 !important;
+}
+
+.vertical-timeline-element-content-arrow {
+    border-right-color: #444444 !important;
+}

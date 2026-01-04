@@ -1,0 +1,19 @@
+@if(store.selectedCompany(); as company){
+  <div class="flex justify-between">
+    <app-company-selection title="Jobs for"/>
+    <p-button label="Create Job" icon="pi pi-plus" routerLink="/jobs/new"/>
+  </div>
+  <div class="flex w-full mt-4">
+    <ag-grid-angular class="w-full" style="height:650px"
+                     [rowData]="store.jobs()"
+                     [pagination]="true"
+                     [columnDefs]="colDefs"
+                     [theme]="theme">
+    </ag-grid-angular>
+  </div>
+}@else{
+  <app-company-selection title="Jobs for"/>
+}
+
+
+

@@ -1,0 +1,400 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35021.124
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobAPI.Contracts", "services\micro-services\job-api\JobAPI.Contracts\JobAPI.Contracts.csproj", "{FEB5E1E6-3211-489F-B08E-64BD4B6C3825}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobApi.Service", "services\micro-services\job-api\JobApi.Service\JobApi.Service.csproj", "{EC73AD0D-E9E0-4232-A67A-1094E1E3C09C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "services", "services", "{6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}"
+	ProjectSection(SolutionItems) = preProject
+		services\Elkhair.Dev.Common\Application\DaprExtensions.cs = services\micro-services\Elkhair.Dev.Common\Application\DaprExtensions.cs
+		services\Elkhair.Dev.Common\Application\Extensions.cs = services\micro-services\Elkhair.Dev.Common\Application\Extensions.cs
+		services\Elkhair.Dev.Common\Application\LoggingAndTracingExtensions.cs = services\micro-services\Elkhair.Dev.Common\Application\LoggingAndTracingExtensions.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "job-api", "job-api", "{34F29689-4830-4406-B6E6-A36922FFAA5B}"
+	ProjectSection(SolutionItems) = preProject
+		services\job-api\Dockerfile = services\micro-services\job-api\Dockerfile
+		services\job-api\.dockerignore = services\micro-services\job-api\.dockerignore
+		services\job-api\Nuget.Config = services\micro-services\job-api\Nuget.Config
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompanyAPI.Contracts", "services\micro-services\company-api\CompanyAPI.Contracts\CompanyAPI.Contracts.csproj", "{F4901292-135E-4E36-93E7-C02762BA6116}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompanyApi.Service", "services\micro-services\company-api\CompanyApi.Service\CompanyApi.Service.csproj", "{391F1325-33CC-4414-B0C5-05395FF006F2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "company-api", "company-api", "{45755CDE-8322-42B4-ADC0-A0126A3997A4}"
+	ProjectSection(SolutionItems) = preProject
+		services\company-api\Dockerfile = services\micro-services\company-api\Dockerfile
+		services\company-api\.dockerignore = services\micro-services\company-api\.dockerignore
+		services\company-api\Nuget.Config = services\micro-services\company-api\Nuget.Config
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{97DBD6A3-512E-4CD4-AE68-6EC565FBC253}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\docker-compose.registry.yml = scripts\docker-compose.registry.yml
+		scripts\docker-publsh.sh = scripts\docker-publsh.sh
+		scripts\nuget-push.ps1 = scripts\nuget-push.ps1
+		scripts\migration.sh = scripts\migration.sh
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "user-api", "user-api", "{D27A4457-B09A-4389-B56C-7A1E180B5F89}"
+	ProjectSection(SolutionItems) = preProject
+		services\user-api\Dockerfile = services\micro-services\user-api\Dockerfile
+		services\user-api\Nuget.Config = services\micro-services\user-api\Nuget.Config
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserApi.Service", "services\micro-services\user-api\UserApi.Service\UserApi.Service.csproj", "{DA8D976B-3C28-4ECB-923A-59167EE25ABE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserAPI.Contracts", "services\micro-services\user-api\UserAPI.Contracts\UserAPI.Contracts.csproj", "{B76718D9-1F9C-462A-B980-F48282456504}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "admin-api", "admin-api", "{D12A1538-3710-454B-91F8-FA92024D5A9E}"
+	ProjectSection(SolutionItems) = preProject
+		services\admin-api\Dockerfile = services\micro-services\admin-api\Dockerfile
+		services\admin-api\.dockerignore = services\micro-services\admin-api\.dockerignore
+		services\admin-api\Nuget.Config = services\micro-services\admin-api\Nuget.Config
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminAPI.Contracts", "services\micro-services\admin-api\AdminAPI.Contracts\AdminAPI.Contracts.csproj", "{5ED52D07-9BB8-4EF4-9DF1-53D19A8A5FDB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminApi.Service", "services\micro-services\admin-api\AdminApi.Service\AdminApi.Service.csproj", "{26C25DD2-F218-4209-9EA3-DEF2D029048C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ai-service", "ai-service", "{E946D98E-8216-438D-BD42-407A4B4E8201}"
+	ProjectSection(SolutionItems) = preProject
+		services\ai-service\src\index.ts = services\ai-service\src\index.ts
+		services\ai-service\Dockerfile = services\ai-service\Dockerfile
+		services\ai-service\.dockerignore = services\ai-service\.dockerignore
+		services\ai-service\package.json = services\ai-service\package.json
+		services\ai-service\settings\swagger.js = services\ai-service\settings\swagger.js
+		services\ai-service\tsconfig.json = services\ai-service\tsconfig.json
+		services\ai-service\package-lock.json = services\ai-service\package-lock.json
+		services\ai-service\run.sh = services\ai-service\run.sh
+		services\ai-service\Dapr\Components\Events\job-published-subscription.yaml = services\ai-service\Dapr\Components\Events\job-published-subscription.yaml
+		services\ai-service\Dapr\Components\Secrets\secret.yaml = services\ai-service\Dapr\Components\Secrets\secret.yaml
+		services\ai-service\Dapr\secrets.json = services\ai-service\Dapr\secrets.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BA3D8C05-0820-48F3-A42F-0CF4FB40BD4D}"
+	ProjectSection(SolutionItems) = preProject
+		services\ai-service\src\index.ts = services\ai-service\src\index.ts
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "settings", "settings", "{20D49EF3-D810-4DE5-9817-FDB6DC93EC3C}"
+	ProjectSection(SolutionItems) = preProject
+		services\ai-service\settings\swagger.js = services\ai-service\settings\swagger.js
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Elkhair.Dev.Common", "Elkhair.Dev.Common", "{55EFE0A8-3F4A-46E2-BD74-39D3D74D8B5E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elkhair.Dev.Common", "services\micro-services\Elkhair.Dev.Common\Elkhair.Dev.Common.csproj", "{A13EA2EF-14FC-4CB1-BFCE-608B1728B788}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Components", "Components", "{7FCF5303-CB4C-4D08-98CF-E14F771C77C1}"
+	ProjectSection(SolutionItems) = preProject
+		Components\jaeger.yaml = Components\jaeger.yaml
+		Components\rabbitmq.yaml = Components\rabbitmq.yaml
+		Components\statestore.yaml = Components\statestore.yaml
+		Components\config.redis.yaml = Components\config.redis.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{3CE6F25C-5B37-4BA7-AFF8-8952DBA0A575}"
+	ProjectSection(SolutionItems) = preProject
+		Config\config.yaml = Config\config.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{8F216E64-AB1B-4402-A602-B20D7B4C470F}"
+	ProjectSection(SolutionItems) = preProject
+		docs\README.md = docs\README.md
+		docs\create-company.puml = docs\create-company.puml
+		docs\create-job.puml = docs\create-job.puml
+		docs\sync.puml = docs\sync.puml
+		docs\local-environment.md = docs\local-environment.md
+		docs\observability.md = docs\observability.md
+		docs\strangler-fig.md = docs\strangler-fig.md
+		docs\screenshots.md = docs\screenshots.md
+		docs\health-checks.md = docs\health-checks.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HealthChecks", "HealthChecks", "{6E111D1A-9F3E-4486-960C-57AF7DA4D809}"
+	ProjectSection(SolutionItems) = preProject
+		services\HealthChecks\Dockerfile = services\micro-services\HealthChecks\Dockerfile
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.WebStatus", "services\micro-services\HealthChecks\JobBoard.WebStatus\JobBoard.WebStatus.csproj", "{1264D55B-686A-4113-B882-B5B8A12F5D39}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.HealthChecks", "services\micro-services\HealthChecks\JobBoard.HealthChecks\JobBoard.HealthChecks.csproj", "{338B7BFE-C80F-43F0-9A98-AD8477C75B8D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "monolith", "monolith", "{315D5079-3539-49CA-93AF-2614E2A84E44}"
+	ProjectSection(SolutionItems) = preProject
+		services\monolith\.gitignore = services\monolith\.gitignore
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{41FF63FA-CAF4-48DF-B7A6-66575AB4F7AC}"
+	ProjectSection(SolutionItems) = preProject
+		services\Monolith\Documentation\architecture.mermaid = services\monolith\Documentation\architecture.mermaid
+		services\Monolith\Documentation\architectureDiagram.png = services\monolith\Documentation\architectureDiagram.png
+		services\Monolith\Documentation\docker-compose.yml = services\monolith\Documentation\docker-compose.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Src", "Src", "{8A455F08-FF6F-466D-AF5C-E11F8147D8A8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{2E899BAD-CF02-48F6-BFEE-B7986DF4EC25}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{F14B3350-CE99-4C91-9077-1C0840D9A738}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{AD9ACDC2-CC8A-4163-8C51-7BFA37233E39}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.IntegrationEvents", "services\monolith\Src\Core\JobBoard.IntegrationEvents\JobBoard.IntegrationEvents.csproj", "{DEE66F5E-D4A2-4352-B27C-8FDB8DF537D2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.Domain", "services\monolith\Src\Core\JobBoard.Domain\JobBoard.Domain.csproj", "{674ED163-0427-4009-8A57-3ECA8A041A9C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.Application", "services\monolith\Src\Core\JobBoard.Application\JobBoard.Application.csproj", "{2F1DC9AD-E382-4F59-B0F4-0CFA42C7AC48}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.Infrastructure.Configuration", "services\monolith\Src\Infrastructure\JobBoard.Infrastructure.Configuration\JobBoard.Infrastructure.Configuration.csproj", "{6D3D4832-CDE0-4D7D-AD45-EC49F496B2BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.Infrastructure.Diagnostics", "services\monolith\Src\Infrastructure\JobBoard.Infrastructure.Diagnostics\JobBoard.Infrastructure.Diagnostics.csproj", "{A3EC32B8-DF37-4466-8191-0CD1AD4405AE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.Infrastructure.Outbox", "services\monolith\Src\Infrastructure\JobBoard.Infrastructure.Outbox\JobBoard.Infrastructure.Outbox.csproj", "{416938B8-3667-4335-A6BF-B83B9C96A335}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.Infrastructure.Persistence", "services\monolith\Src\Infrastructure\JobBoard.Infrastructure.Persistence\JobBoard.Infrastructure.Persistence.csproj", "{0693DE9C-07EE-4970-A17A-68A28CA6C8DD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.Infrastructure.Smtp", "services\monolith\Src\Infrastructure\JobBoard.Infrastructure.Smtp\JobBoard.Infrastructure.Smtp.csproj", "{8C2AB03D-33D7-4965-A686-EA8BFE5F21FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.API", "services\monolith\Src\Presentation\JobBoard.API\JobBoard.API.csproj", "{43614005-1121-4F50-9705-963590729F45}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "micro-services", "micro-services", "{C188C6D3-42A7-48DB-82B2-15E67325DE94}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.Infrastructure.Dapr", "services\monolith\Src\Infrastructure\JobBoard.Infrastructure.Dapr\JobBoard.Infrastructure.Dapr.csproj", "{63D880B4-88BA-4F02-9CE7-4AF5D49E42A3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "connector-api", "connector-api", "{5E0D2CFC-5C65-4046-9C74-2B06EA5B397C}"
+	ProjectSection(SolutionItems) = preProject
+		services\micro-services\admin-api\Nuget.Config = services\micro-services\admin-api\Nuget.Config
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "connector-api", "services\connector-api\connector-api.csproj", "{ECBB5C93-9D0E-43CE-BA02-E818B106414E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Secrets", "Secrets", "{4A790129-1BD4-4F8D-AEE8-605D1E01538D}"
+	ProjectSection(SolutionItems) = preProject
+		secrets\secret.txt = secrets\secret.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{EA007C0E-E085-4F85-903B-087E954D0CA4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elkhair.Common.Observability", "Common\Elkhair.Common.Observability\Elkhair.Common.Observability.csproj", "{E222CA10-E2B1-40BA-9F1C-067212D08F7B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "monolith-sync", "monolith-sync", "{A9B0D052-9CC4-44EE-803D-9D6DDE62F5EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "monolith-sync", "services\monolith-sync\monolith-sync.csproj", "{DC5D5B75-8316-4677-ADF6-EBF38C17363A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ADRs", "ADRs", "{97769D49-12AC-486F-88DC-4E25F78EB71B}"
+	ProjectSection(SolutionItems) = preProject
+		docs\ADRs\ADR-004-Observability-First.md = docs\ADRs\ADR-004-Observability-First.md
+		docs\ADRs\ADR-003-Transactional-Outbox.md = docs\ADRs\ADR-003-Transactional-Outbox.md
+		docs\ADRs\ADR-002-Dapr-Usage-Boundaries.md = docs\ADRs\ADR-002-Dapr-Usage-Boundaries.md
+		docs\ADRs\ADR-001-Architecture-Showcase-Scope.md = docs\ADRs\ADR-001-Architecture-Showcase-Scope.md
+		docs\ADRs\ADR-005-CQRS-and-Decorator-Pipeline.md = docs\ADRs\ADR-005-CQRS-and-Decorator-Pipeline.md
+		docs\ADRs\ADR-006-RabbitMQ-vs-Azure-Service-Bus.md = docs\ADRs\ADR-006-RabbitMQ-vs-Azure-Service-Bus.md
+		docs\ADRs\ADR-007-Trace-Context-Propagation.md = docs\ADRs\ADR-007-Trace-Context-Propagation.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{5206DCD5-98FA-4BD9-BF78-26DBDCA37EF0}"
+	ProjectSection(SolutionItems) = preProject
+		docs\Images\grafana.png = docs\Images\grafana.png
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Strangler Fig", "Strangler Fig", "{CE90738C-FC59-4E52-887F-12F3B46FC2D4}"
+	ProjectSection(SolutionItems) = preProject
+		docs\Images\Strangler Fig\strangler-fig-centralized-logs-elastic.png = docs\Images\Strangler Fig\strangler-fig-centralized-logs-elastic.png
+		docs\Images\Strangler Fig\strangler-fig-saga-log-sequence.png = docs\Images\Strangler Fig\strangler-fig-saga-log-sequence.png
+		docs\Images\Strangler Fig\strangler-fig-stage-1-monolith-primary.png = docs\Images\Strangler Fig\strangler-fig-stage-1-monolith-primary.png
+		docs\Images\Strangler Fig\strangler-fig-stage-2-connector-introduced.png = docs\Images\Strangler Fig\strangler-fig-stage-2-connector-introduced.png
+		docs\Images\Strangler Fig\strangler-fig-stage-3-service-extraction.png = docs\Images\Strangler Fig\strangler-fig-stage-3-service-extraction.png
+		docs\Images\Strangler Fig\strangler-fig-stage-4-monolith-deprecated-paths.png = docs\Images\Strangler Fig\strangler-fig-stage-4-monolith-deprecated-paths.png
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Observability", "Observability", "{85437C52-90D1-46A3-B1F8-13B01E100B24}"
+	ProjectSection(SolutionItems) = preProject
+		docs\Images\Observability\distributed-trace-end-to-end-jaeger.png = docs\Images\Observability\distributed-trace-end-to-end-jaeger.png
+		docs\Images\Observability\logs-trace-correlation-grafana.png = docs\Images\Observability\logs-trace-correlation-grafana.png
+		docs\Images\Observability\trace-id-propagation-browser-to-backend.png = docs\Images\Observability\trace-id-propagation-browser-to-backend.png
+		docs\Images\grafana.png = docs\Images\grafana.png
+		docs\Images\Observability\async-saga-and-pubsub-visibility.png = docs\Images\Observability\async-saga-and-pubsub-visibility.png
+		docs\Images\Observability\grafana-find-by-trace-id.png = docs\Images\Observability\grafana-find-by-trace-id.png
+		docs\Images\Observability\jaeger-end-to-end-trace.png = docs\Images\Observability\jaeger-end-to-end-trace.png
+		docs\Images\Observability\ui-browser-trace-id-header.png = docs\Images\Observability\ui-browser-trace-id-header.png
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Http", "Http", "{EDDEDB77-8AA5-4CFA-A3EA-6C4F02BFF36A}"
+	ProjectSection(SolutionItems) = preProject
+		docs\Images\Http\http-response-trace-id-header.png = docs\Images\Http\http-response-trace-id-header.png
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Healthchecks", "Healthchecks", "{6D1DF1C6-414E-4FA1-8A43-96E1AC67B1AC}"
+	ProjectSection(SolutionItems) = preProject
+		docs\Images\healthchecks\dapr-application-runtime-summary.png = docs\Images\healthchecks\dapr-application-runtime-summary.png
+		docs\Images\healthchecks\dapr-components-status.png = docs\Images\healthchecks\dapr-components-status.png
+		docs\Images\healthchecks\dapr-pubsub-subscriptions.png = docs\Images\healthchecks\dapr-pubsub-subscriptions.png
+		docs\Images\healthchecks\healthchecks-monolith-dependencies.png = docs\Images\healthchecks\healthchecks-monolith-dependencies.png
+		docs\Images\healthchecks\healthchecks-overview-all-services.png = docs\Images\healthchecks\healthchecks-overview-all-services.png
+	EndProjectSection
+EndProject
+Global
+				GlobalSection(SolutionConfigurationPlatforms) = preSolution
+								Debug|Any CPU = Debug|Any CPU
+								Release|Any CPU = Release|Any CPU
+				EndGlobalSection
+				GlobalSection(ProjectConfigurationPlatforms) = postSolution
+								{FEB5E1E6-3211-489F-B08E-64BD4B6C3825}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+								{FEB5E1E6-3211-489F-B08E-64BD4B6C3825}.Debug|Any CPU.Build.0 = Debug|Any CPU
+								{FEB5E1E6-3211-489F-B08E-64BD4B6C3825}.Release|Any CPU.ActiveCfg = Release|Any CPU
+								{FEB5E1E6-3211-489F-B08E-64BD4B6C3825}.Release|Any CPU.Build.0 = Release|Any CPU
+								{EC73AD0D-E9E0-4232-A67A-1094E1E3C09C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+								{EC73AD0D-E9E0-4232-A67A-1094E1E3C09C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+								{EC73AD0D-E9E0-4232-A67A-1094E1E3C09C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+								{EC73AD0D-E9E0-4232-A67A-1094E1E3C09C}.Release|Any CPU.Build.0 = Release|Any CPU
+					{F4901292-135E-4E36-93E7-C02762BA6116}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{F4901292-135E-4E36-93E7-C02762BA6116}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{F4901292-135E-4E36-93E7-C02762BA6116}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{F4901292-135E-4E36-93E7-C02762BA6116}.Release|Any CPU.Build.0 = Release|Any CPU
+					{391F1325-33CC-4414-B0C5-05395FF006F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{391F1325-33CC-4414-B0C5-05395FF006F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{391F1325-33CC-4414-B0C5-05395FF006F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{391F1325-33CC-4414-B0C5-05395FF006F2}.Release|Any CPU.Build.0 = Release|Any CPU
+					{DA8D976B-3C28-4ECB-923A-59167EE25ABE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{DA8D976B-3C28-4ECB-923A-59167EE25ABE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{DA8D976B-3C28-4ECB-923A-59167EE25ABE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{DA8D976B-3C28-4ECB-923A-59167EE25ABE}.Release|Any CPU.Build.0 = Release|Any CPU
+					{B76718D9-1F9C-462A-B980-F48282456504}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{B76718D9-1F9C-462A-B980-F48282456504}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{B76718D9-1F9C-462A-B980-F48282456504}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{B76718D9-1F9C-462A-B980-F48282456504}.Release|Any CPU.Build.0 = Release|Any CPU
+					{5ED52D07-9BB8-4EF4-9DF1-53D19A8A5FDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{5ED52D07-9BB8-4EF4-9DF1-53D19A8A5FDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{5ED52D07-9BB8-4EF4-9DF1-53D19A8A5FDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{5ED52D07-9BB8-4EF4-9DF1-53D19A8A5FDB}.Release|Any CPU.Build.0 = Release|Any CPU
+					{26C25DD2-F218-4209-9EA3-DEF2D029048C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{26C25DD2-F218-4209-9EA3-DEF2D029048C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{26C25DD2-F218-4209-9EA3-DEF2D029048C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{26C25DD2-F218-4209-9EA3-DEF2D029048C}.Release|Any CPU.Build.0 = Release|Any CPU
+					{A13EA2EF-14FC-4CB1-BFCE-608B1728B788}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{A13EA2EF-14FC-4CB1-BFCE-608B1728B788}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{A13EA2EF-14FC-4CB1-BFCE-608B1728B788}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{A13EA2EF-14FC-4CB1-BFCE-608B1728B788}.Release|Any CPU.Build.0 = Release|Any CPU
+					{1264D55B-686A-4113-B882-B5B8A12F5D39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{1264D55B-686A-4113-B882-B5B8A12F5D39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{1264D55B-686A-4113-B882-B5B8A12F5D39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{1264D55B-686A-4113-B882-B5B8A12F5D39}.Release|Any CPU.Build.0 = Release|Any CPU
+					{338B7BFE-C80F-43F0-9A98-AD8477C75B8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{338B7BFE-C80F-43F0-9A98-AD8477C75B8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{338B7BFE-C80F-43F0-9A98-AD8477C75B8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{338B7BFE-C80F-43F0-9A98-AD8477C75B8D}.Release|Any CPU.Build.0 = Release|Any CPU
+					{DEE66F5E-D4A2-4352-B27C-8FDB8DF537D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{DEE66F5E-D4A2-4352-B27C-8FDB8DF537D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{DEE66F5E-D4A2-4352-B27C-8FDB8DF537D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{DEE66F5E-D4A2-4352-B27C-8FDB8DF537D2}.Release|Any CPU.Build.0 = Release|Any CPU
+					{674ED163-0427-4009-8A57-3ECA8A041A9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{674ED163-0427-4009-8A57-3ECA8A041A9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{674ED163-0427-4009-8A57-3ECA8A041A9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{674ED163-0427-4009-8A57-3ECA8A041A9C}.Release|Any CPU.Build.0 = Release|Any CPU
+					{2F1DC9AD-E382-4F59-B0F4-0CFA42C7AC48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{2F1DC9AD-E382-4F59-B0F4-0CFA42C7AC48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{2F1DC9AD-E382-4F59-B0F4-0CFA42C7AC48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{2F1DC9AD-E382-4F59-B0F4-0CFA42C7AC48}.Release|Any CPU.Build.0 = Release|Any CPU
+					{6D3D4832-CDE0-4D7D-AD45-EC49F496B2BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{6D3D4832-CDE0-4D7D-AD45-EC49F496B2BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{6D3D4832-CDE0-4D7D-AD45-EC49F496B2BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{6D3D4832-CDE0-4D7D-AD45-EC49F496B2BD}.Release|Any CPU.Build.0 = Release|Any CPU
+					{A3EC32B8-DF37-4466-8191-0CD1AD4405AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{A3EC32B8-DF37-4466-8191-0CD1AD4405AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{A3EC32B8-DF37-4466-8191-0CD1AD4405AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{A3EC32B8-DF37-4466-8191-0CD1AD4405AE}.Release|Any CPU.Build.0 = Release|Any CPU
+					{416938B8-3667-4335-A6BF-B83B9C96A335}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{416938B8-3667-4335-A6BF-B83B9C96A335}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{416938B8-3667-4335-A6BF-B83B9C96A335}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{416938B8-3667-4335-A6BF-B83B9C96A335}.Release|Any CPU.Build.0 = Release|Any CPU
+					{0693DE9C-07EE-4970-A17A-68A28CA6C8DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{0693DE9C-07EE-4970-A17A-68A28CA6C8DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{0693DE9C-07EE-4970-A17A-68A28CA6C8DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{0693DE9C-07EE-4970-A17A-68A28CA6C8DD}.Release|Any CPU.Build.0 = Release|Any CPU
+					{8C2AB03D-33D7-4965-A686-EA8BFE5F21FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{8C2AB03D-33D7-4965-A686-EA8BFE5F21FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{8C2AB03D-33D7-4965-A686-EA8BFE5F21FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{8C2AB03D-33D7-4965-A686-EA8BFE5F21FA}.Release|Any CPU.Build.0 = Release|Any CPU
+					{43614005-1121-4F50-9705-963590729F45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{43614005-1121-4F50-9705-963590729F45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{43614005-1121-4F50-9705-963590729F45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{43614005-1121-4F50-9705-963590729F45}.Release|Any CPU.Build.0 = Release|Any CPU
+					{63D880B4-88BA-4F02-9CE7-4AF5D49E42A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{63D880B4-88BA-4F02-9CE7-4AF5D49E42A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{63D880B4-88BA-4F02-9CE7-4AF5D49E42A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{63D880B4-88BA-4F02-9CE7-4AF5D49E42A3}.Release|Any CPU.Build.0 = Release|Any CPU
+					{ECBB5C93-9D0E-43CE-BA02-E818B106414E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{ECBB5C93-9D0E-43CE-BA02-E818B106414E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{ECBB5C93-9D0E-43CE-BA02-E818B106414E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{ECBB5C93-9D0E-43CE-BA02-E818B106414E}.Release|Any CPU.Build.0 = Release|Any CPU
+					{E222CA10-E2B1-40BA-9F1C-067212D08F7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{E222CA10-E2B1-40BA-9F1C-067212D08F7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{E222CA10-E2B1-40BA-9F1C-067212D08F7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{E222CA10-E2B1-40BA-9F1C-067212D08F7B}.Release|Any CPU.Build.0 = Release|Any CPU
+					{DC5D5B75-8316-4677-ADF6-EBF38C17363A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{DC5D5B75-8316-4677-ADF6-EBF38C17363A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{DC5D5B75-8316-4677-ADF6-EBF38C17363A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{DC5D5B75-8316-4677-ADF6-EBF38C17363A}.Release|Any CPU.Build.0 = Release|Any CPU
+				EndGlobalSection
+				GlobalSection(SolutionProperties) = preSolution
+								HideSolutionNode = FALSE
+				EndGlobalSection
+				GlobalSection(ExtensibilityGlobals) = postSolution
+								SolutionGuid = {A1C2D3E4-F5A6-47B8-9C0D-E1F2A3B4C5D6}
+				EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FEB5E1E6-3211-489F-B08E-64BD4B6C3825} = {34F29689-4830-4406-B6E6-A36922FFAA5B}
+		{EC73AD0D-E9E0-4232-A67A-1094E1E3C09C} = {34F29689-4830-4406-B6E6-A36922FFAA5B}
+		{F4901292-135E-4E36-93E7-C02762BA6116} = {45755CDE-8322-42B4-ADC0-A0126A3997A4}
+		{391F1325-33CC-4414-B0C5-05395FF006F2} = {45755CDE-8322-42B4-ADC0-A0126A3997A4}
+		{DA8D976B-3C28-4ECB-923A-59167EE25ABE} = {D27A4457-B09A-4389-B56C-7A1E180B5F89}
+		{B76718D9-1F9C-462A-B980-F48282456504} = {D27A4457-B09A-4389-B56C-7A1E180B5F89}
+		{5ED52D07-9BB8-4EF4-9DF1-53D19A8A5FDB} = {D12A1538-3710-454B-91F8-FA92024D5A9E}
+		{26C25DD2-F218-4209-9EA3-DEF2D029048C} = {D12A1538-3710-454B-91F8-FA92024D5A9E}
+		{E946D98E-8216-438D-BD42-407A4B4E8201} = {6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}
+		{BA3D8C05-0820-48F3-A42F-0CF4FB40BD4D} = {E946D98E-8216-438D-BD42-407A4B4E8201}
+		{20D49EF3-D810-4DE5-9817-FDB6DC93EC3C} = {E946D98E-8216-438D-BD42-407A4B4E8201}
+		{A13EA2EF-14FC-4CB1-BFCE-608B1728B788} = {55EFE0A8-3F4A-46E2-BD74-39D3D74D8B5E}
+		{1264D55B-686A-4113-B882-B5B8A12F5D39} = {6E111D1A-9F3E-4486-960C-57AF7DA4D809}
+		{338B7BFE-C80F-43F0-9A98-AD8477C75B8D} = {6E111D1A-9F3E-4486-960C-57AF7DA4D809}
+		{315D5079-3539-49CA-93AF-2614E2A84E44} = {6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}
+		{41FF63FA-CAF4-48DF-B7A6-66575AB4F7AC} = {315D5079-3539-49CA-93AF-2614E2A84E44}
+		{8A455F08-FF6F-466D-AF5C-E11F8147D8A8} = {315D5079-3539-49CA-93AF-2614E2A84E44}
+		{2E899BAD-CF02-48F6-BFEE-B7986DF4EC25} = {8A455F08-FF6F-466D-AF5C-E11F8147D8A8}
+		{F14B3350-CE99-4C91-9077-1C0840D9A738} = {8A455F08-FF6F-466D-AF5C-E11F8147D8A8}
+		{AD9ACDC2-CC8A-4163-8C51-7BFA37233E39} = {8A455F08-FF6F-466D-AF5C-E11F8147D8A8}
+		{DEE66F5E-D4A2-4352-B27C-8FDB8DF537D2} = {2E899BAD-CF02-48F6-BFEE-B7986DF4EC25}
+		{674ED163-0427-4009-8A57-3ECA8A041A9C} = {2E899BAD-CF02-48F6-BFEE-B7986DF4EC25}
+		{2F1DC9AD-E382-4F59-B0F4-0CFA42C7AC48} = {2E899BAD-CF02-48F6-BFEE-B7986DF4EC25}
+		{6D3D4832-CDE0-4D7D-AD45-EC49F496B2BD} = {F14B3350-CE99-4C91-9077-1C0840D9A738}
+		{A3EC32B8-DF37-4466-8191-0CD1AD4405AE} = {F14B3350-CE99-4C91-9077-1C0840D9A738}
+		{416938B8-3667-4335-A6BF-B83B9C96A335} = {F14B3350-CE99-4C91-9077-1C0840D9A738}
+		{0693DE9C-07EE-4970-A17A-68A28CA6C8DD} = {F14B3350-CE99-4C91-9077-1C0840D9A738}
+		{8C2AB03D-33D7-4965-A686-EA8BFE5F21FA} = {F14B3350-CE99-4C91-9077-1C0840D9A738}
+		{43614005-1121-4F50-9705-963590729F45} = {AD9ACDC2-CC8A-4163-8C51-7BFA37233E39}
+		{C188C6D3-42A7-48DB-82B2-15E67325DE94} = {6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}
+		{D12A1538-3710-454B-91F8-FA92024D5A9E} = {C188C6D3-42A7-48DB-82B2-15E67325DE94}
+		{45755CDE-8322-42B4-ADC0-A0126A3997A4} = {C188C6D3-42A7-48DB-82B2-15E67325DE94}
+		{55EFE0A8-3F4A-46E2-BD74-39D3D74D8B5E} = {C188C6D3-42A7-48DB-82B2-15E67325DE94}
+		{6E111D1A-9F3E-4486-960C-57AF7DA4D809} = {C188C6D3-42A7-48DB-82B2-15E67325DE94}
+		{34F29689-4830-4406-B6E6-A36922FFAA5B} = {C188C6D3-42A7-48DB-82B2-15E67325DE94}
+		{D27A4457-B09A-4389-B56C-7A1E180B5F89} = {C188C6D3-42A7-48DB-82B2-15E67325DE94}
+		{63D880B4-88BA-4F02-9CE7-4AF5D49E42A3} = {F14B3350-CE99-4C91-9077-1C0840D9A738}
+		{5E0D2CFC-5C65-4046-9C74-2B06EA5B397C} = {6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}
+		{ECBB5C93-9D0E-43CE-BA02-E818B106414E} = {5E0D2CFC-5C65-4046-9C74-2B06EA5B397C}
+		{E222CA10-E2B1-40BA-9F1C-067212D08F7B} = {EA007C0E-E085-4F85-903B-087E954D0CA4}
+		{A9B0D052-9CC4-44EE-803D-9D6DDE62F5EF} = {6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}
+		{DC5D5B75-8316-4677-ADF6-EBF38C17363A} = {A9B0D052-9CC4-44EE-803D-9D6DDE62F5EF}
+		{97769D49-12AC-486F-88DC-4E25F78EB71B} = {8F216E64-AB1B-4402-A602-B20D7B4C470F}
+		{5206DCD5-98FA-4BD9-BF78-26DBDCA37EF0} = {8F216E64-AB1B-4402-A602-B20D7B4C470F}
+		{CE90738C-FC59-4E52-887F-12F3B46FC2D4} = {5206DCD5-98FA-4BD9-BF78-26DBDCA37EF0}
+		{85437C52-90D1-46A3-B1F8-13B01E100B24} = {5206DCD5-98FA-4BD9-BF78-26DBDCA37EF0}
+		{EDDEDB77-8AA5-4CFA-A3EA-6C4F02BFF36A} = {5206DCD5-98FA-4BD9-BF78-26DBDCA37EF0}
+		{6D1DF1C6-414E-4FA1-8A43-96E1AC67B1AC} = {5206DCD5-98FA-4BD9-BF78-26DBDCA37EF0}
+	EndGlobalSection
+EndGlobal

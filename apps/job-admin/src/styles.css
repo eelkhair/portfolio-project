@@ -1,0 +1,10 @@
+/* src/styles.css */
+@import "primeicons/primeicons.css";
+@import "tailwindcss";
+@plugin "tailwindcss-primeui";
+
+
+@layer base {
+  *, ::before, ::after { box-sizing: border-box; padding: 0; margin: 0}
+
+}

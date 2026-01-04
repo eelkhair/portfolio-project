@@ -1,0 +1,11 @@
+:host ::ng-deep .p-panelmenu .p-panelmenu-item-link-active {
+  background: #C2C2C2;
+  font-weight: 600;
+
+}
+:host ::ng-deep .p-panelmenu .p-panelmenu-item-link-active > span:hover {
+  pointer-events: none;
+}
+
+
+

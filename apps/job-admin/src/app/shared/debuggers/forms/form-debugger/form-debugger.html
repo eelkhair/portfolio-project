@@ -1,0 +1,30 @@
+  <p-divider/>
+  <div class="text-center">
+    <h1 class="text-2xl font-semibold mb-3">DEBUGGER</h1>
+    @if(title()){
+      <h1 class="text-2xl font-semibold text-center mb-3">{{ title() | uppercase }}</h1>
+    }
+    <div class="w-full p-4">
+      <div>
+        Status: {{form().status}}
+      </div>
+      <div>
+        dirty: {{form().dirty}}
+      </div>
+      <div>
+        touched: {{form().touched}}
+      </div>
+    </div>
+    @if(form().invalid){
+      <p-button class="w-30 mx-auto" (click)="toggleFullMode()">
+        {{ fullMode() ? "Hide": "Show"}} CompanyDetails
+      </p-button>
+    }
+  </div>
+
+
+  @if(fullMode()&& controlStates() && form().invalid){
+    <app-control-debug [states]="controlStates()" class="mt-10 pr-6"/>
+  }
+
+

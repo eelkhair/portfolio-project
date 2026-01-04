@@ -1,0 +1,94 @@
+
+<div class="border-l-2 border-white ml-28 pl-5 space-y-4 text-left w-3/4">
+  @for (key of objectKeys(states()); track key) {
+    @let val = states()[key];
+
+    @if (key === '$group') {
+<hr>
+        <div class="text-lg font-semibold">
+          Group-level Validation
+          @if (groupName()) {
+            : {{ groupName() }}
+          }@else{
+            Form Level
+          }
+        </div>
+
+      <div class="text-info ml-2 space-y-1">
+        @for (dbg of debugModels; track dbg.key) {
+          @if (dbg.key !== 'error' && dbg.key !== 'value' && dbg.model.show()) {
+            <div>
+              <strong>{{ dbg.label }}:</strong> {{ val[dbg.key] }}
+            </div>
+          }
+          @if (dbg.key === 'error' && dbg.model.show()) {
+            <div [class.text-error]="val.errors" [class.text-success]="!val.errors">
+              <strong>Errors:</strong>
+              @if (val.errors) {
+                <ul class="list-disc list-inside ml-4 text-lg">
+                  @for (errKey of objectKeys(val.errors); track errKey) {
+                    <li>{{ formatError(errKey, val.errors[errKey]) }}</li>
+                  }
+                </ul>
+              } @else {
+                <span class="text-success ml-2">✅ Valid</span>
+              }
+            </div>
+          }
+        }
+      </div>
+
+    }
+    @else if (isLeaf(val)) {
+      <div>
+        <strong class="text-lg text-blue-600">{{ key }}</strong>
+        <div class="text-info text-base ml-2 space-y-1">
+          @for (dbg of debugModels; track dbg.key) {
+            @if (dbg.key === 'value' && dbg.model.show()) {
+              <div>
+                <strong class="mr-2">Value:</strong>
+                {{ val.value === undefined || val.value === '' || val.value === null ? '(EMPTY)' : val.value }}
+              </div>
+            }
+            @else if (dbg.key === 'error' && dbg.model.show()) {
+              <div [class.text-red-500]="val.errors" [class.text-success]="!val.errors">
+                <strong class="mr-2">Errors:</strong>
+                @if (val.errors) {
+                  <ul class="list-disc list-inside ml-4 text-lg">
+                    @for (errKey of objectKeys(val.errors); track errKey) {
+                      <li>{{ formatError(errKey, val.errors[errKey]) }}</li>
+                    }
+                  </ul>
+                } @else {
+                  <span class="text-success ml-2">✅ Valid</span>
+                }
+              </div>
+            }
+            @else if (dbg.key !== 'error' && dbg.key !== 'value' && dbg.model.show()) {
+              <div>
+                <strong>{{ dbg.label }}:</strong> {{ val[dbg.key] }}
+              </div>
+            }
+          }
+        </div>
+      </div>
+    }
+    @else {
+      <div>
+        <hr class="mt-10 mb-5 text-xl">
+        <strong class="text-xl text-white">{{ key }}</strong>
+        <app-control-debug
+          [states]="val" [groupName]="key"
+          [parentDirtyShow]="dirty.show()"
+          [parentDirtyReady]="dirty.ready()"
+          [parentTouchedShow]="touched.show()"
+          [parentTouchedReady]="touched.ready()"
+          [parentErrorShow]="error.show()"
+          [parentErrorReady]="error.ready()"
+          [parentValueShow]="value.show()"
+          [parentValueReady]="value.ready()"
+        />
+      </div>
+    }
+  }
+</div>

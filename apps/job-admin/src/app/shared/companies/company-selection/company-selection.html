@@ -1,0 +1,23 @@
+@if(store.selectedCompany(); as company ){
+  <div class="flex">
+    <h1 class="text-2xl">{{ title()?title() + ' ':'' }}{{ company.name}}</h1>
+    @if(store.companiesList().length > 1){
+      <span class="text-blue-400 ml-1 cursor-pointer" (click)="store.selectedCompany.set(undefined)">Change</span>
+    }
+  </div>
+}@else{
+  <div class="flex justify-center gap-3">
+    <p-select
+      #select
+      class="w-80"
+      [options]="store.companiesList()"
+      placeholder="Select Company"
+      appendTo="body"
+      [filter]="true"
+      required
+      optionValue="uId"
+      optionLabel="name">
+    </p-select>
+    <p-button label="Select Company" (click)="selectCompany(select.value)"/>
+  </div>
+}

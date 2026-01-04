@@ -1,0 +1,9 @@
+.fixed-textarea {
+  resize: none;      /* disables user resize */
+  width: 100%;       /* optional full width */
+}
+/* component stylesheet */
+:host ::ng-deep .p-autocomplete,
+:host ::ng-deep .p-autocomplete .p-inputtext {
+  width: 100% !important;
+}

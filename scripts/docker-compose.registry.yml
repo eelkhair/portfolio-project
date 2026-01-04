@@ -1,0 +1,281 @@
+﻿services:
+  job-admin:
+    image: registry.eelkhair.net/job-admin:latest
+    ports:
+      - "6080:80"
+    restart: unless-stopped
+    networks:
+      - ai-job-board-net
+
+  job-public:
+    image: registry.eelkhair.net/job-public:latest
+    ports:
+      - "6081:3000"
+    restart: unless-stopped
+    networks:
+      - ai-job-board-net
+  job-api:
+    build:
+      context: ../services/job-api/
+    image: registry.eelkhair.net/job-api:latest
+    ports:
+      - "6084:8080"   # app
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    networks:
+      - ai-job-board-net
+
+  job-api-sidecar:
+    image: daprio/daprd:1.15.8
+    container_name: job-api-side-car
+    depends_on:
+      - job-api
+    network_mode: "service:job-api"
+    volumes:
+      - "/home/eelkhair/Dapr/shared/Components/:/Components"
+      - "/home/eelkhair/Dapr/job-api/:/Dapr"
+    command:
+      [
+        "/daprd",
+        "--app-id", "job-api",
+        "--app-port", "8080",
+        "--resources-path", "./Components",
+        "--resources-path", "./Dapr/Components",
+        "--resources-path", "./Dapr/Components/Secrets",
+        "-config", "./Dapr/Config/config.yaml"
+      ]
+  
+  ai-service:
+    image: registry.eelkhair.net/ai-service:latest
+    container_name: ai-service
+    
+    ports:
+      - "6082:6082"
+    environment:
+      PORT: "6082"
+      NODE_ENV: prod
+    networks:
+      - ai-job-board-net
+
+  ai-service-sidecar:
+    image: "daprio/daprd:1.15.8"
+    container_name: ai-service-sidecar
+    network_mode: "service:ai-service"
+    depends_on:
+      - ai-service
+    volumes:
+      - "/home/eelkhair/Dapr/shared/Components:/Components"
+      - "/home/eelkhair/Dapr/job-ai/:/Dapr"
+    command: [
+      "./daprd",
+      "--app-id", "ai-service",
+      "--app-port", "6082",
+      "--resources-path", "./Components",
+      "--resources-path", "./Dapr/Components",
+      "--resources-path", "./Dapr/Components/Secrets",
+      "-config", "./Dapr/Config/config.yaml"
+    ]
+  user-api:
+    build:
+      context: ../services/user-api/
+    image: registry.eelkhair.net/user-api:latest
+    ports:
+      - "6092:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    networks:
+      - ai-job-board-net
+
+  user-api-sidecar:
+    image: "daprio/daprd:1.15.8"
+    container_name: "user-api-side-car"
+    depends_on:
+      - user-api
+    volumes:
+      - "/home/eelkhair/Dapr/shared/Components:/Components"
+      - "/home/eelkhair/Dapr/user-api/:/Dapr"
+    network_mode: "service:user-api"
+    command: [
+      "./daprd",
+      "--app-id", "user-api",
+      "--app-port", "8080",
+      "--resources-path", "./Components",
+      "--resources-path", "./Dapr/Components",
+      "--resources-path", "./Dapr/Components/Secrets",
+      "--resources-path", "./Dapr/Components/Timers",
+      "-config", "./Dapr/Config/config.yaml"
+    ]
+
+  monolith-api:
+    image: registry.eelkhair.net/monolith-api:latest
+    ports:
+      - "5280:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    networks:
+      - ai-job-board-net
+
+  monolith-api-sidecar:
+    image: "daprio/daprd:1.15.8"
+    container_name: "monolith-api-side-car"
+    depends_on:
+      - monolith-api
+    volumes:
+      - "/home/eelkhair/Dapr/shared/Components:/Components"
+      - "/home/eelkhair/Dapr/monolith-api/:/Dapr"
+    network_mode: "service:monolith-api"
+    command: [
+      "./daprd",
+      "--app-id", "monolith-api",
+      "--app-port", "8080",
+      "--resources-path", "./Components",
+      "--resources-path", "./Dapr/Components",
+      "--resources-path", "./Dapr/Components/Secrets",
+      "--resources-path", "./Dapr/Components/Timers",
+      "-config", "./Dapr/Config/config.yaml"
+    ]
+  
+  connector-api:
+    image: registry.eelkhair.net/connector-api:latest
+    ports:
+      - "5284:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    networks:
+      - ai-job-board-net
+
+  connector-api-sidecar:
+    image: "daprio/daprd:1.15.8"
+    container_name: "connector-api-side-car"
+    depends_on:
+      - connector-api
+    volumes:
+      - "/home/eelkhair/Dapr/shared/Components:/Components"
+      - "/home/eelkhair/Dapr/connector-api/:/Dapr"
+    network_mode: "service:connector-api"
+    command: [
+      "./daprd",
+      "--app-id", "connector-api",
+      "--app-port", "8080",
+      "--resources-path", "./Components",
+      "--resources-path", "./Dapr/Components",
+      "--resources-path", "./Dapr/Components/Secrets",
+      "--resources-path", "./Dapr/Components/Timers",
+      "-config", "./Dapr/Config/config.yaml"
+    ]
+  company-api:
+    build:
+      context: ../services/company-api/
+    image: registry.eelkhair.net/company-api:latest
+    ports:
+      - "6072:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    networks:
+      - ai-job-board-net
+
+  company-api-sidecar:
+    image: "daprio/daprd:1.15.8"
+    container_name: "company-api-side-car"
+    depends_on:
+      - company-api
+    volumes:
+      - "/home/eelkhair/Dapr/shared/Components/:/Components"
+      - "/home/eelkhair/Dapr/company-api/:/Dapr"
+    network_mode: "service:company-api"
+    command: [
+      "./daprd",
+      "--app-id", "company-api",
+      "--app-port", "8080",
+      "--resources-path", "./Components",
+      "--resources-path", "./Dapr/Components/Secrets",
+      "-config", "./Dapr/Config/config.yaml"
+    ]
+  
+  admin-api:
+    build:
+      context: ../services/admin-api/
+    image: registry.eelkhair.net/admin-api:latest
+    ports:
+      - "6062:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    networks:
+      - ai-job-board-net
+
+  admin-api-sidecar:
+    image: "daprio/daprd:1.15.8"
+    container_name: "admin-api-side-car"
+    depends_on:
+      - admin-api
+    volumes:
+      - "/home/eelkhair/Dapr/shared/Components/:/Components"
+      - "/home/eelkhair/Dapr/admin-api/:/Dapr"
+    network_mode: "service:admin-api"
+    command: [
+      "./daprd",
+      "--app-id", "admin-api",
+      "--app-port", "8080",
+      "--resources-path", "./Components",
+      "--resources-path", "./Dapr/Components",
+      "--resources-path", "./Dapr/Components/Secrets",
+      "-config", "./Dapr/Config/config.yaml"
+    ]
+
+  job-board-status:
+    build:
+      context: ../services/HealthChecks
+    image: registry.eelkhair.net/health-check:latest
+    environment:
+      - HealthChecksUI__HealthChecks__0__Name=Monolith API
+      - HealthChecksUI__HealthChecks__0__Uri=https://job-monolith.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__1__Name=Connector API
+      - HealthChecksUI__HealthChecks__1__Uri=https://job-connector.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__2__Name=AI Service
+      - HealthChecksUI__HealthChecks__2__Uri=https://job-ai.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__3__Name=Admin API
+      - HealthChecksUI__HealthChecks__3__Uri=https://job-admin-api.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__4__Name=Company API
+      - HealthChecksUI__HealthChecks__4__Uri=https://job-company-api.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__5__Name=Job API
+      - HealthChecksUI__HealthChecks__5__Uri=https://job-api.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__6__Name=User API
+      - HealthChecksUI__HealthChecks__6__Uri=https://job-users-api.eelkhair.net/healthzEndpoint
+
+    ports:
+      - "5107:8080"
+  
+  seq:
+    image: datalust/seq:latest
+    ports:
+      - "5341:80"
+    environment:
+      - ACCEPT_EULA=Y
+      - SEQ_FIRSTRUN_NOAUTHENTICATION=true
+    networks:
+      - ai-job-board-net
+  
+  dapr-dashboard:
+    image: "daprio/dashboard:latest"
+    command:
+      [
+        "--docker-compose=true",
+        "--components-path", "/Components/",
+        "--config-path=/Config",
+        "--docker-compose-path=/home/nonroot/docker-compose.yml"
+      ]
+    ports:
+      - "8080:8080"
+    volumes:
+      - /home/eelkhair/Dapr/shared/Config:/Config:ro
+      - /home/eelkhair/docker-compose.yml:/home/nonroot/docker-compose.yml:ro
+      - /home/eelkhair/Dapr/_all:/Components:ro
+    
+    networks:
+      - ai-job-board-net
+
+
+networks:
+  ai-job-board-net:
+    name: ai-job-board-net
+

@@ -1,0 +1,197 @@
+<!--suppress JSUnusedGlobalSymbols -->
+<p-dialog header="Generate Draft"
+          (onHide)="store.showGenerate.set(false);form.reset();errors.set([]);setDefaults()"
+          (visibleChange)="store.showGenerate.set(false)"
+          [modal]="true" [visible]="store.showGenerate()"
+          [closable]="!isFinalStep()"
+          [closeOnEscape]="!isFinalStep()"
+          [style]="{ width: '60rem', minHeight:'470px' }">
+
+    <p-stepper [value]="1" class="basis-[50rem]" (valueChange)="validateStep($event)" #stepper >
+      <p-step-list>
+        <p-step [value]="1" [disabled]="isFinalStep() && !success()">Basics</p-step>
+        <p-step [value]="2" [disabled]="!validSteppers[1]">>Scope</p-step>
+        <p-step [value]="3" [disabled]="!validSteppers[2]">Qualifications</p-step>
+        <p-step [value]="4" [disabled]="!validSteppers[3]">Style</p-step>
+        <p-step [value]="5" [disabled]="!isFinalStep()">Generate</p-step>
+      </p-step-list>
+      <p-step-panels>
+        <p-step-panel [value]="1">
+          <ng-template #content let-activateCallback="activateCallback">
+            <form [formGroup]="form.controls.basics">
+            <div class=" flex flex-col gap-3 w-full">
+              <div class="flex items-center" >
+                <label class="w-40">Job Title Seed <span class="text-red-600 font-bold">*</span></label>
+                <input class="w-full" autofocus pInputText placeholder="Backend Engineer" formControlName="titleSeed"/>
+              </div>
+              <div class="flex items-center">
+                <label class="w-40">Company<span class="text-red-600 font-bold">*</span></label>
+                <input class="w-full"  pInputText formControlName="companyName"/>
+              </div>
+              <div class="flex w-full items-center">
+                <label class="w-40">Team<span class="text-red-600 font-bold">*</span></label>
+                <input class="w-full" pInputText formControlName="teamName"/>
+              </div>
+              <div class=" flex w-full items-center">
+                <label class="w-40">Location</label>
+                  <p-autoComplete
+                    formControlName="location"
+                    [suggestions]="store.citySuggestions"
+                    (completeMethod)="store.onCompleteCity($event)"
+                    [forceSelection]="false"
+                    [autoHighlight]="true"
+                    appendTo="body"
+                    class="w-full"
+                    placeholder="City, ST | Remote | Hybrid">
+                  </p-autoComplete>
+              </div>
+            </div>
+            <div class="flex pt-6 justify-end ">
+              <p-button label="Next" icon="pi pi-arrow-right" iconPos="right" [disabled]="!validSteppers[1]" (onClick)="activateCallback(2)"/>
+            </div>
+            </form>
+          </ng-template>
+        </p-step-panel>
+
+        <p-step-panel [value]="2">
+          <ng-template #content let-activateCallback="activateCallback">
+            <form [formGroup]="form.controls.scope">
+            <div class="flex w-full flex-col gap-3">
+              <div class="w-full flex items-center">
+                <label class="w-40">Brief <span class="text-red-600 font-bold">*</span></label>
+                <textarea pInputTextarea rows="5"
+                          formControlName="brief"
+                          class="fixed-textarea"
+                          placeholder="What will this person own? What impact?"></textarea>
+              </div>
+
+              <div class="flex items-center w-full">
+                <label class="w-40">Role Level <span class="text-red-600 font-bold">*</span></label>
+                <p-select class="w-full"
+                          appendTo="body" formControlName="roleLevel"
+                          [options]="['Junior','Mid','Senior','Staff', 'Principal']">senior</p-select>
+              </div>
+            </div>
+            <div class="flex pt-6 justify-between mt-3">
+              <p-button label="Back" severity="secondary" icon="pi pi-arrow-left" (onClick)="activateCallback(1)"/>
+              <p-button label="Next" icon="pi pi-arrow-right" iconPos="right" (onClick)="activateCallback(3)" [disabled]="!validSteppers[2]"/>
+            </div>
+            </form>
+          </ng-template>
+        </p-step-panel>
+
+        <p-step-panel [value]="3">
+          <ng-template #content let-activateCallback="activateCallback">
+            <form [formGroup]="form.controls.qualifications">
+            <div class="mb-8">
+              What qualifications are you looking for?
+            </div>
+            <div class="flex flex-col gap-3 w-full">
+              <div class="w-full flex">
+                <label class="w-44">Must haves</label>
+                <p-autoComplete
+                  class="w-full"
+                  formControlName="mustHaves"
+                  [multiple]="true"
+                  [suggestions]="store.skillSuggestions"
+                  (completeMethod)="store.onComplete($event, form.controls.qualifications.controls.mustHaves.value)"
+                  [autoHighlight]="true"
+                  [forceSelection]="false"
+                  placeholder="Type a skill and press Enter">
+                </p-autoComplete>
+              </div>
+              <div class="flex w-full">
+                <label class="w-44">Nice-to-haves</label>
+                <p-autoComplete
+                  class="w-full"
+                  [multiple]="true"
+                  formControlName="niceToHaves"
+                  [suggestions]="store.skillSuggestions"
+                  (completeMethod)="store.onComplete($event, form.controls.qualifications.controls.niceToHaves.value)"
+                  [autoHighlight]="true"
+                  [forceSelection]="false"
+                  placeholder="Type a skill and press Enter">
+                </p-autoComplete>
+              </div>
+              <div class="flex w-full">
+                <label class="w-44">Tech Stack</label>
+                <p-autoComplete
+                  class="w-full"
+                  [multiple]="true"
+                  [suggestions]="store.techStackSuggestions"
+                  formControlName="techStack"
+                  (completeMethod)="store.onTechStackComplete($event,form.controls.qualifications.controls.techStack.value)"
+                  [autoHighlight]="true"
+                  appendTo="body"
+                  [forceSelection]="false"
+                  placeholder="Type a technology and press Enter">
+                </p-autoComplete>
+              </div>
+            </div>
+            <div class="flex pt-6 justify-between">
+              <p-button label="Back" severity="secondary" icon="pi pi-arrow-left" (onClick)="activateCallback(2)"/>
+              <p-button label="Next" icon="pi pi-arrow-right" iconPos="right" (onClick)="activateCallback(4)" [disabled]="!validSteppers[3]" />
+            </div>
+            </form>
+          </ng-template>
+        </p-step-panel>
+        <p-step-panel [value]="4">
+          <ng-template #content let-activateCallback="activateCallback">
+            <form [formGroup]="form.controls.style">
+              <div class="flex w-full flex-col gap-3">
+                <div class="flex full items-center">
+                  <label class="w-44">Tone <span class="text-red-500 font-bold">*</span></label>
+                  <p-select class="w-full" formControlName="tone" [options]="['Neutral','Concise','Friendly']"></p-select>
+                </div>
+                <div class="flex w-full items-center">
+                  <label class="w-44">Max bullets (3–8)</label>
+                  <input class= "w-full" type="number" formControlName="maxBullets" pInputText />
+                </div>
+                <div class="flex w-full items-center">
+                  <label class="w-44" >Benefits (optional)</label>
+                  <textarea class="fixed-textarea w-full" pInputTextarea formControlName="benefits" rows="3"></textarea>
+                </div>
+              </div>
+              <div class="flex pt-6 justify-between mt-1">
+                <p-button label="Back" severity="secondary" icon="pi pi-arrow-left" (onClick)="activateCallback(3)"/>
+                <p-button label="Generate" icon="pi pi-arrow-right" iconPos="right" type="button" [disabled]="!validSteppers[4]" (click)="activateCallback(5);submit()"/>
+              </div>
+            </form>
+          </ng-template>
+        </p-step-panel>
+        <p-step-panel [value]="5">
+          <ng-template #content let-activateCallback="activateCallback">
+            <form [formGroup]="form.controls.style">
+                @if(isFinalStep()){
+                  @if(!success()){
+
+                    <div class="flex w-full flex-col gap-3 mb-24 mt-12">
+                      <p-progress-spinner strokeWidth="3" fill="transparent" animationDuration=".5s" [style]="{ width: '175px', height: '175px' }">
+                      </p-progress-spinner>
+                      <span style="position:relative; margin: -125px auto auto; text-align:center; font-size:18px">Generating<br/>Draft</span>
+                    </div>
+                  }
+                }
+              @if(success()){
+                <div class="pt-6 flex flex-col items-center gap-6  mt-1 w-full center" style="margin-top: 75px">
+                  <h1 class="text-2xl margin-auto center">The draft was generated successfully!</h1>
+                  <p-button label="Close" icon="pi pi-arrow-right" iconPos="right" type="button" [disabled]="isFinalStep()" (click)="store.showGenerate.set(false); activateCallback(1);this.form.reset();validateSteps();success.set(false); setDefaults()"/>
+                </div>
+              }
+            </form>
+          </ng-template>
+        </p-step-panel>
+      </p-step-panels>
+    </p-stepper>
+
+  @if(errors().length>0){
+    <div class="bg-red-200 p-6 border-1 border-red-500 rounded-3">
+      <ul class="list-disc list-inside text-red-900">
+        @for(error of errors(); track $index){
+          <li >{{error}}</li>
+        }
+      </ul>
+    </div>
+
+  }
+</p-dialog>

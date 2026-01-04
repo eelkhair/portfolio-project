@@ -1,0 +1,14 @@
+{
+  "/v1/traces": {
+    "target": "http://192.168.1.160:4318",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/api/v2/spans": {
+    "target": "http://192.168.1.160:9411",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}

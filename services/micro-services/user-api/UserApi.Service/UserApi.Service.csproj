@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>UserApi</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="9.0.0" />
+        <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
+
+        <PackageReference Include="Auth0.ManagementApi" Version="7.43.0" />
+
+        <PackageReference Include="Dapr.Actors.AspNetCore" Version="1.16.1" />
+        <PackageReference Include="Dapr.AspNetCore" Version="1.16.1" />
+        <PackageReference Include="Dapr.Extensions.Configuration" Version="1.16.1" />
+        <PackageReference Include="Elkhair.Common.Observability" Version="1.0.3" />
+
+        <PackageReference Include="Elkhair.Dev.Common" Version="1.0.18" />
+        <PackageReference Include="FastEndpoints" Version="7.1.1" />
+        <PackageReference Include="FastEndpoints.Security" Version="7.1.1" />
+        <PackageReference Include="FastEndpoints.Swagger" Version="7.1.1" />
+        <PackageReference Include="JobBoard.HealthChecks" Version="1.0.6" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.11" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.11">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+
+        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\UserAPI.Contracts\UserAPI.Contracts.csproj" />
+    </ItemGroup>
+
+</Project>
