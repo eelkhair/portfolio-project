@@ -114,6 +114,8 @@ Aggregated health across APIs and critical dependencies.
 
 Runtime visibility into applications, components, and pub/sub subscriptions.
 
+![Dapr Dashboard – Application Overview](Images/healthchecks/dapr-applications-overview.png)
+
 ![Dapr application runtime summary](Images/healthchecks/dapr-application-runtime-summary.png)
 
 ![Dapr components status](Images/healthchecks/dapr-components-status.png)

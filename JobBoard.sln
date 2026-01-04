@@ -232,6 +232,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Healthchecks", "Healthcheck
 		docs\Images\healthchecks\dapr-pubsub-subscriptions.png = docs\Images\healthchecks\dapr-pubsub-subscriptions.png
 		docs\Images\healthchecks\healthchecks-monolith-dependencies.png = docs\Images\healthchecks\healthchecks-monolith-dependencies.png
 		docs\Images\healthchecks\healthchecks-overview-all-services.png = docs\Images\healthchecks\healthchecks-overview-all-services.png
+		docs\Images\healthchecks\rabbitmq-queues-and-dlq.png = docs\Images\healthchecks\rabbitmq-queues-and-dlq.png
+		docs\Images\healthchecks\dapr-applications-overview.png = docs\Images\healthchecks\dapr-applications-overview.png
+		docs\Images\healthchecks\redis-config-and-feature-flags.png = docs\Images\healthchecks\redis-config-and-feature-flags.png
 	EndProjectSection
 EndProject
 Global
