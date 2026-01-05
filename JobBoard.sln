@@ -231,7 +231,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Healthchecks", "Healthcheck
 		docs\Images\healthchecks\dapr-components-status.png = docs\Images\healthchecks\dapr-components-status.png
 		docs\Images\healthchecks\dapr-pubsub-subscriptions.png = docs\Images\healthchecks\dapr-pubsub-subscriptions.png
 		docs\Images\healthchecks\healthchecks-monolith-dependencies.png = docs\Images\healthchecks\healthchecks-monolith-dependencies.png
-		docs\Images\healthchecks\healthchecks-overview-all-services.png = docs\Images\healthchecks\healthchecks-overview-all-services.png
 		docs\Images\healthchecks\rabbitmq-queues-and-dlq.png = docs\Images\healthchecks\rabbitmq-queues-and-dlq.png
 		docs\Images\healthchecks\dapr-applications-overview.png = docs\Images\healthchecks\dapr-applications-overview.png
 		docs\Images\healthchecks\redis-config-and-feature-flags.png = docs\Images\healthchecks\redis-config-and-feature-flags.png
@@ -240,6 +239,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "medium", "medium", "{72BB44CB-1474-4AC7-9661-6A0668A8D17A}"
 	ProjectSection(SolutionItems) = preProject
 		docs\medium\01-building-a-production-grade-system-in-public.md = docs\medium\01-building-a-production-grade-system-in-public.md
+		docs\medium\02_Infrastructure_as_a_First_Class_System.md = docs\medium\02_Infrastructure_as_a_First_Class_System.md
 	EndProjectSection
 EndProject
 Global
