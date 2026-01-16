@@ -54,7 +54,7 @@ public static class CompanyCreatedEndpoint
 
                     spanError?.SetTag("exception", true);
                     spanError?.SetTag("exception.message", ex.Message);
-                    
+                    logger.LogError(ex, "Unhandled error while provisioning company");
                 }
                 using (activitySource.StartActivity("provision.company.finalize"))
                 {

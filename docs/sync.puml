@@ -1,91 +1,149 @@
 ﻿@startuml
-title Existing Flow — Monolith ➜ Microservices (Company Creation)
+title Company Creation – Connector-Orchestrated Saga (Annotated)
 
-actor "Frontend (FE)" as FE
-participant "Admin API" as Admin
-participant "Monolith" as Monolith
-participant "Outbox Processor" as Outbox
-participant "Dapr Pub/Sub" as Dapr
-participant "Connector API\n(CompanyProvisioningSaga)" as Saga
-participant "Company API" as CompanyAPI
-participant "User API" as UserAPI
-participant "Job API" as JobAPI
+autonumber
+skinparam responseMessageBelowArrow true
+skinparam noteBackgroundColor #FDF6E3
+skinparam noteBorderColor #657B83
 
-== Command Entry ==
+actor "Frontend" as FE
 
-FE -> Admin : Create Company
-Admin -> Monolith : CreateCompanyCommand
+participant "Monolith API\n(Command)" as Monolith
+database "Monolith DB\n(SQL Server)" as MonolithDb
+
+participant "Outbox Processor\n(Timer)" as Outbox
+participant "Dapr / PubSub" as PubSub
+
+participant "Connector API\n(Saga Orchestrator)" as Connector
+database "Idempotency Store" as Idempotency
+
+participant "Company API" as CompanyApi
+participant "User API" as UserApi
+participant "Job API" as JobApi
+
+participant "Monolith API\n(Activation)" as MonolithAct
+participant "SignalR Hub" as SignalR
+
+note right of FE
+Frontend only talks to the Monolith.
+No microservice knowledge,
+no event awareness.
+end note
+
+== Create Company ==
+
+FE -> Monolith: POST /companies
 activate Monolith
 
-Monolith -> Monolith : Validate invariants
-Monolith -> Monolith : INSERT Company + User
-Monolith -> Monolith : INSERT Outbox(company.created.v1)
-Monolith -> Monolith : COMMIT TX
+note right of Monolith
+Command-side responsibility:
+• Validate invariants
+• Enforce business rules
+• Own transactional consistency
+end note
+
+Monolith -> MonolithDb: Validate + INSERT Company/User
+Monolith -> MonolithDb: INSERT outbox(company.created)
+
+note right of MonolithDb
+Company + outbox record
+are committed in the SAME transaction.
+This guarantees no lost events.
+end note
+
+MonolithDb --> Monolith: Commit
+Monolith --> FE: 201 Created
 deactivate Monolith
 
-== Event Publication ==
+== Outbox Publish ==
 
-Outbox -> Dapr : Publish company.created.v1
-Dapr -> Saga : Deliver CompanyCreatedV1Event
+Outbox -> MonolithDb: Poll outbox
+MonolithDb --> Outbox: company.created event
 
-== Saga Orchestration ==
+note right of Outbox
+Outbox processor is time-decoupled.
+Failure here does NOT break
+the user request.
+end note
 
-activate Saga
-Saga -> CompanyAPI : Create projection
-Saga -> UserAPI : Provision user + Auth0
-Saga -> JobAPI : Create projection
+Outbox -> PubSub: Publish company.created
+PubSub --> Outbox: ack
+Outbox -> MonolithDb: Mark outbox processed
 
-Saga -> Monolith : ActivateCompanyCommand
-activate Monolith
-Monolith -> Monolith : UPDATE Company.Status = Active
-Monolith -> Monolith : EMIT company.provisioned.v1
-deactivate Monolith
+== Connector Picks Up Event ==
 
-Saga -> Saga : Log "Saga completed"
-deactivate Saga
+PubSub -> Connector: company.created
+activate Connector
 
-== Fact Propagation ==
+note right of Connector
+Connector is NOT a domain owner.
+It orchestrates cross-system workflows
+and owns saga coordination.
+end note
 
-Monolith -> Outbox : company.provisioned.v1
-@enduml
-@startuml
-title New Flow — Microservices ➜ Monolith (Intent → Command)
+Connector -> Idempotency: Check message id
 
-actor "Frontend (FE)" as FE
-participant "Admin API" as Admin
-participant "Company API" as CompanyAPI
-participant "Dapr Pub/Sub" as Dapr
-participant "MonolithSync\n(Intent Normalizer)" as Sync
-participant "Monolith" as Monolith
-participant "Outbox Processor" as Outbox
+note right of Idempotency
+Idempotency guarantees:
+• At-least-once delivery safety
+• Retry without duplication
+end note
 
-== Alternative Entry Point ==
+Idempotency --> Connector: Not processed
+Connector -> Idempotency: Record message id
 
-FE -> Admin : Create Company
-Admin -> CompanyAPI : Create Company (Intent)
+== Saga: Microservices Fanout ==
 
-CompanyAPI -> CompanyAPI : Validate local rules
-CompanyAPI -> Dapr : Publish company.creation.requested.v1
+note over Connector,CompanyApi
+Each microservice is autonomous:
+• Owns its own database
+• No shared transactions
+• Reacts to events only
+end note
 
-== Intent Normalization ==
+Connector -> CompanyApi: Create Company (event)
+activate CompanyApi
+CompanyApi --> Connector: OK
+deactivate CompanyApi
 
-Dapr -> Sync : Deliver CompanyCreationRequestedV1Event
-activate Sync
+Connector -> UserApi: Create User (event)
+activate UserApi
+UserApi --> Connector: OK
+deactivate UserApi
 
-Sync -> Sync : Check origin + idempotency
-Sync -> Monolith : CreateCompanyCommand
-deactivate Sync
+Connector -> JobApi: Initialize Jobs Context
+activate JobApi
+JobApi --> Connector: OK
+deactivate JobApi
 
-== Authoritative Creation ==
+== Saga Completion ==
 
-activate Monolith
-Monolith -> Monolith : Validate invariants
-Monolith -> Monolith : INSERT Company + User
-Monolith -> Monolith : INSERT Outbox(company.created.v1)
-Monolith -> Monolith : COMMIT TX
-deactivate Monolith
+note right of Connector
+Only AFTER all participants succeed
+does the saga advance.
+end note
 
-== Canonical Fact ==
+Connector -> MonolithAct: POST /companies/{id}/activate
+activate MonolithAct
 
-Outbox -> Dapr : Publish company.created.v1
+note right of MonolithAct
+Activation is a BUSINESS decision,
+not a side effect of creation.
+end note
+
+MonolithAct -> MonolithDb: UPDATE Company.Status = Active
+MonolithDb --> MonolithAct: OK
+
+MonolithAct -> SignalR: CompanyActivated
+
+note right of SignalR
+Realtime feedback to the user
+only after the system
+is fully consistent.
+end note
+
+SignalR --> FE: realtime ack
+deactivate MonolithAct
+deactivate Connector
+
 @enduml
