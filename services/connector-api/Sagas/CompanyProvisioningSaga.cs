@@ -12,6 +12,7 @@ public class CompanyProvisioningSaga
     private readonly ICompanyApiClient _companyApi;
     private readonly IJobApiClient _jobApi;
     private readonly IUserApiClient _userApi;
+    private readonly ActivitySource _activitySource;
     private readonly ILogger<CompanyProvisioningSaga> _logger;
 
     public CompanyProvisioningSaga(
@@ -19,13 +20,14 @@ public class CompanyProvisioningSaga
         ICompanyApiClient companyApi,
         IJobApiClient jobApi,
         IUserApiClient userApi,
-        ILogger<CompanyProvisioningSaga> logger)
+        ILogger<CompanyProvisioningSaga> logger, ActivitySource activitySource)
     {
         _monolith = monolith;
         _companyApi = companyApi;
         _jobApi = jobApi;
         _userApi = userApi;
         _logger = logger;
+        _activitySource = activitySource;
     }
 
     public async Task HandleAsync(
@@ -38,7 +40,7 @@ public class CompanyProvisioningSaga
             "Saga started: CompanyProvisioningSaga {TraceId} Company {CompanyUId}",
             traceId,
             @event.Data.CompanyUId);
-
+        using var payloadsActivity = _activitySource.StartActivity("CompanyProvisioningSaga.buildPayloads");
         var (company, admin) =
             await _monolith.GetCompanyAndAdminForCreatedEventAsync(
                 @event.Data.CompanyUId,
@@ -48,7 +50,7 @@ public class CompanyProvisioningSaga
         
         var payloads =
             CompanyCreatedMapper.Map(@event.Data, company, admin);
-        
+        payloadsActivity?.Stop();
         _logger.LogInformation("Saga step: Projections completed {CompanyUId}", @event.Data.CompanyUId);
 
         var userTask =
@@ -62,14 +64,18 @@ public class CompanyProvisioningSaga
         var userResult = await userTask;
         _logger.LogInformation("Saga step: User provisioned {CompanyUId}", @event.Data.CompanyUId);
 
-        await _monolith.ActivateCompanyAsync(
-            @event.Data,
-            company,
-            userResult,
-            ct);
+        using (var _ = _activitySource.StartActivity("CompanyProvisioningSaga.activateCompany"))
+        {
+              await _monolith.ActivateCompanyAsync(
+                        @event.Data,
+                        company,
+                        userResult,
+                        ct);
+            
+                    _logger.LogInformation("Saga step: Activation completed {CompanyUId}", @event.Data.CompanyUId);
 
-        _logger.LogInformation("Saga step: Activation completed {CompanyUId}", @event.Data.CompanyUId);
-
+        }
+      
         _logger.LogInformation(
             "Saga completed: CompanyProvisioningSaga {TraceId} Company {CompanyUId}",
             traceId,

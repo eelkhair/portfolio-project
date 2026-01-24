@@ -22,26 +22,29 @@ public static class CompanyCreatedEndpoint
                 ILogger<CompanyCreatedV1Event> logger,
                 CancellationToken cancellationToken) =>
             {
-                using var spanIdempotency =
-                    activitySource.StartActivity("provision.company.idempotency");
-
-                logger.LogInformation("Received company created event {CompanyUId}", @event.Data.CompanyUId);
-                logger.LogDebug("Checking idempotency key {IdempotencyKey}", @event.IdempotencyKey);
                 var stateKey = $"{IdempotencyOptions.Prefix}{@event.IdempotencyKey}";
-                var existing = await client.GetStateAsync<string>(StateStores.Redis, stateKey, cancellationToken: cancellationToken);
-
-                if (existing is not null)
+                using (var spanIdempotency =
+                       activitySource.StartActivity("provision.company.idempotency"))
                 {
-                    logger.LogInformation("Skipping company provisioning. Idempotency key already processed");
-                    return Results.Accepted();
+                    logger.LogInformation("Received company created event {CompanyUId}", @event.Data.CompanyUId);
+                    logger.LogDebug("Checking idempotency key {IdempotencyKey}", @event.IdempotencyKey);
+                    var existing = await client.GetStateAsync<string>(StateStores.Redis, stateKey, cancellationToken: cancellationToken);
+
+                    if (existing is not null)
+                    {
+                        logger.LogInformation("Skipping company provisioning. Idempotency key already processed");
+                        return Results.Accepted();
+                    }
+
+                    await client.SaveStateAsync(
+                        StateStores.Redis,
+                        stateKey,
+                        "processing",
+                        metadata: new Dictionary<string, string> { ["ttlInSeconds"] = IdempotencyOptions.PendingTTLSeconds.ToString() },
+                        cancellationToken: cancellationToken);
                 }
 
-                await client.SaveStateAsync(
-                    StateStores.Redis,
-                    stateKey,
-                    "processing",
-                    metadata: new Dictionary<string, string> { ["ttlInSeconds"] = IdempotencyOptions.PendingTTLSeconds.ToString() },
-                    cancellationToken: cancellationToken);
+                
 
                 try
                 {
