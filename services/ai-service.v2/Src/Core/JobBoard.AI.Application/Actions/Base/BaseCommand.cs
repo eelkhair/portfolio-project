@@ -3,6 +3,7 @@ using JobBoard.AI.Application.Interfaces.Configurations;
 
 namespace JobBoard.AI.Application.Actions.Base;
 
+// ReSharper disable once UnusedTypeParameter
 public abstract class BaseCommand<TResponse> : IRequest<TResponse>
 {
     [JsonIgnore]

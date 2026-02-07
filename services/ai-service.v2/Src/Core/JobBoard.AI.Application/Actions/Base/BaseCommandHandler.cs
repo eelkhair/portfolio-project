@@ -1,6 +1,9 @@
 using JobBoard.AI.Application.Interfaces.Configurations;
 using Microsoft.Extensions.Logging;
 
+
+// ReSharper disable SuspiciousTypeConversion.Global
+
 namespace JobBoard.AI.Application.Actions.Base;
 
 public abstract class BaseCommandHandler
@@ -11,4 +14,5 @@ public abstract class BaseCommandHandler
     }
 
     protected ILogger Logger { get; }
+
 }

@@ -6,13 +6,40 @@
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <DocumentationFile>bin\Debug\JobBoard.AI.API.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <DocumentationFile>bin\Release\JobBoard.AI.API.xml</DocumentationFile>
+    </PropertyGroup>
+
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0-preview.1.25120.3" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
+        <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="9.0.0" />
+        <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
+        <PackageReference Include="JobBoard.HealthChecks" Version="1.0.6" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
+        <PackageReference Include="Microsoft.OpenApi" Version="2.3.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.2">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.Extensions.Logging.ApplicationInsights" Version="2.23.0" />
+        <PackageReference Include="Microsoft.Identity.Web" Version="4.3.0" />
+        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
+        <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.15.0" />
+        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.0" />
+        <PackageReference Include="Scalar.AspNetCore" Version="2.12.36" />
+        <PackageReference Include="Scalar.AspNetCore.Swashbuckle" Version="2.12.36" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="10.0.0" />
+
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\..\micro-services\HealthChecks\JobBoard.HealthChecks\JobBoard.HealthChecks.csproj" />
         <ProjectReference Include="..\..\Infrastructure\JobBoard.AI.Infrastructure.Configuration\JobBoard.AI.Infrastructure.Configuration.csproj" />
+        <ProjectReference Include="..\..\Infrastructure\JobBoard.AI.Infrastructure.Dapr\JobBoard.AI.Infrastructure.Dapr.csproj" />
+        <ProjectReference Include="..\..\Infrastructure\JobBoard.Ai.Infrastructure.Diagnostics\JobBoard.Ai.Infrastructure.Diagnostics.csproj" />
         <ProjectReference Include="..\..\Infrastructure\JobBoard.AI.Infrastructure.Persistence\JobBoard.AI.Infrastructure.Persistence.csproj" />
     </ItemGroup>
 

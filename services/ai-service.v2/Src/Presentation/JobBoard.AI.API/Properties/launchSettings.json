@@ -1,25 +1,32 @@
 {
   "$schema": "https://json.schemastore.org/launchsettings.json",
   "profiles": {
+
+    "dapr": {
+      "commandName": "Executable",
+      "executablePath": "dapr.exe",
+      "commandLineArgs": "run --app-id ai-service-v2 --resources-path ../../../../../Components/ --resources-path ./Dapr/Components/Secrets --resources-path ./Dapr/Components/Timers --resources-path ./Dapr/Components --config ./Dapr/Config/config.yaml --app-port 5200 --dapr-http-port 7000  --log-level debug dotnet run",
+      "workingDirectory": "$(ProjectDir)",
+      "launchBrowser": true,
+      "applicationUrl": "http://localhost:5280"
+    },
     "http": {
       "commandName": "Project",
-      "dotnetRunMessages": true,
-      "launchBrowser": true,
-      "launchUrl": "swagger",
-      "applicationUrl": "http://localhost:5200",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://localhost:5200"
     },
     "https": {
       "commandName": "Project",
-      "dotnetRunMessages": true,
-      "launchBrowser": true,
-      "launchUrl": "swagger",
-      "applicationUrl": "https://localhost:7200;http://localhost:5200",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DOTNET_SYSTEM_NET_SOCKETS_PREFER_IPV4": "true",
+        "WEBSITE_PREJUDICE_IPV4": "1"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:7779;http://localhost:5200"
     }
   }
 }

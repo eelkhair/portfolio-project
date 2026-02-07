@@ -1,11 +1,26 @@
-using JobBoard.AI.API.Actions.Test;
+using JobBoard.AI.API.Infrastructure.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoard.AI.API.Controllers;
 
-public class TestController : BaseApiController
+
+
+/// <summary>
+/// Company Controller 
+/// </summary>
+public class CompaniesController : BaseApiController
 {
+    /// <summary>
+    /// Create Company
+    /// </summary>
+    /// <param name="command"></param>
+    /// <returns></returns>
     [HttpPost]
-    public Task<IActionResult> Test()
-        => ExecuteCommandAsync(new TestCommand(), Ok);
+    [AllowAnonymous]
+    [StandardApiResponses]
+   
+    public async Task<IActionResult> Create()
+        => Ok("Company created successfully");
+    
 }
