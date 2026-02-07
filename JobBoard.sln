@@ -262,6 +262,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.AI.Infrastructure.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.AI.API", "services\ai-service.v2\Src\Presentation\JobBoard.AI.API\JobBoard.AI.API.csproj", "{3EEE3CD1-11C7-407F-BCCD-F8B577A3DD83}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.AI.Infrastructure.Dapr", "services\ai-service.v2\Src\Infrastructure\JobBoard.AI.Infrastructure.Dapr\JobBoard.AI.Infrastructure.Dapr.csproj", "{174B20B4-E0E2-4EAD-A91C-B07EFB9D1F87}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.Ai.Infrastructure.Diagnostics", "services\ai-service.v2\Src\Infrastructure\JobBoard.Ai.Infrastructure.Diagnostics\JobBoard.Ai.Infrastructure.Diagnostics.csproj", "{E81F17F9-408B-4A45-9A36-11443F44DF73}"
+EndProject
 Global
 				GlobalSection(SolutionConfigurationPlatforms) = preSolution
 								Debug|Any CPU = Debug|Any CPU
@@ -384,6 +388,14 @@ Global
 					{3EEE3CD1-11C7-407F-BCCD-F8B577A3DD83}.Debug|Any CPU.Build.0 = Debug|Any CPU
 					{3EEE3CD1-11C7-407F-BCCD-F8B577A3DD83}.Release|Any CPU.ActiveCfg = Release|Any CPU
 					{3EEE3CD1-11C7-407F-BCCD-F8B577A3DD83}.Release|Any CPU.Build.0 = Release|Any CPU
+					{174B20B4-E0E2-4EAD-A91C-B07EFB9D1F87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{174B20B4-E0E2-4EAD-A91C-B07EFB9D1F87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{174B20B4-E0E2-4EAD-A91C-B07EFB9D1F87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{174B20B4-E0E2-4EAD-A91C-B07EFB9D1F87}.Release|Any CPU.Build.0 = Release|Any CPU
+					{E81F17F9-408B-4A45-9A36-11443F44DF73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{E81F17F9-408B-4A45-9A36-11443F44DF73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{E81F17F9-408B-4A45-9A36-11443F44DF73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{E81F17F9-408B-4A45-9A36-11443F44DF73}.Release|Any CPU.Build.0 = Release|Any CPU
 				EndGlobalSection
 				GlobalSection(SolutionProperties) = preSolution
 								HideSolutionNode = FALSE
@@ -451,5 +463,7 @@ Global
 		{71AC470A-A455-4445-AF93-3E098018EAEB} = {643D81E9-C0AD-41ED-88C6-3971436A27D5}
 		{D64AF132-AA17-4D81-A97A-2D3BB74FBFF5} = {643D81E9-C0AD-41ED-88C6-3971436A27D5}
 		{3EEE3CD1-11C7-407F-BCCD-F8B577A3DD83} = {BF88B5C8-F307-4228-90D1-F1AB5E2D896B}
+		{174B20B4-E0E2-4EAD-A91C-B07EFB9D1F87} = {643D81E9-C0AD-41ED-88C6-3971436A27D5}
+		{E81F17F9-408B-4A45-9A36-11443F44DF73} = {643D81E9-C0AD-41ED-88C6-3971436A27D5}
 	EndGlobalSection
 EndGlobal

@@ -1,15 +1,41 @@
+
+
+
 namespace JobBoard.AI.Application.Interfaces.Configurations;
 
-public readonly struct Unit : IEquatable<Unit>, IComparable<Unit>
+public sealed class Unit : IEquatable<Unit>
 {
     public static readonly Unit Value = new();
 
-    public int CompareTo(Unit other) => 0;
-    public bool Equals(Unit other) => true;
-    public override bool Equals(object? obj) => obj is Unit;
-    public override int GetHashCode() => 0;
-    public override string ToString() => "()";
 
-    public static bool operator ==(Unit left, Unit right) => true;
-    public static bool operator !=(Unit left, Unit right) => false;
+    public bool Equals(Unit? other)
+    { 
+        return true;
+    }
+    
+    public override bool Equals(object? obj)
+    {
+        return obj is Unit;
+    }
+
+
+    public override int GetHashCode()
+    {
+        return 0;
+    }
+    
+    public override string ToString()
+    {
+        return "()";
+    }
+
+    public static bool operator ==(Unit? first, Unit? second)
+    {
+        return first is null ? second is null : second is not null;
+    }
+    
+    public static bool operator !=(Unit? first, Unit? second)
+    {
+        return !(first == second);
+    }
 }

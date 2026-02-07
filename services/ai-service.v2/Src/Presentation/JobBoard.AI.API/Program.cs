@@ -1,31 +1,28 @@
+using System.Diagnostics;
+using JobBoard.AI.API.Infrastructure;
+using JobBoard.AI.API.Infrastructure.Authorization;
+using JobBoard.AI.API.Infrastructure.OpenApi;
 using JobBoard.AI.Application;
-using JobBoard.AI.Infrastructure.Configuration;
+using JobBoard.AI.Infrastructure.Dapr;
+using JobBoard.Ai.Infrastructure.Diagnostics;
 using JobBoard.AI.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
-builder.Services.AddControllers();
-builder.Services.AddOpenApi();
+#if DEBUG
+Debugger.Launch();
+#endif
+(await builder.AddDaprServices("ai-service-v2")).ConfigureLogging("ai-service-v2").AddCustomHealthChecks().Services
+    .AddApplicationServices()
+    .AddPersistenceServices()
+    .AddHttpContextAccessor()
+  
+    .AddODataServices()
+    .AddAuthorizationService(builder.Configuration)
+    .AddConfiguredSwagger(builder.Configuration)
+    .AddOpenTelemetryServices(builder.Configuration, "ai-service-v2")
+    .AddSignalR();
 
-// Add application layers
-builder.Services.AddApplicationServices(typeof(Program).Assembly);
-builder.Services.AddConfigurationServices();
-builder.Services.AddPersistenceServices();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/openapi/v1.json", "JobBoard AI API v1");
-    });
-}
-
-app.UseHttpsRedirection();
-app.MapControllers();
-
-app.Run();
+builder.Build().UseConfiguredSwagger(builder.Configuration)
+    .UseApplicationServices()
+    .Start();

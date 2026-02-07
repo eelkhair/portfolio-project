@@ -1,4 +1,5 @@
 using System.Reflection;
+using FluentValidation;
 using JobBoard.AI.Application.Actions.Base;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +11,7 @@ public static class DependencyInjection
     public static IServiceCollection AddApplicationServices(this IServiceCollection services, params Assembly[] additionalAssemblies)
     {
         var assemblies = new[] { typeof(BaseCommandHandler).Assembly }.Concat(additionalAssemblies).ToArray();
+        services.AddValidatorsFromAssemblyContaining(typeof(IHandler<,>));
 
         services.Scan(scan => scan
             .FromAssemblies(assemblies)
