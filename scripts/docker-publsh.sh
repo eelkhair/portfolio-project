@@ -13,6 +13,7 @@ declare -A services=(
   ["job-admin"]="../apps/job-admin"
   ["job-public"]="../apps/job-public"
   ["ai-service"]="../services/ai-service"
+  ["ai-service-v2"]="../services/ai-service.v2"
   ["job-api"]="../services/micro-services/job-api"
   ["company-api"]="../services/micro-services/company-api"
   ["admin-api"]="../services/micro-services/admin-api"
@@ -26,13 +27,20 @@ for name in "${!services[@]}"; do
   path="${services[$name]}"
   image="registry.eelkhair.net/${name}:latest"
 
-if [ "$name" = "monolith-api" ]; then
+if [ "$name" = "ai-service-v2" ]; then
   docker build \
-    -f "/c/Users/elkha/RiderProjects/portfolio project/services/monolith/Src/Presentation/JobBoard.API/Dockerfile" \
+    -f "/c/Users/elkha/RiderProjects/portfolio project/services/ai-service.v2/Src/Presentation/JobBoard.AI.API/Dockerfile" \
     -t "$image" \
-    "/c/Users/elkha/RiderProjects/portfolio project/services/monolith"
+    "/c/Users/elkha/RiderProjects/portfolio project/services/ai-service.v2"
 else
-  docker build -t "$image" "$path"
+  if [ "$name" = "monolith-api" ]; then
+    docker build \
+      -f "/c/Users/elkha/RiderProjects/portfolio project/services/monolith/Src/Presentation/JobBoard.API/Dockerfile" \
+      -t "$image" \
+      "/c/Users/elkha/RiderProjects/portfolio project/services/monolith"
+  else
+    docker build -t "$image" "$path"
+  fi
 fi
 
   echo "📤 Pushing $image to registry.eelkhair.net..."

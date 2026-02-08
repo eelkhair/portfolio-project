@@ -4,6 +4,7 @@
         <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -36,12 +37,17 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\..\micro-services\HealthChecks\JobBoard.HealthChecks\JobBoard.HealthChecks.csproj" />
         <ProjectReference Include="..\..\Infrastructure\JobBoard.AI.Infrastructure.AI\JobBoard.AI.Infrastructure.AI.csproj" />
         <ProjectReference Include="..\..\Infrastructure\JobBoard.AI.Infrastructure.Configuration\JobBoard.AI.Infrastructure.Configuration.csproj" />
         <ProjectReference Include="..\..\Infrastructure\JobBoard.AI.Infrastructure.Dapr\JobBoard.AI.Infrastructure.Dapr.csproj" />
         <ProjectReference Include="..\..\Infrastructure\JobBoard.AI.Infrastructure.Diagnostics\JobBoard.AI.Infrastructure.Diagnostics.csproj" />
         <ProjectReference Include="..\..\Infrastructure\JobBoard.AI.Infrastructure.Persistence\JobBoard.AI.Infrastructure.Persistence.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\..\..\..\..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
     </ItemGroup>
 
 </Project>
