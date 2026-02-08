@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using JobBoard.AI.API.Infrastructure.Authorization;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.OpenApi;
@@ -22,6 +23,7 @@ public static class DependencyInjection
         services.AddControllers()
             .AddJsonOptions(options =>
             {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
             });
@@ -34,7 +36,7 @@ public static class DependencyInjection
                 Version = "v2",
                 Description = "Standard RESTful endpoints."
             });
-
+            c.UseInlineDefinitionsForEnums();
             var domain = configuration["Auth0:Domain"] ?? string.Empty;
             var audience = configuration["Auth0:Audience"] ?? string.Empty;
 
