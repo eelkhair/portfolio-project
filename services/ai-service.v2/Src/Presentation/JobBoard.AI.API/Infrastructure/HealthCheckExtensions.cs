@@ -37,8 +37,8 @@ internal static class HealthCheckExtensions
           
                         .AddDapr()      .AddDaprConfigurationStore("global", o =>
                             o.StoreName = "appconfig-global")
-                        .AddDaprConfigurationStore("monolith", o =>
-                            o.StoreName = "appconfig-monolith-api");
+                        .AddDaprConfigurationStore("appconfig-ai-service-v2", o =>
+                            o.StoreName = "appconfig-ai-service-v2");
 
    
           
