@@ -6,37 +6,33 @@ using Microsoft.Extensions.Logging;
 namespace JobBoard.AI.Infrastructure.Dapr;
 
 /// <summary>
-/// A background service that watches for changes in feature flags stored in a Dapr configuration store
-/// and propagates updates to the application using a feature flag notifier.
+/// A background service that watches for changes in configurations stored in a Dapr configuration store
 /// </summary>
-public sealed class FeatureFlagWatcher : BackgroundService
+public sealed class ConfigurationWatcher : BackgroundService
 {
     private readonly DaprClient _daprClient;
     private readonly IConfiguration _configuration;
-    private readonly IFeatureFlagNotifier _notifier;
-    private readonly ILogger<FeatureFlagWatcher> _logger;
+    private readonly ILogger<ConfigurationWatcher> _logger;
     private readonly string _serviceName;
 
     /// <summary>
-    /// A background service that monitors feature flag changes from a Dapr configuration store
-    /// and updates the application's configuration and feature flags accordingly.
+    /// A background service that monitors configuration changes from a Dapr configuration store
+    /// and updates the application's configuration accordingly.
     /// </summary>
-    public FeatureFlagWatcher(
+    public ConfigurationWatcher(
         DaprClient daprClient,
         IConfiguration configuration,
-        IFeatureFlagNotifier notifier,
-        ILogger<FeatureFlagWatcher> logger,
+        ILogger<ConfigurationWatcher> logger,
         string serviceName)
     {
         _daprClient = daprClient;
         _configuration = configuration;
-        _notifier = notifier;
         _logger = logger;
         _serviceName = serviceName;
     }
 
     /// <summary>
-    /// Executes the background task that monitors and updates feature flags from a Dapr configuration store.
+    /// Executes the background task that monitors and updates configurations from a Dapr configuration store.
     /// </summary>
     /// <param name="stoppingToken">A token that signals when the background operation should stop.</param>
     /// <returns>A task that represents the asynchronous execution of the background operation.</returns>
@@ -70,13 +66,12 @@ public sealed class FeatureFlagWatcher : BackgroundService
 
                     _configuration[cleanedKey] = kvp.Value.Value;
                 }
-
-                await _notifier.NotifyAsync(featureFlags);
+                
                 await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while watching for feature flag changes");
+                _logger.LogError(ex, "Error while watching for configuration changes");
             }
            
         }

@@ -1,4 +1,5 @@
 using JobBoard.AI.API.Infrastructure.Authorization;
+using JobBoard.AI.Application.Actions.GenerateJob;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,12 +8,12 @@ namespace JobBoard.AI.API.Controllers;
 
 
 /// <summary>
-/// Company Controller 
+/// Jobs Controller 
 /// </summary>
-public class CompaniesController : BaseApiController
+public class JobsController : BaseApiController
 {
     /// <summary>
-    /// Create Company
+    /// Generate Job
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
@@ -20,7 +21,7 @@ public class CompaniesController : BaseApiController
     [AllowAnonymous]
     [StandardApiResponses]
    
-    public async Task<IActionResult> Create()
-        => Ok("Company created successfully");
+    public async Task<IActionResult> Generate(GenerateJobRequest command)
+        => await ExecuteCommandAsync(new GenerateJobCommand(command), Ok);
     
 }

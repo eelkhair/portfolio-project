@@ -1,6 +1,6 @@
 using JobBoard.AI.Application.Interfaces.Observability;
 
-namespace JobBoard.Ai.Infrastructure.Diagnostics.Observability;
+namespace JobBoard.AI.Infrastructure.Diagnostics.Observability;
 
 public class UnitOfWorkEvents : IUnitOfWorkEvents
 {

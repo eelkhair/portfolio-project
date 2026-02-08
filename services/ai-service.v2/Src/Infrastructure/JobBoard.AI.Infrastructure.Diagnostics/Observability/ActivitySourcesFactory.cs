@@ -3,7 +3,7 @@ using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.Infrastructure.Diagnostics.Observability;
 
 
-namespace JobBoard.Ai.Infrastructure.Diagnostics.Observability;
+namespace JobBoard.AI.Infrastructure.Diagnostics.Observability;
 
 public class ActivitySourceFactory : IActivityFactory
 {

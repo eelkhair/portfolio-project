@@ -33,7 +33,12 @@ public static class DependencyInjection
         ApplyScopedConfig(builder.Configuration, cfg, $"jobboard:config:{serviceName}:", serviceName);
 
         // Background watcher (CORRECT)
-    
+        builder.Services.AddHostedService(sp =>
+            new ConfigurationWatcher(
+                sp.GetRequiredService<DaprClient>(),
+                sp.GetRequiredService<IConfiguration>(),
+                sp.GetRequiredService<ILogger<ConfigurationWatcher>>(),
+                serviceName));
         
         return builder;
     }
