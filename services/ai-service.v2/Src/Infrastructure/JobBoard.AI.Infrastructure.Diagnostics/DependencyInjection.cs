@@ -1,6 +1,6 @@
 using System.Reflection;
 using JobBoard.AI.Application.Interfaces.Observability;
-using JobBoard.Ai.Infrastructure.Diagnostics.Observability;
+using JobBoard.AI.Infrastructure.Diagnostics.Observability;
 using JobBoard.Infrastructure.Diagnostics.Observability;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -15,7 +15,7 @@ using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Sinks.Elasticsearch;
 
-namespace JobBoard.Ai.Infrastructure.Diagnostics;
+namespace JobBoard.AI.Infrastructure.Diagnostics;
 
 public static class DependencyInjection
 {

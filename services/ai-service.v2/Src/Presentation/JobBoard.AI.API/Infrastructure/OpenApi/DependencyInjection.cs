@@ -14,7 +14,10 @@ namespace JobBoard.AI.API.Infrastructure.OpenApi;
 /// </summary>
 public static class DependencyInjection
 {
-    public static IServiceCollection AddODataServices(this IServiceCollection services)
+ 
+    public static IServiceCollection AddConfiguredSwagger(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
         services.AddControllers()
             .AddJsonOptions(options =>
@@ -23,13 +26,6 @@ public static class DependencyInjection
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
             });
 
-        return services;
-    }
-
-    public static IServiceCollection AddConfiguredSwagger(
-        this IServiceCollection services,
-        IConfiguration configuration)
-    {
         services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo

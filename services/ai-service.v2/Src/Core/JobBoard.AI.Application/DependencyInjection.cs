@@ -21,6 +21,12 @@ public static class DependencyInjection
 
         services.AddScoped<IHandlerContext, HandlerContext>();
 
+        services.Scan(scan => scan
+            .FromAssemblies(assemblies)
+            .AddClasses(c => c.AssignableTo(typeof(IAiPrompt<>)))
+            .AsImplementedInterfaces()
+            .WithTransientLifetime()
+        );
         return services;
     }
 }
