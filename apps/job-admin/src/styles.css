@@ -24,6 +24,24 @@
   background-color: var(--p-surface-800) !important;
 }
 
+/* AutoComplete dropdown button border fix */
+.p-autocomplete-dropdown {
+  border: 1px solid var(--p-form-field-border-color) !important;
+  border-left: none !important;
+  border-top-right-radius: var(--p-form-field-border-radius) !important;
+  border-bottom-right-radius: var(--p-form-field-border-radius) !important;
+}
+
+.p-autocomplete:has(.p-autocomplete-input:focus) .p-autocomplete-dropdown,
+.p-autocomplete.p-focus .p-autocomplete-dropdown {
+  border-color: #4F46E5 !important;
+}
+
+.dark .p-autocomplete:has(.p-autocomplete-input:focus) .p-autocomplete-dropdown,
+.dark .p-autocomplete.p-focus .p-autocomplete-dropdown {
+  border-color: #6366F1 !important;
+}
+
 /* Custom button styles - Solid Blue/Indigo theme */
 .p-button {
   background: #4F46E5 !important;
@@ -235,44 +253,60 @@
   filter: brightness(1.2);
 }
 
-/* Stepper - use blue-400 to match option borders */
+/* Stepper - match button colors (indigo) */
 .p-stepper {
-  --p-stepper-step-number-active-background: #60a5fa;
-  --p-stepper-step-number-active-border-color: #60a5fa;
+  --p-stepper-step-number-active-background: #4F46E5;
+  --p-stepper-step-number-active-border-color: #4F46E5;
   --p-stepper-step-number-active-color: #ffffff;
-  --p-stepper-step-title-active-color: #60a5fa;
-  --p-stepper-separator-active-background: #60a5fa;
+  --p-stepper-step-title-active-color: #4F46E5;
+  --p-stepper-separator-active-background: #4F46E5;
 }
 
 .p-step[data-p-active="true"] .p-step-number {
-  background: #60a5fa !important;
-  border-color: #60a5fa !important;
+  background: #4F46E5 !important;
+  border-color: #4F46E5 !important;
   color: #ffffff !important;
 }
 
 .p-step[data-p-active="true"] .p-step-title {
-  color: #60a5fa !important;
+  color: #4F46E5 !important;
 }
 
 .p-step-list .p-step::before {
-  background: #60a5fa !important;
+  background: #4F46E5 !important;
 }
 
 .p-step .p-step-number {
-  border-color: #60a5fa !important;
+  border-color: #4F46E5 !important;
+}
+
+.dark .p-stepper {
+  --p-stepper-step-number-active-background: #6366F1;
+  --p-stepper-step-number-active-border-color: #6366F1;
+  --p-stepper-step-number-active-color: #ffffff;
+  --p-stepper-step-title-active-color: #6366F1;
+  --p-stepper-separator-active-background: #6366F1;
 }
 
 .dark .p-step[data-p-active="true"] .p-step-number {
-  background: #60a5fa !important;
-  border-color: #60a5fa !important;
+  background: #6366F1 !important;
+  border-color: #6366F1 !important;
   color: #ffffff !important;
 }
 
 .dark .p-step[data-p-active="true"] .p-step-title {
-  color: #60a5fa !important;
+  color: #6366F1 !important;
 }
 
-/* Form controls focus state - blue-400 */
+.dark .p-step-list .p-step::before {
+  background: #6366F1 !important;
+}
+
+.dark .p-step .p-step-number {
+  border-color: #6366F1 !important;
+}
+
+/* Form controls focus state - match button colors */
 .p-inputtext:focus,
 .p-inputtext:enabled:focus,
 .p-textarea:focus,
@@ -280,50 +314,76 @@
 .p-inputnumber-input:focus,
 .p-password-input:focus,
 .p-autocomplete-input:focus {
-  border-color: #60a5fa !important;
-  box-shadow: 0 0 0 1px #60a5fa !important;
+  border-color: #4F46E5 !important;
+  box-shadow: 0 0 0 1px #4F46E5 !important;
   outline: none !important;
 }
 
 .p-select:focus,
 .p-select.p-focus,
 .p-select:not(.p-disabled).p-focus {
-  border-color: #60a5fa !important;
-  box-shadow: 0 0 0 1px #60a5fa !important;
+  border-color: #4F46E5 !important;
+  box-shadow: 0 0 0 1px #4F46E5 !important;
   outline: none !important;
 }
 
 .p-multiselect:focus,
 .p-multiselect.p-focus,
 .p-multiselect:not(.p-disabled).p-focus {
-  border-color: #60a5fa !important;
-  box-shadow: 0 0 0 1px #60a5fa !important;
+  border-color: #4F46E5 !important;
+  box-shadow: 0 0 0 1px #4F46E5 !important;
   outline: none !important;
 }
 
 .p-checkbox:not(.p-disabled):has(.p-checkbox-input:focus-visible) .p-checkbox-box,
 .p-checkbox .p-checkbox-box.p-focus {
-  border-color: #60a5fa !important;
-  box-shadow: 0 0 0 1px #60a5fa !important;
+  border-color: #4F46E5 !important;
+  box-shadow: 0 0 0 1px #4F46E5 !important;
 }
 
 .p-checkbox.p-checkbox-checked .p-checkbox-box {
-  background: #60a5fa !important;
-  border-color: #60a5fa !important;
+  background: #4F46E5 !important;
+  border-color: #4F46E5 !important;
 }
 
 .p-radiobutton:not(.p-disabled):has(.p-radiobutton-input:focus-visible) .p-radiobutton-box,
 .p-radiobutton .p-radiobutton-box.p-focus {
-  border-color: #60a5fa !important;
-  box-shadow: 0 0 0 1px #60a5fa !important;
+  border-color: #4F46E5 !important;
+  box-shadow: 0 0 0 1px #4F46E5 !important;
 }
 
 .p-radiobutton.p-radiobutton-checked .p-radiobutton-box {
-  border-color: #60a5fa !important;
+  border-color: #4F46E5 !important;
 }
 
 .p-radiobutton.p-radiobutton-checked .p-radiobutton-icon {
-  background: #60a5fa !important;
+  background: #4F46E5 !important;
+}
+
+/* Dark mode checkbox/radio */
+.dark .p-checkbox:not(.p-disabled):has(.p-checkbox-input:focus-visible) .p-checkbox-box,
+.dark .p-checkbox .p-checkbox-box.p-focus {
+  border-color: #6366F1 !important;
+  box-shadow: 0 0 0 1px #6366F1 !important;
+}
+
+.dark .p-checkbox.p-checkbox-checked .p-checkbox-box {
+  background: #6366F1 !important;
+  border-color: #6366F1 !important;
+}
+
+.dark .p-radiobutton:not(.p-disabled):has(.p-radiobutton-input:focus-visible) .p-radiobutton-box,
+.dark .p-radiobutton .p-radiobutton-box.p-focus {
+  border-color: #6366F1 !important;
+  box-shadow: 0 0 0 1px #6366F1 !important;
+}
+
+.dark .p-radiobutton.p-radiobutton-checked .p-radiobutton-box {
+  border-color: #6366F1 !important;
+}
+
+.dark .p-radiobutton.p-radiobutton-checked .p-radiobutton-icon {
+  background: #6366F1 !important;
 }
 
 /* Dark mode form focus */
@@ -334,22 +394,22 @@
 .dark .p-inputnumber-input:focus,
 .dark .p-password-input:focus,
 .dark .p-autocomplete-input:focus {
-  border-color: #60a5fa !important;
-  box-shadow: 0 0 0 1px #60a5fa !important;
+  border-color: #6366F1 !important;
+  box-shadow: 0 0 0 1px #6366F1 !important;
 }
 
 .dark .p-select:focus,
 .dark .p-select.p-focus,
 .dark .p-select:not(.p-disabled).p-focus {
-  border-color: #60a5fa !important;
-  box-shadow: 0 0 0 1px #60a5fa !important;
+  border-color: #6366F1 !important;
+  box-shadow: 0 0 0 1px #6366F1 !important;
 }
 
 .dark .p-multiselect:focus,
 .dark .p-multiselect.p-focus,
 .dark .p-multiselect:not(.p-disabled).p-focus {
-  border-color: #60a5fa !important;
-  box-shadow: 0 0 0 1px #60a5fa !important;
+  border-color: #6366F1 !important;
+  box-shadow: 0 0 0 1px #6366F1 !important;
 }
 
 /* AI Chat dark mode */
