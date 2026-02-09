@@ -3,17 +3,17 @@
 /* Floating action button */
 .chat-fab {
   position: fixed;
-  bottom: 16px;
+  bottom: 32px;
   right: 24px;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
+  height: 48px;
+  padding: 0 20px;
+  border-radius: 24px;
   border: none;
   background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 50%, #F59E0B 100%);
   background-size: 200% 200%;
   animation: ai-gradient 3s ease infinite;
   color: white;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   cursor: pointer;
   box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -21,6 +21,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
+}
+
+.chat-fab-label {
+  font-size: 0.95rem;
+  font-weight: 600;
 }
 
 .chat-fab:hover {
