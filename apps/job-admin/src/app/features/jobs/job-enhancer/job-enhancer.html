@@ -83,7 +83,10 @@
           @if (options(); as opts) {
             <div class="flex  gap-10 w-full">
               @for (option of opts; track $index) {
-                <div class="option cursor-pointer hover:bg-gray-100 p-3">
+                <div class="option cursor-pointer p-3 border-2 border-transparent rounded-lg
+                  hover:bg-surface-100 dark:hover:bg-surface-700
+                  has-[:checked]:bg-blue-50 has-[:checked]:border-blue-400 has-[:checked]:text-gray-900
+                  dark:has-[:checked]:bg-surface-800 dark:has-[:checked]:border-blue-400 dark:has-[:checked]:text-surface-0">
                   <input
                     type="radio"
                     [id]="'option' + $index"
