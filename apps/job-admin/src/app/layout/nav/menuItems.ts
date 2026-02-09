@@ -49,7 +49,11 @@ export class NavItems{
         label: 'Settings', icon: 'pi pi-cog',
         items: [
           { label: 'Profile', icon: 'pi pi-id-card', routerLink: '/settings/profile' },
-          { label: 'App Settings', icon: 'pi pi-sliders-h', routerLink: '/settings/app', visible: isAdmin, },
+          { label: 'App Settings', icon: 'pi pi-sliders-h', visible: isAdmin,
+            items: [
+              { label: 'AI Provider', icon: 'pi pi-microchip-ai', routerLink: '/settings/ai-provider' },
+            ]
+          },
         ]
       },
 

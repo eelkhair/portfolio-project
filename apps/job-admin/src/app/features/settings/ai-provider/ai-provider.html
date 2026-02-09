@@ -1,0 +1,47 @@
+<p-card header="AI Provider Settings">
+  <form [formGroup]="form" (ngSubmit)="saveSettings()">
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-2">
+        <label for="provider" class="font-semibold">Provider<span class="text-red-500">*</span></label>
+        <p-autoComplete
+          id="provider"
+          formControlName="provider"
+          [suggestions]="providerSuggestions()"
+          (completeMethod)="onCompleteProvider($event)"
+          (onSelect)="onProviderChange()"
+          (onBlur)="onProviderChange()"
+          [forceSelection]="false"
+          [autoHighlight]="true"
+          [dropdown]="true"
+          placeholder="Select or enter provider"
+          class="w-full md:w-80">
+        </p-autoComplete>
+        @if (form.controls.provider.invalid && form.controls.provider.touched) {
+          <span class="text-red-700 text-sm">Provider is required.</span>
+        }
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label for="model" class="font-semibold">Model<span class="text-red-500">*</span></label>
+        <p-autoComplete
+          id="model"
+          formControlName="model"
+          [suggestions]="modelSuggestions()"
+          (completeMethod)="onCompleteModel($event)"
+          [forceSelection]="false"
+          [autoHighlight]="true"
+          [dropdown]="true"
+          placeholder="Select or enter model"
+          class="w-full md:w-80">
+        </p-autoComplete>
+        @if (form.controls.model.invalid && form.controls.model.touched) {
+          <span class="text-red-700 text-sm">Model is required.</span>
+        }
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <p-button type="submit" label="Save" icon="pi pi-save" [loading]="loading()" />
+      </div>
+    </div>
+  </form>
+</p-card>
