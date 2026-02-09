@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Dapr.Client;
+using Elkhair.Dev.Common.Application;
 using JobBoard.Application.Actions.Jobs.Models;
 using JobBoard.Application.Actions.Settings.Models;
 using JobBoard.Application.Infrastructure.Exceptions;
@@ -110,20 +111,20 @@ public sealed class AiServiceClient(
             await ThrowExternalServiceError(response, "drafts.generate", cancellationToken, serviceName);
 
         var result = await response.Content
-                         .ReadFromJsonAsync<JobGenResponse>(JsonOpts, cancellationToken)
+                         .ReadFromJsonAsync<ApiResponse<JobGenResponse>>(JsonOpts, cancellationToken)
                      ?? throw new InvalidOperationException($"{serviceName} returned empty JSON payload.");
 
-        Activity.Current?.SetTag("ai.draft.id", result.DraftId);
-        Activity.Current?.SetTag("ai.draft.title", result.Title);
+        Activity.Current?.SetTag("ai.draft.id", result.Data?.DraftId);
+        Activity.Current?.SetTag("ai.draft.title", result.Data?.Title);
 
         logger.LogInformation(
             "{ServiceName} generated draft {DraftId} with title '{Title}' for company {CompanyId}",
             serviceName,
-            result.DraftId,
-            result.Title,
+            result.Data?.DraftId,
+            result.Data?.Title,
             companyId);
 
-        return result;
+        return result.Data!;
     }
 
     public async Task<ProviderSettings> GetProvider(CancellationToken cancellationToken)
