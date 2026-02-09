@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, ElementRef, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
@@ -26,8 +26,13 @@ export class AiChat {
     { role: 'assistant', content: 'Great! Here\'s a draft for your Senior Software Engineer role:\n\n**About the Role**\nWe\'re looking for a Senior Software Engineer to join our Seattle team in a hybrid capacity. You\'ll build and maintain full-stack applications using .NET and Angular.\n\nWould you like me to expand on any section or adjust the tone?' }
   ]);
 
+  chatInput = viewChild<ElementRef<HTMLInputElement>>('chatInput');
+
   toggle() {
     this.isOpen.update(v => !v);
+    if (this.isOpen()) {
+      setTimeout(() => this.chatInput()?.nativeElement.focus(), 0);
+    }
   }
 
   send() {
