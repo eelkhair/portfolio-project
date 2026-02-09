@@ -1,0 +1,131 @@
+/* Floating action button */
+.chat-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 50%, #F59E0B 100%);
+  background-size: 200% 200%;
+  animation: ai-gradient 3s ease infinite;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-fab:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 24px rgba(139, 92, 246, 0.5);
+}
+
+.chat-fab-open {
+  background: var(--p-surface-600);
+  animation: none;
+}
+
+@keyframes ai-gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Chat window */
+.chat-window {
+  position: fixed;
+  bottom: 96px;
+  right: 24px;
+  width: 380px;
+  height: 500px;
+  background: var(--p-surface-0);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 999;
+  border: 1px solid var(--p-surface-200);
+}
+
+/* Header */
+.chat-header {
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.chat-header i {
+  font-size: 1.2rem;
+}
+
+/* Messages area */
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chat-message {
+  max-width: 80%;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.chat-message.user {
+  align-self: flex-end;
+}
+
+.chat-message.assistant {
+  align-self: flex-start;
+}
+
+.message-content {
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.chat-message.user .message-content {
+  background: #60a5fa;
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.chat-message.assistant .message-content {
+  background: var(--p-surface-100);
+  color: var(--p-surface-900);
+  border-bottom-left-radius: 4px;
+}
+
+/* Input area */
+.chat-input {
+  padding: 12px 16px;
+  border-top: 1px solid var(--p-surface-200);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.chat-input input {
+  flex: 1;
+}
