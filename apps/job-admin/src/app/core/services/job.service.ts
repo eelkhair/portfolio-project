@@ -19,7 +19,9 @@ export class JobService {
   }
 
   generateDraft(uId: string, payload: JobGenRequest) {
-    return this.http.post<ApiResponse<JobGenResponse>>(environment.apiUrl+ 'jobs/'+uId +'/generate', payload);
+    const baseUrl = this.featureFlagService.isMonolith() ? environment.monolithUrl : environment.microserviceUrl;
+    const path = this.featureFlagService.isMonolith() ? 'drafts' : 'jobs';
+    return this.http.post<ApiResponse<JobGenResponse>>(`${baseUrl}${path}/${uId}/generate`, payload);
   }
   saveDraft(uId: string, payload: Draft) {
     return this.http.put<ApiResponse<Draft>>(environment.apiUrl+ 'jobs/'+uId +'/save-draft',payload);
