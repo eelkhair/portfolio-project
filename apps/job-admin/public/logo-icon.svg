@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <!-- Main diamond (rotated square) - behind -->
+  <g transform="translate(24,24) rotate(45)">
+    <!-- Inner squares grid (3x3 all black with white outline) -->
+    <!-- Top row -->
+    <rect x="-12" y="-12" width="7" height="7" fill="#1E293B" stroke="white" stroke-width="1"/>
+    <rect x="-3.5" y="-12" width="7" height="7" fill="#1E293B" stroke="white" stroke-width="1"/>
+    <rect x="5" y="-12" width="7" height="7" fill="#1E293B" stroke="white" stroke-width="1"/>
+
+    <!-- Middle row -->
+    <rect x="-12" y="-3.5" width="7" height="7" fill="#1E293B" stroke="white" stroke-width="1"/>
+    <rect x="-3.5" y="-3.5" width="7" height="7" fill="#1E293B" stroke="white" stroke-width="1"/>
+    <rect x="5" y="-3.5" width="7" height="7" fill="#1E293B" stroke="white" stroke-width="1"/>
+
+    <!-- Bottom row -->
+    <rect x="-12" y="5" width="7" height="7" fill="#1E293B" stroke="white" stroke-width="1"/>
+    <rect x="-3.5" y="5" width="7" height="7" fill="#1E293B" stroke="white" stroke-width="1"/>
+    <rect x="5" y="5" width="7" height="7" fill="#1E293B" stroke="white" stroke-width="1"/>
+  </g>
+
+  <!-- White star foreground (smaller, 80% opacity) -->
+  <polygon points="24,8 27,18 38,18 29,25 32,36 24,30 16,36 19,25 10,18 21,18"
+           fill="#F59E0B" fill-opacity="0.8" stroke="#1E293B" stroke-width="1"/>
+</svg>
