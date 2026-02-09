@@ -6,7 +6,6 @@ import {Nav} from './layout/nav/nav';
 import {AccountService} from './core/services/account.service';
 import {ToastModule} from 'primeng/toast';
 import {RealtimeNotificationsService} from './core/services/realtime-notifications.service';
-import {environment} from '../environments/environment';
 import {AiChat} from './shared/ai-chat/ai-chat';
 
 @Component({
