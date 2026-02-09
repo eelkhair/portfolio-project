@@ -233,3 +233,120 @@
 .ai-enhance-link:hover {
   filter: brightness(1.2);
 }
+
+/* Stepper - use blue-400 to match option borders */
+.p-stepper {
+  --p-stepper-step-number-active-background: #60a5fa;
+  --p-stepper-step-number-active-border-color: #60a5fa;
+  --p-stepper-step-number-active-color: #ffffff;
+  --p-stepper-step-title-active-color: #60a5fa;
+  --p-stepper-separator-active-background: #60a5fa;
+}
+
+.p-step[data-p-active="true"] .p-step-number {
+  background: #60a5fa !important;
+  border-color: #60a5fa !important;
+  color: #ffffff !important;
+}
+
+.p-step[data-p-active="true"] .p-step-title {
+  color: #60a5fa !important;
+}
+
+.p-step-list .p-step::before {
+  background: #60a5fa !important;
+}
+
+.p-step .p-step-number {
+  border-color: #60a5fa !important;
+}
+
+.dark .p-step[data-p-active="true"] .p-step-number {
+  background: #60a5fa !important;
+  border-color: #60a5fa !important;
+  color: #ffffff !important;
+}
+
+.dark .p-step[data-p-active="true"] .p-step-title {
+  color: #60a5fa !important;
+}
+
+/* Form controls focus state - blue-400 */
+.p-inputtext:focus,
+.p-inputtext:enabled:focus,
+.p-textarea:focus,
+.p-textarea:enabled:focus,
+.p-inputnumber-input:focus,
+.p-password-input:focus,
+.p-autocomplete-input:focus {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 1px #60a5fa !important;
+  outline: none !important;
+}
+
+.p-select:focus,
+.p-select.p-focus,
+.p-select:not(.p-disabled).p-focus {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 1px #60a5fa !important;
+  outline: none !important;
+}
+
+.p-multiselect:focus,
+.p-multiselect.p-focus,
+.p-multiselect:not(.p-disabled).p-focus {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 1px #60a5fa !important;
+  outline: none !important;
+}
+
+.p-checkbox:not(.p-disabled):has(.p-checkbox-input:focus-visible) .p-checkbox-box,
+.p-checkbox .p-checkbox-box.p-focus {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 1px #60a5fa !important;
+}
+
+.p-checkbox.p-checkbox-checked .p-checkbox-box {
+  background: #60a5fa !important;
+  border-color: #60a5fa !important;
+}
+
+.p-radiobutton:not(.p-disabled):has(.p-radiobutton-input:focus-visible) .p-radiobutton-box,
+.p-radiobutton .p-radiobutton-box.p-focus {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 1px #60a5fa !important;
+}
+
+.p-radiobutton.p-radiobutton-checked .p-radiobutton-box {
+  border-color: #60a5fa !important;
+}
+
+.p-radiobutton.p-radiobutton-checked .p-radiobutton-icon {
+  background: #60a5fa !important;
+}
+
+/* Dark mode form focus */
+.dark .p-inputtext:focus,
+.dark .p-inputtext:enabled:focus,
+.dark .p-textarea:focus,
+.dark .p-textarea:enabled:focus,
+.dark .p-inputnumber-input:focus,
+.dark .p-password-input:focus,
+.dark .p-autocomplete-input:focus {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 1px #60a5fa !important;
+}
+
+.dark .p-select:focus,
+.dark .p-select.p-focus,
+.dark .p-select:not(.p-disabled).p-focus {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 1px #60a5fa !important;
+}
+
+.dark .p-multiselect:focus,
+.dark .p-multiselect.p-focus,
+.dark .p-multiselect:not(.p-disabled).p-focus {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 1px #60a5fa !important;
+}
