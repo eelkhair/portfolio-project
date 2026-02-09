@@ -1,10 +1,83 @@
-:host ::ng-deep .p-panelmenu .p-panelmenu-item-link-active {
-  background: #C2C2C2;
-  font-weight: 600;
-
+:host {
+  display: block;
+  flex: 1;
 }
-:host ::ng-deep .p-panelmenu .p-panelmenu-item-link-active > span:hover {
-  pointer-events: none;
+
+:host ::ng-deep .p-menubar {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+:host ::ng-deep .p-menubar .p-menubar-root-list > .p-menubar-item > .p-menubar-item-content {
+  background: transparent;
+}
+
+/* Only apply white color to root-level menu items (top navbar) */
+:host ::ng-deep .p-menubar .p-menubar-root-list > .p-menubar-item > .p-menubar-item-content .p-menubar-item-link,
+:host ::ng-deep .p-menubar .p-menubar-root-list > .p-menubar-item > .p-menubar-item-content .p-menubar-item-icon,
+:host ::ng-deep .p-menubar .p-menubar-root-list > .p-menubar-item > .p-menubar-item-content .p-menubar-item-label,
+:host ::ng-deep .p-menubar .p-menubar-root-list > .p-menubar-item > .p-menubar-item-content .p-menubar-submenu-icon {
+  color: #ffffff !important;
+}
+
+/* Hover effect for root-level items */
+:host ::ng-deep .p-menubar .p-menubar-root-list > .p-menubar-item > .p-menubar-item-content:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Active route styling for root-level items */
+:host ::ng-deep .p-menubar .p-menubar-root-list > .p-menubar-item.router-active > .p-menubar-item-content {
+  background: rgba(255, 255, 255, 0.15) !important;
+}
+
+:host ::ng-deep .p-menubar .p-menubar-root-list > .p-menubar-item.router-active > .p-menubar-item-content .p-menubar-item-label {
+  font-weight: 600;
+}
+
+/* Mobile menu button (hamburger) */
+:host ::ng-deep .p-menubar .p-menubar-button {
+  color: #ffffff !important;
+}
+
+:host ::ng-deep .p-menubar .p-menubar-button:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Mobile menu - all items need white text on dark background */
+:host ::ng-deep .p-menubar-mobile .p-menubar-root-list {
+  background: var(--p-surface-900) !important;
+}
+
+:host ::ng-deep .p-menubar-mobile .p-menubar-root-list .p-menubar-item-content {
+  background: transparent !important;
+}
+
+:host ::ng-deep .p-menubar-mobile .p-menubar-root-list .p-menubar-item-link,
+:host ::ng-deep .p-menubar-mobile .p-menubar-root-list .p-menubar-item-icon,
+:host ::ng-deep .p-menubar-mobile .p-menubar-root-list .p-menubar-item-label,
+:host ::ng-deep .p-menubar-mobile .p-menubar-root-list .p-menubar-submenu-icon {
+  color: #ffffff !important;
+}
+
+:host ::ng-deep .p-menubar-mobile .p-menubar-root-list .p-menubar-item-content:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Mobile submenu styling */
+:host ::ng-deep .p-menubar-mobile .p-menubar-submenu {
+  background: var(--p-surface-900) !important;
+}
+
+:host ::ng-deep .p-menubar-mobile .p-menubar-submenu .p-menubar-item-link,
+:host ::ng-deep .p-menubar-mobile .p-menubar-submenu .p-menubar-item-icon,
+:host ::ng-deep .p-menubar-mobile .p-menubar-submenu .p-menubar-item-label,
+:host ::ng-deep .p-menubar-mobile .p-menubar-submenu .p-menubar-submenu-icon {
+  color: #ffffff !important;
+}
+
+:host ::ng-deep .p-menubar-mobile .p-menubar-submenu .p-menubar-item-content:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
 }
 
 

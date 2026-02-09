@@ -1,23 +1,15 @@
-<div class="flex justify-between flex-1">
-  <div class="flex w-1/4 gap-4">
-    <button class=" text-yellow">
-      <i class="pi pi-bars"></i>
-    </button>
-    <h1 class="text-3xl text-shadow-amber-900">Job Board Admin</h1>
-  </div>
+<div class="flex justify-between items-center flex-1">
+  <h1 class="text-2xl font-semibold">Job Board Admin</h1>
 
   <div class="flex items-center gap-2">
-      <p-menu #userMenu [model]="menuItems()" [popup]="true"></p-menu>
-
-      <p-button
-              [label]="'Welcome, ' + (displayName() | titlecase)"
-              icon="pi pi-user"
-              iconPos="left"
-              (click)="userMenu.toggle($event)">
-      </p-button>
-
+    <p-menu #userMenu [model]="menuItems()" [popup]="true"></p-menu>
+    <p-button
+      [label]="'Welcome, ' + (displayName() | titlecase)"
+      icon="pi pi-user"
+      iconPos="left"
+      (click)="userMenu.toggle($event)">
+    </p-button>
   </div>
-
 </div>
 
 
