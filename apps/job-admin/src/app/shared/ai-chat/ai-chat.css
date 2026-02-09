@@ -3,10 +3,10 @@
 /* Floating action button */
 .chat-fab {
   position: fixed;
-  bottom: 24px;
+  bottom: 16px;
   right: 24px;
-  width: 56px;
-  height: 56px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   border: none;
   background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 50%, #F59E0B 100%);
@@ -105,10 +105,11 @@
   border-radius: 12px;
   font-size: 0.9rem;
   line-height: 1.5;
+  white-space: pre-wrap;
 }
 
 .chat-message.user .message-content {
-  background: #60a5fa;
+  background: #4F46E5;
   color: white;
   border-bottom-right-radius: 4px;
 }
@@ -130,4 +131,24 @@
 
 .chat-input input {
   flex: 1;
+}
+
+/* Dark mode adjustments */
+:host-context(.dark) .chat-window {
+  background: var(--p-surface-900);
+  border-color: var(--p-surface-700);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+:host-context(.dark) .chat-message.user .message-content {
+  background: #6366F1;
+}
+
+:host-context(.dark) .chat-message.assistant .message-content {
+  background: var(--p-surface-700);
+  color: var(--p-surface-0);
+}
+
+:host-context(.dark) .chat-input {
+  border-color: var(--p-surface-700);
 }
