@@ -33,23 +33,61 @@ public class CompletionService(
 
     public async Task<T> GetResponseAsync<T>(string systemPrompt, string userPrompt, CancellationToken cancellationToken)
     {
+        var provider = configuration["AIProvider"]?.ToLowerInvariant()
+                       ?? throw new InvalidOperationException("AIProvider not configured");
         var client = GetClient();
         var messages = new []
         {
             new ChatMessage(ChatRole.System, systemPrompt),
             new ChatMessage(ChatRole.User, userPrompt)
         };
-        var response =  await client.GetResponseAsync(
-            messages, serviceProvider.GetRequiredService<ChatOptions>(),
-            cancellationToken: cancellationToken);
-        
-     
-        Activity.Current?.SetTag("ai.response.length", response.Text.Length);
-        Activity.Current?.SetTag("ai.tokens.total", response.Usage?.TotalTokenCount ?? 0);
-        Activity.Current?.SetTag("ai.tokens.input", response.Usage?.InputTokenCount ?? 0);
-        Activity.Current?.SetTag("ai.tokens.output", response.Usage?.OutputTokenCount ?? 0);
-        
-        
-        return JsonSerializer.Deserialize<T>(response.Text, JsonOptions)?? throw new InvalidOperationException("ai-service returned empty JSON payload.");
+        try
+        {
+            var response = await client.GetResponseAsync(
+                messages, serviceProvider.GetRequiredService<ChatOptions>(),
+                cancellationToken: cancellationToken);
+
+
+            Activity.Current?.SetTag("ai.response.length", response.Text.Length);
+            Activity.Current?.SetTag("ai.tokens.total", response.Usage?.TotalTokenCount ?? 0);
+            Activity.Current?.SetTag("ai.tokens.input", response.Usage?.InputTokenCount ?? 0);
+            Activity.Current?.SetTag("ai.tokens.output", response.Usage?.OutputTokenCount ?? 0);
+
+
+            return JsonSerializer.Deserialize<T>(
+                       
+                            NormalizeJson(response.Text)
+                          , JsonOptions) ??
+                   throw new InvalidOperationException("ai-service returned empty JSON payload.");
+
+        }
+        catch (Exception ex)
+        {
+            Activity.Current?.SetTag("ai.error", true);
+            Activity.Current?.SetTag("ai.error.message", ex.Message);
+            throw;
+        }
+    }
+    
+    private static string NormalizeJson(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            throw new InvalidOperationException("AI response was empty.");
+
+        text = text.Trim();
+
+        // Remove markdown code fences if present
+        if (text.StartsWith("```"))
+        {
+            var firstBrace = text.IndexOf('{');
+            var lastBrace = text.LastIndexOf('}');
+
+            if (firstBrace >= 0 && lastBrace > firstBrace)
+            {
+                return text.Substring(firstBrace, lastBrace - firstBrace + 1);
+            }
+        }
+
+        return text;
     }
 }
