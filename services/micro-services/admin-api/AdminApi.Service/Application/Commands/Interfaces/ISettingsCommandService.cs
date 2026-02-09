@@ -5,5 +5,6 @@ namespace AdminApi.Application.Commands.Interfaces;
 
 public interface ISettingsCommandService
 {
+    Task<ApiResponse<GetProviderResponse>> GetProviderAsync(CancellationToken ct = default);
     Task<ApiResponse<UpdateProviderResponse>> UpdateProviderAsync(UpdateProviderRequest request, CancellationToken ct = default);
 }

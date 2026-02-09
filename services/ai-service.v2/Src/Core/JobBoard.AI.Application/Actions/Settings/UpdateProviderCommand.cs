@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using JobBoard.AI.Application.Actions.Base;
 using JobBoard.AI.Application.Interfaces.Configurations;
 
@@ -10,9 +11,12 @@ public class UpdateProviderCommand(UpdateProviderRequest request) : BaseCommand<
 
 public class UpdateProviderCommandHandler(IHandlerContext context, ISettingsService settingsService) : BaseCommandHandler(context), IHandler<UpdateProviderCommand, Unit>
 {
-    public async Task<Unit> HandleAsync(UpdateProviderCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> HandleAsync(UpdateProviderCommand command, CancellationToken cancellationToken)
     {
-        await settingsService.UpdateProviderAsync(request.Request);
+        Activity.Current?.SetTag("ai.provider", command.Request.Provider);
+        Activity.Current?.SetTag("ai.model", command.Request.Model);
+
+        await settingsService.UpdateProviderAsync(command.Request);
         return Unit.Value;
     }
 }

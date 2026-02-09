@@ -27,6 +27,12 @@ public sealed class RedisJsonStore(IConnectionMultiplexer mux) : IRedisJsonStore
         var value = await _db.StringGetAsync(key);
         if (value.IsNullOrEmpty) return default;
 
+        // Handle string type specially (matches SetAsync behavior)
+        if (typeof(T) == typeof(string))
+        {
+            return (T)(object)value.ToString();
+        }
+
         return JsonSerializer.Deserialize<T>(
             value.ToString(),
             _jsonOptions
