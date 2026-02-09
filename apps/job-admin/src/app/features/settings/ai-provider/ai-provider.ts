@@ -1,10 +1,11 @@
-import {Component, inject, signal} from '@angular/core';
+  import {Component, inject, OnInit, signal} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {AutoComplete, AutoCompleteCompleteEvent} from 'primeng/autocomplete';
 import {Button} from 'primeng/button';
 import {Card} from 'primeng/card';
 import {SettingsService} from '../../../core/services/settings.service';
 import {NotificationService} from '../../../core/services/notification.service';
+import {ProgressSpinner} from 'primeng/progressspinner';
 
 interface ProviderOption {
   value: string;
@@ -19,11 +20,12 @@ interface ProviderOption {
     AutoComplete,
     Button,
     Card,
+    ProgressSpinner,
   ],
   templateUrl: './ai-provider.html',
   styleUrl: './ai-provider.css'
 })
-export class AiProvider {
+export class AiProvider implements OnInit {
   private settingsService = inject(SettingsService);
   private notificationService = inject(NotificationService);
 
@@ -37,11 +39,32 @@ export class AiProvider {
   providerSuggestions = signal<string[]>([]);
   modelSuggestions = signal<string[]>([]);
   loading = signal(false);
+  initialLoading = signal(true);
 
   form = new FormGroup({
     provider: new FormControl<string>('', Validators.required),
     model: new FormControl<string>('', Validators.required),
   });
+
+  ngOnInit() {
+    this.loadCurrentSettings();
+  }
+
+  private loadCurrentSettings() {
+    this.settingsService.getProvider().subscribe({
+      next: (response) => {
+        if (response.data) {
+          const provider = this.providers.find(p => p.value === response.data!.provider);
+          this.form.controls.provider.setValue(provider?.label ?? response.data.provider);
+          this.form.controls.model.setValue(response.data.model);
+        }
+        this.initialLoading.set(false);
+      },
+      error: () => {
+        this.initialLoading.set(false);
+      }
+    });
+  }
 
   onCompleteProvider(event: AutoCompleteCompleteEvent) {
     const query = event.query.toLowerCase();
