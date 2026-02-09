@@ -236,7 +236,9 @@ export class JobUpsert implements OnInit, OnDestroy{
     this.ref = this.dialogService.open(JobEnhancer, {
       header: header,
       width:'60rem',
-      modal:true,closable:false, closeOnEscape: false,
+      modal:true,
+      closable:true,
+      closeOnEscape: true,
       data: {model: model},
     });
 
