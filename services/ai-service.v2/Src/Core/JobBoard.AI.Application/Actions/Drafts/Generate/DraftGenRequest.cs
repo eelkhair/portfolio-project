@@ -1,8 +1,8 @@
 using JobBoard.AI.Application.Actions.Shared;
 
-namespace JobBoard.AI.Application.Actions.GenerateJob;
+namespace JobBoard.AI.Application.Actions.Drafts.Generate;
 
-public class GenerateJobRequest
+public class DraftGenRequest
 {
     public string Brief { get; set; } = "";
 

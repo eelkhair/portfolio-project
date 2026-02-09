@@ -1,8 +1,8 @@
 using JobBoard.AI.Application.Actions.Base;
 
-namespace JobBoard.AI.Application.Actions.GenerateJob;
+namespace JobBoard.AI.Application.Actions.Drafts.Generate;
 
-public class GenerateJobPrompt : IAiPrompt<GenerateJobRequest>
+public class DraftGenPrompt : IAiPrompt<DraftGenRequest>
 {
 
     private const string JobGenJsonShape = """
@@ -21,7 +21,7 @@ public class GenerateJobPrompt : IAiPrompt<GenerateJobRequest>
                                            """;
     public string Name => "GenerateJob";
     public string Version => "0.1";
-    public string BuildUserPrompt(GenerateJobRequest request)
+    public string BuildUserPrompt(DraftGenRequest request)
     {
         var jsonShape = JobGenJsonShape
             .Replace("MAX_BULLETS", request.MaxBullets.ToString())

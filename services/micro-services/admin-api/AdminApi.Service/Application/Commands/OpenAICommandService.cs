@@ -9,7 +9,7 @@ using Elkhair.Dev.Common.Application;
 
 namespace AdminApi.Application.Commands;
 
-public class OpenAICommandService(DaprClient client, UserContextService accessor, ILogger<OpenAICommandService> _logger): IOpenAICommandService
+public class OpenAICommandService(DaprClient client, UserContextService accessor, IConfiguration configuration, ILogger<OpenAICommandService> _logger): IOpenAICommandService
 {     
     static readonly JsonSerializerOptions JsonOpts = new()
          {
@@ -22,9 +22,10 @@ public class OpenAICommandService(DaprClient client, UserContextService accessor
     {
         try
         {
+            var service = configuration.GetValue<string>("ai-source") ?? "ai-service-v2";
             var req = client.CreateInvokeMethodRequest(
                 HttpMethod.Post,
-                appId: "ai-service",
+                appId: service,
                 methodName: $"drafts/{companyId}/generate"
             );
 
@@ -47,12 +48,20 @@ public class OpenAICommandService(DaprClient client, UserContextService accessor
                     $"ai-service {resp.StatusCode}: {raw}", null, resp.StatusCode);
             }
 
-            var result = JsonSerializer.Deserialize<JobGenResponse>(raw, JsonOpts);
+            if (service == "ai-service-v2")
+            {
+                var result = JsonSerializer.Deserialize<ApiResponse<JobGenResponse>>(raw, JsonOpts);
 
-            if (result is null)
-                throw new InvalidOperationException("Empty or invalid JSON from ai-service.");
+                return result ?? throw new InvalidOperationException("Empty or invalid JSON from ai-service.");
+            }
+            else
+            {
+                var result = JsonSerializer.Deserialize<JobGenResponse>(raw, JsonOpts);
+                return new ApiResponse<JobGenResponse>()
+                    { Data = result, Success = true, StatusCode = HttpStatusCode.OK };
+            }
 
-            return new ApiResponse<JobGenResponse>() { Data = result, Success = true, StatusCode = HttpStatusCode.OK };
+           
         }catch (Exception e)
         {
             _logger.LogError(e, "Error generating job draft");
