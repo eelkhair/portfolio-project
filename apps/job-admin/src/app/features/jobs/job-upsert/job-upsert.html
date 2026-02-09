@@ -4,8 +4,6 @@
       <app-company-selection title="Create job for"/>
       <div class="flex gap-3">
         <button pButton label="Prefill with AI"
-                  class="bg-white border-purple-600 hover:bg-purple-100 text-purple-600"
-
                 icon="pi pi-sparkles" type="button" (click)="store.showGenerate.set(true)"></button>
         <p-button label="Save Draft" icon="pi pi-bookmark" type="button" (click)="saveDraft()"/>
         <p-button label="Publish Job" icon="pi pi-save" type="submit"/>
@@ -28,7 +26,7 @@
               <label for="aboutRole" class="text-lg w-28">About Role</label>
               <textarea   rows="8" pTextarea name="aboutRole" id="aboutRole" placeholder="About Role" class="w-full" formControlName="aboutRole"></textarea>
             </div>
-            <div class=" text-blue-600 cursor-pointer font-bold justify-end flex w-full" (click)="enhanceAboutMe()">Enhance with AI</div>
+            <div class="ai-enhance-link justify-end flex w-full" (click)="enhanceAboutMe()">Enhance with AI</div>
           </div>
 
           <div class="w-full flex gap-5 items-center">
@@ -63,9 +61,7 @@
                   <button
                     pButton
                     type="button"
-                    class="bg-white border-purple-600 hover:bg-purple-50 text-purple-600"
                     icon="pi pi-sparkles"
-                    severity="warn"
                     (click)="enhanceResponsibility($index)"
                     [pTooltip]="'Enhance this item with AI'"
                     tooltipPosition="left">
@@ -91,9 +87,7 @@
                   <button
                     pButton
                     type="button"
-                    class="bg-white border-purple-600 hover:bg-purple-50 text-purple-600"
                     icon="pi pi-sparkles"
-
                     (click)="enhanceQualification($index)"
                     [pTooltip]="'Enhance this item with AI'"
                     tooltipPosition="left">

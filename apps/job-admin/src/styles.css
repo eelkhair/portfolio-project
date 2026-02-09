@@ -3,8 +3,233 @@
 @import "tailwindcss";
 @plugin "tailwindcss-primeui";
 
+@custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
   *, ::before, ::after { box-sizing: border-box; padding: 0; margin: 0}
+}
 
+/* Dark mode form controls - slightly lighter than pure black */
+.dark .p-inputtext,
+.dark .p-autocomplete-input,
+.dark .p-select,
+.dark .p-textarea,
+.dark .p-inputnumber-input,
+.dark .p-password-input {
+  background-color: var(--p-surface-800) !important;
+}
+
+.dark .p-card {
+  background-color: var(--p-surface-800) !important;
+}
+
+/* Custom button styles - Solid Blue/Indigo theme */
+.p-button {
+  background: #4F46E5 !important;
+  border: 2px solid #4F46E5 !important;
+  color: #ffffff !important;
+  transition: all 0.25s ease-in-out !important;
+  transform: translateY(0);
+}
+
+.p-button:hover:not(:disabled) {
+  background: #4338CA !important;
+  border-color: #4338CA !important;
+  color: #ffffff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4) !important;
+}
+
+/* Welcome button - outline style with grey border */
+.p-button.btn-welcome,
+.btn-welcome.p-button,
+.dark .p-button.btn-welcome,
+.dark .btn-welcome.p-button {
+  background: transparent !important;
+  border: 2px solid #9CA3AF !important;
+  color: #ffffff !important;
+}
+
+.p-button.btn-welcome:hover:not(:disabled),
+.btn-welcome.p-button:hover:not(:disabled),
+.dark .p-button.btn-welcome:hover:not(:disabled),
+.dark .btn-welcome.p-button:hover:not(:disabled) {
+  background: rgba(156, 163, 175, 0.2) !important;
+  border-color: #D1D5DB !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+  transform: translateY(0) !important;
+}
+
+.p-button:focus {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #818CF8 !important;
+}
+
+.p-button:active:not(:disabled) {
+  background: #4338CA !important;
+  border-color: #4338CA !important;
+  color: #ffffff !important;
+}
+
+/* Secondary button */
+.p-button-secondary {
+  background: #6B7280 !important;
+  border-color: #6B7280 !important;
+  color: #ffffff !important;
+}
+
+.p-button-secondary:hover:not(:disabled) {
+  background: #4B5563 !important;
+  border-color: #4B5563 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(107, 114, 128, 0.4) !important;
+}
+
+/* Success button */
+.p-button-success {
+  background: #059669 !important;
+  border-color: #059669 !important;
+  color: #ffffff !important;
+}
+
+.p-button-success:hover:not(:disabled) {
+  background: #047857 !important;
+  border-color: #047857 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.4) !important;
+}
+
+/* Danger button */
+.p-button-danger {
+  background: #DC2626 !important;
+  border-color: #DC2626 !important;
+  color: #ffffff !important;
+}
+
+.p-button-danger:hover:not(:disabled) {
+  background: #B91C1C !important;
+  border-color: #B91C1C !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4) !important;
+}
+
+/* Warning button */
+.p-button-warn {
+  background: #D97706 !important;
+  border-color: #D97706 !important;
+  color: #ffffff !important;
+}
+
+.p-button-warn:hover:not(:disabled) {
+  background: #B45309 !important;
+  border-color: #B45309 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4) !important;
+}
+
+/* Dark mode adjustments */
+.dark .p-button {
+  background: #6366F1 !important;
+  border-color: #6366F1 !important;
+  color: #ffffff !important;
+}
+
+.dark .p-button:hover:not(:disabled) {
+  background: #4F46E5 !important;
+  border-color: #4F46E5 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4) !important;
+}
+
+.dark .p-button-secondary {
+  background: #6B7280 !important;
+  border-color: #6B7280 !important;
+  color: #ffffff !important;
+}
+
+.dark .p-button-secondary:hover:not(:disabled) {
+  background: #4B5563 !important;
+  border-color: #4B5563 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(107, 114, 128, 0.4) !important;
+}
+
+.dark .p-button-success {
+  background: #10B981 !important;
+  border-color: #10B981 !important;
+  color: #ffffff !important;
+}
+
+.dark .p-button-success:hover:not(:disabled) {
+  background: #059669 !important;
+  border-color: #059669 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4) !important;
+}
+
+.dark .p-button-danger {
+  background: #EF4444 !important;
+  border-color: #EF4444 !important;
+  color: #ffffff !important;
+}
+
+.dark .p-button-danger:hover:not(:disabled) {
+  background: #DC2626 !important;
+  border-color: #DC2626 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4) !important;
+}
+
+.dark .p-button-warn {
+  background: #F59E0B !important;
+  border-color: #F59E0B !important;
+  color: #ffffff !important;
+}
+
+.dark .p-button-warn:hover:not(:disabled) {
+  background: #D97706 !important;
+  border-color: #D97706 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4) !important;
+}
+
+/* AI Button - Special gradient style */
+.p-button.btn-ai,
+.p-button[icon="pi pi-sparkles"],
+.p-button[icon="pi pi-microchip-ai"] {
+  background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 50%, #F59E0B 100%) !important;
+  border: none !important;
+  color: #ffffff !important;
+  background-size: 200% 200% !important;
+  animation: ai-gradient 3s ease infinite !important;
+}
+
+.p-button.btn-ai:hover:not(:disabled),
+.p-button[icon="pi pi-sparkles"]:hover:not(:disabled),
+.p-button[icon="pi pi-microchip-ai"]:hover:not(:disabled) {
+  background: linear-gradient(135deg, #7C3AED 0%, #DB2777 50%, #D97706 100%) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5) !important;
+  color: #ffffff !important;
+}
+
+@keyframes ai-gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* AI text links */
+.ai-enhance-link {
+  background: linear-gradient(135deg, #8B5CF6, #EC4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease-in-out;
+}
+
+.ai-enhance-link:hover {
+  filter: brightness(1.2);
 }

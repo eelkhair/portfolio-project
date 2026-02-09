@@ -4,11 +4,11 @@
     <p-button label="Create Job" icon="pi pi-plus" routerLink="/jobs/new"/>
   </div>
   <div class="flex w-full mt-4">
-    <ag-grid-angular class="w-full" style="height:650px"
+    <ag-grid-angular class="w-full" style="height: calc(100vh - 280px)"
                      [rowData]="store.jobs()"
                      [pagination]="true"
                      [columnDefs]="colDefs"
-                     [theme]="theme">
+                     [theme]="themeService.agGridTheme()">
     </ag-grid-angular>
   </div>
 }@else{

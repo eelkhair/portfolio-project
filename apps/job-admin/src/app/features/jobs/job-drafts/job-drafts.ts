@@ -2,9 +2,10 @@ import {Component, effect, inject} from '@angular/core';
 import {JobsStore} from '../jobs.store';
 import {CompanySelection} from '../../../shared/companies/company-selection/company-selection';
 import {AgGridAngular} from 'ag-grid-angular';
-import {ColDef, themeQuartz} from 'ag-grid-community';
+import {ColDef} from 'ag-grid-community';
 import {AgButton} from '../../../shared/ag-button/ag-button';
 import {Router} from '@angular/router';
+import {ThemeService} from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-job-drafts',
@@ -17,7 +18,8 @@ import {Router} from '@angular/router';
 })
 export class JobDrafts{
   store = inject(JobsStore);
-  router= inject(Router);
+  router = inject(Router);
+  themeService = inject(ThemeService);
   colDefs: ColDef[] = [
     { field: 'id', autoHeight: true,
       cellRenderer: AgButton,
@@ -40,8 +42,5 @@ export class JobDrafts{
         this.store.loadDrafts(this.store.selectedCompany()?.uId!).subscribe();
       }
     })
-
   }
-
-  protected readonly theme = themeQuartz;
 }
