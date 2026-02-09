@@ -1,5 +1,5 @@
-﻿using AdminAPI.Contracts.Models.Jobs.Requests;
-using JobBoard.Application.Actions.Jobs.Drafts;
+﻿using JobBoard.Application.Actions.Jobs.Drafts;
+using JobBoard.Application.Actions.Jobs.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoard.API.Controllers;

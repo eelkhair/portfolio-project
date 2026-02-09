@@ -39,14 +39,14 @@ public static class DependencyInjection
 
         services.AddKeyedSingleton<IChatClient>("claude",
             new AnthropicClient(
-                new APIAuthentication(configuration["CLAUDE_API_KEY"]!)
+                new APIAuthentication(configuration["AI:CLAUDE_API_KEY"]!)
             ).Messages);
 
         services.AddTransient<ChatOptions>(sp => new ChatOptions
         {
             MaxOutputTokens = 5000,
             Temperature = 1, 
-            ModelId = configuration["AI:MODEL"]!
+            ModelId = configuration["AIModel"]!
         });
         services.AddTransient<ICompletionService, CompletionService>();
         return services;
