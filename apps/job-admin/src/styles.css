@@ -42,6 +42,76 @@
   border-color: #6366F1 !important;
 }
 
+/* AutoComplete dropdown panel/overlay */
+.p-autocomplete-overlay {
+  background: var(--p-surface-0) !important;
+  border: 1px solid var(--p-surface-200) !important;
+}
+
+.p-autocomplete-option {
+  background: transparent !important;
+}
+
+.p-autocomplete-option:hover,
+.p-autocomplete-option.p-focus {
+  background: var(--p-surface-200) !important;
+}
+
+.p-autocomplete-option.p-highlight {
+  background: #4F46E5 !important;
+  color: #ffffff !important;
+}
+
+.dark .p-autocomplete-overlay {
+  background: var(--p-surface-800) !important;
+  border-color: var(--p-surface-600) !important;
+}
+
+.dark .p-autocomplete-option:hover,
+.dark .p-autocomplete-option.p-focus {
+  background: var(--p-surface-600) !important;
+}
+
+.dark .p-autocomplete-option.p-highlight {
+  background: #6366F1 !important;
+  color: #ffffff !important;
+}
+
+/* Select dropdown panel/overlay */
+.p-select-overlay {
+  background: var(--p-surface-0) !important;
+  border: 1px solid var(--p-surface-200) !important;
+}
+
+.p-select-option {
+  background: transparent !important;
+}
+
+.p-select-option:hover,
+.p-select-option.p-focus {
+  background: var(--p-surface-200) !important;
+}
+
+.p-select-option.p-highlight {
+  background: #4F46E5 !important;
+  color: #ffffff !important;
+}
+
+.dark .p-select-overlay {
+  background: var(--p-surface-800) !important;
+  border-color: var(--p-surface-600) !important;
+}
+
+.dark .p-select-option:hover,
+.dark .p-select-option.p-focus {
+  background: var(--p-surface-600) !important;
+}
+
+.dark .p-select-option.p-highlight {
+  background: #6366F1 !important;
+  color: #ffffff !important;
+}
+
 /* Custom button styles - Solid Blue/Indigo theme */
 .p-button {
   background: #4F46E5 !important;
