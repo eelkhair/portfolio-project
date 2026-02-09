@@ -7,5 +7,11 @@ export const SETTINGS_ROUTES: Route[] = [
     canActivate: [roleGuard],
     data: {roles: ['admin']},
     loadComponent: () => import('./settings').then(c=>c.Settings)
+  },
+  {
+    path:'ai-provider',
+    canActivate: [roleGuard],
+    data: {roles: ['admin']},
+    loadComponent: () => import('./ai-provider/ai-provider').then(c=>c.AiProvider)
   }
 ]
