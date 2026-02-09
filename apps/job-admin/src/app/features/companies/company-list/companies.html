@@ -3,11 +3,11 @@
   <p-button label="Create Company" icon="pi pi-plus" (click)="store.showCreateCompanyDialog.set(true)" />
 </div>
 
-<ag-grid-angular class="w-full" style="height:650px"
+<ag-grid-angular class="w-full" style="height: calc(100vh - 280px)"
   [rowData]="companies()"
   [columnDefs]="colDefs"
                  [pagination]="true"
-  [theme]="theme">
+  [theme]="themeService.agGridTheme()">
 </ag-grid-angular>
 
 <app-company-create/>

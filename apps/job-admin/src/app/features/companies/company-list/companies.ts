@@ -1,11 +1,12 @@
 import {Component, inject} from '@angular/core';
 import {CompanyStore} from '../company.store';
 import {AgGridAngular} from 'ag-grid-angular';
-import {ColDef, themeQuartz} from 'ag-grid-community';
+import {ColDef} from 'ag-grid-community';
 import {Button} from 'primeng/button';
 import {CompanyCreate} from '../company-create/company-create';
 import {AgButton} from '../../../shared/ag-button/ag-button';
 import {Router} from '@angular/router';
+import {ThemeService} from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-org',
@@ -21,7 +22,7 @@ import {Router} from '@angular/router';
 export class Companies {
   store = inject(CompanyStore);
   companies = this.store.companies;
-  theme = themeQuartz;
+  themeService = inject(ThemeService);
   router = inject(Router);
   colDefs: ColDef[] = [
     { field: 'uId', autoHeight: true,

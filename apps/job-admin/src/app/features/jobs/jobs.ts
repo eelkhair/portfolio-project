@@ -1,11 +1,12 @@
 import {Component, effect, inject} from '@angular/core';
 import {CompanySelection} from '../../shared/companies/company-selection/company-selection';
 import {JobsStore} from './jobs.store';
-import {ColDef, themeQuartz} from 'ag-grid-community';
+import {ColDef} from 'ag-grid-community';
 import {AgGridAngular} from 'ag-grid-angular';
 import {AgButton} from '../../shared/ag-button/ag-button';
 import {Button} from 'primeng/button';
 import {RouterLink} from '@angular/router';
+import {ThemeService} from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-jobs',
@@ -20,7 +21,7 @@ import {RouterLink} from '@angular/router';
 })
 export class Jobs {
   store = inject(JobsStore);
-  theme = themeQuartz;
+  themeService = inject(ThemeService);
 
   colDefs: ColDef[] = [
     {

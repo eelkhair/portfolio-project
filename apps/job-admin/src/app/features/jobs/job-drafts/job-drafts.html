@@ -3,11 +3,11 @@
     <app-company-selection title="Drafts for "/>
   </div>
   <div class="flex w-full mt-4">
-    <ag-grid-angular class="w-full" style="height:650px"
+    <ag-grid-angular class="w-full" style="height: calc(100vh - 280px)"
                      [rowData]="store.drafts()"
                      [columnDefs]="colDefs"
                      [pagination]="true"
-                     [theme]="theme">
+                     [theme]="themeService.agGridTheme()">
     </ag-grid-angular>
   </div>
 }@else{
