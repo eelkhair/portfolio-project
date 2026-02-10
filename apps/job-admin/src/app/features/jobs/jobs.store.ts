@@ -42,7 +42,8 @@ export class JobsStore {
     }));
   }
   saveDraft(payload: Draft) {
-    return this.jobService.saveDraft(this.selectedCompany()?.uId!, payload).pipe(tap(job => {
+    const companyId = this.selectedCompany()?.uId!;
+    return this.jobService.saveDraft(companyId, payload).pipe(tap(job => {
       let draft: JobGenResponse;
       draft = {
         aboutRole: job.data?.aboutRole??'',
@@ -57,6 +58,17 @@ export class JobsStore {
         salaryRange:payload.salaryRange??''
       };
       this.aiResponse.set(draft);
+
+      const saved: Draft = {
+        ...payload,
+        id: job.data?.id ?? payload.id,
+      };
+      this.drafts.update(list => {
+        const idx = list.findIndex(d => d.id === saved.id);
+        return idx >= 0
+          ? list.map((d, i) => i === idx ? saved : d)
+          : [saved, ...list];
+      });
     }));
   }
   private allSkills = [
