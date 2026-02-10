@@ -193,7 +193,6 @@ export class JobsStore {
     const response = draft as JobGenResponse;
     this.aiResponse.set(response)
 
-    console.log(this.aiResponse())
   }
 
   createJob(model: CreateJobDto) {
