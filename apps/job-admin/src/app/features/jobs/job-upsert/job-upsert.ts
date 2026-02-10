@@ -93,6 +93,10 @@ export class JobUpsert implements OnInit, OnDestroy{
         this.form.controls.title.setValue(aiResponse.title);
         this.form.controls.aboutRole.setValue(aiResponse.aboutRole);
         this.form.controls.location.setValue(aiResponse.location);
+        if (aiResponse.jobType) {
+          this.form.controls.jobType.setValue(aiResponse.jobType as JobType);
+        }
+        this.form.controls.salaryRange.setValue(aiResponse.salaryRange??"");
         this.setStringArray('responsibilities', aiResponse.responsibilities);
         this.setStringArray('qualifications', aiResponse.qualifications);
       }
