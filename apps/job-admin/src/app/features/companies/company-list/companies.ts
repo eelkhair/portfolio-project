@@ -7,6 +7,7 @@ import {CompanyCreate} from '../company-create/company-create';
 import {AgButton} from '../../../shared/ag-button/ag-button';
 import {Router} from '@angular/router';
 import {ThemeService} from '../../../core/services/theme.service';
+import {AgSetFilter} from '../../../shared/ag-set-filter/ag-set-filter';
 
 @Component({
   selector: 'app-org',
@@ -24,6 +25,7 @@ export class Companies {
   companies = this.store.companies;
   themeService = inject(ThemeService);
   router = inject(Router);
+  defaultColDef: ColDef = { filter: true };
   colDefs: ColDef[] = [
     { field: 'uId', autoHeight: true,
       cellRenderer: AgButton,
@@ -38,7 +40,7 @@ export class Companies {
     { field: 'name' },
     { field: 'website' },
     { field: 'email' },
-    { field: 'status'},
+    { field: 'status', filter: AgSetFilter },
     {
       field: 'createdAt',
       valueFormatter: ({ value }) =>
