@@ -7,7 +7,7 @@
     --bgSecondary: #222222;
     --fcBase: #FFFFFF;
     --bgTable: #222222;
-    --logoImageUrl: url('https://job-admin.eelkhair.net/logo-icon.svg');
+    --logoImageUrl: url('/images/logo-icon.svg');
     --bgAside: #222222;
     --bgTableSecondary: #2c2c2c;
     --bcTable: #000000;
@@ -25,7 +25,7 @@
     margin-bottom:15px !important;
 }
 .hc-aside__logo{
-    background-image: url('https://job-admin.eelkhair.net/logo-icon.svg');
+    background-image: url('/images/logo-icon.svg');
     min-width:0;
     margin-top:30px !important;
     margin-bottom:30px !important;

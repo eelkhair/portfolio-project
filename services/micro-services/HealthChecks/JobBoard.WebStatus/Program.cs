@@ -16,7 +16,7 @@ app.UseHealthChecksUI(config =>
     config.AddCustomStylesheet("wwwroot/css/style.css");
 });
 app.MapGet("/", (HttpContext ctx) => ctx.Response.Redirect("/health"));
-
+app.UseStaticFiles();
 app.MapHealthChecksUI();
 
 app.Run();
