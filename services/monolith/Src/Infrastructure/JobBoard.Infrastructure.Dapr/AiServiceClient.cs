@@ -143,15 +143,15 @@ public sealed class AiServiceClient(
             await ThrowExternalServiceError(response, "settings.get-provider", cancellationToken, AiServiceV2);
 
         var result = await response.Content
-                         .ReadFromJsonAsync<ProviderSettings>(JsonOpts, cancellationToken)
+                         .ReadFromJsonAsync<ApiResponse<ProviderSettings>>(JsonOpts, cancellationToken)
                      ?? throw new InvalidOperationException($"{AiServiceV2} returned empty JSON payload.");
 
         logger.LogInformation(
             "ai-service-v2 returned provider {Provider} with model {Model}",
-            result.Provider,
-            result.Model);
+            result.Data?.Provider,
+            result.Data?.Model);
 
-        return result;
+        return result.Data!;
     }
 
     public async Task UpdateProvider(UpdateProviderRequest request, CancellationToken cancellationToken)

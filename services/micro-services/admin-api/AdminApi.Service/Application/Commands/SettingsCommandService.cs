@@ -41,14 +41,14 @@ public class SettingsCommandService(DaprClient client, UserContextService access
                 throw new HttpRequestException($"ai-service-v2 {resp.StatusCode}: {raw}", null, resp.StatusCode);
             }
 
-            var result = JsonSerializer.Deserialize<GetProviderResponse>(raw, JsonOpts);
+            var result = JsonSerializer.Deserialize<ApiResponse<GetProviderResponse>>(raw, JsonOpts);
 
-            Activity.Current?.SetTag("ai.provider", result?.Provider);
-            Activity.Current?.SetTag("ai.model", result?.Model);
+            Activity.Current?.SetTag("ai.provider", result?.Data?.Provider);
+            Activity.Current?.SetTag("ai.model", result?.Data?.Model);
 
             return new ApiResponse<GetProviderResponse>
             {
-                Data = result,
+                Data = result?.Data,
                 Success = true,
                 StatusCode = HttpStatusCode.OK
             };

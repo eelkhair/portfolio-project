@@ -1,8 +1,6 @@
 using JobBoard.AI.API.Infrastructure.Authorization;
-using JobBoard.AI.Application.Actions.Drafts;
-using JobBoard.AI.Application.Actions.Drafts.Generate;
 using JobBoard.AI.Application.Actions.Settings;
-using JobBoard.AI.Application.Interfaces.Configurations;
+using JobBoard.AI.Application.Actions.Settings.Provider; 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,7 +9,7 @@ namespace JobBoard.AI.API.Controllers;
 /// <summary>
 /// Settings Controller
 /// </summary>
-public class SettingsController(ISettingsService settingsService) : BaseApiController
+public class SettingsController : BaseApiController
 {
     /// <summary>
     /// Get current AI provider settings
@@ -20,11 +18,9 @@ public class SettingsController(ISettingsService settingsService) : BaseApiContr
     [HttpGet("provider")]
     [AllowAnonymous]
     [StandardApiResponses]
-    public async Task<IActionResult> GetProvider()
-    {
-        var result = await settingsService.GetProviderAsync();
-        return Ok(result);
-    }
+    public async Task<IActionResult> GetProvider() 
+        => await ExecuteQueryAsync(new GetProviderQuery(), Ok);
+    
 
     /// <summary>
     /// Update Settings for the application
