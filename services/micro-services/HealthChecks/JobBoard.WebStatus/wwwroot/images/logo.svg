@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" width="200" height="50">
+  <!-- Icon -->
+  <g transform="translate(25,25)">
+    <!-- Main diamond - behind -->
+    <g transform="rotate(45)">
+      <!-- Inner squares grid (3x3 all black with white outline) -->
+      <!-- Top row -->
+      <rect x="-10.5" y="-10.5" width="6" height="6" fill="#1E293B" stroke="#F59E0B" stroke-width="0.8"/>
+      <rect x="-3" y="-10.5" width="6" height="6" fill="#1E293B" stroke="#F59E0B" stroke-width="0.8"/>
+      <rect x="4.5" y="-10.5" width="6" height="6" fill="#1E293B" stroke="#F59E0B" stroke-width="0.8"/>
+
+      <!-- Middle row -->
+      <rect x="-10.5" y="-3" width="6" height="6" fill="#1E293B" stroke="#F59E0B" stroke-width="0.8"/>
+      <rect x="-3" y="-3" width="6" height="6" fill="#1E293B" stroke="#F59E0B" stroke-width="0.8"/>
+      <rect x="4.5" y="-3" width="6" height="6" fill="#1E293B" stroke="#F59E0B" stroke-width="0.8"/>
+
+      <!-- Bottom row -->
+      <rect x="-10.5" y="4.5" width="6" height="6" fill="#1E293B" stroke="#F59E0B" stroke-width="0.8"/>
+      <rect x="-3" y="4.5" width="6" height="6" fill="#1E293B" stroke="#F59E0B" stroke-width="0.8"/>
+      <rect x="4.5" y="4.5" width="6" height="6" fill="#1E293B" stroke="#F59E0B" stroke-width="0.8"/>
+    </g>
+
+    <!-- White star foreground (smaller, 80% opacity) -->
+    <polygon points="0,-17 3.5,-6 14,-6 6,2 9,13 0,6 -9,13 -6,2 -14,-6 -3.5,-6"
+             fill="#F59E0B" stroke="#F59E0B" stroke-width="1.2"/>
+  </g>
+
+  <!-- Text: Job -->
+  <text x="55" y="35" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+        font-size="28" font-weight="700" fill="#1E293B">Job</text>
+
+  <!-- Text: Board -->
+  <text x="100" y="35" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+        font-size="28" font-weight="700" fill="#1E293B">Board</text>
+</svg>

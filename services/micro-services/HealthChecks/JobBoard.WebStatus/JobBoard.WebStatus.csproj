@@ -16,10 +16,18 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Remove="wwwroot\images\corteva-logo-sm.png" />
-      <Resource Include="wwwroot\images\corteva-logo-sm.png" />
-      <Content Remove="wwwroot\images\corteva_logo.png" />
-      <Resource Include="wwwroot\images\corteva_logo.png" />
+      <Content Update="wwwroot\images\corteva-logo-sm.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Update="wwwroot\images\corteva_logo.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Update="wwwroot\images\logo.svg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Update="wwwroot\images\logo-icon.svg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
 </Project>

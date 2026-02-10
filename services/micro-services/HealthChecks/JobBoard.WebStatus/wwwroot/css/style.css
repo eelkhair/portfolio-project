@@ -7,7 +7,7 @@
     --bgSecondary: #222222;
     --fcBase: #FFFFFF;
     --bgTable: #222222;
-    --logoImageUrl: url('https://i.imgur.com/KdqywvF.png');
+    --logoImageUrl: url('https://job-admin.eelkhair.net/logo-icon.svg');
     --bgAside: #222222;
     --bgTableSecondary: #2c2c2c;
     --bcTable: #000000;
@@ -16,7 +16,8 @@
 .is-open .hc-aside__logo{
     content: '';
     display: block;
-    filter: brightness(0) invert(1);
+    width:6rem !important;
+    height:6rem !important;
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
@@ -24,11 +25,12 @@
     margin-bottom:15px !important;
 }
 .hc-aside__logo{
-
-    filter: brightness(0) invert(1);
+    background-image: url('https://job-admin.eelkhair.net/logo-icon.svg');
     min-width:0;
-    margin-top:15px !important;
-    margin-bottom:15px !important;
+    margin-top:30px !important;
+    margin-bottom:30px !important;
+    background-color: transparent;
+
 }
 .tag {
     background-color: var(--primaryColor);
