@@ -6,6 +6,8 @@ import {ColDef} from 'ag-grid-community';
 import {AgButton} from '../../../shared/ag-button/ag-button';
 import {Router} from '@angular/router';
 import {ThemeService} from '../../../core/services/theme.service';
+import {AgSetFilter} from '../../../shared/ag-set-filter/ag-set-filter';
+import {JOB_TYPE_LABELS} from '../../../core/types/Dtos/CreateJobRequest';
 
 @Component({
   selector: 'app-job-drafts',
@@ -20,6 +22,7 @@ export class JobDrafts{
   store = inject(JobsStore);
   router = inject(Router);
   themeService = inject(ThemeService);
+  defaultColDef: ColDef = { filter: true };
   colDefs: ColDef[] = [
     { field: 'id', autoHeight: true,
       cellRenderer: AgButton,
@@ -33,7 +36,12 @@ export class JobDrafts{
     { field: 'title' },
     { field: 'aboutRole' },
     { field: 'location' },
-    { field: 'jobType' },
+    {
+      field: 'jobType',
+      filter: AgSetFilter,
+      filterParams: { labelMap: JOB_TYPE_LABELS },
+      valueFormatter: ({ value }) => JOB_TYPE_LABELS[value as keyof typeof JOB_TYPE_LABELS] ?? value,
+    },
     { field: 'salaryRange' },
   ]
   constructor() {

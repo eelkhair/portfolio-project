@@ -6,6 +6,7 @@
     <ag-grid-angular class="w-full" style="height: calc(100vh - 280px)"
                      [rowData]="store.drafts()"
                      [columnDefs]="colDefs"
+                     [defaultColDef]="defaultColDef"
                      [pagination]="true"
                      [theme]="themeService.agGridTheme()">
     </ag-grid-angular>

@@ -1,4 +1,4 @@
-@if(store.selectedCompany(); as company){
+@if(store.selectedCompany()){
   <div class="flex justify-between">
     <app-company-selection title="Jobs for"/>
     <p-button label="Create Job" icon="pi pi-plus" routerLink="/jobs/new"/>
@@ -8,6 +8,7 @@
                      [rowData]="store.jobs()"
                      [pagination]="true"
                      [columnDefs]="colDefs"
+                     [defaultColDef]="defaultColDef"
                      [theme]="themeService.agGridTheme()">
     </ag-grid-angular>
   </div>

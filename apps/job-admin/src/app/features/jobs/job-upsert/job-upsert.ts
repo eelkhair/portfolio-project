@@ -5,7 +5,7 @@ import {InputText} from 'primeng/inputtext';
 import {Textarea} from 'primeng/textarea';
 import {Button, ButtonDirective} from 'primeng/button';
 import {FormArray, FormBuilder, FormControl, ReactiveFormsModule, Validators} from '@angular/forms';
-import {CreateJobDto, JobType} from '../../../core/types/Dtos/CreateJobRequest';
+import {CreateJobDto, JOB_TYPE_LABELS, JobType} from '../../../core/types/Dtos/CreateJobRequest';
 import {Select} from 'primeng/select';
 import {Tooltip} from 'primeng/tooltip';
 import {JobGenerate} from '../job-generate/job-generate';
@@ -63,14 +63,7 @@ export class JobUpsert implements OnInit, OnDestroy{
     qualifications: this.fb.array<FormControl<string>>([]),
   });
 
-  jobTypes: { label: string; value: JobType }[] = [
-    { label: 'Full time', value: 'fullTime' },
-    { label: 'Part time', value: 'partTime' },
-    { label: 'Contract',  value: 'contract' },
-    { label: 'Internship', value: 'internship' },
-    { label: 'Temporary', value: 'temporary' },
-    { label: 'Other',     value: 'other' },
-  ];
+  jobTypes = Object.entries(JOB_TYPE_LABELS).map(([value, label]) => ({ label, value: value as JobType }));
   ngOnInit() {
     const draftId = this.draftId()
 

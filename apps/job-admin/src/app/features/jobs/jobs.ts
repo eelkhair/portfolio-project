@@ -23,6 +23,7 @@ export class Jobs {
   store = inject(JobsStore);
   themeService = inject(ThemeService);
 
+  defaultColDef: ColDef = { filter: true };
   colDefs: ColDef[] = [
     {
       field: 'uId', autoHeight: true,
