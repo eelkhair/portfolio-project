@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using JobBoard.AI.Application.Actions.Base;
+using JobBoard.AI.Application.Actions.Drafts.Save;
 using JobBoard.AI.Application.Interfaces.AI;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
@@ -16,6 +17,7 @@ public class DraftGenCommand(Guid companyId, DraftGenRequest request) : BaseComm
 public class DraftGenCommandHandler(IHandlerContext context, 
     IAiPrompt<DraftGenRequest> aiPrompt,
     IActivityFactory activityFactory,
+    IApplicationOrchestrator orchestrator,
     ICompletionService completionService
     ) : BaseCommandHandler(context),
     IHandler<DraftGenCommand, DraftGenResponse>
@@ -35,6 +37,21 @@ public class DraftGenCommandHandler(IHandlerContext context,
         
         var response = await completionService.GetResponseAsync<DraftGenResponse>(systemPrompt, userPrompt, cancellationToken);
         
+        Logger.LogInformation("Draft generated for company {CompanyId} with draftId {DraftId}", request.CompanyId, response.DraftId);
+
+        var saveRequest = new SaveDraftRequest
+        {
+            Title = response.Title,
+            AboutRole = response.AboutRole,
+            Metadata = response.Metadata,
+            Location = response.Location,
+            Notes = response.Notes,
+            Qualifications = response.Qualifications,
+            Responsibilities = response.Responsibilities,
+        };
+        
+        var savedDraft = await orchestrator.ExecuteCommandAsync(new SaveDraftCommand(request.CompanyId, saveRequest), cancellationToken);
+        response.DraftId = savedDraft.Id?? string.Empty;
         return response;
     }
 }
