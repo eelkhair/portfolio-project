@@ -10,7 +10,7 @@ using JobAPI.Contracts.Models.Jobs.Responses;
 
 namespace AdminApi.Application.Commands;
 
-public class JobCommandService(DaprClient client, UserContextService accessor, ILogger<JobCommandService> _logger) : IJobCommandService
+public class JobCommandService(DaprClient client, UserContextService accessor, IConfiguration configuration, ILogger<JobCommandService> _logger) : IJobCommandService
 {
     static readonly JsonSerializerOptions JsonOpts = new()
     {
@@ -21,11 +21,12 @@ public class JobCommandService(DaprClient client, UserContextService accessor, I
     
     public async Task<ApiResponse<JobDraftResponse>> CreateDraft(string companyId, JobDraftRequest request, CancellationToken ct = default)
     {
+        var service = configuration.GetValue<string>("ai-source") ?? "ai-service-v2";
         try
         {
             var req = client.CreateInvokeMethodRequest(
                 HttpMethod.Put,
-                appId: "ai-service",
+                appId: service,
                 methodName: $"drafts/{companyId}/upsert"
             );
 
@@ -48,12 +49,15 @@ public class JobCommandService(DaprClient client, UserContextService accessor, I
                     $"ai-service {resp.StatusCode}: {raw}", null, resp.StatusCode);
             }
 
+            if (service == "ai-service-v2")
+            {
+                var response = JsonSerializer.Deserialize<ApiResponse<JobDraftResponse>>(raw, JsonOpts);
+
+                return response ?? throw new InvalidOperationException("Empty or invalid JSON from ai-service.");
+            }
+           
             var result = JsonSerializer.Deserialize<JobDraftResponse>(raw, JsonOpts);
-
-            if (result is null)
-                throw new InvalidOperationException("Empty or invalid JSON from ai-service.");
-
-            return new ApiResponse<JobDraftResponse> { Data = result, Success = true, StatusCode = HttpStatusCode.OK };
+            return result is null ? throw new InvalidOperationException("Empty or invalid JSON from ai-service.") : new ApiResponse<JobDraftResponse> { Data = result, Success = true, StatusCode = HttpStatusCode.OK };
         }catch (Exception e)
         {
             _logger.LogError(e, "Error generating job draft");
