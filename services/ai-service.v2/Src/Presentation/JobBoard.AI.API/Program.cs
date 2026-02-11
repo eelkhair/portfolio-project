@@ -18,7 +18,7 @@ Debugger.Launch();
     .AddApplicationServices()
     .AddConfigurationServices()
     .AddAiServices(builder.Configuration)
-    .AddPersistenceServices()
+    .AddPersistenceServices(builder.Configuration)
     .AddHttpContextAccessor()
     .AddAuthorizationService(builder.Configuration)
     .AddConfiguredSwagger(builder.Configuration)
