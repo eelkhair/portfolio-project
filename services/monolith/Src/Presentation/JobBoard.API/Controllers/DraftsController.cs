@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace JobBoard.API.Controllers;
 
 /// <summary>
-/// Drafts Controller - proxies to AI Service
+/// Drafts Controller
 /// </summary>
 public class DraftsController : BaseApiController
 {
@@ -19,4 +19,6 @@ public class DraftsController : BaseApiController
             CompanyId = companyId,
             Request = request
         }, Ok);
+    
+    
 }

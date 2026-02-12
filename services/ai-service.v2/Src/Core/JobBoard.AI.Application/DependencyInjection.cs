@@ -1,6 +1,7 @@
 using System.Reflection;
 using FluentValidation;
 using JobBoard.AI.Application.Actions.Base;
+using JobBoard.AI.Application.Infrastructure.Decorators;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,6 +21,10 @@ public static class DependencyInjection
             .WithTransientLifetime());
 
         services.AddScoped<IHandlerContext, HandlerContext>();
+
+        services.Decorate(typeof(IHandler<,>), typeof(ValidationCommandHandlerDecorator<,>));
+        services.Decorate(typeof(IHandler<,>), typeof(NormalizationCommandHandlerDecorator<,>));
+        services.Decorate(typeof(IHandler<,>), typeof(ObservabilityCommandHandlerDecorator<,>));
 
         services.Scan(scan => scan
             .FromAssemblies(assemblies)

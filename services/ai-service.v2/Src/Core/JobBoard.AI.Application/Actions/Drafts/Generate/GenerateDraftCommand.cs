@@ -8,21 +8,21 @@ using Microsoft.Extensions.Logging;
 
 namespace JobBoard.AI.Application.Actions.Drafts.Generate;
 
-public class DraftGenCommand(Guid companyId, DraftGenRequest request) : BaseCommand<DraftGenResponse>
+public class GenerateDraftCommand(Guid companyId, GenerateDraftRequest request) : BaseCommand<DraftResponse>
 {
     public Guid CompanyId { get; } = companyId;
-    public DraftGenRequest Request { get; } = request;
+    public GenerateDraftRequest Request { get; } = request;
 }
 
 public class DraftGenCommandHandler(IHandlerContext context, 
-    IAiPrompt<DraftGenRequest> aiPrompt,
+    IAiPrompt<GenerateDraftRequest> aiPrompt,
     IActivityFactory activityFactory,
     IApplicationOrchestrator orchestrator,
     ICompletionService completionService
     ) : BaseCommandHandler(context),
-    IHandler<DraftGenCommand, DraftGenResponse>
+    IHandler<GenerateDraftCommand, DraftResponse>
 {
-    public async Task<DraftGenResponse> HandleAsync(DraftGenCommand request, CancellationToken cancellationToken)
+    public async Task<DraftResponse> HandleAsync(GenerateDraftCommand request, CancellationToken cancellationToken)
     {
         using var activity = activityFactory.StartActivity("DraftGenCommand", ActivityKind.Internal);
         
@@ -35,9 +35,9 @@ public class DraftGenCommandHandler(IHandlerContext context,
         var userPrompt = aiPrompt.BuildUserPrompt(request.Request);
         var systemPrompt = aiPrompt.BuildSystemPrompt();
         
-        var response = await completionService.GetResponseAsync<DraftGenResponse>(systemPrompt, userPrompt, cancellationToken);
+        var response = await completionService.GetResponseAsync<DraftResponse>(systemPrompt, userPrompt, cancellationToken);
         
-        Logger.LogInformation("Draft generated for company {CompanyId} with draftId {DraftId}", request.CompanyId, response.DraftId);
+        Logger.LogInformation("Draft generated for company {CompanyId}", request.CompanyId);
 
         var saveRequest = new SaveDraftRequest
         {
@@ -51,7 +51,8 @@ public class DraftGenCommandHandler(IHandlerContext context,
         };
         
         var savedDraft = await orchestrator.ExecuteCommandAsync(new SaveDraftCommand(request.CompanyId, saveRequest), cancellationToken);
-        response.DraftId = savedDraft.Id?? string.Empty;
+        response.Id = savedDraft.Id?? string.Empty;
+        
         return response;
     }
 }

@@ -1,4 +1,3 @@
-// src/schemas/job-rewrite-item.ts
 import { z } from "zod";
 
 /** Literal enums */
@@ -19,7 +18,6 @@ export const FieldLiterals = [
     "qualifications",
 ] as const;
 
-/** Enum schemas */
 const ToneEnum = z.enum(ToneLiterals);
 const FormalityEnum = z.enum(FormalityLiterals);
 const FieldEnum = z.enum(FieldLiterals);

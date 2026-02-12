@@ -9,9 +9,9 @@ public class JobRewriteResponse
 
 public class JobRewriteMetadata
 {
-    public string Model{get;set;} = null!;
-    public int PromptTokens{get;set;}
-    public int CompletionTokens{get;set;}
-    public int TotalTokens{get;set;}
-    public string FinishReason{get;set;} = null!;
+    public string? Model{get;set;} = null;
+    public int? PromptTokens{get;set;}
+    public int? CompletionTokens{get;set;}
+    public int? TotalTokens{get;set;}
+    public string? FinishReason{get;set;} = null;
 }

@@ -1,4 +1,4 @@
-namespace JobBoard.AI.Application.Actions.Settings;
+namespace JobBoard.AI.Application.Actions.Settings.Provider;
 
 public class GetProviderResponse
 {

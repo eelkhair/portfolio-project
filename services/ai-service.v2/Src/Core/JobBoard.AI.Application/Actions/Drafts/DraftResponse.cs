@@ -1,8 +1,9 @@
 using JobBoard.AI.Application.Actions.Shared;
+using JobBoard.AI.Domain.Drafts;
 
-namespace JobBoard.AI.Application.Actions.Drafts.Generate;
+namespace JobBoard.AI.Application.Actions.Drafts;
 
-public class DraftGenResponse
+public class DraftResponse
 {
     public string Title { get; set; } = "";
     public string AboutRole { get; set; } = "";
@@ -11,5 +12,9 @@ public class DraftGenResponse
     public string Notes { get; set; } = "";
     public string Location { get; set; } = "";
     public JobMetadata Metadata { get; set; } = new();
-    public string DraftId { get; set; } = "";
+    
+    public string JobType { get; set; } = "";
+    public string SalaryRange { get; set; } = "";
+    public string Id { get; set; } = "";
+    
 }
