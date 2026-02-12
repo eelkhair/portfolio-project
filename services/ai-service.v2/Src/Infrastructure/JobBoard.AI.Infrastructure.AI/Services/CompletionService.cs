@@ -13,6 +13,7 @@ namespace JobBoard.AI.Infrastructure.AI.Services;
 
 public class CompletionService(
     IActivityFactory activityFactory,
+    ChatOptions chatOptions,
     IConfiguration configuration,
     IServiceProvider serviceProvider)
     : ICompletionService
@@ -24,17 +25,21 @@ public class CompletionService(
     };
     private IChatClient GetClient()
     {
-       
+        using var activity = activityFactory.StartActivity(
+            "ai.completion",
+            ActivityKind.Internal);
         var provider = configuration["AIProvider"]?.ToLowerInvariant()
-                       ?? throw new InvalidOperationException("AIProvider not configured");
-        Activity.Current?.SetTag("ai.provider", provider);
+                       ?? throw new InvalidOperationException("AI Provider not configured");
+        var model = configuration["AIModel"]
+                       ?? throw new InvalidOperationException("AI Model not configured");
+        activity?.SetTag("ai.provider", provider);
+        activity?.SetTag("ai.model", model);
+        
         return serviceProvider.GetRequiredKeyedService<IChatClient>(provider);
     }
 
     public async Task<T> GetResponseAsync<T>(string systemPrompt, string userPrompt, CancellationToken cancellationToken)
     {
-        var provider = configuration["AIProvider"]?.ToLowerInvariant()
-                       ?? throw new InvalidOperationException("AIProvider not configured");
         var client = GetClient();
         var messages = new []
         {
@@ -44,7 +49,7 @@ public class CompletionService(
         try
         {
             var response = await client.GetResponseAsync(
-                messages, serviceProvider.GetRequiredService<ChatOptions>(),
+                messages, chatOptions,
                 cancellationToken: cancellationToken);
 
 

@@ -120,9 +120,10 @@ public class JobCommandService(DaprClient client, UserContextService accessor, I
     {
         try
         {
+            var service = configuration.GetValue<string>("ai-source") ?? "ai-service-v2";
             var req = client.CreateInvokeMethodRequest(
                 HttpMethod.Put,
-                appId: "ai-service",
+                appId: service,
                 methodName: $"drafts/rewrite/item"
             );
 
@@ -145,12 +146,18 @@ public class JobCommandService(DaprClient client, UserContextService accessor, I
                     $"ai-service {resp.StatusCode}: {raw}", null, resp.StatusCode);
             }
 
-            var result = JsonSerializer.Deserialize<JobRewriteResponse>(raw, JsonOpts);
-
-            if (result is null)
-                throw new InvalidOperationException("Empty or invalid JSON from ai-service.");
-
-            return new ApiResponse<JobRewriteResponse> { Data = result, Success = true, StatusCode = HttpStatusCode.OK };
+            if (service != "ai-service-v2")
+            {
+                var result = JsonSerializer.Deserialize<JobRewriteResponse>(raw, JsonOpts);
+                
+                 return result is null ? throw new InvalidOperationException("Empty or invalid JSON from ai-service.") : new ApiResponse<JobRewriteResponse> { Data = result, Success = true, StatusCode = HttpStatusCode.OK };
+            }
+            else
+            {
+                var result = JsonSerializer.Deserialize<ApiResponse<JobRewriteResponse>>(raw, JsonOpts);
+                
+                return result ?? throw new InvalidOperationException("Empty or invalid JSON from ai-service.");
+            } 
         }
         catch (Exception e)
         {

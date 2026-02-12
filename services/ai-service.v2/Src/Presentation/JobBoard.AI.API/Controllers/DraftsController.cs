@@ -1,6 +1,8 @@
 using JobBoard.AI.API.Infrastructure.Authorization;
 using JobBoard.AI.Application.Actions.Drafts;
 using JobBoard.AI.Application.Actions.Drafts.Generate;
+using JobBoard.AI.Application.Actions.Drafts.List;
+using JobBoard.AI.Application.Actions.Drafts.RewriteItem;
 using JobBoard.AI.Application.Actions.Drafts.Save;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +15,17 @@ namespace JobBoard.AI.API.Controllers;
 public class DraftsController : BaseApiController
 {
     /// <summary>
+    /// List job drafts for a company
+    /// </summary>
+    /// <param name="companyId"></param>
+    /// <returns></returns>
+    [HttpGet("{companyId:guid}")]
+    [AllowAnonymous]
+    [StandardApiResponses]
+    public async Task<IActionResult> List(Guid companyId)
+        => await ExecuteQueryAsync(new ListDraftsQuery(companyId), Ok);
+        
+    /// <summary>
     /// Generate a job draft using AI
     /// </summary>
     /// <param name="companyId"></param>
@@ -22,8 +35,8 @@ public class DraftsController : BaseApiController
     [AllowAnonymous]
     [StandardApiResponses]
    
-    public async Task<IActionResult> Generate(Guid companyId, DraftGenRequest request)
-        => await ExecuteCommandAsync(new DraftGenCommand(companyId, request), Ok);
+    public async Task<IActionResult> Generate(Guid companyId, GenerateDraftRequest request)
+        => await ExecuteCommandAsync(new GenerateDraftCommand(companyId, request), Ok);
     
     /// <summary>
     /// Save a job draft
@@ -35,5 +48,16 @@ public class DraftsController : BaseApiController
     [StandardApiResponses]
     public async Task<IActionResult> Save(Guid companyId, [FromBody] SaveDraftRequest request)
         => await ExecuteCommandAsync(new SaveDraftCommand(companyId, request), Ok);
+    
+    
+    /// <summary>
+    /// Rewrite item
+    /// </summary>
+    [HttpPut("rewrite/item")]
+    [AllowAnonymous]
+    [StandardApiResponses]
+    public async Task<IActionResult> RewriteItem([FromBody] RewriteItemRequest request)
+        => await ExecuteCommandAsync(new RewriteItemCommand(request), Ok);
+    
     
 }

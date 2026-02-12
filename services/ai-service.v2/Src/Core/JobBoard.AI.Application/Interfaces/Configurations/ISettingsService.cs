@@ -1,4 +1,5 @@
 using JobBoard.AI.Application.Actions.Settings;
+using JobBoard.AI.Application.Actions.Settings.Provider;
 
 namespace JobBoard.AI.Application.Interfaces.Configurations;
 

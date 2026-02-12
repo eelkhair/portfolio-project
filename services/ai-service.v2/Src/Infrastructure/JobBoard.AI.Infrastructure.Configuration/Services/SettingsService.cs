@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using JobBoard.AI.Application.Actions.Settings;
+using JobBoard.AI.Application.Actions.Settings.Provider;
 using JobBoard.AI.Application.Interfaces.Configurations;
 
 namespace JobBoard.AI.Infrastructure.Configuration.Services;

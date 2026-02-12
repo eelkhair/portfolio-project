@@ -2,7 +2,7 @@ using System.Diagnostics;
 using JobBoard.AI.Application.Actions.Base;
 using JobBoard.AI.Application.Interfaces.Configurations;
 
-namespace JobBoard.AI.Application.Actions.Settings;
+namespace JobBoard.AI.Application.Actions.Settings.Provider;
 
 public class UpdateProviderCommand(UpdateProviderRequest request) : BaseCommand<Unit>
 {

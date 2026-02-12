@@ -9,7 +9,7 @@ using JobAPI.Contracts.Models.Jobs.Responses;
 
 namespace AdminApi.Application.Queries;
 
-public class JobQueryService(DaprClient client, UserContextService accessor, ILogger<JobQueryService> _logger) : IJobQueryService
+public class JobQueryService(DaprClient client, IConfiguration configuration, UserContextService accessor, ILogger<JobQueryService> _logger) : IJobQueryService
 {
     static readonly JsonSerializerOptions JsonOpts = new()
     {
@@ -31,9 +31,11 @@ public class JobQueryService(DaprClient client, UserContextService accessor, ILo
     {
         try
         {
+            var service = configuration.GetValue<string>("ai-source") ?? "ai-service-v2";
+
             var req = client.CreateInvokeMethodRequest(
                 HttpMethod.Get,
-                appId: "ai-service",
+                appId: service,
                 methodName: $"drafts/{companyId}"
             );
 
@@ -54,12 +56,15 @@ public class JobQueryService(DaprClient client, UserContextService accessor, ILo
                     $"ai-service {resp.StatusCode}: {raw}", null, resp.StatusCode);
             }
 
+            if (service == "ai-service-v2")
+            {
+                var responses = JsonSerializer.Deserialize<ApiResponse<List<JobDraftResponse>>>(raw, JsonOpts);
+
+                return responses ?? throw new InvalidOperationException("Empty or invalid JSON from ai-service.");
+            }
             var result = JsonSerializer.Deserialize<List<JobDraftResponse>>(raw, JsonOpts);
 
-            if (result is null)
-                throw new InvalidOperationException("Empty or invalid JSON from ai-service.");
-
-            return new ApiResponse<List<JobDraftResponse>> { Data = result, Success = true, StatusCode = HttpStatusCode.OK };
+            return result is null ? throw new InvalidOperationException("Empty or invalid JSON from ai-service.") : new ApiResponse<List<JobDraftResponse>> { Data = result, Success = true, StatusCode = HttpStatusCode.OK };
         }catch (Exception e)
         {
             _logger.LogError(e, "Error generating job draft");

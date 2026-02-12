@@ -2,7 +2,7 @@ using JobBoard.AI.Application.Actions.Shared;
 
 namespace JobBoard.AI.Application.Actions.Drafts.Generate;
 
-public class DraftGenRequest
+public class GenerateDraftRequest
 {
     public string Brief { get; set; } = "";
 
