@@ -1,7 +1,7 @@
 ﻿using JobBoard.Application.Actions.Base;
-using JobBoard.Application.Actions.Companies.Models;
 using JobBoard.Application.Interfaces;
 using JobBoard.Application.Interfaces.Configurations;
+using JobBoard.Monolith.Contracts.Companies;
 using Microsoft.Extensions.Logging;
 
 namespace JobBoard.Application.Actions.Companies.Industries;

@@ -61,6 +61,7 @@ public class GenerateDraftPrompt : IAiPrompt<GenerateDraftRequest>
                HARD RULES
                - Audience: candidates scanning quickly.
                - Clarity > cleverness. Short sentences; use bullet lists.
+               - Avoid age, gender, nationality, or health-related requirements unless explicitly provided.
                - Do NOT invent salary, benefits, or location. If unknown, omit.
                - Normalize US location to "City, ST"; allow Remote/Hybrid if stated.
                - No placeholders like "TBD".
@@ -69,7 +70,8 @@ public class GenerateDraftPrompt : IAiPrompt<GenerateDraftRequest>
                - Output JSON ONLY. Match schema exactly (no markdown, no extra keys).
                - If there are no caveats, set "notes" to "" (empty string).
                - Always include "location". Normalize to "City, ST", or "Remote"/"Hybrid" if stated. If unknown, set location to "" (empty string).
-
+               - You do not call tools or request additional data. Generate output only from the provided input.
+               - Prompt version: 0.1. Scope: job draft generation only.
                """.Trim();
     }
 }

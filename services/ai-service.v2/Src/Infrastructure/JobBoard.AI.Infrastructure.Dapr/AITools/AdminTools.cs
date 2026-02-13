@@ -1,9 +1,10 @@
 using JobBoard.AI.Application.Interfaces.Configurations;
+using JobBoard.AI.Infrastructure.Dapr.AITools.Clients;
 using Microsoft.Extensions.AI;
 
 namespace JobBoard.AI.Infrastructure.Dapr.AITools;
 
-public class AdminTools : IAiTools
+public class AdminTools(IAdminApiClient client) : IAiTools
 {
     public IEnumerable<AITool> GetTools()
     {

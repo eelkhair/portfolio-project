@@ -23,19 +23,31 @@ public class CompletionService(
         PropertyNameCaseInsensitive = true,
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
-    private IChatClient GetClient()
+    
+    public async Task<string> RunChatAsync(
+        string systemPrompt,
+        string userMessage,
+        CancellationToken cancellationToken)
     {
-        using var activity = activityFactory.StartActivity(
-            "ai.completion",
-            ActivityKind.Internal);
-        var provider = configuration["AIProvider"]?.ToLowerInvariant()
-                       ?? throw new InvalidOperationException("AI Provider not configured");
-        var model = configuration["AIModel"]
-                       ?? throw new InvalidOperationException("AI Model not configured");
-        activity?.SetTag("ai.provider", provider);
-        activity?.SetTag("ai.model", model);
-        
-        return serviceProvider.GetRequiredKeyedService<IChatClient>(provider);
+        var client = new FunctionInvokingChatClient(GetClient());
+
+        var messages = new List<ChatMessage>()
+        {
+            new(ChatRole.System, systemPrompt),
+            new(ChatRole.User, userMessage)
+        };
+
+        var response = await client.GetResponseAsync(
+            messages,
+            chatOptions,
+            cancellationToken: cancellationToken);
+
+        Activity.Current?.SetTag("ai.response.length", response.Text.Length);
+        Activity.Current?.SetTag("ai.tokens.total", response.Usage?.TotalTokenCount ?? 0);
+        Activity.Current?.SetTag("ai.tokens.input", response.Usage?.InputTokenCount ?? 0);
+        Activity.Current?.SetTag("ai.tokens.output", response.Usage?.OutputTokenCount ?? 0);
+
+        return response.Text;
     }
 
     public async Task<T> GetResponseAsync<T>(string systemPrompt, string userPrompt, CancellationToken cancellationToken)
@@ -72,6 +84,21 @@ public class CompletionService(
             Activity.Current?.SetTag("ai.error.message", ex.Message);
             throw;
         }
+    }
+    
+    private IChatClient GetClient()
+    {
+        using var activity = activityFactory.StartActivity(
+            "ai.completion",
+            ActivityKind.Internal);
+        var provider = configuration["AIProvider"]?.ToLowerInvariant()
+                       ?? throw new InvalidOperationException("AI Provider not configured");
+        var model = configuration["AIModel"]
+                    ?? throw new InvalidOperationException("AI Model not configured");
+        activity?.SetTag("ai.provider", provider);
+        activity?.SetTag("ai.model", model);
+        
+        return serviceProvider.GetRequiredKeyedService<IChatClient>(provider);
     }
     
     private static string NormalizeJson(string text)

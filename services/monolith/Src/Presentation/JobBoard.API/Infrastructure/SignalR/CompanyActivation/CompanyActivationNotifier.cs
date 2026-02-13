@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using JobBoard.Application.Actions.Companies.Models;
+using JobBoard.Monolith.Contracts.Companies;
 using Microsoft.AspNetCore.SignalR;
 
 namespace JobBoard.API.Infrastructure.SignalR.CompanyActivation;

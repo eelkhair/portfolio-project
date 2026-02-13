@@ -1,5 +1,5 @@
-using JobBoard.Application.Actions.Companies.Models;
-using JobBoard.Application.Actions.Users.Models;
+using JobBoard.Monolith.Contracts.Companies;
+using JobBoard.Monolith.Contracts.Users;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 

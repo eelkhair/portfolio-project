@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <PackageId>JobBoard.Monolith.Contracts</PackageId>
+        <Authors>Elkhair Elkhair</Authors>
+        <RootNamespace>JobBoard.Monolith.Contracts</RootNamespace>
+        <Version>1.0.1</Version>
+    </PropertyGroup>
+
+</Project>

@@ -1,4 +1,4 @@
-﻿namespace JobBoard.Application.Actions.Companies.Models;
+﻿namespace JobBoard.Monolith.Contracts.Companies;
 
 public class CompanyCreatedModel
 {

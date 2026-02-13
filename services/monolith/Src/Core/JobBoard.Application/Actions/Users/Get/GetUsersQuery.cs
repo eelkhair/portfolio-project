@@ -1,7 +1,7 @@
 ﻿using JobBoard.Application.Actions.Base;
-using JobBoard.Application.Actions.Users.Models;
 using JobBoard.Application.Interfaces;
 using JobBoard.Application.Interfaces.Configurations;
+using JobBoard.Monolith.Contracts.Users;
 using Microsoft.Extensions.Logging;
 
 namespace JobBoard.Application.Actions.Users.Get;

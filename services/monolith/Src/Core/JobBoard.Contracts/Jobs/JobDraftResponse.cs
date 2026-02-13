@@ -1,6 +1,8 @@
-﻿namespace JobBoard.Application.Actions.Jobs.Models;
+﻿
 
-public class JobGenResponse
+namespace JobBoard.Monolith.Contracts.Jobs;
+
+public class JobDraftResponse
 {
     public string Title { get; set; } = "";
     public string AboutRole { get; set; } = "";
@@ -8,6 +10,8 @@ public class JobGenResponse
     public List<string> Qualifications { get; set; } = new();
     public string Notes { get; set; } = "";
     public string Location { get; set; } = "";
+    public string JobType { get; set; } = "";
+    public string SalaryRange { get; set; } = "";
     public JobGenMetadata Metadata { get; set; } = new();
-    public string DraftId { get; set; } = "";
+    public string? Id { get; set; } = "";
 }

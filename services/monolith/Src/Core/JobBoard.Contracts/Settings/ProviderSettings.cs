@@ -1,4 +1,4 @@
-namespace JobBoard.Application.Actions.Settings.Models;
+namespace JobBoard.Monolith.Contracts.Settings;
 
 public class ProviderSettings
 {

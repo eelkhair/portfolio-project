@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
 using JobBoard.Application.Actions.Base;
-using JobBoard.Application.Actions.Jobs.Models;
 using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Application.Interfaces.Infrastructure;
+using JobBoard.Monolith.Contracts.Jobs;
 using Microsoft.Extensions.Logging;
 
 namespace JobBoard.Application.Actions.Jobs.Drafts;
