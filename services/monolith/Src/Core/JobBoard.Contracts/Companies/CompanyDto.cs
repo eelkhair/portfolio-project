@@ -1,6 +1,4 @@
-﻿using JobBoard.Application.Actions.Base;
-
-namespace JobBoard.Application.Actions.Companies.Models;
+﻿namespace JobBoard.Monolith.Contracts.Companies;
 
 public class CompanyDto : BaseDto
 {

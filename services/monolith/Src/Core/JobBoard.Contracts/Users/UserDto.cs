@@ -1,6 +1,4 @@
-﻿using JobBoard.Application.Actions.Base;
-
-namespace JobBoard.Application.Actions.Users.Models;
+﻿namespace JobBoard.Monolith.Contracts.Users;
 
 public class UserDto : BaseDto
 {

@@ -1,5 +1,5 @@
 ﻿using JobBoard.Application.Actions.Users.Get;
-using JobBoard.Application.Actions.Users.Models;
+using JobBoard.Monolith.Contracts.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Results;

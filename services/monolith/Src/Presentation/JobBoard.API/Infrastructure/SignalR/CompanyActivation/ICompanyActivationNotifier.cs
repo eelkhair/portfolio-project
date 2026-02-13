@@ -1,4 +1,4 @@
-﻿using JobBoard.Application.Actions.Companies.Models;
+﻿using JobBoard.Monolith.Contracts.Companies;
 
 namespace JobBoard.API.Infrastructure.SignalR.CompanyActivation;
 

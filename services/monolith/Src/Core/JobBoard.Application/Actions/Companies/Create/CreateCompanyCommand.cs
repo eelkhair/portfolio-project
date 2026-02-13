@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using JobBoard.Application.Actions.Base;
-using JobBoard.Application.Actions.Companies.Models;
 using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Application.Interfaces.Repositories;
 using JobBoard.Domain.Entities;
 using JobBoard.Domain.Entities.Users;
+using JobBoard.Monolith.Contracts.Companies;
 using Microsoft.Extensions.Logging;
 
 namespace JobBoard.Application.Actions.Companies.Create;

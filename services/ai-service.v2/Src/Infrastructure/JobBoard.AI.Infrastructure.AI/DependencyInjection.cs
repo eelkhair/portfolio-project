@@ -6,6 +6,7 @@ using GeminiDotnet;
 using GeminiDotnet.Extensions.AI;
 using JobBoard.AI.Application.Interfaces.AI;
 using JobBoard.AI.Application.Interfaces.Configurations;
+using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Infrastructure.AI.Services;
 using JobBoard.AI.Infrastructure.AI.Tools;
 using Microsoft.Extensions.AI;
@@ -47,7 +48,7 @@ public static class DependencyInjection
             ).Messages);
 
         
-        services.AddKeyedSingleton<IAiTools, AiServiceTools>("ai");
+        services.AddKeyedScoped<IAiTools, AiServiceTools>("ai");
    
         services.AddTransient<ChatOptions>(sp =>
         {
@@ -75,12 +76,16 @@ public static class DependencyInjection
             var tools = topologyTools
                 .Concat(aiTools)
                 .ToList();
-            Activity.Current?.SetTag("ai.model", configuration["AIModel"]);
-            Activity.Current?.SetTag("ai.provider", configuration["AIProvider"]);
+            
+            var factory = sp.GetRequiredService<IActivityFactory>();
+            using var activity = factory.StartActivity("tool.Selection", ActivityKind.Internal);
+            activity?.AddTag("ai.model", configuration["AIModel"]);
+            activity?.AddTag("ai.provider", configuration["AIProvider"]);
 
-            Activity.Current?.SetTag("ai.tools.count", tools.Count);
-            Activity.Current?.SetTag("ai.tools.topology.count", topologyTools.Count);
-            Activity.Current?.SetTag("ai.tools.ai.count", aiTools.Count);
+            activity?.AddTag("ai.tools", isMonolith ? "Monolith,AI" : "Micro,AI");
+            activity?.AddTag("ai.tools.count", tools.Count);
+            activity?.AddTag("ai.tools.topology.count", topologyTools.Count);
+            activity?.AddTag("ai.tools.ai.count", aiTools.Count);
             
             return new ChatOptions
             {
@@ -90,9 +95,6 @@ public static class DependencyInjection
                 ModelId = configuration["AIModel"]!
             };
         });
-        
-        
-        
         
         services.AddTransient<ICompletionService, CompletionService>();
         return services;

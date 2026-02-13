@@ -1,5 +1,5 @@
 using JobBoard.Application.Actions.Settings;
-using JobBoard.Application.Actions.Settings.Models;
+using JobBoard.Monolith.Contracts.Settings;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoard.API.Controllers;

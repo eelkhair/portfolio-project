@@ -1,5 +1,5 @@
-﻿using JobBoard.Application.Actions.Jobs.Models;
-using JobBoard.Application.Actions.Settings.Models;
+﻿using JobBoard.Monolith.Contracts.Jobs;
+using JobBoard.Monolith.Contracts.Settings;
 
 namespace JobBoard.Application.Interfaces.Infrastructure;
 

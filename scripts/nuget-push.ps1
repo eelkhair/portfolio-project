@@ -5,6 +5,8 @@ $packages = @(
   Join-Path $rootPath 'services\micro-services\company-api\CompanyApi.Contracts'
   Join-Path $rootPath 'services\micro-services\job-api\JobApi.Contracts'
   Join-Path $rootPath 'services\micro-services\user-api\UserAPI.Contracts'
+  Join-Path $rootPath 'services\micro-services\admin-api\AdminAPI.Contracts'  
+  Join-Path $rootPath 'services\monolith\Src\Core\JobBoard.Contracts'
   Join-Path $rootPath 'services\micro-services\Elkhair.Dev.Common'
   Join-Path $rootPath 'services\micro-services\HealthChecks\JobBoard.HealthChecks'
   Join-Path $rootPath 'services\monolith\Src\Core\JobBoard.IntegrationEvents'

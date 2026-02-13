@@ -1,6 +1,6 @@
 ﻿using System.Net;
 using JobBoard.API.Helpers;
-using JobBoard.Application.Actions.Companies.Models;
+using JobBoard.Monolith.Contracts.Companies;
 using Swashbuckle.AspNetCore.Filters;
 
 namespace JobBoard.API.SwaggerExamples;

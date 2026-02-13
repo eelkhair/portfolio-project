@@ -1,2 +1,2 @@
-﻿namespace JobBoard.Application.Actions.Jobs.Models;
+﻿namespace JobBoard.Monolith.Contracts.Jobs;
 public enum RoleLevel { Junior, Mid, Senior, Staff, Principal }

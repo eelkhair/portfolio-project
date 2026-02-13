@@ -1,4 +1,5 @@
-﻿namespace JobBoard.Application.Actions.Jobs.Models;
+﻿
+namespace JobBoard.Monolith.Contracts.Jobs;
 
 public class JobGenMetadata
 {

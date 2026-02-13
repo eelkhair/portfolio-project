@@ -4,11 +4,11 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Dapr.Client;
 using Elkhair.Dev.Common.Application;
-using JobBoard.Application.Actions.Jobs.Models;
-using JobBoard.Application.Actions.Settings.Models;
 using JobBoard.Application.Infrastructure.Exceptions;
 using JobBoard.Application.Interfaces.Infrastructure;
 using JobBoard.Application.Interfaces.Users;
+using JobBoard.Monolith.Contracts.Jobs;
+using JobBoard.Monolith.Contracts.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
