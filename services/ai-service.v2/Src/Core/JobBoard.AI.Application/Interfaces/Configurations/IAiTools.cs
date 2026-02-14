@@ -9,5 +9,5 @@ public interface IAiTools
 
 public sealed record ToolResultEnvelope<T>(
     T Data,
-    DateTimeOffset ExecutedAt
-);
+    int Count,
+    DateTimeOffset ExecutedAt);
