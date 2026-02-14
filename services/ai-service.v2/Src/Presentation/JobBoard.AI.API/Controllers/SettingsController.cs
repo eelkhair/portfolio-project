@@ -16,7 +16,6 @@ public class SettingsController : BaseApiController
     /// </summary>
     /// <returns></returns>
     [HttpGet("provider")]
-    [AllowAnonymous]
     [StandardApiResponses]
     public async Task<IActionResult> GetProvider() 
         => await ExecuteQueryAsync(new GetProviderQuery(), Ok);
@@ -28,7 +27,6 @@ public class SettingsController : BaseApiController
     /// <param name="request"></param>
     /// <returns></returns>
     [HttpPut("update-provider")]
-    [AllowAnonymous]
     [StandardApiResponses]
     public async Task<IActionResult> UpdateProvider(UpdateProviderRequest request)
         => await ExecuteCommandAsync(new UpdateProviderCommand(request), Ok);

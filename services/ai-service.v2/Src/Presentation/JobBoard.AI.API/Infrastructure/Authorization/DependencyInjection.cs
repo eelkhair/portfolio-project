@@ -1,4 +1,5 @@
 using HealthChecks.UI.Client;
+using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.HealthChecks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -16,6 +17,7 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        services.AddScoped<IUserAccessor, HttpUserAccessor>();
         // ---------------------------------------------------------------------
         // CORS
         // ---------------------------------------------------------------------

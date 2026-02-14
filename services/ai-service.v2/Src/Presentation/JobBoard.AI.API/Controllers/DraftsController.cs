@@ -20,7 +20,6 @@ public class DraftsController : BaseApiController
     /// <param name="companyId"></param>
     /// <returns></returns>
     [HttpGet("{companyId:guid}")]
-    [AllowAnonymous]
     [StandardApiResponses]
     public async Task<IActionResult> List(Guid companyId)
         => await ExecuteQueryAsync(new ListDraftsQuery(companyId), Ok);
@@ -32,7 +31,6 @@ public class DraftsController : BaseApiController
     /// <param name="request"></param>
     /// <returns></returns>
     [HttpPost("{companyId:guid}/generate")]
-    [AllowAnonymous]
     [StandardApiResponses]
    
     public async Task<IActionResult> Generate(Guid companyId, GenerateDraftRequest request)
@@ -44,7 +42,6 @@ public class DraftsController : BaseApiController
     /// <param name="companyId"></param>
     /// <param name="request"></param>
     [HttpPut("{companyId:guid}/upsert")]
-    [AllowAnonymous]
     [StandardApiResponses]
     public async Task<IActionResult> Save(Guid companyId, [FromBody] SaveDraftRequest request)
         => await ExecuteCommandAsync(new SaveDraftCommand(companyId, request), Ok);
@@ -54,7 +51,6 @@ public class DraftsController : BaseApiController
     /// Rewrite item
     /// </summary>
     [HttpPut("rewrite/item")]
-    [AllowAnonymous]
     [StandardApiResponses]
     public async Task<IActionResult> RewriteItem([FromBody] RewriteItemRequest request)
         => await ExecuteCommandAsync(new RewriteItemCommand(request), Ok);
