@@ -27,7 +27,7 @@ export class AiChat {
     {role: 'assistant', content: 'Hello! I\'m your AI assistant. I can help you with job postings, companies, and more. How can I help you today?'}
   ]);
 
-  chatInput = viewChild<ElementRef<HTMLInputElement>>('chatInput');
+  chatInput = viewChild<ElementRef<HTMLTextAreaElement>>('chatInput');
   messagesContainer = viewChild<ElementRef<HTMLDivElement>>('messagesContainer');
 
   toggle() {
