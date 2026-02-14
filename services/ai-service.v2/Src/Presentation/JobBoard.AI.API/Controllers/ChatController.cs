@@ -28,6 +28,6 @@ public class ChatController : BaseApiController
     [StandardApiResponses]
     public async Task<IActionResult> Chat([FromBody] ChatRequest request)
         => await ExecuteCommandAsync(
-            new ChatCommand(request.Message, request.CompanyId),
+            new ChatCommand(request.Message, request.CompanyId, request.ConversationId),
             Ok);
 }

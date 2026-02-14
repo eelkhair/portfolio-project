@@ -9,7 +9,7 @@ public sealed class AiDbContextFactory
     public AiDbContext CreateDbContext(string[] args)
     {
         var options = new DbContextOptionsBuilder<AiDbContext>()
-            .UseNpgsql("", o=>o.UseVector())
+            .UseNpgsql("Host=192.168.1.160;Port=5432;Database=ai_service;Username=ai_user;Password=Pass321$;Pooling=true;Maximum Pool Size=20;", o=>o.UseVector())
             .Options;
 
         return new AiDbContext(options);

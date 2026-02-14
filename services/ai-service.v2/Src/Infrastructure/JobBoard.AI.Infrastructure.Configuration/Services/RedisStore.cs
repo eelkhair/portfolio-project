@@ -1,30 +1,24 @@
 using System.Text.Json;
+using JobBoard.AI.Application.Interfaces.Configurations;
 using StackExchange.Redis;
 
 namespace JobBoard.AI.Infrastructure.Configuration.Services;
 
 
-public interface IRedisJsonStore
-{
-    Task<T?> GetAsync<T>(string key);
-    Task SetAsync<T>(string key, T value, TimeSpan? ttl = null);
-    Task<bool> ExistsAsync(string key);
-    Task RemoveAsync(string key);
-}
 
 
-public sealed class RedisJsonStore(IConnectionMultiplexer mux) : IRedisJsonStore
+public sealed class RedisConfigurationStore(IConnectionMultiplexer mux) : IRedisStore
 {
-    private readonly IDatabase _db = mux.GetDatabase(1);
 
     private static readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
-    public async Task<T?> GetAsync<T>(string key)
+    public async Task<T?> GetAsync<T>(string key, int dbId)
     {
-        var value = await _db.StringGetAsync(key);
+        var db = mux.GetDatabase(dbId);
+        var value = await db.StringGetAsync(key);
         if (value.IsNullOrEmpty) return default;
 
         // Handle string type specially (matches SetAsync behavior)
@@ -42,8 +36,10 @@ public sealed class RedisJsonStore(IConnectionMultiplexer mux) : IRedisJsonStore
     public async Task SetAsync<T>(
         string key,
         T value,
+        int dbId,
         TimeSpan? ttl = null)
     {
+        var _db = mux.GetDatabase(dbId);
         if (value is null) return;
         var json = JsonSerializer.Serialize(value, _jsonOptions);
 
@@ -54,9 +50,16 @@ public sealed class RedisJsonStore(IConnectionMultiplexer mux) : IRedisJsonStore
         );
     }
 
-    public Task<bool> ExistsAsync(string key)
-        => _db.KeyExistsAsync(key);
+    public Task<bool> ExistsAsync(string key, int dbId)
+    {
+        var db = mux.GetDatabase(dbId);
+        return db.KeyExistsAsync(key);
+    }
 
-    public Task RemoveAsync(string key)
-        => _db.KeyDeleteAsync(key);
+    public Task RemoveAsync(string key, int dbId){
+        var db = mux.GetDatabase(dbId);
+        db.KeyDeleteAsync(key);
+        return Task.CompletedTask;
+    }
+            
 }
