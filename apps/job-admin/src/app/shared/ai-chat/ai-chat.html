@@ -19,10 +19,17 @@
       <span>AI Assistant</span>
     </div>
 
-    <div class="chat-messages">
+    <div class="chat-messages" #messagesContainer>
       @for (msg of messages(); track $index) {
         <div class="chat-message" [class.user]="msg.role === 'user'" [class.assistant]="msg.role === 'assistant'">
           <div class="message-content">{{ msg.content }}</div>
+        </div>
+      }
+      @if (loading()) {
+        <div class="chat-message assistant">
+          <div class="message-content typing-indicator">
+            <span></span><span></span><span></span>
+          </div>
         </div>
       }
     </div>
@@ -34,11 +41,12 @@
         [(ngModel)]="message"
         placeholder="Type a message..."
         (keydown)="onKeydown($event)"
+        [disabled]="loading()"
         class="w-full" />
       <p-button
         icon="pi pi-send"
         (onClick)="send()"
-        [disabled]="!message.trim()">
+        [disabled]="!message.trim() || loading()">
       </p-button>
     </div>
   </div>

@@ -24,7 +24,6 @@ public class ChatController : BaseApiController
     /// An <see cref="IActionResult"/> representing the result of the operation, typically a JSON response containing the chat output.
     /// </returns>
     [HttpPost]
-    [AllowAnonymous]
     [StandardApiResponses]
     public async Task<IActionResult> Chat([FromBody] ChatRequest request)
         => await ExecuteCommandAsync(

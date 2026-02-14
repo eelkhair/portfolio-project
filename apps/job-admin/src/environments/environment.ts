@@ -3,6 +3,7 @@ export const environment = {
   apiUrl: 'https://job-admin-api.eelkhair.net/',
   monolithUrl: 'https://job-monolith.eelkhair.net/',
   microserviceUrl: 'https://job-admin-api.eelkhair.net/',
+  aiServiceUrl: 'https://job-ai-v2.eelkhair.net/',
   otel:'https://otel.eelkhair.net/v1/traces',
   otelZipkin: 'https://otel.eelkhair.net/api/v2/spans',
 };
