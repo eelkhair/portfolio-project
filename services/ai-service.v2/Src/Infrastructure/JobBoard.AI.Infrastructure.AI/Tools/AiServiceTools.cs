@@ -152,6 +152,7 @@ public class AiServiceTools(
                     """
                     "Returns the list of drafts by location for a company.
                     State must be normalized to 2 letter code (eg. CA, NY, IA, TX)
+                    Remove any drafts that are not in the specified location after the tool is done processing.
                     """
             });
 
@@ -164,6 +165,7 @@ public class AiServiceTools(
             .Select(s => s.Trim())
             .ToList();
 
+        parts[^1] = ", " + parts[^1];
         return drafts
             .Where(d =>
                 !string.IsNullOrWhiteSpace(d.Location) &&
@@ -194,7 +196,7 @@ public class AiServiceTools(
             new AIFunctionFactoryOptions
             {
                 Name = "save_draft",
-                Description = "Saves a draft for a company."
+                Description = "Saves a draft for a company. companyId is required. Ensure CompanyId is populated"
             });
     }
 }

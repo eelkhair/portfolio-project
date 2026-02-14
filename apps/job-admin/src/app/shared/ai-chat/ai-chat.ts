@@ -1,7 +1,8 @@
-import { Component, ElementRef, signal, viewChild } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { Button } from 'primeng/button';
-import { InputText } from 'primeng/inputtext';
+import {Component, ElementRef, inject, signal, viewChild} from '@angular/core';
+import {FormsModule} from '@angular/forms';
+import {Button} from 'primeng/button';
+import {InputText} from 'primeng/inputtext';
+import {ChatService} from '../../core/services/chat.service';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -16,17 +17,18 @@ interface ChatMessage {
   styleUrl: './ai-chat.css'
 })
 export class AiChat {
+  private chatService = inject(ChatService);
+
   isOpen = signal(false);
   message = '';
+  loading = signal(false);
+  conversationId = signal<string | undefined>(undefined);
   messages = signal<ChatMessage[]>([
-    { role: 'assistant', content: 'Hello! I\'m your AI assistant. I can help you with job postings, candidate searches, and more. How can I help you today?' },
-    { role: 'user', content: 'Can you help me write a job description for a Senior Software Engineer?' },
-    { role: 'assistant', content: 'I\'d be happy to help you create a compelling job description for a Senior Software Engineer position. To get started, could you tell me:\n\n1. What technologies/stack will they work with?\n2. Is this remote, hybrid, or on-site?\n3. What team will they be joining?' },
-    { role: 'user', content: 'It\'s a full-stack role using .NET and Angular, hybrid in Seattle' },
-    { role: 'assistant', content: 'Great! Here\'s a draft for your Senior Software Engineer role:\n\n**About the Role**\nWe\'re looking for a Senior Software Engineer to join our Seattle team in a hybrid capacity. You\'ll build and maintain full-stack applications using .NET and Angular.\n\nWould you like me to expand on any section or adjust the tone?' }
+    {role: 'assistant', content: 'Hello! I\'m your AI assistant. I can help you with job postings, companies, and more. How can I help you today?'}
   ]);
 
   chatInput = viewChild<ElementRef<HTMLInputElement>>('chatInput');
+  messagesContainer = viewChild<ElementRef<HTMLDivElement>>('messagesContainer');
 
   toggle() {
     this.isOpen.update(v => !v);
@@ -36,22 +38,34 @@ export class AiChat {
   }
 
   send() {
-    if (!this.message.trim()) return;
+    const text = this.message.trim();
+    if (!text || this.loading()) return;
 
-    this.messages.update(msgs => [
-      ...msgs,
-      { role: 'user', content: this.message }
-    ]);
-
+    this.messages.update(msgs => [...msgs, {role: 'user', content: text}]);
     this.message = '';
+    this.loading.set(true);
+    this.scrollToBottom();
 
-    // Simulate AI response
-    setTimeout(() => {
-      this.messages.update(msgs => [
-        ...msgs,
-        { role: 'assistant', content: 'This is a demo response. Backend not connected.' }
-      ]);
-    }, 500);
+    this.chatService.chat({
+      message: text,
+      conversationId: this.conversationId()
+    }).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.conversationId.set(res.data.conversationId);
+          this.messages.update(msgs => [...msgs, {role: 'assistant', content: res.data!.response}]);
+        } else {
+          this.messages.update(msgs => [...msgs, {role: 'assistant', content: 'Sorry, something went wrong. Please try again.'}]);
+        }
+        this.loading.set(false);
+        this.scrollToBottom();
+      },
+      error: () => {
+        this.messages.update(msgs => [...msgs, {role: 'assistant', content: 'Unable to reach the AI service. Please try again later.'}]);
+        this.loading.set(false);
+        this.scrollToBottom();
+      }
+    });
   }
 
   onKeydown(event: KeyboardEvent) {
@@ -59,5 +73,12 @@ export class AiChat {
       event.preventDefault();
       this.send();
     }
+  }
+
+  private scrollToBottom() {
+    setTimeout(() => {
+      const el = this.messagesContainer()?.nativeElement;
+      if (el) el.scrollTop = el.scrollHeight;
+    }, 0);
   }
 }
