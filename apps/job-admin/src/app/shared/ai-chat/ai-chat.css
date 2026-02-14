@@ -35,8 +35,12 @@
 }
 
 .chat-fab-open {
-  background: var(--p-surface-600);
+  background: var(--p-red-500);
   animation: none;
+}
+
+.chat-fab-open:hover {
+  box-shadow: 0 6px 24px rgba(239, 68, 68, 0.5);
 }
 
 @keyframes ai-gradient {
@@ -48,10 +52,10 @@
 /* Chat window */
 .chat-window {
   position: fixed;
-  bottom: 96px;
-  right: 24px;
+  bottom: 16px;
+  top: 16px;
+  right: 90px;
   width: 380px;
-  height: 500px;
   background: var(--p-surface-0);
   border-radius: 16px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
@@ -60,6 +64,12 @@
   overflow: hidden;
   z-index: 999;
   border: 1px solid var(--p-surface-200);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Header */
@@ -128,15 +138,23 @@
 
 /* Input area */
 .chat-input {
-  padding: 12px 16px;
+  padding: 16px;
   border-top: 1px solid var(--p-surface-200);
   display: flex;
-  gap: 8px;
-  align-items: center;
+  gap: 12px;
+  align-items: stretch;
 }
 
-.chat-input input {
+.chat-input textarea {
   flex: 1;
+  resize: none;
+  line-height: 1.5;
+}
+
+.chat-input p-button ::ng-deep .p-button {
+  width: 48px;
+  height: 100%;
+  font-size: 1.2rem;
 }
 
 /* Dark mode adjustments */

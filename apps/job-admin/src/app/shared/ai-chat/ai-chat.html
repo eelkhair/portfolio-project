@@ -13,7 +13,7 @@
 
 <!-- Chat window -->
 @if (isOpen()) {
-  <div class="chat-window">
+  <aside class="chat-window">
     <div class="chat-header">
       <i class="pi pi-sparkles"></i>
       <span>AI Assistant</span>
@@ -35,19 +35,20 @@
     </div>
 
     <div class="chat-input">
-      <input
+      <textarea
         #chatInput
         pInputText
         [(ngModel)]="message"
         placeholder="Type a message..."
         (keydown)="onKeydown($event)"
         [disabled]="loading()"
-        class="w-full" />
+        rows="3"
+        class="w-full"></textarea>
       <p-button
         icon="pi pi-send"
         (onClick)="send()"
         [disabled]="!message.trim() || loading()">
       </p-button>
     </div>
-  </div>
+  </aside>
 }
