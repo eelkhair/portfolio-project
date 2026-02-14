@@ -69,15 +69,10 @@ public static class DependencyInjection
 
             c.AddSecurityDefinition("oauth2", securityScheme);
 
-            // In OpenAPI v2, security requirements use OpenApiSecuritySchemeReference
-            c.AddSecurityRequirement(_ =>
+            c.AddSecurityRequirement(doc =>
+                new OpenApiSecurityRequirement
             {
-                var schemeRef = new OpenApiSecuritySchemeReference("oauth2");
-                var requirement = new OpenApiSecurityRequirement
-                {
-                    [schemeRef] = new List<string>()
-                };
-                return requirement;
+                [new OpenApiSecuritySchemeReference("oauth2", doc)] = new List<string>()
             });
 
             // TraceId response header (observability)
