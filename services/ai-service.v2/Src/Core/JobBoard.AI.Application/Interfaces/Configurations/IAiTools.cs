@@ -6,3 +6,8 @@ public interface IAiTools
 {
     IEnumerable<AITool> GetTools();
 }
+
+public sealed record ToolResultEnvelope<T>(
+    T Data,
+    DateTimeOffset ExecutedAt
+);

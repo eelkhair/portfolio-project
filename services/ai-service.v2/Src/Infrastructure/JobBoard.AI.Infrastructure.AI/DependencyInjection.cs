@@ -95,7 +95,7 @@ public static class DependencyInjection
                 ModelId = configuration["AIModel"]!
             };
         });
-        
+        services.AddScoped<IConversationStore, ConversationStore>();
         services.AddTransient<ICompletionService, CompletionService>();
         return services;
     }

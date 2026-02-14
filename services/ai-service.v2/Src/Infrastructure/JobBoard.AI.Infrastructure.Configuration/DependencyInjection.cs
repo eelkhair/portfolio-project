@@ -11,7 +11,7 @@ public static class DependencyInjection
     {
         services.AddSingleton<IApplicationOrchestrator, ApplicationOrchestrator>();
         services.AddScoped<ISettingsService, SettingsService>();
-        services.AddSingleton<IRedisJsonStore, RedisJsonStore>();
+        services.AddSingleton<IRedisStore, RedisConfigurationStore>();
         services.AddSingleton<IConnectionMultiplexer>(_ =>
             ConnectionMultiplexer.Connect("192.168.1.160:6379")
         );

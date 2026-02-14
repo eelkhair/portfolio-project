@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using JobBoard.AI.Application.Actions.Drafts.RewriteItem;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
@@ -6,10 +5,9 @@ using Microsoft.Extensions.Logging;
 
 namespace JobBoard.AI.Application.Infrastructure.Decorators;
 
-public sealed class NormalizationCommandHandlerDecorator<TRequest, TResult>(
+public sealed partial class NormalizationCommandHandlerDecorator<TRequest, TResult>(
     IHandler<TRequest, TResult> decorated,
-    ILogger<TRequest> logger,
-    IActivityFactory activityFactory)
+    ILogger<TRequest> logger)
     : IHandler<TRequest, TResult>
     where TRequest : IRequest<TResult>
 {
@@ -17,22 +15,19 @@ public sealed class NormalizationCommandHandlerDecorator<TRequest, TResult>(
         TRequest request,
         CancellationToken cancellationToken)
     {
-        logger.LogInformation("Normalizing request {Request}...", typeof(TRequest).Name);
-        using (var activity = activityFactory.StartActivity(
-                   $"{typeof(TRequest).Name}.normalize",
-                   ActivityKind.Internal))
-        {
-            Normalize(request, activity);
-        }
-        logger.LogInformation("Normalized request {Request}", typeof(TRequest).Name);
+        LogNormalizingRequestRequest(logger, typeof(TRequest).Name);
+       
+        Normalize(request);
+        
+        LogNormalizedRequestRequest(logger, typeof(TRequest).Name);
         return await decorated.HandleAsync(request, cancellationToken);
     }
 
-    private static void Normalize(TRequest request, Activity? activity)
+    private static void Normalize(TRequest request)
     {
         if (request is RewriteItemCommand rewrite)
         {
-            NormalizeRewriteItem(rewrite, activity);
+            NormalizeRewriteItem(rewrite);
         }
 
         // Future:
@@ -40,8 +35,7 @@ public sealed class NormalizationCommandHandlerDecorator<TRequest, TResult>(
     }
 
     private static void NormalizeRewriteItem(
-        RewriteItemCommand command,
-        Activity? activity)
+        RewriteItemCommand command)
     {
         var req = command.Request;
 
@@ -85,9 +79,6 @@ public sealed class NormalizationCommandHandlerDecorator<TRequest, TResult>(
                     .Distinct(StringComparer.OrdinalIgnoreCase)
                     .ToList();
         }
-
-        activity?.SetTag("ai.normalized", true);
-        activity?.SetTag("ai.normalized.request", nameof(RewriteItemCommand));
     }
 
     private static int? Clamp(int? value, int min, int max)
@@ -95,4 +86,10 @@ public sealed class NormalizationCommandHandlerDecorator<TRequest, TResult>(
         if (!value.HasValue) return null;
         return Math.Min(Math.Max(value.Value, min), max);
     }
+
+    [LoggerMessage(LogLevel.Information, "Normalized request {Request}")]
+    static partial void LogNormalizedRequestRequest(ILogger<TRequest> logger, string Request);
+
+    [LoggerMessage(LogLevel.Information, "Normalizing request {Request}...")]
+    static partial void LogNormalizingRequestRequest(ILogger<TRequest> logger, string Request);
 }
