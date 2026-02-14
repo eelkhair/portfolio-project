@@ -22,37 +22,12 @@ public class AiServiceTools(
     public IEnumerable<AITool> GetTools()
     {
         yield return SaveDraftAiTool();
+        yield return ListDraftsByLocationAiTool();
         yield return ListDraftsAiTool();
-
-        yield return AIFunctionFactory.Create(
-            (string input) =>
-            {
-                var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-                {
-                    ["texas"] = "TX",
-                    ["tx"] = "TX",
-                    ["california"] = "CA",
-                    ["ca"] = "CA"
-                };
-
-                return map.TryGetValue(input.Trim(), out var state)
-                    ? state
-                    : null;
-            },
-            new AIFunctionFactoryOptions
-            {
-                Name = "normalize_state",
-                Description =
-                    """
-                    Converts a US state name or abbreviation into a 2-letter uppercase state code.
-                    Returns null if unknown.
-                    """
-            });
-    }
-
-
-
-    private AITool ListDraftsAiTool()
+        
+}
+    
+    private AIFunction ListDraftsAiTool()
     {
         return AIFunctionFactory.Create(
             async (Guid companyId, CancellationToken ct) =>
@@ -93,6 +68,7 @@ public class AiServiceTools(
 
                 var envelope = new ToolResultEnvelope<List<DraftResponse>>(
                     drafts,
+                    drafts.Count,
                     DateTimeOffset.UtcNow);
 
                 cache.Set(
@@ -108,16 +84,96 @@ public class AiServiceTools(
                 Name = "draft_list",
                 Description =
                     """
-                    Returns a list of drafts for a company.
-                    Requires companyId.
-
-                    The AI may freely filter, count, group, or transform the returned drafts
-                    in-memory without additional tools.
+                    "Returns a list of drafts for a company.
                     """
             });
+
+    }
+    private AIFunction ListDraftsByLocationAiTool()
+    {
+        return AIFunctionFactory.Create(
+            async (Guid companyId, string location, CancellationToken ct) =>
+            {
+                using var activity = activityFactory.StartActivity(
+                    "tool.draft_list_by_location",
+                    ActivityKind.Internal);
+
+                activity?.AddTag("ai.operation", "draft_list_by_location");
+                activity?.AddTag("tool.company_id", companyId);
+
+                var cacheKey = $"draft_list:{companyId}:{location}";
+
+                if (cache.TryGet(cacheKey, out var cachedObj))
+                {
+                    var entry = (ToolCacheEntry)cachedObj!;
+                    var age = DateTimeOffset.UtcNow - entry.ExecutedAt;
+
+                    if (age < ToolTtl)
+                    {
+                        activity?.SetTag("tool.cache.hit", true);
+                        activity?.SetTag("tool.cache.age_minutes", age.TotalMinutes); 
+                        return (ToolResultEnvelope<List<DraftResponse>>)entry.Value;
+                        
+                       
+                    }
+
+                    activity?.SetTag("tool.cache.expired", true);
+                }
+
+                activity?.SetTag("tool.cache.hit", false);
+
+                var handler =
+                    serviceProvider.GetRequiredService<
+                        IHandler<ListDraftsQuery, List<DraftResponse>>>();
+
+                var drafts = await handler.HandleAsync(
+                    new ListDraftsQuery(companyId),
+                    ct);
+                
+                var filteredDrafts = FilterByLocation(drafts, location);
+
+                var envelope = new ToolResultEnvelope<List<DraftResponse>>(
+                    filteredDrafts,
+                    filteredDrafts.Count,
+                    DateTimeOffset.UtcNow);
+
+                cache.Set(
+                    cacheKey,
+                    new ToolCacheEntry(envelope, envelope.ExecutedAt));
+
+                activity?.SetTag("tool.result.count", filteredDrafts.Count);
+
+                return envelope;
+            },
+            new AIFunctionFactoryOptions
+            {
+                Name = "draft_list_by_location",
+                Description =
+                    """
+                    "Returns the list of drafts by location for a company.
+                    State must be normalized to 2 letter code (eg. CA, NY, IA, TX)
+                    """
+            });
+
     }
 
-    private AITool SaveDraftAiTool()
+    private static List<DraftResponse> FilterByLocation(List<DraftResponse> drafts, string location)
+    {
+        var parts = location
+            .Split(",", StringSplitOptions.RemoveEmptyEntries)
+            .Select(s => s.Trim())
+            .ToList();
+
+        return drafts
+            .Where(d =>
+                !string.IsNullOrWhiteSpace(d.Location) &&
+                parts.Any(p =>
+                    d.Location.EndsWith(p, StringComparison.OrdinalIgnoreCase) ||
+                    d.Location.Contains(p, StringComparison.OrdinalIgnoreCase)))
+            .ToList();    }
+
+
+    private AIFunction SaveDraftAiTool()
     {
         return AIFunctionFactory.Create(
             async (SaveDraftCommand cmd, CancellationToken ct) =>
