@@ -44,6 +44,9 @@ public sealed class AiServiceClient(
             $"drafts/{companyId}",
             serviceName);
 
+    //    if (accessor.Token is { } auth)
+      //      request.Headers.TryAddWithoutValidation("Authorization", auth);
+
         using var response =
             await client.InvokeMethodWithResponseAsync(request, cancellationToken);
 
