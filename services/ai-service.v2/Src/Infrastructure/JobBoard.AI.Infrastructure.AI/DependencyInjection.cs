@@ -48,7 +48,7 @@ public static class DependencyInjection
             ).Messages);
 
         
-        services.AddKeyedScoped<IAiTools, AiServiceTools>("ai");
+        services.AddKeyedScoped<IAiTools, AiToolRegistry>("ai");
    
         services.AddTransient<ChatOptions>(sp =>
         {

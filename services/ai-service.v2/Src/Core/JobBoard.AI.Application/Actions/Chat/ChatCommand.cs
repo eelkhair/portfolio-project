@@ -10,11 +10,11 @@ public sealed class ChatCommand(
     string message,
     Guid? companyId,
     Guid? conversationId
-) : BaseCommand<ChatResponse>
+) : BaseCommand<ChatResponse>, IConversationContext
 {
     public string Message { get; } = message;
     public Guid? CompanyId { get; } = companyId;
-    public Guid? ConversationId { get; } = conversationId;
+    public Guid? ConversationId { get; set; } = conversationId;
 }
 
 public sealed class ChatCommandHandler(
@@ -33,25 +33,20 @@ public sealed class ChatCommandHandler(
             "ChatCommand",
             ActivityKind.Internal);
 
-        if (string.IsNullOrEmpty(request.UserId))
-        {
-            request.UserId = "7396AC4F-EF64-48A7-BA42-A747938622D0";
-        }
+    
         activity?.SetTag("chat.message", request.Message);
         activity?.SetTag("chat.companyId", request.CompanyId);
         activity?.SetTag("ai.operation", "chat");
-        activity?.SetTag("chat.userId", request.UserId);
-        activity?.SetTag("chat.conversationId", request.ConversationId);
+        activity?.SetTag("ai.userId", request.UserId);
 
         var effectiveUserMessage = request.CompanyId is not null
             ? $"Context:\n- companyId: {request.CompanyId}\n\nUser:\n{request.Message}"
             : request.Message;
         
+        
         return await completionService.RunChatAsync(
             systemPrompt.Value,
             effectiveUserMessage,
-            request.ConversationId,
-            request.UserId,
             cancellationToken);
     }
 }

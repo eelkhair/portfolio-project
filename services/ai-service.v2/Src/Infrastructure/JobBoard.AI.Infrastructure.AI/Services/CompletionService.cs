@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using JobBoard.AI.Application.Interfaces.AI;
+using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +16,8 @@ public class CompletionService(
     IActivityFactory activityFactory,
     ChatOptions chatOptions,
     IConversationStore conversationStore,
+    IConversationContext conversationContext,
+    IUserAccessor userAccessor,
     IConfiguration configuration,
     IServiceProvider serviceProvider)
     : ICompletionService
@@ -28,8 +31,6 @@ public class CompletionService(
     public async Task<ChatResponse> RunChatAsync(
         string systemPrompt,
         string userMessage,
-        Guid? conversationId,
-        string userId,
         CancellationToken cancellationToken)
     {
         var client = new FunctionInvokingChatClient(GetClient());
@@ -38,16 +39,10 @@ public class CompletionService(
         {
             new(ChatRole.System, systemPrompt)
         };
-
-        if (conversationId.HasValue)
-        {
-            var savedMessages = await conversationStore.GetChatMessages(conversationId.Value, userId);
-            messages.AddRange(savedMessages);
-        }
-        else
-        {
-            conversationId = Guid.CreateVersion7();
-        }
+        
+        var savedMessages = await conversationStore.GetChatMessages(conversationContext.ConversationId!.Value, userAccessor.UserId!);
+        messages.AddRange(savedMessages);
+       
         
         messages.Add(new(ChatRole.User, userMessage));
 
@@ -60,19 +55,20 @@ public class CompletionService(
         Activity.Current?.SetTag("ai.tokens.total", response.Usage?.TotalTokenCount ?? 0);
         Activity.Current?.SetTag("ai.tokens.input", response.Usage?.InputTokenCount ?? 0);
         Activity.Current?.SetTag("ai.tokens.output", response.Usage?.OutputTokenCount ?? 0);
-        Activity.Current?.SetTag("ai.conversationId", conversationId);
+        Activity.Current?.SetTag("ai.conversationId", conversationContext.ConversationId);
 
         messages.AddMessages(response);
         messages = messages.TakeLast(40).ToList();
         await conversationStore.SaveChatMessages(
-            conversationId.Value,
-            userId,
+            conversationContext.ConversationId.Value,
+            userAccessor.UserId!,
             messages.Where(m => m.Role != ChatRole.System).ToList());
          
         return new ChatResponse
         {
             Response = response.Text,
-            ConversationId = conversationId.Value
+            ConversationId = conversationContext.ConversationId.Value,
+            TraceId = Activity.Current?.TraceId.ToString() ?? string.Empty,
         };
     }
 
