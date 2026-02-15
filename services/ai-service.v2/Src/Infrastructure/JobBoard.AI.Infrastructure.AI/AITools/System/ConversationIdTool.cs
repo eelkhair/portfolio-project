@@ -21,8 +21,6 @@ public static class ConversationIdTool
 
                 
                 var conversationId = conversationContext.ConversationId;
-
-                activity?.SetTag("conversation.id", conversationId);
                 return Task.FromResult(conversationId);
                 
             },
@@ -31,7 +29,7 @@ public static class ConversationIdTool
                 Name = "conversation_id",
                 Description =
                     "Returns the conversation id for the current conversation." +
-                    "Return the conversation id. also return in the format 'ai.conversation_id={}' for jaeger"
+                    "Return the conversation id. also return in the format 'ai.conversationId={}' for jaeger"
             });
     }
 }
