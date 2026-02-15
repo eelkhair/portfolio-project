@@ -22,7 +22,7 @@ public static class ListDraftsByLocationTool
 
                 activity?.AddTag("ai.operation", "draft_list_by_location");
                 activity?.AddTag("tool.company_id", companyId);
-
+                activity?.AddTag("tool.location", location);
                 var cacheKey = $"draft_list:{companyId}:{location}";
 
                 if (cache.TryGet(cacheKey, out var cachedObj))
