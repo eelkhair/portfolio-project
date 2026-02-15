@@ -33,7 +33,7 @@ export class AiChat {
   toggle() {
     this.isOpen.update(v => !v);
     if (this.isOpen()) {
-      setTimeout(() => this.chatInput()?.nativeElement.focus(), 0);
+      this.focusInput();
     }
   }
 
@@ -59,11 +59,13 @@ export class AiChat {
         }
         this.loading.set(false);
         this.scrollToBottom();
+        this.focusInput();
       },
       error: () => {
         this.messages.update(msgs => [...msgs, {role: 'assistant', content: 'Unable to reach the AI service. Please try again later.'}]);
         this.loading.set(false);
         this.scrollToBottom();
+        this.focusInput();
       }
     });
   }
@@ -73,6 +75,10 @@ export class AiChat {
       event.preventDefault();
       this.send();
     }
+  }
+
+  private focusInput() {
+    setTimeout(() => this.chatInput()?.nativeElement.focus(), 0);
   }
 
   private scrollToBottom() {

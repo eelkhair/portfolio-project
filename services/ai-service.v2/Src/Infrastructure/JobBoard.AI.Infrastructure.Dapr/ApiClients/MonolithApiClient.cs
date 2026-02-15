@@ -21,7 +21,7 @@ public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<Mon
         catch (InvocationException ex)
         {
             var response = ex.Response;
-            var body = await response.Content.ReadAsStringAsync();
+            var body = await response.Content.ReadAsStringAsync(cancellationToken);
             
             logger.LogError(ex, "Error getting companies from monolith-api: {Body}", body);
             throw;
@@ -40,7 +40,7 @@ public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<Mon
         catch (InvocationException ex)
         {
             var response = ex.Response;
-            var body = await response.Content.ReadAsStringAsync();
+            var body = await response.Content.ReadAsStringAsync(ct);
             logger.LogError(ex, "Error creating company in monolith-api: {Body}", body);
             throw;
         }
@@ -57,7 +57,7 @@ public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<Mon
         catch (InvocationException ex)
         {
             var response = ex.Response;
-            var body = await response.Content.ReadAsStringAsync();
+            var body = await response.Content.ReadAsStringAsync(cancellationToken);
             logger.LogError(ex, "Error getting industries from monolith-api: {Body}", body);
 
             throw;

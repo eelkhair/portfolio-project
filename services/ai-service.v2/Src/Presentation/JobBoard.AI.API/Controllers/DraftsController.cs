@@ -1,10 +1,8 @@
 using JobBoard.AI.API.Infrastructure.Authorization;
-using JobBoard.AI.Application.Actions.Drafts;
 using JobBoard.AI.Application.Actions.Drafts.Generate;
 using JobBoard.AI.Application.Actions.Drafts.List;
 using JobBoard.AI.Application.Actions.Drafts.RewriteItem;
 using JobBoard.AI.Application.Actions.Drafts.Save;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoard.AI.API.Controllers;

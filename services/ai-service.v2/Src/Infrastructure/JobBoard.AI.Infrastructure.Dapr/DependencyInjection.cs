@@ -2,6 +2,7 @@
 using Dapr.Extensions.Configuration;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Infrastructure.Dapr.AITools;
+using JobBoard.AI.Infrastructure.Dapr.AITools.Admin;
 using JobBoard.AI.Infrastructure.Dapr.AITools.Monolith;
 using JobBoard.AI.Infrastructure.Dapr.ApiClients;
 using Microsoft.AspNetCore.Builder;
@@ -20,7 +21,7 @@ public static class DependencyInjection
         // Dapr client
         builder.Services.AddDaprClient();
         builder.Services.AddKeyedScoped<IAiTools, MonolithToolRegistry>("monolith");
-        builder.Services.AddKeyedScoped<IAiTools, AdminTools>("micro");
+        builder.Services.AddKeyedScoped<IAiTools, AdminToolRegistry>("micro");
         builder.Services.AddScoped<IMonolithApiClient, MonolithApiClient>();
         builder.Services.AddScoped<IAdminApiClient, AdminApiClient>();
         // Vault secrets

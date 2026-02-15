@@ -7,23 +7,23 @@ using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
 using Microsoft.Extensions.AI;
 
-namespace JobBoard.AI.Infrastructure.AI.Tools.Drafts;
+namespace JobBoard.AI.Infrastructure.AI.AITools.Drafts;
 
-public static class ListDraftsByLocationTool
+public static class ListDraftsTool
 {
     public static AIFunction Get(IActivityFactory activityFactory, IAiToolHandlerResolver toolResolver, IToolExecutionCache cache, TimeSpan toolTtl)
     {
         return AIFunctionFactory.Create(
-            async (Guid companyId, string location, CancellationToken ct) =>
+            async (Guid companyId, CancellationToken ct) =>
             {
                 using var activity = activityFactory.StartActivity(
-                    "tool.draft_list_by_location",
+                    "tool.draft_list",
                     ActivityKind.Internal);
 
-                activity?.AddTag("ai.operation", "draft_list_by_location");
+                activity?.AddTag("ai.operation", "draft_list");
                 activity?.AddTag("tool.company_id", companyId);
 
-                var cacheKey = $"draft_list:{companyId}:{location}";
+                var cacheKey = $"draft_list:{companyId}";
 
                 if (cache.TryGet(cacheKey, out var cachedObj))
                 {
@@ -35,8 +35,6 @@ public static class ListDraftsByLocationTool
                         activity?.SetTag("tool.cache.hit", true);
                         activity?.SetTag("tool.cache.age_minutes", age.TotalMinutes);
                         return (ToolResultEnvelope<List<DraftResponse>>)entry.Value;
-
-
                     }
 
                     activity?.SetTag("tool.cache.expired", true);
@@ -50,48 +48,28 @@ public static class ListDraftsByLocationTool
                     new ListDraftsQuery(companyId),
                     ct);
 
-                var filteredDrafts = FilterByLocation(drafts, location);
-
                 var envelope = new ToolResultEnvelope<List<DraftResponse>>(
-                    filteredDrafts,
-                    filteredDrafts.Count,
+                    drafts,
+                    drafts.Count,
                     DateTimeOffset.UtcNow);
 
                 cache.Set(
                     cacheKey,
                     new ToolCacheEntry(envelope, envelope.ExecutedAt));
 
-                activity?.SetTag("tool.result.count", filteredDrafts.Count);
+                activity?.SetTag("tool.result.count", drafts.Count);
 
                 return envelope;
             },
             new AIFunctionFactoryOptions
             {
-                Name = "draft_list_by_location",
+                Name = "draft_list",
                 Description =
                     """
-                    "Returns the list of drafts by location for a company.
-                    State must be normalized to 2 letter code (eg. CA, NY, IA, TX)
-                    Remove any drafts that are not in the specified location after the tool is done processing.
+                    "Returns a list of drafts for a company.
                     """
             });
 
-        static List<DraftResponse> FilterByLocation(List<DraftResponse> drafts, string location)
-        {
-            var parts = location
-                .Split(",", StringSplitOptions.RemoveEmptyEntries)
-                .Select(s => s.Trim())
-                .ToList();
-
-            parts[^1] = ", " + parts[^1];
-            return drafts
-                .Where(d =>
-                    !string.IsNullOrWhiteSpace(d.Location) &&
-                    parts.Any(p =>
-                        d.Location.EndsWith(p, StringComparison.OrdinalIgnoreCase) ||
-                        d.Location.Contains(p, StringComparison.OrdinalIgnoreCase)))
-                .ToList();
-        }
-
     }
 }
+

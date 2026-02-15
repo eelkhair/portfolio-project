@@ -1,6 +1,5 @@
 using JobBoard.AI.API.Infrastructure.Authorization;
 using JobBoard.AI.Application.Actions.Chat;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoard.AI.API.Controllers;

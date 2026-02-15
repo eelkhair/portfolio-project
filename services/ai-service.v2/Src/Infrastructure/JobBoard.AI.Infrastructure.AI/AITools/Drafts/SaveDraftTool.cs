@@ -3,7 +3,8 @@ using JobBoard.AI.Application.Actions.Drafts.Save;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
 using Microsoft.Extensions.AI;
-namespace JobBoard.AI.Infrastructure.AI.Tools.Drafts;
+
+namespace JobBoard.AI.Infrastructure.AI.AITools.Drafts;
 
 public static class SaveDraftTool
 {
