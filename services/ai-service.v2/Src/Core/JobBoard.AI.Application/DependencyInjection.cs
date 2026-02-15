@@ -1,6 +1,7 @@
 using System.Reflection;
 using FluentValidation;
 using JobBoard.AI.Application.Actions.Base;
+using JobBoard.AI.Application.Actions.Chat;
 using JobBoard.AI.Application.Infrastructure.AI;
 using JobBoard.AI.Application.Infrastructure.Decorators;
 using JobBoard.AI.Application.Interfaces.AI;
@@ -15,7 +16,8 @@ public static class DependencyInjection
     {
         var assemblies = new[] { typeof(BaseCommandHandler).Assembly }.Concat(additionalAssemblies).ToArray();
         services.AddValidatorsFromAssemblyContaining(typeof(IHandler<,>));
-
+        services.AddScoped<IAiToolHandlerResolver, AiToolHandlerResolver>();
+        
         services.Scan(scan => scan
             .FromAssemblies(assemblies)
             .AddClasses(c => c.AssignableTo(typeof(IHandler<,>)))
@@ -23,10 +25,12 @@ public static class DependencyInjection
             .WithTransientLifetime());
 
         services.AddScoped<IHandlerContext, HandlerContext>();
-
+        services.AddScoped<IConversationContext, ConversationContext>();
         services.Decorate(typeof(IHandler<,>), typeof(ValidationCommandHandlerDecorator<,>));
         services.Decorate(typeof(IHandler<,>), typeof(NormalizationCommandHandlerDecorator<,>));
         services.Decorate(typeof(IHandler<,>), typeof(ObservabilityCommandHandlerDecorator<,>));
+        services.Decorate(typeof(IHandler<,>), typeof(UserContextCommandHandlerDecorator<,>));
+        services.Decorate(typeof(IHandler<,>), typeof(ConversationContextDecorator<,>));
         services.AddScoped<IToolExecutionCache, ToolExecutionCache>();
         services.Scan(scan => scan
             .FromAssemblies(assemblies)
