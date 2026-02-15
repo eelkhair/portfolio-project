@@ -2,7 +2,7 @@ import {Component, ElementRef, inject, signal, viewChild} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {Button} from 'primeng/button';
 import {InputText} from 'primeng/inputtext';
-import {ChatService} from '../../core/services/chat.service';
+import {ChatService, ChatStreamDone} from '../../core/services/chat.service';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -18,6 +18,7 @@ interface ChatMessage {
 })
 export class AiChat {
   private chatService = inject(ChatService);
+  private abortController: AbortController | null = null;
 
   isOpen = signal(false);
   message = '';
@@ -37,7 +38,7 @@ export class AiChat {
     }
   }
 
-  send() {
+  async send() {
     const text = this.message.trim();
     if (!text || this.loading()) return;
 
@@ -46,26 +47,45 @@ export class AiChat {
     this.loading.set(true);
     this.scrollToBottom();
 
-    this.chatService.chat({
-      message: text,
-      conversationId: this.conversationId()
-    }).subscribe({
-      next: (res) => {
-        if (res.success && res.data) {
-          this.conversationId.set(res.data.conversationId);
-          this.messages.update(msgs => [...msgs, {role: 'assistant', content: res.data!.response}]);
+    this.messages.update(msgs => [...msgs, {role: 'assistant', content: ''}]);
+
+    this.abortController = new AbortController();
+
+    try {
+      const stream = this.chatService.chatStream(
+        {message: text, conversationId: this.conversationId()},
+        this.abortController.signal
+      );
+
+      for await (const chunk of stream) {
+        if (typeof chunk === 'string') {
+          this.messages.update(msgs => {
+            const updated = [...msgs];
+            const last = updated[updated.length - 1];
+            updated[updated.length - 1] = {...last, content: last.content + chunk};
+            return updated;
+          });
+          this.scrollToBottom();
         } else {
-          this.messages.update(msgs => [...msgs, {role: 'assistant', content: 'Sorry, something went wrong. Please try again.'}]);
+          const done = chunk as ChatStreamDone;
+          this.conversationId.set(done.conversationId);
         }
-        this.loading.set(false);
-        this.scrollToBottom();
-      },
-      error: () => {
-        this.messages.update(msgs => [...msgs, {role: 'assistant', content: 'Unable to reach the AI service. Please try again later.'}]);
-        this.loading.set(false);
-        this.scrollToBottom();
       }
-    });
+    } catch (err: any) {
+      if (err.name === 'AbortError') return;
+      this.messages.update(msgs => {
+        const updated = [...msgs];
+        const last = updated[updated.length - 1];
+        if (!last.content) {
+          updated[updated.length - 1] = {...last, content: 'Unable to reach the AI service. Please try again later.'};
+        }
+        return updated;
+      });
+    } finally {
+      this.loading.set(false);
+      this.abortController = null;
+      this.scrollToBottom();
+    }
   }
 
   onKeydown(event: KeyboardEvent) {

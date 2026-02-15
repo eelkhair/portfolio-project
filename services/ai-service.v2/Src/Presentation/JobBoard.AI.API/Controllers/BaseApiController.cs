@@ -76,7 +76,7 @@ public abstract class BaseApiController : ControllerBase
 
         return StatusCode(StatusCodes.Status201Created, body);
     }
-    private Task<TResult> ExecuteCoreAsync<TResult>(IRequest<TResult> request)
+    protected Task<TResult> ExecuteCoreAsync<TResult>(IRequest<TResult> request)
     {
         var handlerType = typeof(IHandler<,>).MakeGenericType(request.GetType(), typeof(TResult));
         var handler = HttpContext.RequestServices.GetRequiredService(handlerType);

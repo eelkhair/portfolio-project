@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using JobBoard.AI.Application.Interfaces.AI;
@@ -70,6 +72,68 @@ public class CompletionService(
             ConversationId = conversationContext.ConversationId.Value,
             TraceId = Activity.Current?.TraceId.ToString() ?? string.Empty,
         };
+    }
+
+    public async IAsyncEnumerable<string> StreamChatAsync(
+        string systemPrompt,
+        string userMessage,
+        [EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        using var streamActivity = activityFactory.StartActivity(
+            "ai.stream_completion",
+            ActivityKind.Client);
+
+        var client = new FunctionInvokingChatClient(GetClient());
+
+        var messages = new List<ChatMessage>
+        {
+            new(ChatRole.System, systemPrompt)
+        };
+
+        var savedMessages = await conversationStore.GetChatMessages(
+            conversationContext.ConversationId!.Value, userAccessor.UserId!);
+        messages.AddRange(savedMessages);
+        messages.Add(new(ChatRole.User, userMessage));
+
+        streamActivity?.SetTag("ai.conversationId", conversationContext.ConversationId);
+        streamActivity?.SetTag("ai.history.message_count", savedMessages.Count);
+
+        var updates = new List<ChatResponseUpdate>();
+        var fullResponse = new StringBuilder();
+        var sw = Stopwatch.StartNew();
+
+        await foreach (var update in client.GetStreamingResponseAsync(
+                           messages, chatOptions, cancellationToken))
+        {
+            updates.Add(update);
+            if (!string.IsNullOrEmpty(update.Text))
+            {
+                fullResponse.Append(update.Text);
+                yield return update.Text;
+            }
+        }
+
+        sw.Stop();
+
+        // Extract token usage from streaming updates
+        var usage = updates
+            .SelectMany(u => u.Contents)
+            .OfType<UsageContent>()
+            .LastOrDefault()?.Details;
+
+        streamActivity?.SetTag("ai.response.length", fullResponse.Length);
+        streamActivity?.SetTag("ai.stream.duration_ms", sw.ElapsedMilliseconds);
+        streamActivity?.SetTag("ai.tokens.total", usage?.TotalTokenCount ?? 0);
+        streamActivity?.SetTag("ai.tokens.input", usage?.InputTokenCount ?? 0);
+        streamActivity?.SetTag("ai.tokens.output", usage?.OutputTokenCount ?? 0);
+
+        messages.AddMessages(updates);
+        messages = messages.TakeLast(40).ToList();
+
+        await conversationStore.SaveChatMessages(
+            conversationContext.ConversationId.Value,
+            userAccessor.UserId!,
+            messages.Where(m => m.Role != ChatRole.System).ToList());
     }
 
     public async Task<T> GetResponseAsync<T>(string systemPrompt, string userPrompt, CancellationToken cancellationToken)
