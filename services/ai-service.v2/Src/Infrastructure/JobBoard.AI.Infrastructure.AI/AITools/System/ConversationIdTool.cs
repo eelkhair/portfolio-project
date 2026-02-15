@@ -11,7 +11,7 @@ public static class ConversationIdTool
         IActivityFactory activityFactory,
         IConversationContext conversationContext)
     {
-        return AIFunctionFactory.Create((CancellationToken ct) =>
+        return AIFunctionFactory.Create(() =>
             {
                 using var activity = activityFactory.StartActivity(
                     "tool.conversation_id",
@@ -30,7 +30,8 @@ public static class ConversationIdTool
             {
                 Name = "conversation_id",
                 Description =
-                    "Returns the conversation id for the current conversation."
+                    "Returns the conversation id for the current conversation." +
+                    "Return the conversation id. also return in the format 'ai.conversation_id={}' for jaeger"
             });
     }
 }
