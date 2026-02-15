@@ -14,10 +14,10 @@ public class ConversationContextDecorator<ChatCommand, ChatResponse>(
     public async Task<ChatResponse> HandleAsync(ChatCommand request, CancellationToken cancellationToken)
     {
         logger.LogInformation("Checking conversation id for chat command");
-        Activity.Current?.SetTag("new_conversationId",request.ConversationId == null);
+        Activity.Current?.SetTag("new_conversation_id",request.ConversationId == null);
         conversationContext.ConversationId = request.ConversationId ?? Guid.NewGuid();
         logger.LogInformation("Handling chat command with conversation id: {ConversationId}", conversationContext.ConversationId);
-        Activity.Current?.SetTag("conversationId",conversationContext.ConversationId);
+        Activity.Current?.SetTag("conversation_id",conversationContext.ConversationId);
         return await decorated.HandleAsync(request, cancellationToken);
     }
 }
