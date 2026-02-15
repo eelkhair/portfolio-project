@@ -1,30 +1,28 @@
-
 using System.Diagnostics;
-using JobBoard.AI.Application.Actions.Drafts;
-using JobBoard.AI.Application.Actions.Drafts.List;
+using CompanyAPI.Contracts.Models.Industries.Responses;
 using JobBoard.AI.Application.Infrastructure.AI;
 using JobBoard.AI.Application.Interfaces.AI;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
+using JobBoard.AI.Infrastructure.Dapr.ApiClients;
 using Microsoft.Extensions.AI;
 
-namespace JobBoard.AI.Infrastructure.AI.Tools.Drafts;
+namespace JobBoard.AI.Infrastructure.Dapr.AITools.Admin.Industries;
 
-public static class ListDraftsTool
+public static class ListIndustriesTool
 {
-    public static AIFunction Get(IActivityFactory activityFactory, IAiToolHandlerResolver toolResolver, IToolExecutionCache cache, TimeSpan toolTtl)
+    public static AIFunction Get(IActivityFactory activityFactory, IAdminApiClient client, IToolExecutionCache cache, IUserAccessor accessor, TimeSpan toolTtl)
     {
         return AIFunctionFactory.Create(
-            async (Guid companyId, CancellationToken ct) =>
+            async (CancellationToken ct) =>
             {
                 using var activity = activityFactory.StartActivity(
-                    "tool.draft_list",
+                    "tool.industry_list",
                     ActivityKind.Internal);
 
-                activity?.AddTag("ai.operation", "draft_list");
-                activity?.AddTag("tool.company_id", companyId);
+                activity?.AddTag("ai.operation", "industry_list");
 
-                var cacheKey = $"draft_list:{companyId}";
+                var cacheKey = $"industry_list:{accessor.UserId}";
 
                 if (cache.TryGet(cacheKey, out var cachedObj))
                 {
@@ -35,42 +33,36 @@ public static class ListDraftsTool
                     {
                         activity?.SetTag("tool.cache.hit", true);
                         activity?.SetTag("tool.cache.age_minutes", age.TotalMinutes);
-                        return (ToolResultEnvelope<List<DraftResponse>>)entry.Value;
+                        return (ToolResultEnvelope<List<IndustryResponse>>)entry.Value;
                     }
 
                     activity?.SetTag("tool.cache.expired", true);
                 }
-
+                activity?.AddTag("tool.source", "monolith");
+                activity?.AddTag("tool.cache.key", cacheKey);
                 activity?.SetTag("tool.cache.hit", false);
 
-                var handler = toolResolver.Resolve<ListDraftsQuery, List<DraftResponse>>();
+                var industries = await client.ListIndustriesAsync(ct);
 
-                var drafts = await handler.HandleAsync(
-                    new ListDraftsQuery(companyId),
-                    ct);
-
-                var envelope = new ToolResultEnvelope<List<DraftResponse>>(
-                    drafts,
-                    drafts.Count,
+                var envelope = new ToolResultEnvelope<List<IndustryResponse>>(
+                    industries.Data!,
+                    industries.Data!.Count,
                     DateTimeOffset.UtcNow);
 
                 cache.Set(
                     cacheKey,
                     new ToolCacheEntry(envelope, envelope.ExecutedAt));
 
-                activity?.SetTag("tool.result.count", drafts.Count);
+                activity?.SetTag("tool.result.count", industries.Data!.Count);
 
                 return envelope;
             },
             new AIFunctionFactoryOptions
             {
-                Name = "draft_list",
+                Name = "industry_list",
                 Description =
-                    """
-                    "Returns a list of drafts for a company.
-                    """
+                    "Returns a list all industries in the system."
             });
 
     }
 }
-

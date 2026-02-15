@@ -1,11 +1,12 @@
 using JobBoard.AI.Application.Interfaces.AI;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
-using JobBoard.AI.Infrastructure.AI.Tools.Drafts;
-using JobBoard.AI.Infrastructure.AI.Tools.System;
+using JobBoard.AI.Infrastructure.AI.AITools.Drafts;
+using JobBoard.AI.Infrastructure.AI.AITools.System;
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.Logging;
 
-namespace JobBoard.AI.Infrastructure.AI.Tools;
+namespace JobBoard.AI.Infrastructure.AI.AITools;
 
 public class AiToolRegistry(
     IAiToolHandlerResolver toolResolver,
@@ -13,6 +14,7 @@ public class AiToolRegistry(
     IRedisStore redisStore,
     IUserAccessor userAccessor,
     IToolExecutionCache cache,
+    ILogger<AiToolRegistry> logger,
     IConversationContext conversationContext
 ) : IAiTools
 {
@@ -25,5 +27,8 @@ public class AiToolRegistry(
         yield return ListDraftsByLocationTool.Get(activityFactory, toolResolver, cache, ToolTtl);
         yield return LastTraceIdTool.Get(activityFactory, redisStore,userAccessor, conversationContext);
         yield return ConversationIdTool.Get(activityFactory, conversationContext);
+        yield return ProviderRetrievalTool.Get(activityFactory, toolResolver, logger);
+        yield return IsMonolithTool.Get(activityFactory, redisStore, logger);
+        yield return SetModeTool.Get(activityFactory, redisStore, logger);
     }
 }

@@ -4,7 +4,7 @@ using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Infrastructure.AI.Services;
 using Microsoft.Extensions.AI;
 
-namespace JobBoard.AI.Infrastructure.AI.Tools.System;
+namespace JobBoard.AI.Infrastructure.AI.AITools.System;
 
 public static class LastTraceIdTool
 {
