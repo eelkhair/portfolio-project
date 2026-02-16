@@ -8,6 +8,7 @@ using JobBoard.AI.Application.Interfaces.AI;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Infrastructure.AI.AITools;
+using JobBoard.AI.Infrastructure.AI.Infrastructure;
 using JobBoard.AI.Infrastructure.AI.Services;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
@@ -49,52 +50,9 @@ public static class DependencyInjection
 
         
         services.AddKeyedScoped<IAiTools, AiToolRegistry>("ai");
-   
-        services.AddTransient<ChatOptions>(sp =>
-        {
-            var isMonolith = configuration.GetValue<bool>("FeatureFlags:Monolith");
-            
-            var toolService = sp.GetRequiredKeyedService<IAiTools>(isMonolith ? "monolith" : "micro");
-            var aiToolService = sp.GetRequiredKeyedService<IAiTools>("ai");
-            
-            var topologyTools = toolService.GetTools().ToList();
-            var aiTools = aiToolService.GetTools().ToList();
-
-            var duplicates = topologyTools
-                .Concat(aiTools)
-                .GroupBy(t => t.Name)
-                .Where(g => g.Count() > 1)
-                .Select(g => g.Key)
-                .ToList();
-
-            if (duplicates.Any())
-                throw new InvalidOperationException(
-                    $"Duplicate AI tools detected. Tool names must be unique across " +
-                    $"topology and AI tool sets. Duplicates: {string.Join(", ", duplicates)}");
+        services.AddSingleton<IChatOptionsFactory, ChatOptionsFactory>();
 
 
-            var tools = topologyTools
-                .Concat(aiTools)
-                .ToList();
-            
-            var factory = sp.GetRequiredService<IActivityFactory>();
-            using var activity = factory.StartActivity("tool.Selection", ActivityKind.Internal);
-            activity?.AddTag("ai.model", configuration["AIModel"]);
-            activity?.AddTag("ai.provider", configuration["AIProvider"]);
-
-            activity?.AddTag("ai.tools", isMonolith ? "Monolith,AI" : "Micro,AI");
-            activity?.AddTag("ai.tools.count", tools.Count);
-            activity?.AddTag("ai.tools.topology.count", topologyTools.Count);
-            activity?.AddTag("ai.tools.ai.count", aiTools.Count);
-            
-            return new ChatOptions
-            {
-                Tools =tools,
-                MaxOutputTokens = 5000,
-                Temperature = 1,
-                ModelId = configuration["AIModel"]!
-            };
-        });
         services.AddScoped<IConversationStore, ConversationStore>();
         services.AddTransient<ICompletionService, CompletionService>();
         return services;

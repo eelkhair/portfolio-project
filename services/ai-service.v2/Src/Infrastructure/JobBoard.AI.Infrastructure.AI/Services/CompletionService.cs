@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using JobBoard.AI.Application.Interfaces.AI;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
+using JobBoard.AI.Infrastructure.AI.Infrastructure;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,7 +15,7 @@ namespace JobBoard.AI.Infrastructure.AI.Services;
 
 public class CompletionService(
     IActivityFactory activityFactory,
-    ChatOptions chatOptions,
+    IChatOptionsFactory chatOptionsFactory,
     IConversationStore conversationStore,
     IConversationContext conversationContext,
     IUserAccessor userAccessor,
@@ -31,6 +32,7 @@ public class CompletionService(
     public async Task<ChatResponse> RunChatAsync(
         string systemPrompt,
         string userMessage,
+        bool allowTools,
         CancellationToken cancellationToken)
     {
         var client = new FunctionInvokingChatClient(GetClient());
@@ -42,13 +44,14 @@ public class CompletionService(
         
         var savedMessages = await conversationStore.GetChatMessages(conversationContext.ConversationId!.Value, userAccessor.UserId!);
         messages.AddRange(savedMessages);
-       
+        
+        var options = chatOptionsFactory.Create(allowTools);
         
         messages.Add(new(ChatRole.User, userMessage));
 
         var response = await client.GetResponseAsync(
             messages,
-            chatOptions,
+            options,
             cancellationToken: cancellationToken);
 
         Activity.Current?.SetTag("ai.response.length", response.Text.Length);
@@ -72,7 +75,8 @@ public class CompletionService(
         };
     }
 
-    public async Task<T> GetResponseAsync<T>(string systemPrompt, string userPrompt, CancellationToken cancellationToken)
+    public async Task<T> GetResponseAsync<T>(string systemPrompt, string userPrompt, bool allowTools,
+        CancellationToken cancellationToken)
     {
         var client = GetClient();
         var messages = new []
@@ -82,6 +86,8 @@ public class CompletionService(
         };
         try
         {
+            var chatOptions = chatOptionsFactory.Create(allowTools);
+
             var response = await client.GetResponseAsync(
                 messages, chatOptions,
                 cancellationToken: cancellationToken);

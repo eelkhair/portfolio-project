@@ -4,6 +4,7 @@ namespace JobBoard.AI.Application.Actions.Drafts.RewriteItem;
 
 public sealed class RewriteItemPrompt : IAiPrompt<RewriteItemRequest>
 {
+    public bool AllowTools => false;
     private const string RewriteJsonShape = """
     {
       "options": [

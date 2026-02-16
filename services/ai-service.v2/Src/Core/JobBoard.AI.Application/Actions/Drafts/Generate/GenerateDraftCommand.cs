@@ -35,7 +35,7 @@ public class DraftGenCommandHandler(IHandlerContext context,
         var userPrompt = aiPrompt.BuildUserPrompt(request.Request);
         var systemPrompt = aiPrompt.BuildSystemPrompt();
         
-        var response = await completionService.GetResponseAsync<DraftResponse>(systemPrompt, userPrompt, cancellationToken);
+        var response = await completionService.GetResponseAsync<DraftResponse>(systemPrompt, userPrompt, aiPrompt.AllowTools, cancellationToken);
         
         Logger.LogInformation("Draft generated for company {CompanyId}", request.CompanyId);
 
