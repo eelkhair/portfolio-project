@@ -9,20 +9,16 @@ namespace JobBoard.AI.Infrastructure.AI.Infrastructure;
 
 public interface IChatOptionsFactory
 {
-    ChatOptions Create(bool allowTools);
+    ChatOptions Create(IServiceProvider sp, bool allowTools);
 }
 
 public sealed class ChatOptionsFactory(
-    IServiceScopeFactory scopeFactory,
     IConfiguration configuration,
     IActivityFactory activityFactory)
     : IChatOptionsFactory
 {
-    public ChatOptions Create(bool allowTools)
+    public ChatOptions Create(IServiceProvider sp,bool allowTools)
     {
-        using var scope = scopeFactory.CreateScope();
-        var sp = scope.ServiceProvider;
-
         var isMonolith = configuration.GetValue<bool>("FeatureFlags:Monolith");
 
         var topologyTools =
