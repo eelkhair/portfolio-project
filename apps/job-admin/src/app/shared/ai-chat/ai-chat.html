@@ -23,6 +23,15 @@
       @for (msg of messages(); track $index) {
         <div class="chat-message" [class.user]="msg.role === 'user'" [class.assistant]="msg.role === 'assistant'">
           <div class="message-content">{{ msg.content }}</div>
+          @if (msg.traceId) {
+            <a class="trace-link"
+               [href]="'https://jaeger.eelkhair.net/trace/' + msg.traceId"
+               target="_blank"
+               rel="noopener"
+               title="View trace in Jaeger">
+              <i class="pi pi-external-link"></i> <span class="trace-label">view in jaeger</span>
+            </a>
+          }
         </div>
       }
       @if (loading()) {

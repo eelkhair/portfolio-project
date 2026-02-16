@@ -136,6 +136,36 @@
   border-bottom-left-radius: 4px;
 }
 
+/* Trace link */
+.trace-link {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 5px;
+  margin-top: 4px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #F59E0B;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.trace-link:hover {
+  color: #D97706;
+}
+
+.trace-link i {
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.trace-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
 /* Input area */
 .chat-input {
   padding: 16px;
