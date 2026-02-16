@@ -22,6 +22,7 @@ public class AiToolRegistry(
 
     public IEnumerable<AITool> GetTools()
     {
+        yield return GenerateDraftTool.Get(activityFactory, toolResolver);
         yield return SaveDraftTool.Get(activityFactory, toolResolver);
         yield return ListDraftsTool.Get(activityFactory, toolResolver, cache, conversationContext, ToolTtl);
         yield return ListDraftsByLocationTool.Get(activityFactory, toolResolver, cache, conversationContext, ToolTtl);
@@ -31,6 +32,5 @@ public class AiToolRegistry(
         yield return ProviderRetrievalTool.Get(activityFactory, toolResolver, logger);
         yield return IsMonolithTool.Get(activityFactory, redisStore, logger);
         yield return SetModeTool.Get(activityFactory, redisStore, logger);
-        
     }
 }
