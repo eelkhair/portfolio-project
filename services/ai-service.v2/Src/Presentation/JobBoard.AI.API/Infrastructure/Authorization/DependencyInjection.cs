@@ -1,4 +1,5 @@
 using HealthChecks.UI.Client;
+using JobBoard.AI.API.Infrastructure.SignalR;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.HealthChecks;
 using Microsoft.AspNetCore.Authentication;
@@ -119,6 +120,7 @@ public static class DependencyInjection
       
         app.UseAuthorization();
         app.MapControllers();
+        app.MapHub<AiNotificationHub>("/hubs/notifications").RequireAuthorization();
         return app;
     }
 

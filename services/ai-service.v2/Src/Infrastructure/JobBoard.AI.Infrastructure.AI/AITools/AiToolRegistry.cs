@@ -1,4 +1,5 @@
 using JobBoard.AI.Application.Interfaces.Configurations;
+using JobBoard.AI.Application.Interfaces.Notifications;
 using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Infrastructure.AI.AITools.Drafts;
 using JobBoard.AI.Infrastructure.AI.AITools.System;
@@ -15,6 +16,7 @@ public class AiToolRegistry(
     IUserAccessor userAccessor,
     IMemoryCache cache,
     ILogger<AiToolRegistry> logger,
+    IAiNotificationHub notificationHub,
     IConversationContext conversationContext
 ) : IAiTools
 {
@@ -22,7 +24,7 @@ public class AiToolRegistry(
 
     public IEnumerable<AITool> GetTools()
     {
-        yield return GenerateDraftTool.Get(activityFactory, toolResolver);
+        yield return GenerateDraftTool.Get(activityFactory, toolResolver, notificationHub, userAccessor);
         yield return SaveDraftTool.Get(activityFactory, toolResolver);
         yield return ListDraftsTool.Get(activityFactory, toolResolver, cache, conversationContext, ToolTtl);
         yield return ListDraftsByLocationTool.Get(activityFactory, toolResolver, cache, conversationContext, ToolTtl);
