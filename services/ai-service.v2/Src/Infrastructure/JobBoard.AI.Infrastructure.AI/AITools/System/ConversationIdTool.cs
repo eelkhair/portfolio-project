@@ -11,7 +11,8 @@ public static class ConversationIdTool
         IConversationContext conversationContext)
     {
         return AIFunctionFactory.Create(() =>
-                ToolHelper.ExecuteAsync(activityFactory, "conversation_id",
+                ToolHelper.ExecuteAsync(activityFactory, 
+                    "conversation_id",
                     (_, _) => Task.FromResult(conversationContext.ConversationId),
                     CancellationToken.None),
             new AIFunctionFactoryOptions

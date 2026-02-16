@@ -11,7 +11,8 @@ public static class SetModeTool
     {
         return AIFunctionFactory.Create(
             async (bool isMonolith) =>
-                await ToolHelper.ExecuteAsync(activityFactory, "set_mode",
+                await ToolHelper.ExecuteAsync(activityFactory, 
+                    "set_mode",
                     async activity =>
                     {
                         logger.LogInformation("Setting application mode to {Mode}", isMonolith ? "monolith" : "microservices");

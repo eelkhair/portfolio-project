@@ -8,12 +8,17 @@ public static class CreateCompanyTool
 {
     public static AIFunction Get<TRequest>(
         IActivityFactory activityFactory,
-        Func<TRequest, CancellationToken, Task<object>> createCompany)
+        Func<TRequest, CancellationToken, Task<object>> createCompany, string source)
     {
         return AIFunctionFactory.Create(
             async (TRequest cmd, CancellationToken ct) =>
-                await ToolHelper.ExecuteAsync(activityFactory, "create_company",
-                    async (_, token) => await createCompany(cmd, token), ct),
+                await ToolHelper.ExecuteAsync(activityFactory, 
+                    "create_company",
+                    async (_, token) => await createCompany(cmd, token),
+                    ToolHelper.Tags(
+                        ("tool.source", source)
+                    ),
+                    ct),
             new AIFunctionFactoryOptions
             {
                 Name = "create_company",

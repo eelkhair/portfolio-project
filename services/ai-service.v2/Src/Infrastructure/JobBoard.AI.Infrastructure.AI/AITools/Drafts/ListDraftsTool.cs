@@ -14,7 +14,9 @@ public static class ListDraftsTool
         return AIFunctionFactory.Create(
             async (Guid companyId, CancellationToken ct) =>
                 await ToolHelper.ExecuteCachedAsync(
-                    activityFactory, "draft_list", cache,
+                    activityFactory, 
+                    "draft_list", 
+                    cache,
                     $"draft_list:{conversation.ConversationId}:{companyId}",
                     toolTtl,
                     async token =>
@@ -22,8 +24,10 @@ public static class ListDraftsTool
                         var handler = toolResolver.Resolve<ListDraftsQuery, List<DraftResponse>>();
                         return await handler.HandleAsync(new ListDraftsQuery(companyId), token);
                     },
-                    list => list.Count, ct,
-                    ("tool.company_id", companyId)),
+                    list => list.Count,
+                    ToolHelper.Tags(
+                        ("tool.company_id", companyId)
+                    ), ct),
             new AIFunctionFactoryOptions
             {
                 Name = "draft_list",

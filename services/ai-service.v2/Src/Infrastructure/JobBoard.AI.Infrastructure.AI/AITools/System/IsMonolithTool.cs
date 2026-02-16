@@ -11,14 +11,16 @@ public static class IsMonolithTool
     {
         return AIFunctionFactory.Create(
             async (CancellationToken cancellationToken) =>
-                await ToolHelper.ExecuteAsync(activityFactory, "is_monolith",
+                await ToolHelper.ExecuteAsync(activityFactory, 
+                    "is_monolith",
                     async (activity, _) =>
                     {
                         logger.LogInformation("Checking if monolith or microservice");
                         var is_monolith = await store.GetAsync<string>("jobboard:config:global:FeatureFlags:Monolith", 1);
                         activity?.SetTag("is_monolith", is_monolith);
                         return is_monolith == "true";
-                    }, cancellationToken),
+                    },
+                    cancellationToken),
             new AIFunctionFactoryOptions
             {
                 Name = "is_monolith",

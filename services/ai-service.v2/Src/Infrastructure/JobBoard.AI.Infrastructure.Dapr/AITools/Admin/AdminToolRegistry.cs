@@ -21,10 +21,14 @@ public class AdminToolRegistry(IAdminApiClient client,
         yield return ListCompaniesTool.Get(activityFactory,
             async ct => (await client.ListCompaniesAsync(ct)).Data!,
             "microservices", cache, conversation, ToolTtl);
+        
         yield return ListIndustriesTool.Get(activityFactory,
             async ct => (await client.ListIndustriesAsync(ct)).Data!,
             "microservices", cache, conversation, ToolTtl);
+        
         yield return CreateCompanyTool.Get<CreateCompanyRequest>(activityFactory,
-            async (cmd, ct) => (object)(await client.CreateCompanyAsync(cmd, ct))!);
+            async (cmd, ct) 
+                => await client.CreateCompanyAsync(cmd, ct)
+                , "microservices");
     }
 }

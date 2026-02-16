@@ -11,13 +11,16 @@ public static class SaveDraftTool
     {
         return AIFunctionFactory.Create(
             async (SaveDraftCommand cmd, CancellationToken ct) =>
-                await ToolHelper.ExecuteAsync(activityFactory, "save_draft",
+                await ToolHelper.ExecuteAsync(activityFactory, 
+                    "save_draft",
                     async (_, token) =>
                     {
                         var handler = toolResolver.Resolve<SaveDraftCommand, SaveDraftResponse>();
                         return await handler.HandleAsync(cmd, token);
-                    }, ct,
-                    ("tool.company_id", cmd.CompanyId)),
+                    },
+                    ToolHelper.Tags(
+                        ("tool.company_id", cmd.CompanyId)
+                    ), ct),
             new AIFunctionFactoryOptions
             {
                 Name = "save_draft",

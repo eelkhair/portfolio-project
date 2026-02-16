@@ -18,10 +18,16 @@ public static class ListIndustriesTool
         return AIFunctionFactory.Create(
             async (CancellationToken ct) =>
                 await ToolHelper.ExecuteCachedAsync(
-                    activityFactory, "industry_list", cache,
+                    activityFactory, 
+                    "industry_list", 
+                    cache,
                     $"industry_list:{conversation.ConversationId}",
-                    toolTtl, fetchIndustries, list => list.Count, ct,
-                    ("tool.source", source)),
+                    toolTtl, 
+                    fetchIndustries, 
+                    list => list.Count,
+                    ToolHelper.Tags(
+                        ("tool.source", source)
+                    ), ct),
             new AIFunctionFactoryOptions
             {
                 Name = "industry_list",

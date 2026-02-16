@@ -14,7 +14,9 @@ public static class ListDraftsByLocationTool
         return AIFunctionFactory.Create(
             async (Guid companyId, string location, CancellationToken ct) =>
                 await ToolHelper.ExecuteCachedAsync(
-                    activityFactory, "draft_list_by_location", cache,
+                    activityFactory, 
+                    "draft_list_by_location", 
+                    cache,
                     $"draft_list:{conversation.ConversationId}:{companyId}:{location}",
                     toolTtl,
                     async token =>
@@ -23,9 +25,11 @@ public static class ListDraftsByLocationTool
                         var drafts = await handler.HandleAsync(new ListDraftsQuery(companyId), token);
                         return FilterByLocation(drafts, location);
                     },
-                    list => list.Count, ct,
-                    ("tool.company_id", companyId), 
-                    ("tool.location", location)),
+                    list => list.Count,
+                    ToolHelper.Tags(
+                        ("tool.company_id", companyId),
+                        ("tool.location", location)
+                    ), ct),
             new AIFunctionFactoryOptions
             {
                 Name = "draft_list_by_location",

@@ -12,7 +12,8 @@ public static class ProviderRetrievalTool
     {
         return AIFunctionFactory.Create(
             async (CancellationToken cancellationToken) =>
-                await ToolHelper.ExecuteAsync(activityFactory, "provider_retrieval",
+                await ToolHelper.ExecuteAsync(activityFactory, 
+                    "provider_retrieval",
                     async (activity, token) =>
                     {
                         logger.LogInformation("Retrieving provider");
@@ -22,7 +23,8 @@ public static class ProviderRetrievalTool
                         activity?.SetTag("ai.provider", provider.Provider);
                         activity?.SetTag("ai.model", provider.Model);
                         return provider;
-                    }, cancellationToken),
+                    },
+                    cancellationToken),
             new AIFunctionFactoryOptions
             {
                 Name = "provider_retrieval",

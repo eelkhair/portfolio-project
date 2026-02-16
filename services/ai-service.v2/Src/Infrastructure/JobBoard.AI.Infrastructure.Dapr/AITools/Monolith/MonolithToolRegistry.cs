@@ -23,6 +23,6 @@ public class MonolithToolRegistry(IMonolithApiClient client,
             async ct => (await client.ListIndustriesAsync(ct)).Value,
             "monolith", cache, conversation, ToolTtl);
         yield return CreateCompanyTool.Get<CreateCompanyCommand>(activityFactory,
-            async (cmd, ct) => (object)(await client.CreateCompanyAsync(cmd, ct))!);
+            async (cmd, ct) => await client.CreateCompanyAsync(cmd, ct), "monolith");
     }
 }

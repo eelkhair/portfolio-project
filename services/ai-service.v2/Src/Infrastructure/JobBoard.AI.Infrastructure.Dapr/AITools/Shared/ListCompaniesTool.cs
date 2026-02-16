@@ -18,10 +18,16 @@ public static class ListCompaniesTool
         return AIFunctionFactory.Create(
             async (CancellationToken ct) =>
                 await ToolHelper.ExecuteCachedAsync(
-                    activityFactory, "company_list", cache,
+                    activityFactory, 
+                    "company_list", 
+                    cache,
                     $"company_list:{conversation.ConversationId}",
-                    toolTtl, fetchCompanies, list => list.Count, ct,
-                    ("tool.source", source)),
+                    toolTtl,
+                    fetchCompanies,
+                    list => list.Count,
+                    ToolHelper.Tags(
+                        ("tool.source", source)
+                    ), ct),
             new AIFunctionFactoryOptions
             {
                 Name = "company_list",

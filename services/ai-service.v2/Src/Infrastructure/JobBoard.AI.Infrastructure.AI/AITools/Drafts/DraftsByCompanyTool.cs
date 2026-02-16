@@ -13,7 +13,9 @@ public static class DraftsByCompanyTool
         return AIFunctionFactory.Create(
             async (CancellationToken ct) =>
                 await ToolHelper.ExecuteCachedAsync(
-                    activityFactory, "drafts_by_company", cache,
+                    activityFactory, 
+                    "drafts_by_company", 
+                    cache,
                     $"drafts_by_company:{conversation.ConversationId}",
                     toolTtl,
                     async token =>
