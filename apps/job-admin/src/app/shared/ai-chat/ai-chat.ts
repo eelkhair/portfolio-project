@@ -44,6 +44,16 @@ export class AiChat {
     const text = this.message.trim();
     if (!text || this.loading()) return;
 
+    const command = text.toLowerCase();
+    if (command === 'show jaeger' || command === 'hide jaeger') {
+      const show = command === 'show jaeger';
+      this.showJaeger.set(show);
+      localStorage.setItem(AiChat.JAEGER_KEY, String(show));
+      this.message = '';
+      this.focusInput();
+      return;
+    }
+
     this.messages.update(msgs => [...msgs, {role: 'user', content: text}]);
     this.message = '';
     this.loading.set(true);
@@ -74,6 +84,13 @@ export class AiChat {
   }
 
   onKeydown(event: KeyboardEvent) {
+    if (event.key === 'q' && event.ctrlKey) {
+      event.preventDefault();
+      const show = !this.showJaeger();
+      this.showJaeger.set(show);
+      localStorage.setItem(AiChat.JAEGER_KEY, String(show));
+      return;
+    }
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
       this.send();
