@@ -1,17 +1,16 @@
 using System.Diagnostics;
-using JobBoard.AI.Application.Infrastructure.AI;
-using JobBoard.AI.Application.Interfaces.AI;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Infrastructure.Dapr.ApiClients;
 using JobBoard.Monolith.Contracts.Companies;
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace JobBoard.AI.Infrastructure.Dapr.AITools.Monolith.Industries;
 
 public static class ListIndustriesTool
 {
-    public static AIFunction Get(IActivityFactory activityFactory, IMonolithApiClient client, IToolExecutionCache cache, IUserAccessor accessor, TimeSpan toolTtl)
+    public static AIFunction Get(IActivityFactory activityFactory, IMonolithApiClient client, IMemoryCache cache, IConversationContext conversation, TimeSpan toolTtl)
     {
         return AIFunctionFactory.Create(
             async (CancellationToken ct) =>
@@ -22,22 +21,16 @@ public static class ListIndustriesTool
 
                 activity?.AddTag("ai.operation", "industry_list");
 
-                var cacheKey = $"industry_list:{accessor.UserId}";
+                var cacheKey = $"industry_list:{conversation.ConversationId}";
+                activity?.SetTag("tool.cache.key", cacheKey);
+                activity?.SetTag("tool.ttl.seconds", toolTtl.TotalSeconds);
 
-                if (cache.TryGet(cacheKey, out var cachedObj))
+                if (cache.TryGetValue(cacheKey, out ToolResultEnvelope<List<IndustryDto>>? cached))
                 {
-                    var entry = (ToolCacheEntry)cachedObj!;
-                    var age = DateTimeOffset.UtcNow - entry.ExecutedAt;
-
-                    if (age < toolTtl)
-                    {
-                        activity?.SetTag("tool.cache.hit", true);
-                        activity?.SetTag("tool.cache.age_minutes", age.TotalMinutes);
-                        return (ToolResultEnvelope<List<IndustryDto>>)entry.Value;
-                    }
-
-                    activity?.SetTag("tool.cache.expired", true);
+                    activity?.SetTag("tool.cache.hit", true);
+                    return cached;
                 }
+
                 activity?.AddTag("tool.source", "monolith");
                 activity?.AddTag("tool.cache.key", cacheKey);
                 activity?.SetTag("tool.cache.hit", false);
@@ -49,9 +42,7 @@ public static class ListIndustriesTool
                     industries.Value.Count,
                     DateTimeOffset.UtcNow);
 
-                cache.Set(
-                    cacheKey,
-                    new ToolCacheEntry(envelope, envelope.ExecutedAt));
+                cache.Set(cacheKey, envelope, toolTtl);
 
                 activity?.SetTag("tool.result.count", industries.Value.Count);
 
