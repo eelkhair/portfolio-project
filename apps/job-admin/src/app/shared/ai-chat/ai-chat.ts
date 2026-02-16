@@ -7,6 +7,7 @@ import {ChatService} from '../../core/services/chat.service';
 interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
+  traceId?: string;
 }
 
 @Component({
@@ -18,10 +19,12 @@ interface ChatMessage {
 })
 export class AiChat {
   private chatService = inject(ChatService);
+  private static readonly JAEGER_KEY = 'ai-chat-show-jaeger';
 
   isOpen = signal(false);
   message = '';
   loading = signal(false);
+  showJaeger = signal(localStorage.getItem(AiChat.JAEGER_KEY) === 'true');
   conversationId = signal<string | undefined>(undefined);
   messages = signal<ChatMessage[]>([
     {role: 'assistant', content: 'Hello! I\'m your AI assistant. I can help you with job postings, companies, and more. How can I help you today?'}
@@ -53,7 +56,7 @@ export class AiChat {
       next: (res) => {
         if (res.success && res.data) {
           this.conversationId.set(res.data.conversationId);
-          this.messages.update(msgs => [...msgs, {role: 'assistant', content: res.data!.response}]);
+          this.messages.update(msgs => [...msgs, {role: 'assistant', content: res.data!.response, traceId: res.data!.traceId}]);
         } else {
           this.messages.update(msgs => [...msgs, {role: 'assistant', content: 'Sorry, something went wrong. Please try again.'}]);
         }
