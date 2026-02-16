@@ -6,4 +6,5 @@ public interface IAiPrompt<in TRequest>
     string Version { get; }
     string BuildUserPrompt(TRequest request);
     string BuildSystemPrompt();
+    bool AllowTools => true;
 }

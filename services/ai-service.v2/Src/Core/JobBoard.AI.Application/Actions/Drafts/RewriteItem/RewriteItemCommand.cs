@@ -46,6 +46,7 @@ public sealed class RewriteItemCommandHandler(
             .GetResponseAsync<RewriteItemResponse>(
                 systemPrompt,
                 userPrompt,
+                aiPrompt.AllowTools,
                 cancellationToken);
 
         Logger.LogInformation(

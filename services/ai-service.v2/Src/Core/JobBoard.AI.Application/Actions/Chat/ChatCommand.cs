@@ -47,6 +47,7 @@ public sealed class ChatCommandHandler(
         return await completionService.RunChatAsync(
             systemPrompt.Value,
             effectiveUserMessage,
+            true,
             cancellationToken);
     }
 }

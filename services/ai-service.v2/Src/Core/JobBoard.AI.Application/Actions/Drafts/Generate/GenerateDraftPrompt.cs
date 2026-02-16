@@ -4,7 +4,7 @@ namespace JobBoard.AI.Application.Actions.Drafts.Generate;
 
 public class GenerateDraftPrompt : IAiPrompt<GenerateDraftRequest>
 {
-
+    public bool AllowTools => false;
     private const string JobGenJsonShape = """
                                            {
                                              "title": "string (<= 80 chars; no [Hiring] or emojis)",
