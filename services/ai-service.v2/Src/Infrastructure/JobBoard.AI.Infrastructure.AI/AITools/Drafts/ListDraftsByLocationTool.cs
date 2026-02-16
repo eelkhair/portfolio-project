@@ -1,17 +1,16 @@
 using System.Diagnostics;
 using JobBoard.AI.Application.Actions.Drafts;
 using JobBoard.AI.Application.Actions.Drafts.List;
-using JobBoard.AI.Application.Infrastructure.AI;
-using JobBoard.AI.Application.Interfaces.AI;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace JobBoard.AI.Infrastructure.AI.AITools.Drafts;
 
 public static class ListDraftsByLocationTool
 {
-    public static AIFunction Get(IActivityFactory activityFactory, IAiToolHandlerResolver toolResolver, IToolExecutionCache cache, IUserAccessor userAccessor, TimeSpan toolTtl)
+    public static AIFunction Get(IActivityFactory activityFactory, IAiToolHandlerResolver toolResolver, IMemoryCache cache, IConversationContext conversation, TimeSpan toolTtl)
     {
         return AIFunctionFactory.Create(
             async (Guid companyId, string location, CancellationToken ct) =>
@@ -23,23 +22,15 @@ public static class ListDraftsByLocationTool
                 activity?.AddTag("ai.operation", "draft_list_by_location");
                 activity?.AddTag("tool.company_id", companyId);
                 activity?.AddTag("tool.location", location);
-                var cacheKey = $"draft_list:{userAccessor.UserId}:{companyId}:{location}";
-
-                if (cache.TryGet(cacheKey, out var cachedObj))
+                
+                var cacheKey = $"draft_list:{conversation.ConversationId}:{companyId}:{location}";
+                activity?.SetTag("tool.cache.key", cacheKey);
+                activity?.SetTag("tool.ttl.seconds", toolTtl.TotalSeconds);
+                
+                if (cache.TryGetValue(cacheKey, out ToolResultEnvelope<List<DraftResponse>>? cached))
                 {
-                    var entry = (ToolCacheEntry)cachedObj!;
-                    var age = DateTimeOffset.UtcNow - entry.ExecutedAt;
-
-                    if (age < toolTtl)
-                    {
-                        activity?.SetTag("tool.cache.hit", true);
-                        activity?.SetTag("tool.cache.age_minutes", age.TotalMinutes);
-                        return (ToolResultEnvelope<List<DraftResponse>>)entry.Value;
-
-
-                    }
-
-                    activity?.SetTag("tool.cache.expired", true);
+                    activity?.SetTag("tool.cache.hit", true);
+                    return cached;
                 }
 
                 activity?.SetTag("tool.cache.hit", false);
@@ -57,9 +48,7 @@ public static class ListDraftsByLocationTool
                     filteredDrafts.Count,
                     DateTimeOffset.UtcNow);
 
-                cache.Set(
-                    cacheKey,
-                    new ToolCacheEntry(envelope, envelope.ExecutedAt));
+                cache.Set(cacheKey, envelope, toolTtl);
 
                 activity?.SetTag("tool.result.count", filteredDrafts.Count);
 

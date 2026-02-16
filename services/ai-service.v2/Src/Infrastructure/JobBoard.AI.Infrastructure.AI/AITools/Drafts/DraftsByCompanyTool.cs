@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using JobBoard.AI.Application.Actions.Drafts;
+using JobBoard.AI.Application.Actions.Drafts.DraftsByCompany;
 using JobBoard.AI.Application.Actions.Drafts.List;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
@@ -8,25 +9,25 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace JobBoard.AI.Infrastructure.AI.AITools.Drafts;
 
-public static class ListDraftsTool
+public static class DraftsByCompanyTool
 {
     public static AIFunction Get(IActivityFactory activityFactory, IAiToolHandlerResolver toolResolver, IMemoryCache cache, IConversationContext conversation, TimeSpan toolTtl)
     {
         return AIFunctionFactory.Create(
-            async (Guid companyId, CancellationToken ct) =>
+            async (CancellationToken ct) =>
             {
                 using var activity = activityFactory.StartActivity(
-                    "tool.draft_list",
+                    "tool.drafts_by_company",
                     ActivityKind.Internal);
 
-                activity?.AddTag("ai.operation", "draft_list");
-                activity?.AddTag("tool.company_id", companyId);
+                activity?.AddTag("ai.operation", "drafts_by_company");
+               
 
-                var cacheKey = $"draft_list:{conversation.ConversationId}:{companyId}";
+                var cacheKey = $"drafts_by_company:{conversation.ConversationId}";
                 activity?.SetTag("tool.cache.key", cacheKey);
                 activity?.SetTag("tool.ttl.seconds", toolTtl.TotalSeconds);
-
-                if (cache.TryGetValue(cacheKey, out ToolResultEnvelope<List<DraftResponse>>? cached))
+               
+                if (cache.TryGetValue(cacheKey, out ToolResultEnvelope<DraftsByCompanyResponse>? cached))
                 {
                     activity?.SetTag("tool.cache.hit", true);
                     return cached;
@@ -34,30 +35,28 @@ public static class ListDraftsTool
 
                 activity?.SetTag("tool.cache.hit", false);
 
-                var handler = toolResolver.Resolve<ListDraftsQuery, List<DraftResponse>>();
+                var handler = toolResolver.Resolve<DraftsByCompanyQuery, DraftsByCompanyResponse>();
 
-                var drafts = await handler.HandleAsync(
-                    new ListDraftsQuery(companyId),
-                    ct);
+                var results = await handler.HandleAsync(new DraftsByCompanyQuery(), ct);
 
-                var envelope = new ToolResultEnvelope<List<DraftResponse>>(
-                    drafts,
-                    drafts.Count,
+                var envelope = new ToolResultEnvelope<DraftsByCompanyResponse>(
+                    results,
+                    results.DraftsByCompany.Count,
                     DateTimeOffset.UtcNow);
 
                 cache.Set(cacheKey, envelope, toolTtl);
 
-                activity?.SetTag("tool.result.count", drafts.Count);
+                activity?.SetTag("tool.result.count", results.DraftsByCompany.Count);
 
                 return envelope;
             },
             new AIFunctionFactoryOptions
             {
-                Name = "draft_list",
-                Description =
-                    """
-                    "Returns a list of drafts for a company.
-                    """
+                Name = "drafts_by_company",
+                Description = """
+                              Returns job drafts grouped by company.
+                              Each company entry contains a list of drafts and a count.
+                              """
             });
 
     }

@@ -2,9 +2,7 @@ using System.Reflection;
 using FluentValidation;
 using JobBoard.AI.Application.Actions.Base;
 using JobBoard.AI.Application.Actions.Chat;
-using JobBoard.AI.Application.Infrastructure.AI;
 using JobBoard.AI.Application.Infrastructure.Decorators;
-using JobBoard.AI.Application.Interfaces.AI;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -31,7 +29,7 @@ public static class DependencyInjection
         services.Decorate(typeof(IHandler<,>), typeof(ObservabilityCommandHandlerDecorator<,>));
         services.Decorate(typeof(IHandler<,>), typeof(UserContextCommandHandlerDecorator<,>));
         services.Decorate(typeof(IHandler<,>), typeof(ConversationContextDecorator<,>));
-        services.AddSingleton<IToolExecutionCache, ToolExecutionCache>();
+        services.AddMemoryCache();
         services.Scan(scan => scan
             .FromAssemblies(assemblies)
             .AddClasses(c => c.AssignableTo(typeof(IAiPrompt<>)))
