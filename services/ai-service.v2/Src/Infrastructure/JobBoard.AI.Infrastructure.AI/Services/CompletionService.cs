@@ -15,6 +15,7 @@ namespace JobBoard.AI.Infrastructure.AI.Services;
 
 public class CompletionService(
     IActivityFactory activityFactory,
+    IServiceScopeFactory scopeFactory,
     IChatOptionsFactory chatOptionsFactory,
     IConversationStore conversationStore,
     IConversationContext conversationContext,
@@ -35,6 +36,9 @@ public class CompletionService(
         bool allowTools,
         CancellationToken cancellationToken)
     {
+        using var scope = scopeFactory.CreateScope();
+        var sp = scope.ServiceProvider;
+        
         var client = new FunctionInvokingChatClient(GetClient());
 
         var messages = new List<ChatMessage>()
@@ -45,7 +49,7 @@ public class CompletionService(
         var savedMessages = await conversationStore.GetChatMessages(conversationContext.ConversationId!.Value, userAccessor.UserId!);
         messages.AddRange(savedMessages);
         
-        var options = chatOptionsFactory.Create(allowTools);
+        var options = chatOptionsFactory.Create(sp, allowTools);
         
         messages.Add(new(ChatRole.User, userMessage));
 
@@ -78,6 +82,9 @@ public class CompletionService(
     public async Task<T> GetResponseAsync<T>(string systemPrompt, string userPrompt, bool allowTools,
         CancellationToken cancellationToken)
     {
+        using var scope = scopeFactory.CreateScope();
+        var sp = scope.ServiceProvider;
+        
         var client = GetClient();
         var messages = new []
         {
@@ -86,7 +93,7 @@ public class CompletionService(
         };
         try
         {
-            var chatOptions = chatOptionsFactory.Create(allowTools);
+            var chatOptions = chatOptionsFactory.Create(sp, allowTools);
 
             var response = await client.GetResponseAsync(
                 messages, chatOptions,
