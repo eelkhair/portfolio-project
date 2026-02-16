@@ -3,10 +3,12 @@ import {FormsModule} from '@angular/forms';
 import {Button} from 'primeng/button';
 import {InputText} from 'primeng/inputtext';
 import {ChatService} from '../../core/services/chat.service';
+import {marked} from 'marked';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
+  html?: string;
   traceId?: string;
 }
 
@@ -26,8 +28,9 @@ export class AiChat {
   loading = signal(false);
   showJaeger = signal(localStorage.getItem(AiChat.JAEGER_KEY) === 'true');
   conversationId = signal<string | undefined>(undefined);
+  private readonly welcomeMessage = 'Hello! I\'m your AI assistant. I can help you with job postings, companies, and more. How can I help you today?';
   messages = signal<ChatMessage[]>([
-    {role: 'assistant', content: 'Hello! I\'m your AI assistant. I can help you with job postings, companies, and more. How can I help you today?'}
+    {role: 'assistant', content: this.welcomeMessage, html: marked.parse(this.welcomeMessage, {async: false}) as string}
   ]);
 
   chatInput = viewChild<ElementRef<HTMLTextAreaElement>>('chatInput');
@@ -66,16 +69,19 @@ export class AiChat {
       next: (res) => {
         if (res.success && res.data) {
           this.conversationId.set(res.data.conversationId);
-          this.messages.update(msgs => [...msgs, {role: 'assistant', content: res.data!.response, traceId: res.data!.traceId}]);
+          const content = res.data!.response;
+          this.messages.update(msgs => [...msgs, {role: 'assistant', content, html: this.renderMarkdown(content), traceId: res.data!.traceId}]);
         } else {
-          this.messages.update(msgs => [...msgs, {role: 'assistant', content: 'Sorry, something went wrong. Please try again.'}]);
+          const content = 'Sorry, something went wrong. Please try again.';
+          this.messages.update(msgs => [...msgs, {role: 'assistant', content, html: this.renderMarkdown(content)}]);
         }
         this.loading.set(false);
         this.scrollToBottom();
         this.focusInput();
       },
       error: () => {
-        this.messages.update(msgs => [...msgs, {role: 'assistant', content: 'Unable to reach the AI service. Please try again later.'}]);
+        const content = 'Unable to reach the AI service. Please try again later.';
+        this.messages.update(msgs => [...msgs, {role: 'assistant', content, html: this.renderMarkdown(content)}]);
         this.loading.set(false);
         this.scrollToBottom();
         this.focusInput();
@@ -95,6 +101,10 @@ export class AiChat {
       event.preventDefault();
       this.send();
     }
+  }
+
+  private renderMarkdown(content: string): string {
+    return marked.parse(content, {async: false}) as string;
   }
 
   private focusInput() {
