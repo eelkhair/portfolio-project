@@ -31,7 +31,7 @@ public static class DependencyInjection
         services.Decorate(typeof(IHandler<,>), typeof(ObservabilityCommandHandlerDecorator<,>));
         services.Decorate(typeof(IHandler<,>), typeof(UserContextCommandHandlerDecorator<,>));
         services.Decorate(typeof(IHandler<,>), typeof(ConversationContextDecorator<,>));
-        services.AddScoped<IToolExecutionCache, ToolExecutionCache>();
+        services.AddSingleton<IToolExecutionCache, ToolExecutionCache>();
         services.Scan(scan => scan
             .FromAssemblies(assemblies)
             .AddClasses(c => c.AssignableTo(typeof(IAiPrompt<>)))

@@ -11,7 +11,7 @@ namespace JobBoard.AI.Infrastructure.AI.AITools.Drafts;
 
 public static class ListDraftsByLocationTool
 {
-    public static AIFunction Get(IActivityFactory activityFactory, IAiToolHandlerResolver toolResolver, IToolExecutionCache cache, TimeSpan toolTtl)
+    public static AIFunction Get(IActivityFactory activityFactory, IAiToolHandlerResolver toolResolver, IToolExecutionCache cache, IUserAccessor userAccessor, TimeSpan toolTtl)
     {
         return AIFunctionFactory.Create(
             async (Guid companyId, string location, CancellationToken ct) =>
@@ -23,7 +23,7 @@ public static class ListDraftsByLocationTool
                 activity?.AddTag("ai.operation", "draft_list_by_location");
                 activity?.AddTag("tool.company_id", companyId);
                 activity?.AddTag("tool.location", location);
-                var cacheKey = $"draft_list:{companyId}:{location}";
+                var cacheKey = $"draft_list:{userAccessor.UserId}:{companyId}:{location}";
 
                 if (cache.TryGet(cacheKey, out var cachedObj))
                 {

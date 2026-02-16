@@ -32,13 +32,13 @@ public static class LastTraceIdTool
                 var convo = await store.GetAsync<ConversationDto>(
                     $"conversations:{userId}:{conversationId}", 2);
 
-                return convo?.LastTraceId;
+                return new {LastTraceId = convo?.LastTraceId, CurrentTraceId = Activity.Current?.TraceId};
             },
             new AIFunctionFactoryOptions
             {
                 Name = "last_trace",
                 Description =
-                    "Returns the trace id for the most recent operation in the current conversation."
+                    "Returns the TraceId of the last message sent to the bot. This tool is useful for debugging and tracking the flow of conversations. It also returns the current TraceId."
             });
     }
 }

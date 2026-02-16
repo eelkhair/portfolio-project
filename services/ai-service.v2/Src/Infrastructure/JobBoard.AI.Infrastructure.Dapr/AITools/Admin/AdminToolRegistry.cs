@@ -16,8 +16,8 @@ public class AdminToolRegistry(IAdminApiClient client,
 {
     public IEnumerable<AITool> GetTools()
     {
-        yield return ListCompaniesTool.Get(activityFactory, client, cache, accessor, TimeSpan.FromMinutes(10));
-        yield return ListIndustriesTool.Get(activityFactory, client, cache, accessor, TimeSpan.FromMinutes(10));
+        yield return ListCompaniesTool.Get(activityFactory, client, cache, accessor, TimeSpan.FromMinutes(5));
+        yield return ListIndustriesTool.Get(activityFactory, client, cache, accessor, TimeSpan.FromMinutes(5));
         yield return CreateCompanyTool.Get(activityFactory, client);
     }
 }

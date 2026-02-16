@@ -18,13 +18,13 @@ public class AiToolRegistry(
     IConversationContext conversationContext
 ) : IAiTools
 {
-    private static readonly TimeSpan ToolTtl = TimeSpan.FromHours(1);
+    private static readonly TimeSpan ToolTtl = TimeSpan.FromMinutes(5);
 
     public IEnumerable<AITool> GetTools()
     {
         yield return SaveDraftTool.Get(activityFactory, toolResolver);
-        yield return ListDraftsTool.Get(activityFactory, toolResolver, cache, ToolTtl);
-        yield return ListDraftsByLocationTool.Get(activityFactory, toolResolver, cache, ToolTtl);
+        yield return ListDraftsTool.Get(activityFactory, toolResolver, cache, userAccessor, ToolTtl);
+        yield return ListDraftsByLocationTool.Get(activityFactory, toolResolver, cache, userAccessor, ToolTtl);
         yield return LastTraceIdTool.Get(activityFactory, redisStore,userAccessor, conversationContext);
         yield return ConversationIdTool.Get(activityFactory, conversationContext);
         yield return ProviderRetrievalTool.Get(activityFactory, toolResolver, logger);
