@@ -145,14 +145,22 @@
   margin-top: 4px;
   font-size: 0.85rem;
   font-weight: 700;
-  color: #F59E0B;
+  color: #B45309;
   text-decoration: none;
   cursor: pointer;
   transition: color 0.15s ease;
 }
 
 .trace-link:hover {
-  color: #D97706;
+  color: #92400E;
+}
+
+:host-context(.dark) .trace-link {
+  color: #F59E0B;
+}
+
+:host-context(.dark) .trace-link:hover {
+  color: #FBBF24;
 }
 
 .trace-link i {
