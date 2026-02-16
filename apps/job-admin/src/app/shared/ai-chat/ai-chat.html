@@ -27,12 +27,20 @@
           } @else {
             <div class="message-content">{{ msg.content }}</div>
           }
-          @if (showJaeger() && (msg.duration || msg.traceId)) {
-            <div class="message-footer">
-              @if (msg.duration) {
-                <span class="duration-label">{{ msg.duration }}</span>
-              }
-              @if (msg.traceId) {
+          <div class="message-footer">
+            <span class="message-time">{{ msg.time }}</span>
+            @if (showJaeger() && msg.duration) {
+              <span class="duration-label">{{ msg.duration }}</span>
+            }
+            @if (showJaeger() && msg.traceId) {
+              <div class="trace-links">
+                <a class="trace-link grafana"
+                   [href]="'https://grafana.eelkhair.net/d/bf5m5dwukfncwd/find-by-trace-id?orgId=1&var-TraceId=' + msg.traceId"
+                   target="_blank"
+                   rel="noopener"
+                   title="View trace in Grafana">
+                  <i class="pi pi-external-link"></i> <span class="trace-label">view in grafana</span>
+                </a>
                 <a class="trace-link"
                    [href]="'https://jaeger.eelkhair.net/trace/' + msg.traceId"
                    target="_blank"
@@ -40,9 +48,9 @@
                    title="View trace in Jaeger">
                   <i class="pi pi-external-link"></i> <span class="trace-label">view in jaeger</span>
                 </a>
-              }
-            </div>
-          }
+              </div>
+            }
+          </div>
         </div>
       }
       @if (loading()) {
@@ -53,6 +61,10 @@
         </div>
       }
     </div>
+
+    @if (jaegerNotification()) {
+      <div class="jaeger-notification">{{ jaegerNotification() }}</div>
+    }
 
     <div class="chat-input">
       <textarea

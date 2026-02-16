@@ -150,14 +150,19 @@
 .message-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 8px;
   margin-top: 4px;
+}
+
+.message-time {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--p-surface-400);
 }
 
 .duration-label {
   font-size: 0.65rem;
   font-weight: 600;
-  text-transform: uppercase;
   letter-spacing: 0.03em;
   color: #B45309;
 }
@@ -166,12 +171,19 @@
   color: #F59E0B;
 }
 
-/* Trace link */
+/* Trace links */
+.trace-links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  margin-left: auto;
+}
+
 .trace-link {
   display: flex;
   align-items: center;
   gap: 5px;
-  margin-left: auto;
   font-size: 0.85rem;
   font-weight: 700;
   color: #B45309;
@@ -192,6 +204,22 @@
   color: #FBBF24;
 }
 
+.trace-link.grafana {
+  color: #E65100;
+}
+
+.trace-link.grafana:hover {
+  color: #BF360C;
+}
+
+:host-context(.dark) .trace-link.grafana {
+  color: #FF9800;
+}
+
+:host-context(.dark) .trace-link.grafana:hover {
+  color: #FFB74D;
+}
+
 .trace-link i {
   font-size: 0.7rem;
   font-weight: 700;
@@ -201,6 +229,29 @@
   font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 0.03em;
+}
+
+/* Jaeger notification */
+.jaeger-notification {
+  text-align: center;
+  padding: 6px 0;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #B45309;
+  background: rgba(245, 158, 11, 0.08);
+  animation: notificationFade 2s ease forwards;
+}
+
+:host-context(.dark) .jaeger-notification {
+  color: #F59E0B;
+  background: rgba(245, 158, 11, 0.1);
+}
+
+@keyframes notificationFade {
+  0%, 70% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 /* Input area */

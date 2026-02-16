@@ -11,6 +11,7 @@ interface ChatMessage {
   html?: string;
   traceId?: string;
   duration?: string;
+  time: string;
 }
 
 @Component({
@@ -28,10 +29,11 @@ export class AiChat {
   message = '';
   loading = signal(false);
   showJaeger = signal(localStorage.getItem(AiChat.JAEGER_KEY) === 'true');
+  jaegerNotification = signal<string | null>(null);
   conversationId = signal<string | undefined>(undefined);
   private readonly welcomeMessage = 'Hello! I\'m your AI assistant. I can help you with job postings, companies, and more. How can I help you today?';
   messages = signal<ChatMessage[]>([
-    {role: 'assistant', content: this.welcomeMessage, html: marked.parse(this.welcomeMessage, {async: false}) as string}
+    {role: 'assistant', content: this.welcomeMessage, html: marked.parse(this.welcomeMessage, {async: false}) as string, time: this.formatTime()}
   ]);
 
   chatInput = viewChild<ElementRef<HTMLTextAreaElement>>('chatInput');
@@ -50,15 +52,13 @@ export class AiChat {
 
     const command = text.toLowerCase();
     if (command === 'show jaeger' || command === 'hide jaeger') {
-      const show = command === 'show jaeger';
-      this.showJaeger.set(show);
-      localStorage.setItem(AiChat.JAEGER_KEY, String(show));
+      this.toggleJaeger(command === 'show jaeger');
       this.message = '';
       this.focusInput();
       return;
     }
 
-    this.messages.update(msgs => [...msgs, {role: 'user', content: text}]);
+    this.messages.update(msgs => [...msgs, {role: 'user', content: text, time: this.formatTime()}]);
     this.message = '';
     this.loading.set(true);
     this.scrollToBottom();
@@ -74,10 +74,10 @@ export class AiChat {
         if (res.success && res.data) {
           this.conversationId.set(res.data.conversationId);
           const content = res.data!.response;
-          this.messages.update(msgs => [...msgs, {role: 'assistant', content, html: this.renderMarkdown(content), traceId: res.data!.traceId, duration}]);
+          this.messages.update(msgs => [...msgs, {role: 'assistant', content, html: this.renderMarkdown(content), traceId: res.data!.traceId, duration, time: this.formatTime()}]);
         } else {
           const content = 'Sorry, something went wrong. Please try again.';
-          this.messages.update(msgs => [...msgs, {role: 'assistant', content, html: this.renderMarkdown(content), duration}]);
+          this.messages.update(msgs => [...msgs, {role: 'assistant', content, html: this.renderMarkdown(content), duration, time: this.formatTime()}]);
         }
         this.loading.set(false);
         this.scrollToBottom();
@@ -86,7 +86,7 @@ export class AiChat {
       error: () => {
         const duration = this.formatDuration(performance.now() - startTime);
         const content = 'Unable to reach the AI service. Please try again later.';
-        this.messages.update(msgs => [...msgs, {role: 'assistant', content, html: this.renderMarkdown(content), duration}]);
+        this.messages.update(msgs => [...msgs, {role: 'assistant', content, html: this.renderMarkdown(content), duration, time: this.formatTime()}]);
         this.loading.set(false);
         this.scrollToBottom();
         this.focusInput();
@@ -97,9 +97,7 @@ export class AiChat {
   onKeydown(event: KeyboardEvent) {
     if (event.key === 'q' && event.ctrlKey) {
       event.preventDefault();
-      const show = !this.showJaeger();
-      this.showJaeger.set(show);
-      localStorage.setItem(AiChat.JAEGER_KEY, String(show));
+      this.toggleJaeger(!this.showJaeger());
       return;
     }
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -108,12 +106,25 @@ export class AiChat {
     }
   }
 
+  private toggleJaeger(show: boolean) {
+    this.showJaeger.set(show);
+    localStorage.setItem(AiChat.JAEGER_KEY, String(show));
+    this.jaegerNotification.set(show ? 'debugging mode on' : 'debugging mode off');
+    setTimeout(() => this.jaegerNotification.set(null), 2000);
+  }
+
+  private formatTime(): string {
+    return new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+  }
+
   private formatDuration(ms: number): string {
-    const totalSec = Math.round(ms / 1000);
-    if (totalSec < 60) return `${totalSec}s`;
+    const totalMs = Math.round(ms);
+    const totalSec = Math.floor(totalMs / 1000);
+    const remainMs = totalMs % 1000;
+    if (totalSec < 60) return `${totalSec}s ${remainMs}ms`;
     const min = Math.floor(totalSec / 60);
     const sec = totalSec % 60;
-    return sec > 0 ? `${min}min ${sec}s` : `${min}min`;
+    return sec > 0 ? `${min}min ${sec}s ${remainMs}ms` : `${min}min ${remainMs}ms`;
   }
 
   private renderMarkdown(content: string): string {
