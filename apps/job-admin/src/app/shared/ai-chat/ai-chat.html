@@ -20,7 +20,7 @@
     </div>
 
     <div class="chat-messages" #messagesContainer>
-      @for (msg of messages(); track $index) {
+      @for (msg of store.messages(); track $index) {
         <div class="chat-message" [class.user]="msg.role === 'user'" [class.assistant]="msg.role === 'assistant'">
           @if (msg.html) {
             <div class="message-content" [innerHTML]="msg.html"></div>
@@ -29,10 +29,10 @@
           }
           <div class="message-footer">
             <span class="message-time">{{ msg.time }}</span>
-            @if (showJaeger() && msg.duration) {
+            @if (store.showJaeger() && msg.duration) {
               <span class="duration-label">{{ msg.duration }}</span>
             }
-            @if (showJaeger() && msg.traceId) {
+            @if (store.showJaeger() && msg.traceId) {
               <div class="trace-links">
                 <a class="trace-link grafana"
                    [href]="'https://grafana.eelkhair.net/d/bf5m5dwukfncwd/find-by-trace-id?orgId=1&var-TraceId=' + msg.traceId"
@@ -53,7 +53,7 @@
           </div>
         </div>
       }
-      @if (loading()) {
+      @if (store.loading()) {
         <div class="chat-message assistant">
           <div class="message-content typing-indicator">
             <span></span><span></span><span></span>
@@ -62,8 +62,8 @@
       }
     </div>
 
-    @if (jaegerNotification()) {
-      <div class="jaeger-notification">{{ jaegerNotification() }}</div>
+    @if (store.jaegerNotification()) {
+      <div class="jaeger-notification">{{ store.jaegerNotification() }}</div>
     }
 
     <div class="chat-input">
@@ -73,13 +73,13 @@
         [(ngModel)]="message"
         placeholder="Type a message..."
         (keydown)="onKeydown($event)"
-        [disabled]="loading()"
+        [disabled]="store.loading()"
         rows="3"
         class="w-full"></textarea>
       <p-button
         icon="pi pi-send"
         (onClick)="send()"
-        [disabled]="!message.trim() || loading()">
+        [disabled]="!message.trim() || store.loading()">
       </p-button>
     </div>
   </aside>
