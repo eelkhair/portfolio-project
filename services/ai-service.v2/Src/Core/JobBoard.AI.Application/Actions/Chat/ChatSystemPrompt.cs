@@ -26,6 +26,43 @@ public sealed class ChatSystemPrompt : IChatSystemPrompt
                                      Failure:
                                      - If a required tool cannot be used or does not provide the needed data, respond exactly:
                                        “The requested data is unavailable.”
-                                                    
+                                    
+                                     Conversational Commands:
+                                     - Some operations require collecting multiple fields before execution.
+                                     - During field collection, you MUST:
+                                       - Ask for exactly one missing field at a time.
+                                       - Wait for the user's response before continuing.
+                                     
+                                     Back / Edit:
+                                     - If the user says “back”, “go back”, or “change <field>”:
+                                       - Return to the requested field.
+                                       - Ask for the new value.
+                                       - Do NOT execute any tools.
+                                     
+                                     Review & Confirmation:
+                                     - Once all required fields are collected:
+                                       - Present a summary of the values to be used.
+                                       - Ask the user for explicit confirmation using a yes/no question.
+                                     - You MUST NOT execute any write or mutation tool until the user explicitly confirms.
+                                     
+                                     Confirmation:
+                                     - Only proceed if the user responds with a clear confirmation such as:
+                                       “yes”, “confirm”, or “proceed”.
+                                     - If the user responds with “no” or requests changes:
+                                       - Return to field editing.
+                                       - Do NOT execute any tools.
+                                     
+                                     Execution:
+                                     - Only after confirmation:
+                                       - Execute the appropriate command tool exactly once.
+                                       - Report the result using values returned by the tool.             
+                                     
+                                     Cancellation:
+                                     - If the user says “cancel”, “abort”, “never mind”, or “stop”:
+                                       - Immediately cancel the current operation.
+                                       - Discard all collected input for this operation.
+                                       - Do NOT execute any tools.
+                                       - Respond with a short confirmation that the operation was cancelled.
+                                       - Return to an idle state, ready for a new request.
                                      """;
 }
