@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using JobBoard.AI.Application.Actions.Drafts;
 using JobBoard.AI.Application.Actions.Drafts.List;
 using JobBoard.AI.Application.Interfaces.Configurations;
@@ -14,46 +13,19 @@ public static class ListDraftsByLocationTool
     {
         return AIFunctionFactory.Create(
             async (Guid companyId, string location, CancellationToken ct) =>
-            {
-                using var activity = activityFactory.StartActivity(
-                    "tool.draft_list_by_location",
-                    ActivityKind.Internal);
-
-                activity?.AddTag("ai.operation", "draft_list_by_location");
-                activity?.AddTag("tool.company_id", companyId);
-                activity?.AddTag("tool.location", location);
-                
-                var cacheKey = $"draft_list:{conversation.ConversationId}:{companyId}:{location}";
-                activity?.SetTag("tool.cache.key", cacheKey);
-                activity?.SetTag("tool.ttl.seconds", toolTtl.TotalSeconds);
-                
-                if (cache.TryGetValue(cacheKey, out ToolResultEnvelope<List<DraftResponse>>? cached))
-                {
-                    activity?.SetTag("tool.cache.hit", true);
-                    return cached;
-                }
-
-                activity?.SetTag("tool.cache.hit", false);
-
-                var handler = toolResolver.Resolve<ListDraftsQuery, List<DraftResponse>>();
-
-                var drafts = await handler.HandleAsync(
-                    new ListDraftsQuery(companyId),
-                    ct);
-
-                var filteredDrafts = FilterByLocation(drafts, location);
-
-                var envelope = new ToolResultEnvelope<List<DraftResponse>>(
-                    filteredDrafts,
-                    filteredDrafts.Count,
-                    DateTimeOffset.UtcNow);
-
-                cache.Set(cacheKey, envelope, toolTtl);
-
-                activity?.SetTag("tool.result.count", filteredDrafts.Count);
-
-                return envelope;
-            },
+                await ToolHelper.ExecuteCachedAsync(
+                    activityFactory, "draft_list_by_location", cache,
+                    $"draft_list:{conversation.ConversationId}:{companyId}:{location}",
+                    toolTtl,
+                    async token =>
+                    {
+                        var handler = toolResolver.Resolve<ListDraftsQuery, List<DraftResponse>>();
+                        var drafts = await handler.HandleAsync(new ListDraftsQuery(companyId), token);
+                        return FilterByLocation(drafts, location);
+                    },
+                    list => list.Count, ct,
+                    ("tool.company_id", companyId), 
+                    ("tool.location", location)),
             new AIFunctionFactoryOptions
             {
                 Name = "draft_list_by_location",
@@ -81,6 +53,5 @@ public static class ListDraftsByLocationTool
                         d.Location.Contains(p, StringComparison.OrdinalIgnoreCase)))
                 .ToList();
         }
-
     }
 }

@@ -16,24 +16,17 @@ public static class LastTraceIdTool
     {
         return AIFunctionFactory.Create(
             async (CancellationToken ct) =>
-            {
-                using var activity = activityFactory.StartActivity(
-                    "tool.last_trace",
-                    ActivityKind.Internal);
-
-                activity?.SetTag("ai.operation", "last_trace");
-
-                var userId = userAccessor.UserId;
-                var conversationId = conversationContext.ConversationId;
-
-                activity?.SetTag("conversation.id", conversationId);
-                activity?.SetTag("user.id", userId);
-
-                var convo = await store.GetAsync<ConversationDto>(
-                    $"conversations:{userId}:{conversationId}", 2);
-
-                return new {LastTraceId = convo?.LastTraceId, CurrentTraceId = Activity.Current?.TraceId};
-            },
+                await ToolHelper.ExecuteAsync(activityFactory, "last_trace",
+                    async (_, token) =>
+                    {
+                        var userId = userAccessor.UserId;
+                        var conversationId = conversationContext.ConversationId;
+                        var convo = await store.GetAsync<ConversationDto>(
+                            $"conversations:{userId}:{conversationId}", 2);
+                        return new { LastTraceId = convo?.LastTraceId, CurrentTraceId = Activity.Current?.TraceId };
+                    }, ct,
+                    ("conversation.id", conversationContext.ConversationId),
+                    ("user.id", userAccessor.UserId)),
             new AIFunctionFactoryOptions
             {
                 Name = "last_trace",

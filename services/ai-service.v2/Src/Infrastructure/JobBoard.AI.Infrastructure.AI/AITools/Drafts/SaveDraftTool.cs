@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using JobBoard.AI.Application.Actions.Drafts.Save;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
@@ -12,18 +11,13 @@ public static class SaveDraftTool
     {
         return AIFunctionFactory.Create(
             async (SaveDraftCommand cmd, CancellationToken ct) =>
-            {
-                using var activity = activityFactory.StartActivity(
-                    "tool.save_draft",
-                    ActivityKind.Internal);
-
-                activity?.AddTag("ai.operation", "save_draft");
-                activity?.AddTag("tool.company_id", cmd.CompanyId);
-
-                var handler = toolResolver.Resolve<SaveDraftCommand, SaveDraftResponse>();
-
-                return await handler.HandleAsync(cmd, ct);
-            },
+                await ToolHelper.ExecuteAsync(activityFactory, "save_draft",
+                    async (_, token) =>
+                    {
+                        var handler = toolResolver.Resolve<SaveDraftCommand, SaveDraftResponse>();
+                        return await handler.HandleAsync(cmd, token);
+                    }, ct,
+                    ("tool.company_id", cmd.CompanyId)),
             new AIFunctionFactoryOptions
             {
                 Name = "save_draft",

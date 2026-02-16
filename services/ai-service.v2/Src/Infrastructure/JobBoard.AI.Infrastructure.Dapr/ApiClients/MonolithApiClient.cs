@@ -2,7 +2,6 @@ using System.Net.Http.Json;
 using Dapr.Client;
 using Elkhair.Dev.Common.Application;
 using JobBoard.AI.Application.Interfaces.Configurations;
-using JobBoard.AI.Infrastructure.Dapr.AITools.Monolith.Companies;
 using JobBoard.Monolith.Contracts.Companies;
 using Microsoft.Extensions.Logging;
 

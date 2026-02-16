@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using JobBoard.AI.Application.Actions.Drafts;
 using JobBoard.AI.Application.Actions.Drafts.List;
 using JobBoard.AI.Application.Interfaces.Configurations;
@@ -14,43 +13,17 @@ public static class ListDraftsTool
     {
         return AIFunctionFactory.Create(
             async (Guid companyId, CancellationToken ct) =>
-            {
-                using var activity = activityFactory.StartActivity(
-                    "tool.draft_list",
-                    ActivityKind.Internal);
-
-                activity?.AddTag("ai.operation", "draft_list");
-                activity?.AddTag("tool.company_id", companyId);
-
-                var cacheKey = $"draft_list:{conversation.ConversationId}:{companyId}";
-                activity?.SetTag("tool.cache.key", cacheKey);
-                activity?.SetTag("tool.ttl.seconds", toolTtl.TotalSeconds);
-
-                if (cache.TryGetValue(cacheKey, out ToolResultEnvelope<List<DraftResponse>>? cached))
-                {
-                    activity?.SetTag("tool.cache.hit", true);
-                    return cached;
-                }
-
-                activity?.SetTag("tool.cache.hit", false);
-
-                var handler = toolResolver.Resolve<ListDraftsQuery, List<DraftResponse>>();
-
-                var drafts = await handler.HandleAsync(
-                    new ListDraftsQuery(companyId),
-                    ct);
-
-                var envelope = new ToolResultEnvelope<List<DraftResponse>>(
-                    drafts,
-                    drafts.Count,
-                    DateTimeOffset.UtcNow);
-
-                cache.Set(cacheKey, envelope, toolTtl);
-
-                activity?.SetTag("tool.result.count", drafts.Count);
-
-                return envelope;
-            },
+                await ToolHelper.ExecuteCachedAsync(
+                    activityFactory, "draft_list", cache,
+                    $"draft_list:{conversation.ConversationId}:{companyId}",
+                    toolTtl,
+                    async token =>
+                    {
+                        var handler = toolResolver.Resolve<ListDraftsQuery, List<DraftResponse>>();
+                        return await handler.HandleAsync(new ListDraftsQuery(companyId), token);
+                    },
+                    list => list.Count, ct,
+                    ("tool.company_id", companyId)),
             new AIFunctionFactoryOptions
             {
                 Name = "draft_list",
@@ -59,6 +32,5 @@ public static class ListDraftsTool
                     "Returns a list of drafts for a company.
                     """
             });
-
     }
 }
