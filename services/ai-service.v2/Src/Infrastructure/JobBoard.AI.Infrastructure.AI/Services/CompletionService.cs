@@ -28,7 +28,7 @@ public class CompletionService(
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
     
-    public async Task<ChatResponse> RunChatAsync(
+    public async Task<ChatRespRunChatAsync(
         string systemPrompt,
         string userMessage,
         CancellationToken cancellationToken)
