@@ -146,13 +146,32 @@
   border-bottom-left-radius: 4px;
 }
 
+/* Message footer */
+.message-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.duration-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #B45309;
+}
+
+:host-context(.dark) .duration-label {
+  color: #F59E0B;
+}
+
 /* Trace link */
 .trace-link {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
   gap: 5px;
-  margin-top: 4px;
+  margin-left: auto;
   font-size: 0.85rem;
   font-weight: 700;
   color: #B45309;

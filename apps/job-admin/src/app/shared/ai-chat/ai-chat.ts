@@ -10,6 +10,7 @@ interface ChatMessage {
   content: string;
   html?: string;
   traceId?: string;
+  duration?: string;
 }
 
 @Component({
@@ -62,26 +63,30 @@ export class AiChat {
     this.loading.set(true);
     this.scrollToBottom();
 
+    const startTime = performance.now();
+
     this.chatService.chat({
       message: text,
       conversationId: this.conversationId()
     }).subscribe({
       next: (res) => {
+        const duration = this.formatDuration(performance.now() - startTime);
         if (res.success && res.data) {
           this.conversationId.set(res.data.conversationId);
           const content = res.data!.response;
-          this.messages.update(msgs => [...msgs, {role: 'assistant', content, html: this.renderMarkdown(content), traceId: res.data!.traceId}]);
+          this.messages.update(msgs => [...msgs, {role: 'assistant', content, html: this.renderMarkdown(content), traceId: res.data!.traceId, duration}]);
         } else {
           const content = 'Sorry, something went wrong. Please try again.';
-          this.messages.update(msgs => [...msgs, {role: 'assistant', content, html: this.renderMarkdown(content)}]);
+          this.messages.update(msgs => [...msgs, {role: 'assistant', content, html: this.renderMarkdown(content), duration}]);
         }
         this.loading.set(false);
         this.scrollToBottom();
         this.focusInput();
       },
       error: () => {
+        const duration = this.formatDuration(performance.now() - startTime);
         const content = 'Unable to reach the AI service. Please try again later.';
-        this.messages.update(msgs => [...msgs, {role: 'assistant', content, html: this.renderMarkdown(content)}]);
+        this.messages.update(msgs => [...msgs, {role: 'assistant', content, html: this.renderMarkdown(content), duration}]);
         this.loading.set(false);
         this.scrollToBottom();
         this.focusInput();
@@ -101,6 +106,14 @@ export class AiChat {
       event.preventDefault();
       this.send();
     }
+  }
+
+  private formatDuration(ms: number): string {
+    const totalSec = Math.round(ms / 1000);
+    if (totalSec < 60) return `${totalSec}s`;
+    const min = Math.floor(totalSec / 60);
+    const sec = totalSec % 60;
+    return sec > 0 ? `${min}min ${sec}s` : `${min}min`;
   }
 
   private renderMarkdown(content: string): string {

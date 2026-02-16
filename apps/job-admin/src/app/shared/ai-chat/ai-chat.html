@@ -27,14 +27,21 @@
           } @else {
             <div class="message-content">{{ msg.content }}</div>
           }
-          @if (msg.traceId && showJaeger()) {
-            <a class="trace-link"
-               [href]="'https://jaeger.eelkhair.net/trace/' + msg.traceId"
-               target="_blank"
-               rel="noopener"
-               title="View trace in Jaeger">
-              <i class="pi pi-external-link"></i> <span class="trace-label">view in jaeger</span>
-            </a>
+          @if (showJaeger() && (msg.duration || msg.traceId)) {
+            <div class="message-footer">
+              @if (msg.duration) {
+                <span class="duration-label">{{ msg.duration }}</span>
+              }
+              @if (msg.traceId) {
+                <a class="trace-link"
+                   [href]="'https://jaeger.eelkhair.net/trace/' + msg.traceId"
+                   target="_blank"
+                   rel="noopener"
+                   title="View trace in Jaeger">
+                  <i class="pi pi-external-link"></i> <span class="trace-label">view in jaeger</span>
+                </a>
+              }
+            </div>
           }
         </div>
       }
