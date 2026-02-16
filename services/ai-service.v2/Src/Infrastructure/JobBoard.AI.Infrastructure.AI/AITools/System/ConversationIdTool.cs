@@ -29,7 +29,9 @@ public static class ConversationIdTool
                 Name = "conversation_id",
                 Description =
                     "Returns the conversation id for the current conversation." +
-                    "Return the conversation id. also return in the format 'ai.conversationId={}' for jaeger"
+                    "Also return in the format 'ai.conversationId={}' for Jaeger" +
+                    "Return both versions by default. in multiple lines"
+                    
             });
     }
 }
