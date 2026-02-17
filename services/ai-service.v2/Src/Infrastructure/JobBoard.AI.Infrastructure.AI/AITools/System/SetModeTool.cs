@@ -22,7 +22,13 @@ public static class SetModeTool
         }, new AIFunctionFactoryOptions
         {
             Name="set_mode",
-            Description = "Sets the application mode to monolith or microservices based on the provided boolean flag. true = monolith, false = microservices"
+            Description = """
+                          Sets the application mode to monolith or microservices based on the provided boolean flag. true = monolith, false = microservices
+                          ⚠️ WARNING:
+                          - This tool MUST ONLY be used when the user explicitly asks to change system mode.
+                          - DO NOT call this tool unless the user clearly requests a mode change.
+                        
+                          """
         });
     }
 }

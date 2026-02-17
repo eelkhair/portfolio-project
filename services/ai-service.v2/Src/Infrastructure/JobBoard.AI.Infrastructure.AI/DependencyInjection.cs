@@ -50,11 +50,11 @@ public static class DependencyInjection
 
         
         services.AddKeyedScoped<IAiTools, AiToolRegistry>("ai");
-        services.AddSingleton<IChatOptionsFactory, ChatOptionsFactory>();
+        services.AddScoped<IChatOptionsFactory, ChatOptionsFactory>();
 
 
         services.AddScoped<IConversationStore, ConversationStore>();
-        services.AddTransient<ICompletionService, CompletionService>();
+        services.AddScoped<ICompletionService, CompletionService>();
         return services;
     }
 }
