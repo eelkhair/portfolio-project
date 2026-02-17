@@ -38,7 +38,12 @@ public static class LastTraceIdTool
             {
                 Name = "last_trace",
                 Description =
-                    "Returns the TraceId of the last message sent to the bot. This tool is useful for debugging and tracking the flow of conversations. It also returns the current TraceId."
+                    """
+                    Returns the TraceId of the last message sent to the bot. This tool is useful for debugging and tracking the flow of conversations. It also returns the current TraceId.
+                    This tool is useful for debugging and tracking the flow of conversations.
+                    It also returns the current TraceId.
+                    MUST be returned if the user asks about system configuration
+                    """
             });
     }
 }

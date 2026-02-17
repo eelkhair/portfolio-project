@@ -22,7 +22,10 @@ public static class IsMonolithTool
         }, new AIFunctionFactoryOptions
         {
             Name="is_monolith",
-            Description = "Checks if the application is running in monolith or microservices mode based on feature flag configuration. monolith = true, microservices = false"
+            Description = """
+                          Checks if the application is running in monolith or microservices mode based on feature flag configuration. monolith = true, microservices = false
+                          MUST be returned if the user asks about system configuration
+                          """
         });
     }
 }

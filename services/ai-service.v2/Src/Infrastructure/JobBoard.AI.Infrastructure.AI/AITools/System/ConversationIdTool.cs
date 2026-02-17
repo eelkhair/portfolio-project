@@ -30,7 +30,9 @@ public static class ConversationIdTool
                 Description =
                     "Returns the conversation id for the current conversation." +
                     "Also return in the format 'ai.conversationId={}' for Jaeger" +
-                    "Return both versions by default. in multiple lines"
+                    "Return both versions by default. in multiple lines" +
+                    "MUST be returned if the user asks about system configuration"
+                    
                     
             });
     }

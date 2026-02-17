@@ -28,7 +28,10 @@ public static class ProviderRetrievalTool
         }, new AIFunctionFactoryOptions
         {
             Name="provider_retrieval",
-            Description = "Retrieves the provider and model used for the current conversation."
+            Description = """
+                          Retrieves the provider and model used for the current conversation.
+                          MUST be returned if the user asks about system configuration
+                          """
         });
     }
 }
