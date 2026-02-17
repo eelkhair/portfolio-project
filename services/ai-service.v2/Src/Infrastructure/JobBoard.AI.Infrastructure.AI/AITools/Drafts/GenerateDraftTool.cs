@@ -56,7 +56,10 @@ public static class GenerateDraftTool
             new AIFunctionFactoryOptions
             {
                 Name = "generate_draft",
-                Description = "Use AI to generate a draft for a company. companyId is required. Ensure CompanyId is populated in the request, Team and TitleSeed are required, company name  is required, make sure they are populated"
+                Description =
+                    "Generates a job draft for a company using AI and automatically saves it to the database. " +
+                    "Required fields: companyId, companyName, team, titleSeed,about role(brief), job-type." +
+                    "Only call this function when all required fields are available."
             });
     }
 }
