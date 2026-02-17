@@ -6,7 +6,7 @@
         <Nullable>enable</Nullable>
         <PackageId>Elkhair.Common.Observability</PackageId>
         <Authors>Elkhair Elkhair</Authors>
-        <Version>1.0.3</Version>
+        <Version>1.0.4</Version>
         <Description>Logging and Tracing</Description>
         <IsPackable>true</IsPackable>
     </PropertyGroup>
