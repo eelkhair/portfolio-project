@@ -1,4 +1,4 @@
-import {Component, ElementRef, inject, signal, viewChild} from '@angular/core';
+import {Component, ElementRef, inject, signal, viewChild, ViewEncapsulation} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {Button} from 'primeng/button';
 import {InputText} from 'primeng/inputtext';
@@ -9,7 +9,8 @@ import {ChatStore} from './ai-chat.store';
   standalone: true,
   imports: [FormsModule, Button, InputText],
   templateUrl: './ai-chat.html',
-  styleUrl: './ai-chat.css'
+  styleUrl: './ai-chat.css',
+  encapsulation: ViewEncapsulation.None
 })
 export class AiChat {
   readonly store = inject(ChatStore);

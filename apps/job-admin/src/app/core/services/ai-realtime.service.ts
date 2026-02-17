@@ -1,6 +1,6 @@
 import { Injectable, signal, inject } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
-import { firstValueFrom } from 'rxjs';
+import {firstValueFrom} from 'rxjs';
 import { NotificationService } from './notification.service';
 import { AccountService } from './account.service';
 import { environment } from '../../../environments/environment';
@@ -9,7 +9,7 @@ import { AiNotificationDto } from '../types/Dtos/AiNotificationDto';
 import {Router} from '@angular/router';
 import {CompanyService} from './company.service';
 import {CompanySelectionStore} from '../../shared/companies/company-selection/company-selection.store';
-import {JobService} from './job.service';
+import {JobsStore} from '../../features/jobs/jobs.store';
 
 @Injectable({ providedIn: 'root' })
 export class AiRealtimeService {
@@ -18,7 +18,7 @@ export class AiRealtimeService {
   private account = inject(AccountService);
   private companyService = inject(CompanyService);
   private companySelectionStore = inject(CompanySelectionStore);
-  private jobsStore = inject(JobService);
+  private jobsStore = inject(JobsStore);
   private router = inject(Router);
   private tracer = trace.getTracer('admin-fe');
   private starting = false;
@@ -118,8 +118,9 @@ export class AiRealtimeService {
   }
 
   private async handleDraftGenerated(msg: AiNotificationDto, span: Span) {
-    let companyName = msg.metadata?.['companyName']?.toString();
-    let companyId = msg.metadata?.['companyId']?.toString();
+    const companyName = msg.metadata?.['companyName']?.toString();
+    const companyId = msg.metadata?.['companyId']?.toString();
+    const draftId = msg.entityId;
 
     if (companyName) {
       this.notify.success('Draft Generated', `Draft Generated for ${companyName}`);
@@ -128,25 +129,20 @@ export class AiRealtimeService {
     }
 
     if (companyId && companyId !== '') {
+      // Hydrate companies + drafts, select the company, then navigate to the draft
+      const res = await firstValueFrom(this.companyService.listCompanies());
+      const company = res.data?.find(c => c.uId === companyId);
+      if (!company) return;
 
-      const companies = await firstValueFrom(
-        this.companyService.listCompanies()
-      );
+      this.companySelectionStore.selectedCompany.set(company);
 
-      // Ensure drafts store is hydrated before navigation
-      await firstValueFrom(
-        this.jobsStore.loadDrafts(companyId)
-      );
-        const company = companies.data?.find(c => c.uId === companyId);
+      await firstValueFrom(this.jobsStore.loadDrafts(companyId));
 
-      if (company) {
-        this.companySelectionStore.selectedCompany.set(company);
-        if (this.router.url !== `/jobs/new/${msg.entityId}`) {
-          span.setAttribute('ui.action', 'navigate');
-          span.setAttribute('ui.route', `/jobs/new/${msg.entityId}`);
-          void this.router.navigate(['/jobs/new', msg.entityId]);
-
-        }      }
+      if (this.router.url !== `/jobs/new/${draftId}`) {
+        span.setAttribute('ui.action', 'navigate');
+        span.setAttribute('ui.route', `/jobs/new/${draftId}`);
+        await this.router.navigate(['/jobs/new', draftId]);
+      }
     }
   }
 
