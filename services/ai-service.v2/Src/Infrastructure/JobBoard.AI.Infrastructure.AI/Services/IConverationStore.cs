@@ -41,6 +41,8 @@ public class ConversationStore(IRedisStore store) : IConversationStore
                         }
                     )
                 );
+
+
             }
         }
         
@@ -59,9 +61,7 @@ public class ConversationStore(IRedisStore store) : IConversationStore
             traceParents.Add(current);
             traceParent = current;
         }
-           
-
-   
+        
         if (result?.TraceParents is { Count: > 0 })
         {
             traceParents.AddRange(
