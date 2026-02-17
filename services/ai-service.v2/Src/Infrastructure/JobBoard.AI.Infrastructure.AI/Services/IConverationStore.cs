@@ -67,7 +67,7 @@ public class ConversationStore(IRedisStore store) : IConversationStore
             traceParents.AddRange(
                 result.TraceParents
                     .Where(tp =>  tp != traceParent)
-                    .TakeLast(5) // or 3–10 max
+                    .TakeLast(15) 
             );
         }
         var dto = new ConversationDto
