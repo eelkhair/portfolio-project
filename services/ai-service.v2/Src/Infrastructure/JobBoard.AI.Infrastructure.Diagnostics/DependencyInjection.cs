@@ -40,6 +40,7 @@ public static class DependencyInjection
              .AddAspNetCoreInstrumentation(o => o.AddFilters() )
              .AddEntityFrameworkCoreInstrumentation(o => o.AddFilters())
              .AddHttpClientInstrumentation(o => o.AddFilters())
+             .AddZipkinExporter()
              .AddOtlpExporter(exporter =>
              {
                  exporter.Endpoint = new Uri("http://192.168.1.160:4317");

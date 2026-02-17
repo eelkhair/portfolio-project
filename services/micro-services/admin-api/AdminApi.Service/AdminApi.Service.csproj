@@ -13,7 +13,7 @@
 
         <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
 
-        <PackageReference Include="Elkhair.Common.Observability" Version="1.0.3" />
+        <PackageReference Include="Elkhair.Common.Observability" Version="1.0.4" />
 
         <PackageReference Include="Elkhair.Dev.Common" Version="1.0.18" />
 

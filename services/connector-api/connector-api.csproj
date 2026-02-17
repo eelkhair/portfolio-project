@@ -13,7 +13,7 @@
     <ItemGroup>
         <PackageReference Include="Dapr.AspNetCore" Version="1.16.1" />
         <PackageReference Include="Dapr.Extensions.Configuration" Version="1.16.1" />
-        <PackageReference Include="Elkhair.Common.Observability" Version="1.0.3" />
+        <PackageReference Include="Elkhair.Common.Observability" Version="1.0.4" />
         <PackageReference Include="Elkhair.Dev.Common" Version="1.0.17" />
         <PackageReference Include="JobBoard.HealthChecks" Version="1.0.6" />
         <PackageReference Include="JobBoard.IntegrationEvents" Version="1.0.3" />
