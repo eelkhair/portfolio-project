@@ -78,8 +78,7 @@ public class CompletionService(
             userAccessor.UserId!,
             messages
                 .Where(m =>
-                    m.Role != ChatRole.System &&
-                    m.Contents.All(c => c is not FunctionResultContent)
+                    m.Role != ChatRole.System
                 )
                 .ToList()
 
