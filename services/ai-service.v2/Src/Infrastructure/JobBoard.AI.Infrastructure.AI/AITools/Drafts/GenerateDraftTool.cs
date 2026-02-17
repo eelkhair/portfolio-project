@@ -20,8 +20,7 @@ public static class GenerateDraftTool
                     ActivityKind.Internal);
 
                 activity?.AddTag("ai.operation", "generate_draft");
-                activity?.AddTag("tool.Title", cmd.Request.TitleSeed?[..128]);
-                activity?.AddTag("tool.Brief", cmd.Request.Brief?[..512]);
+                activity?.AddTag("tool.Title", cmd.Request.TitleSeed);
                 
                 activity?.AddTag("tool.company_id", cmd.CompanyId);
 
@@ -37,24 +36,27 @@ public static class GenerateDraftTool
                     AiNotificationMethods.Notification,
                     new AiNotificationDto(
                         Type: "draft.generated",
-                        Title: $"Draft generated for {cmd.Request.TitleSeed}",
+                        Title: $"{cmd.Request.TitleSeed}",
                         EntityId: result.Id,
                         EntityType: "draft",
+                        TraceParent: Activity.Current?.Id,                 
+                        TraceState: Activity.Current?.TraceStateString, 
                         CorrelationId: activity?.TraceId.ToString(),
-                        Timestamp: DateTimeOffset.UtcNow
+                        Timestamp: DateTimeOffset.UtcNow,
+                        Metadata: new Dictionary<string, object>
+                        {
+                            { "companyId", cmd.CompanyId },
+                            { "companyName", cmd.Request.CompanyName ?? string.Empty }
+                        }
                     ),
                     ct
                 );
-                return new
-                {
-                    Status = "DraftGenerated",
-                    DraftId = result.Id
-                };
+                return result;
             },
             new AIFunctionFactoryOptions
             {
                 Name = "generate_draft",
-                Description = "Use AI to generate a draft for a company. companyId is required. Ensure CompanyId is populated in the request"
+                Description = "Use AI to generate a draft for a company. companyId is required. Ensure CompanyId is populated in the request, Team and TitleSeed are required, company name  is required, make sure they are populated"
             });
     }
 }

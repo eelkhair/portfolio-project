@@ -27,7 +27,9 @@ public sealed class ChatSystemPrompt : IChatSystemPrompt
                                      - If a required tool cannot be used or does not provide the needed data, respond exactly:
                                        “The requested data is unavailable.”
                                     
+                                     
                                      Conversational Commands:
+                                     - Always default to a wizard-style conversation when filling out forms.
                                      - Some operations require collecting multiple fields before execution.
                                      - During field collection, you MUST:
                                        - Ask for exactly one missing field at a time.

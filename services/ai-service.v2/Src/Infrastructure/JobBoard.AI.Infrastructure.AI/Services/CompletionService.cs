@@ -66,10 +66,24 @@ public class CompletionService(
 
         messages.AddMessages(response);
         messages = messages.TakeLast(40).ToList();
+        if (messages.Count > 0 &&
+            messages[0].Contents is { Count: > 0 } &&
+            messages[0].Contents[0] is FunctionResultContent)
+        {
+            messages.RemoveAt(0);
+        }
+
         await conversationStore.SaveChatMessages(
             conversationContext.ConversationId.Value,
             userAccessor.UserId!,
-            messages.Where(m => m.Role != ChatRole.System).ToList());
+            messages
+                .Where(m =>
+                    m.Role != ChatRole.System &&
+                    m.Contents.All(c => c is not FunctionResultContent)
+                )
+                .ToList()
+
+        );
          
         return new ChatResponse
         {
