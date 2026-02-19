@@ -28,7 +28,7 @@ public class AiToolRegistry(
         yield return SaveDraftTool.Get(activityFactory, toolResolver);
         yield return ListDraftsTool.Get(activityFactory, toolResolver, cache, conversationContext, ToolTtl);
         yield return ListDraftsByLocationTool.Get(activityFactory, toolResolver, cache, conversationContext, ToolTtl);
-        yield return LastTraceIdTool.Get(activityFactory, redisStore,userAccessor, conversationContext);
+        yield return TraceIdTool.Get(activityFactory, redisStore,userAccessor, conversationContext);
         yield return DraftsByCompanyTool.Get(activityFactory, toolResolver, cache, conversationContext, ToolTtl);
         yield return ConversationIdTool.Get(activityFactory, conversationContext);
         yield return ProviderRetrievalTool.Get(activityFactory, toolResolver, logger);
