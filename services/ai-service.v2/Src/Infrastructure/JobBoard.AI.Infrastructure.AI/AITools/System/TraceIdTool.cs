@@ -15,7 +15,7 @@ public static class TraceIdTool
         IConversationContext conversationContext)
     {
         return AIFunctionFactory.Create(
-            async (CancellationToken ct) =>
+            async () =>
             {
                 using var activity = activityFactory.StartActivity(
                     "tool.trace_id",
@@ -32,7 +32,7 @@ public static class TraceIdTool
                 var convo = await store.GetAsync<ConversationDto>(
                     $"conversations:{userId}:{conversationId}", 2);
 
-                return new {LastTraceId = convo?.LastTraceId, CurrentTraceId = Activity.Current?.TraceId.ToString()};
+                return new {convo?.LastTraceId, CurrentTraceId = Activity.Current?.TraceId.ToString()};
             },
             new AIFunctionFactoryOptions
             {
