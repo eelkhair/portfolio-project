@@ -19,7 +19,7 @@ export interface ChatResponse {
 @Injectable({providedIn: 'root'})
 export class ChatService {
   private http = inject(HttpClient);
-  private baseUrl = environment.aiServiceUrl;
+  private baseUrl = `${environment.gatewayUrl}ai/v2/`;
 
   chat(request: ChatRequest) {
     return this.http.post<ApiResponse<ChatResponse>>(

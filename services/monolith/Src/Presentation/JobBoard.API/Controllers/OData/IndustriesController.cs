@@ -13,7 +13,9 @@ public class IndustriesController : BaseODataController
     /// Handles HTTP GET requests to retrieve a collection of industries.
     /// </summary>
     /// <returns>An IActionResult containing the retrieved collection of industries in response to an OData query.</returns>
+    [HttpGet]
     [EnableQuery]
+    [Route("industries")]
     public async Task<IActionResult> Get()
     {
         var industries = await ExecuteODataQueryAsync(new GetIndustriesQuery());

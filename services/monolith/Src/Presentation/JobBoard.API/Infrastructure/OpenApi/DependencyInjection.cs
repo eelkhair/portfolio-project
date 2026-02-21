@@ -83,13 +83,16 @@ public static class DependencyInjection
                 {
                     return false;
                 }
-                
+
+                var isODataController = apiDesc.ActionDescriptor is ControllerActionDescriptor ctrl
+                    && typeof(Microsoft.AspNetCore.OData.Routing.Controllers.ODataController)
+                        .IsAssignableFrom(ctrl.ControllerTypeInfo);
                 var isODataPath = relativePath.StartsWith("odata", StringComparison.OrdinalIgnoreCase);
 
                 return docName switch
                 {
-                    "v1" => !isODataPath,
-                    "odata-v1" => isODataPath,
+                    "v1" => !isODataController,
+                    "odata-v1" => isODataController && isODataPath,
                     _ => false
                 };
             });

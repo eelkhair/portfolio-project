@@ -17,7 +17,9 @@ public class CompaniesController : BaseODataController
     /// Retrieves a company by its unique identifier (UId).
     /// </summary>
     /// <returns>A filtered <see cref="SingleResult"/> containing the company matching the specified UId.</returns>
+    [HttpGet]
     [EnableQuery]
+    [Route("companies")]
     public async Task<IActionResult> Get()
     {
         var companies = await ExecuteODataQueryAsync(new GetCompaniesQuery());

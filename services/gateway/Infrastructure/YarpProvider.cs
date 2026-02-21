@@ -13,6 +13,13 @@ public static class YarpProvider
             Match = new RouteMatch
             {
                 Path = "/ai/v2/{**catch-all}"
+            },
+            Transforms = new[]
+            {
+                new Dictionary<string, string>
+                {
+                    ["PathRemovePrefix"] = "/ai/v2"
+                }
             }
         },
         new RouteConfig
