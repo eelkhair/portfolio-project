@@ -1,4 +1,5 @@
-﻿using JobBoard.Application.Actions.Jobs.Drafts;
+﻿using JobBoard.Application.Actions.Drafts;
+using JobBoard.Application.Actions.Jobs.Drafts;
 using JobBoard.Monolith.Contracts.Drafts;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,6 +10,17 @@ namespace JobBoard.API.Controllers;
 /// </summary>
 public class JobsController : BaseApiController
 {
+    /// <summary>
+    /// Generate a job draft via AI
+    /// </summary>
+    [HttpPost("{companyId:guid}/generate")]
+    public async Task<IActionResult> Generate(Guid companyId, DraftGenRequest request)
+        => await ExecuteCommandAsync(new GenerateDraftCommand
+        {
+            CompanyId = companyId,
+            Request = request
+        }, Ok);
+
     /// <summary>
     /// Retrieves a list of job drafts for the specified company.
     /// </summary>

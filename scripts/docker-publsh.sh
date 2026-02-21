@@ -20,6 +20,7 @@ declare -A services=(
   ["user-api"]="../services/micro-services/user-api"
   ["monolith-api"]="../services/monolith"
   ["connector-api"]="../services/connector-api"
+  ["gateway"]="../services/gateway"
   ["health-check"]="../services/micro-services/HealthChecks"
 )
 

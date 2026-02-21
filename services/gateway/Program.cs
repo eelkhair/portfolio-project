@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 using Elkhair.Common.Observability;
 using Gateway.Api.Infrastructure;
 const string CorsPolicy = "AllowJobAdmin";
@@ -16,18 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
     .LoadFromMemory(YarpProvider.GetRoutes(), YarpProvider.GetClusters());
 
 var app = builder.Build();
-app.Use(async (context, next) =>
-{
-    // Get the current span and its traceid
-    var span = Activity.Current;
-    var traceId = span?.TraceId.ToString();
 
-    // Add the traceid to the response headers
-    context.Response.Headers.Append("trace-id", traceId);
-
-    // Call the next middleware in the pipeline
-    await next();
-});
 app.Use(async (ctx, next) =>
 {
 
@@ -43,8 +33,24 @@ app.Use(async (ctx, next) =>
     }
 
     var isMonolith = builder.Configuration.GetValue<bool>("FeatureFlags:Monolith");
-    ctx.Request.Headers["x-mode"] = isMonolith ? "monolith" : "admin";
-    Activity.Current?.SetTag("service", isMonolith ? "Monolith" : "Admin");
+
+    // GET /jobs/{guid} (list jobs) only exists on the admin API
+    var adminOnly = isMonolith
+        && ctx.Request.Method == "GET"
+        && ctx.Request.Path.Value is { } p
+        && Regex.IsMatch(p, @"^/jobs/[0-9a-f-]+$", RegexOptions.IgnoreCase);
+
+    string mode;
+    if (adminOnly)
+    {
+        mode = "admin";
+    }
+    else
+    {
+        mode = isMonolith ? "monolith" : "admin";
+    }
+    ctx.Request.Headers["x-mode"] = mode;
+    Activity.Current?.SetTag("service", mode == "monolith" ? "Monolith" : "Admin");
 
 
     await next();

@@ -7,37 +7,32 @@ import {JobGenRequest, JobGenResponse} from '../types/Dtos/JobGen';
 import {Draft} from '../types/Dtos/draft';
 import {EnhancementRequest, EnhancementResponse} from '../types/Dtos/EnhancementDto';
 import {CreateJobDto} from '../types/Dtos/CreateJobRequest';
-import {FeatureFlagsService} from './feature-flags.service';
 
 @Injectable({ providedIn: 'root' })
 export class JobService {
   private http: HttpClient = inject(HttpClient);
-  private featureFlagService = inject(FeatureFlagsService);
 
   list(companyUId: string){
-    return this.http.get<ApiResponse<Job[]>>(environment.apiUrl+ 'jobs/'+companyUId);
+    return this.http.get<ApiResponse<Job[]>>(`${environment.gatewayUrl}jobs/${companyUId}`);
   }
 
   generateDraft(uId: string, payload: JobGenRequest) {
-    const baseUrl = this.featureFlagService.isMonolith() ? environment.monolithUrl : environment.microserviceUrl;
-    const path = this.featureFlagService.isMonolith() ? 'drafts' : 'jobs';
-    return this.http.post<ApiResponse<JobGenResponse>>(`${baseUrl}${path}/${uId}/generate`, payload);
+    return this.http.post<ApiResponse<JobGenResponse>>(`${environment.gatewayUrl}jobs/${uId}/generate`, payload);
   }
+
   saveDraft(uId: string, payload: Draft) {
-    return this.http.put<ApiResponse<Draft>>(environment.apiUrl+ 'jobs/'+uId +'/save-draft',payload);
+    return this.http.put<ApiResponse<Draft>>(`${environment.gatewayUrl}jobs/${uId}/save-draft`, payload);
   }
 
   loadDrafts(companyId: string) {
-    const baseUrl = this.featureFlagService.isMonolith()?environment.monolithUrl: environment.microserviceUrl;
-    return this.http.get<ApiResponse<Draft[]>>(baseUrl+ 'jobs/'+companyId +'/list-drafts');
+    return this.http.get<ApiResponse<Draft[]>>(`${environment.gatewayUrl}jobs/${companyId}/list-drafts`);
   }
 
   rewrite(model: EnhancementRequest) {
-    const baseUrl = this.featureFlagService.isMonolith()?environment.monolithUrl: environment.microserviceUrl;
-    return this.http.put<ApiResponse<EnhancementResponse>>(baseUrl +"jobs/drafts/rewrite", model);
+    return this.http.put<ApiResponse<EnhancementResponse>>(`${environment.gatewayUrl}jobs/drafts/rewrite`, model);
   }
 
   createJob(model: CreateJobDto) {
-    return this.http.post<ApiResponse<Job[]>>(environment.apiUrl + 'jobs', model);
+    return this.http.post<ApiResponse<Job[]>>(`${environment.gatewayUrl}jobs`, model);
   }
 }
