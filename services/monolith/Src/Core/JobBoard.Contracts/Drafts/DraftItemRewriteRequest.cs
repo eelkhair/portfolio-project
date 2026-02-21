@@ -1,6 +1,6 @@
-﻿namespace JobBoard.Monolith.Contracts.Jobs;
+﻿namespace JobBoard.Monolith.Contracts.Drafts;
 
-public class JobRewriteRequest
+public class DraftItemRewriteRequest
 {
     public string Field { get; set; } = null!;
     public string Value { get; set; } = null!;

@@ -1,13 +1,13 @@
-﻿namespace JobBoard.Monolith.Contracts.Jobs;
+﻿namespace JobBoard.Monolith.Contracts.Drafts;
 
-public class JobRewriteResponse
+public class DraftRewriteResponse
 {
     public string Field { get; set; } = null!;
     public List<string> Options { get; set; } = new();
-    public JobRewriteMetadata Meta { get; set; } = null!;
+    public DraftRewriteMetadata Meta { get; set; } = null!;
 }
 
-public class JobRewriteMetadata
+public class DraftRewriteMetadata
 {
     public string? Model{get;set;}
     public int? PromptTokens{get;set;}

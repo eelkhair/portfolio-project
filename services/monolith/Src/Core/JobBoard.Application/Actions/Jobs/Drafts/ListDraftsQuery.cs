@@ -3,20 +3,20 @@ using JobBoard.Application.Actions.Base;
 using JobBoard.Application.Interfaces;
 using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Application.Interfaces.Infrastructure;
-using JobBoard.Monolith.Contracts.Jobs;
+using JobBoard.Monolith.Contracts.Drafts;
 using Microsoft.Extensions.Logging;
 
 namespace JobBoard.Application.Actions.Jobs.Drafts;
 
-public class ListDraftsQuery: BaseQuery<List<JobDraftResponse>>
+public class ListDraftsQuery: BaseQuery<List<DraftResponse>>
 {
     public Guid CompanyId { get; set; }
 }
 
 public class ListDraftsQueryHandler(IJobBoardQueryDbContext context, ILogger<ListDraftsQueryHandler> logger, IAiServiceClient aiServiceClient)
-    : BaseQueryHandler(context, logger), IHandler<ListDraftsQuery, List<JobDraftResponse>>
+    : BaseQueryHandler(context, logger), IHandler<ListDraftsQuery, List<DraftResponse>>
 {
-    public async Task<List<JobDraftResponse>> HandleAsync(ListDraftsQuery request, CancellationToken cancellationToken)
+    public async Task<List<DraftResponse>> HandleAsync(ListDraftsQuery request, CancellationToken cancellationToken)
     {
         Activity.Current?.SetTag("company.id", request.CompanyId);
         Logger.LogInformation("Fetching drafts for company {CompanyId} from the AI Service...", request.CompanyId);

@@ -19,3 +19,4 @@ scopes:
   - monolith-api
   - company-api
   - ai-service-v2
+  - gateway

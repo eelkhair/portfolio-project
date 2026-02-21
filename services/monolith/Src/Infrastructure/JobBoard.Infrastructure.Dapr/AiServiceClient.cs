@@ -7,7 +7,7 @@ using Elkhair.Dev.Common.Application;
 using JobBoard.Application.Infrastructure.Exceptions;
 using JobBoard.Application.Interfaces.Infrastructure;
 using JobBoard.Application.Interfaces.Users;
-using JobBoard.Monolith.Contracts.Jobs;
+using JobBoard.Monolith.Contracts.Drafts;
 using JobBoard.Monolith.Contracts.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -32,7 +32,7 @@ public sealed class AiServiceClient(
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
 
-    public async Task<List<JobDraftResponse>> ListDrafts(
+    public async Task<List<DraftResponse>> ListDrafts(
         Guid companyId,
         CancellationToken cancellationToken)
     {
@@ -53,7 +53,7 @@ public sealed class AiServiceClient(
         if (serviceName == AiServiceV1)
         {
             var drafts = await response.Content
-                                     .ReadFromJsonAsync<List<JobDraftResponse>>(JsonOpts, cancellationToken)
+                                     .ReadFromJsonAsync<List<DraftResponse>>(JsonOpts, cancellationToken)
                                  ?? throw new InvalidOperationException($"{AiServiceV1} returned empty JSON payload.");
             
                     Activity.Current?.SetTag("ai.drafts.count", drafts.Count);
@@ -66,7 +66,7 @@ public sealed class AiServiceClient(
                     return drafts;
         }
         var results = await response.Content
-                         .ReadFromJsonAsync<ApiResponse<List<JobDraftResponse>>>(JsonOpts, cancellationToken)
+                         .ReadFromJsonAsync<ApiResponse<List<DraftResponse>>>(JsonOpts, cancellationToken)
                      ?? throw new InvalidOperationException($"{AiServiceV1} returned empty JSON payload.");
             
         Activity.Current?.SetTag("ai.drafts.count", results.Data?.Count);
@@ -79,8 +79,8 @@ public sealed class AiServiceClient(
         return results.Data!;
     }
 
-    public async Task<JobRewriteResponse> RewriteItem(
-        JobRewriteRequest requestModel,
+    public async Task<DraftRewriteResponse> RewriteItem(
+        DraftItemRewriteRequest requestModel,
         CancellationToken cancellationToken)
     {
         var serviceName = AiSource;
@@ -102,7 +102,7 @@ public sealed class AiServiceClient(
         if (serviceName == AiServiceV1)
         {
              var result = await response.Content
-                                     .ReadFromJsonAsync<JobRewriteResponse>(JsonOpts, cancellationToken)
+                                     .ReadFromJsonAsync<DraftRewriteResponse>(JsonOpts, cancellationToken)
                                  ?? throw new InvalidOperationException($"{AiServiceV1} returned empty JSON payload.");
             
                     return result;
@@ -110,7 +110,7 @@ public sealed class AiServiceClient(
         else
         {
             var result = await response.Content
-                             .ReadFromJsonAsync<ApiResponse<JobRewriteResponse>>(JsonOpts, cancellationToken)
+                             .ReadFromJsonAsync<ApiResponse<DraftRewriteResponse>>(JsonOpts, cancellationToken)
                          ?? throw new InvalidOperationException($"{AiServiceV1} returned empty JSON payload.");
             
             return result.Data!;
@@ -118,9 +118,9 @@ public sealed class AiServiceClient(
        
     }
 
-    public async Task<JobGenResponse> GenerateDraft(
+    public async Task<DraftGenResponse> GenerateDraft(
         Guid companyId,
-        JobGenRequest requestModel,
+        DraftGenRequest requestModel,
         CancellationToken cancellationToken)
     {
         var serviceName = AiSource;
@@ -140,7 +140,7 @@ public sealed class AiServiceClient(
             await ThrowExternalServiceError(response, "drafts.generate", cancellationToken, serviceName);
 
         var result = await response.Content
-                         .ReadFromJsonAsync<ApiResponse<JobGenResponse>>(JsonOpts, cancellationToken)
+                         .ReadFromJsonAsync<ApiResponse<DraftGenResponse>>(JsonOpts, cancellationToken)
                      ?? throw new InvalidOperationException($"{serviceName} returned empty JSON payload.");
 
         Activity.Current?.SetTag("ai.draft.id", result.Data?.DraftId);

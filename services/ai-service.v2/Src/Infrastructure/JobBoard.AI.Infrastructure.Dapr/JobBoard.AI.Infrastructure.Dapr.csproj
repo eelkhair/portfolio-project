@@ -9,7 +9,7 @@
     <ItemGroup>
       <PackageReference Include="Dapr.Client" Version="1.17.0-rc08" />
       <PackageReference Include="JobBoard.AdminAPI.Contracts" Version="1.0.0" />
-      <PackageReference Include="JobBoard.Monolith.Contracts" Version="1.0.1" />
+      <PackageReference Include="JobBoard.Monolith.Contracts" Version="1.0.2" />
     </ItemGroup>
 
     <ItemGroup>

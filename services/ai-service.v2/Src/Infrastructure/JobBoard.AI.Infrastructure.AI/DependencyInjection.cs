@@ -54,7 +54,7 @@ public static class DependencyInjection
 
 
         services.AddScoped<IConversationStore, ConversationStore>();
-        services.AddScoped<ICompletionService, CompletionService>();
+        services.AddScoped<IChatService, ChatService>();
         return services;
     }
 }
