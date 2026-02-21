@@ -1,0 +1,31 @@
+﻿{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "dapr": {
+      "commandName": "Executable",
+      "executablePath": "dapr.exe",
+      "commandLineArgs": "run --app-id gateway --resources-path ../../Components/ --resources-path ./Dapr/Components/Secrets  --config ./Dapr/Config/config.yaml --app-port 5238 --dapr-http-port 3500  --log-level debug dotnet run",
+      "workingDirectory": "$(ProjectDir)",
+      "launchBrowser": true,
+      "applicationUrl": "http://localhost:5238"
+    },
+    "http": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "applicationUrl": "http://localhost:5238",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "https": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "applicationUrl": "https://localhost:7090;http://localhost:5238",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
