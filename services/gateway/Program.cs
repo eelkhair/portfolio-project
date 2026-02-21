@@ -16,7 +16,6 @@ var builder = WebApplication.CreateBuilder(args);
     .LoadFromMemory(YarpProvider.GetRoutes(), YarpProvider.GetClusters());
 
 var app = builder.Build();
-app.UseCors(CorsPolicy);
 app.Use(async (context, next) =>
 {
     // Get the current span and its traceid
@@ -31,14 +30,14 @@ app.Use(async (context, next) =>
 });
 app.Use(async (ctx, next) =>
 {
-     
-    if (ctx.Request.Path.StartsWithSegments("/ai/v2") 
-        || ctx.Request.Path.StartsWithSegments("/dapr/config") 
+
+    if (ctx.Request.Path.StartsWithSegments("/ai/v2")
+        || ctx.Request.Path.StartsWithSegments("/dapr/config")
         || ctx.Request.Path.StartsWithSegments("/dapr/subscribe"))
     {
         if(ctx.Request.Path.StartsWithSegments("/ai/v2"))
             Activity.Current?.SetTag("service", "AI V2");
-        
+
         await next();
         return;
     }
@@ -46,11 +45,13 @@ app.Use(async (ctx, next) =>
     var isMonolith = builder.Configuration.GetValue<bool>("FeatureFlags:Monolith");
     ctx.Request.Headers["x-mode"] = isMonolith ? "monolith" : "admin";
     Activity.Current?.SetTag("service", isMonolith ? "Monolith" : "Admin");
-    
+
 
     await next();
 });
 
+app.UseRouting();
+app.UseCors(CorsPolicy);
 app.MapReverseProxy();
 app.SetupStartupServices();
 

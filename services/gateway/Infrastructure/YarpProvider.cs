@@ -21,7 +21,7 @@ public static class YarpProvider
             ClusterId = "admin",
             Match = new RouteMatch
             {
-                Path = "/api/{**catch-all}",
+                Path = "/{**catch-all}",
                 Headers = new[]
                 {
                     new RouteHeader
@@ -30,10 +30,6 @@ public static class YarpProvider
                         Values = new[] { "admin" }
                     }
                 }
-            }, 
-            Transforms = new[]
-            {
-                new Dictionary<string, string> { ["PathRemovePrefix"] = "/api" },
             }
 
         },
@@ -43,7 +39,7 @@ public static class YarpProvider
             ClusterId = "monolith",
             Match = new RouteMatch
             {
-                Path = "/api/{**catch-all}",
+                Path = "/{**catch-all}",
                 Headers = new[]
                 {
                     new RouteHeader
@@ -52,10 +48,6 @@ public static class YarpProvider
                         Values = new[] { "monolith" }
                     }
                 }
-            }, 
-            Transforms = new[]
-            {
-                new Dictionary<string, string> { ["PathRemovePrefix"] = "/api" },
             }
         }
     };
