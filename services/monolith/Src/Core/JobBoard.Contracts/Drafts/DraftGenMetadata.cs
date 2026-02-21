@@ -1,7 +1,7 @@
 ﻿
-namespace JobBoard.Monolith.Contracts.Jobs;
+namespace JobBoard.Monolith.Contracts.Drafts;
 
-public class JobGenMetadata
+public class DraftGenMetadata
 {
     public RoleLevel RoleLevel { get; set; }
     public Tone Tone { get; set; }

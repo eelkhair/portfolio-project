@@ -1,6 +1,6 @@
-namespace JobBoard.Monolith.Contracts.Jobs;
+namespace JobBoard.Monolith.Contracts.Drafts;
 
-public class JobGenRequest
+public class DraftGenRequest
 {
     public string Brief { get; set; } = "";
     public RoleLevel RoleLevel { get; set; } = RoleLevel.Mid;

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace CompanyApi.Infrastructure.Data;
 
@@ -15,7 +16,10 @@ public class DesignTimeCompanyDbContextFactory :  IDesignTimeDbContextFactory<Co
             .Build();
 
         var optionsBuilder = new DbContextOptionsBuilder<CompanyDbContext>();
-        optionsBuilder.UseSqlServer(config.GetConnectionString("CompanyDbContext"));
+        optionsBuilder.UseSqlServer(config.GetConnectionString("CompanyDbContext"), sql =>
+        {
+            sql.MigrationsHistoryTable(HistoryRepository.DefaultTableName, "Companies");
+        });
 
         return new CompanyDbContext(optionsBuilder.Options);
     }

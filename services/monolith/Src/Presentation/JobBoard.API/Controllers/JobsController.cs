@@ -1,5 +1,5 @@
 ﻿using JobBoard.Application.Actions.Jobs.Drafts;
-using JobBoard.Monolith.Contracts.Jobs;
+using JobBoard.Monolith.Contracts.Drafts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoard.API.Controllers;
@@ -24,6 +24,6 @@ public class JobsController : BaseApiController
     /// <param name="request">The request containing the field to be updated, its new value, and additional context or style information.</param>
     /// <returns>An IActionResult indicating the success or failure of the operation.</returns>
     [HttpPut("drafts/rewrite")]
-    public async Task<IActionResult> RewriteDraftItem(JobRewriteRequest request)
-        => await ExecuteCommandAsync(new RewriteDraftItemCommand{JobRewriteRequest = request}, Ok);
+    public async Task<IActionResult> RewriteDraftItem(DraftItemRewriteRequest request)
+        => await ExecuteCommandAsync(new RewriteDraftItemCommand{DraftItemRewriteRequest = request}, Ok);
 }

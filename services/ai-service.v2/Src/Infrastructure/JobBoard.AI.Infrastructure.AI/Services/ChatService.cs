@@ -13,7 +13,7 @@ using ChatResponse = JobBoard.AI.Application.Actions.Chat.ChatResponse;
 
 namespace JobBoard.AI.Infrastructure.AI.Services;
 
-public class CompletionService(
+public class ChatService(
     IActivityFactory activityFactory,
     IChatOptionsFactory chatOptionsFactory,
     IConversationStore conversationStore,
@@ -21,7 +21,7 @@ public class CompletionService(
     IUserAccessor userAccessor,
     IConfiguration configuration,
     IServiceProvider serviceProvider)
-    : ICompletionService
+    : IChatService
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {

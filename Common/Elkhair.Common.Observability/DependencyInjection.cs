@@ -42,9 +42,6 @@ public static class DependencyInjection
                 .AddOtlpExporter(exporter => { exporter.Endpoint = new Uri("http://192.168.1.160:4317"); });
         }
             ); 
-
-
-
         return services;
     }
     

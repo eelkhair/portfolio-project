@@ -15,7 +15,7 @@ public class RewriteItemCommand(RewriteItemRequest request) : BaseCommand<Rewrit
 public sealed class RewriteItemCommandHandler(
     IHandlerContext context,
     IAiPrompt<RewriteItemRequest> aiPrompt,
-    ICompletionService completionService,
+    IChatService chatService,
     IActivityFactory activityFactory)
     : BaseCommandHandler(context),
         IHandler<RewriteItemCommand, RewriteItemResponse>
@@ -42,7 +42,7 @@ public sealed class RewriteItemCommandHandler(
         var userPrompt = aiPrompt.BuildUserPrompt(request);
         var systemPrompt = aiPrompt.BuildSystemPrompt();
 
-        var response = await completionService
+        var response = await chatService
             .GetResponseAsync<RewriteItemResponse>(
                 systemPrompt,
                 userPrompt,

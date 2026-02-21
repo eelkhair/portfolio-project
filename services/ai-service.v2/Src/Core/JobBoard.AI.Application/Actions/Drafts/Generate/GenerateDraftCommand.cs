@@ -18,7 +18,7 @@ public class DraftGenCommandHandler(IHandlerContext context,
     IAiPrompt<GenerateDraftRequest> aiPrompt,
     IActivityFactory activityFactory,
     IApplicationOrchestrator orchestrator,
-    ICompletionService completionService
+    IChatService chatService
     ) : BaseCommandHandler(context),
     IHandler<GenerateDraftCommand, DraftResponse>
 {
@@ -35,7 +35,7 @@ public class DraftGenCommandHandler(IHandlerContext context,
         var userPrompt = aiPrompt.BuildUserPrompt(request.Request);
         var systemPrompt = aiPrompt.BuildSystemPrompt();
         
-        var response = await completionService.GetResponseAsync<DraftResponse>(systemPrompt, userPrompt, aiPrompt.AllowTools, cancellationToken);
+        var response = await chatService.GetResponseAsync<DraftResponse>(systemPrompt, userPrompt, aiPrompt.AllowTools, cancellationToken);
         
         Logger.LogInformation("Draft generated for company {CompanyId}", request.CompanyId);
 

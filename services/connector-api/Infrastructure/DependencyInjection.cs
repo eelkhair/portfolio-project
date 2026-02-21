@@ -1,5 +1,4 @@
 using System.Text.Json;
-using ConnectorAPI.Interfaces;
 using ConnectorAPI.Interfaces.Clients;
 using ConnectorAPI.Sagas;
 using ConnectorAPI.Services;

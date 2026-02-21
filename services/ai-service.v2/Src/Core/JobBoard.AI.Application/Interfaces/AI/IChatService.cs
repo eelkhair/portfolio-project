@@ -2,7 +2,7 @@ using JobBoard.AI.Application.Actions.Chat;
 
 namespace JobBoard.AI.Application.Interfaces.AI;
 
-public interface ICompletionService
+public interface IChatService
 {
     Task<T> GetResponseAsync<T>(string systemPrompt, string userPrompt, bool allowTools,
         CancellationToken cancellationToken);

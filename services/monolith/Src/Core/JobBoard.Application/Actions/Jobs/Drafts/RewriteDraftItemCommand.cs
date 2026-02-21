@@ -2,25 +2,25 @@
 using JobBoard.Application.Actions.Base;
 using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Application.Interfaces.Infrastructure;
-using JobBoard.Monolith.Contracts.Jobs;
+using JobBoard.Monolith.Contracts.Drafts;
 using Microsoft.Extensions.Logging;
 
 namespace JobBoard.Application.Actions.Jobs.Drafts;
 
-public class RewriteDraftItemCommand : BaseCommand<JobRewriteResponse>, INoTransaction
+public class RewriteDraftItemCommand : BaseCommand<DraftRewriteResponse>, INoTransaction
 {
-    public JobRewriteRequest JobRewriteRequest { get; set; } = new();
+    public DraftItemRewriteRequest DraftItemRewriteRequest { get; set; } = new();
 }
 
 public class RewriteDraftItemCommandHandler(IHandlerContext handlerContext, IAiServiceClient client) : BaseCommandHandler(handlerContext),
-    IHandler<RewriteDraftItemCommand, JobRewriteResponse>
+    IHandler<RewriteDraftItemCommand, DraftRewriteResponse>
 {
-    public async Task<JobRewriteResponse> HandleAsync(RewriteDraftItemCommand request, CancellationToken cancellationToken)
+    public async Task<DraftRewriteResponse> HandleAsync(RewriteDraftItemCommand request, CancellationToken cancellationToken)
     {
-        Activity.Current?.SetTag("field", request.JobRewriteRequest.Field);
-        Logger.LogInformation("Calling the AI Service to rewrite {Field} ...", request.JobRewriteRequest.Field);
+        Activity.Current?.SetTag("field", request.DraftItemRewriteRequest.Field);
+        Logger.LogInformation("Calling the AI Service to rewrite {Field} ...", request.DraftItemRewriteRequest.Field);
        
-        var drafts = await client.RewriteItem(request.JobRewriteRequest, cancellationToken);
+        var drafts = await client.RewriteItem(request.DraftItemRewriteRequest, cancellationToken);
         
         Logger.LogInformation("Rewrite completed");
         return drafts;

@@ -20,7 +20,7 @@ public sealed class ChatCommand(
 public sealed class ChatCommandHandler(
     IHandlerContext context,
     IChatSystemPrompt systemPrompt,
-    ICompletionService completionService,
+    IChatService chatService,
     IActivityFactory activityFactory
 ) : BaseCommandHandler(context),
     IHandler<ChatCommand, ChatResponse>
@@ -44,7 +44,7 @@ public sealed class ChatCommandHandler(
             : request.Message;
         
         
-        return await completionService.RunChatAsync(
+        return await chatService.RunChatAsync(
             systemPrompt.Value,
             effectiveUserMessage,
             true,
