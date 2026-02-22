@@ -10,4 +10,6 @@ public interface IAiServiceClient
     Task<DraftGenResponse> GenerateDraft(Guid companyId, DraftGenRequest requestModel, CancellationToken cancellationToken);
     Task<ProviderSettings> GetProvider(CancellationToken cancellationToken);
     Task UpdateProvider(UpdateProviderRequest request, CancellationToken cancellationToken);
+    Task UpdateApplicationMode(ApplicationModeDto request, CancellationToken cancellationToken);
+    Task<ApplicationModeDto> GetApplicationMode(CancellationToken cancellationToken);
 }

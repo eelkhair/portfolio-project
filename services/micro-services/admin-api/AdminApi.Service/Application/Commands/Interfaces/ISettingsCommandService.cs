@@ -7,4 +7,6 @@ public interface ISettingsCommandService
 {
     Task<ApiResponse<GetProviderResponse>> GetProviderAsync(CancellationToken ct = default);
     Task<ApiResponse<UpdateProviderResponse>> UpdateProviderAsync(UpdateProviderRequest request, CancellationToken ct = default);
+    Task<ApiResponse<ApplicationModeDto>> GetApplicationModeAsync(CancellationToken ct);
+    Task<ApiResponse<ApplicationModeDto>> UpdateApplicationModeAsync(ApplicationModeDto request, CancellationToken ct);
 }

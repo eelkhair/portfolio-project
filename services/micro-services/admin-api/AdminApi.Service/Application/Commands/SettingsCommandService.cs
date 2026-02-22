@@ -125,4 +125,103 @@ public class SettingsCommandService(DaprClient client, UserContextService access
             };
         }
     }
+
+    public async Task<ApiResponse<ApplicationModeDto>> GetApplicationModeAsync(CancellationToken ct)
+    {
+        try
+        {
+            var req = client.CreateInvokeMethodRequest(
+                HttpMethod.Get,
+                appId: "ai-service-v2",
+                methodName: "settings/mode"
+            );
+
+            if (accessor.GetHeader("Authorization") is { } auth && !string.IsNullOrWhiteSpace(auth))
+                req.Headers.TryAddWithoutValidation("Authorization", auth);
+
+            using var resp = await client.InvokeMethodWithResponseAsync(req, ct);
+
+            var raw = await resp.Content.ReadAsStringAsync(ct);
+
+            if (!resp.IsSuccessStatusCode)
+            {
+                logger.LogError("ai-service-v2 returned {StatusCode}: {Body}", (int)resp.StatusCode, raw);
+                throw new HttpRequestException($"ai-service-v2 {resp.StatusCode}: {raw}", null, resp.StatusCode);
+            }
+
+            var result = JsonSerializer.Deserialize<ApiResponse<ApplicationModeDto>>(raw, JsonOpts)!;
+
+            Activity.Current?.SetTag("isMonolith", result?.Data?.IsMonolith);
+
+            return result!;
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error getting Application Mode");
+            return new ApiResponse<ApplicationModeDto>
+            {
+                Success = false,
+                StatusCode = HttpStatusCode.InternalServerError,
+                Exceptions = new ApiError
+                {
+                    Message = e.Message,
+                    Errors = new Dictionary<string, string[]>
+                    {
+                        { "Error", [e.Message] }
+                    }
+                }
+            };
+        }
+    }
+    
+    public async Task<ApiResponse<ApplicationModeDto>> UpdateApplicationModeAsync(ApplicationModeDto request, CancellationToken ct)
+    {
+        Activity.Current?.SetTag("isMonolith", request.IsMonolith);
+        
+        try
+        {
+            var req = client.CreateInvokeMethodRequest(
+                HttpMethod.Put,
+                appId: "ai-service-v2",
+                methodName: "settings/mode"
+            );
+
+            if (accessor.GetHeader("Authorization") is { } auth && !string.IsNullOrWhiteSpace(auth))
+                req.Headers.TryAddWithoutValidation("Authorization", auth);
+
+            req.Content = JsonContent.Create(request, options: JsonOpts);
+
+            using var resp = await client.InvokeMethodWithResponseAsync(req, ct);
+
+            var raw = await resp.Content.ReadAsStringAsync(ct);
+
+            if (resp.IsSuccessStatusCode)
+                return new ApiResponse<ApplicationModeDto>
+                {
+                    Data = request,
+                    Success = true,
+                    StatusCode = HttpStatusCode.OK
+                };
+            logger.LogError("ai-service-v2 returned {StatusCode}: {Body}", (int)resp.StatusCode, raw);
+            throw new HttpRequestException($"ai-service-v2 {resp.StatusCode}: {raw}", null, resp.StatusCode);
+            
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error updating Application Mode");
+            return new ApiResponse<ApplicationModeDto>
+            {
+                Success = false,
+                StatusCode = HttpStatusCode.InternalServerError,
+                Exceptions = new ApiError
+                {
+                    Message = e.Message,
+                    Errors = new Dictionary<string, string[]>
+                    {
+                        { "Error", [e.Message] }
+                    }
+                }
+            };
+        }
+    }
 }

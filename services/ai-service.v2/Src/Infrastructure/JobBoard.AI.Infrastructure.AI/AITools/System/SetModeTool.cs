@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using JobBoard.AI.Application.Actions.Settings.ApplicationMode;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
 using Microsoft.Extensions.AI;
@@ -8,7 +9,7 @@ namespace JobBoard.AI.Infrastructure.AI.AITools.System;
 
 public static class SetModeTool
 {
-    public static AIFunction Get(IActivityFactory activityFactory, IRedisStore store, ILogger<AiToolRegistry> logger)
+    public static AIFunction Get(IActivityFactory activityFactory, ISettingsService settingsService, ILogger<AiToolRegistry> logger)
     {
         return AIFunctionFactory.Create(async (bool isMonolith) =>
         {
@@ -17,8 +18,9 @@ public static class SetModeTool
             activity?.SetTag("ai.operation", "set_mode");
             logger.LogInformation("Setting application mode to {Mode}", isMonolith ? "monolith" : "microservices");
             
-            await store.SetAsync("jobboard:config:global:FeatureFlags:Monolith", isMonolith ? "true" : "false", 1);
+            await settingsService.UpdateApplicationModeAsync(new ApplicationModeDto{IsMonolith = isMonolith});
             activity?.SetTag("is_monolith", isMonolith);
+            
         }, new AIFunctionFactoryOptions
         {
             Name="set_mode",

@@ -3,7 +3,7 @@ using AdminAPI.Contracts.Models.Settings;
 using Elkhair.Dev.Common.Application;
 using FastEndpoints;
 
-namespace AdminApi.Features.Settings.GetProvider;
+namespace AdminApi.Features.Settings.Provider;
 
 public sealed class GetProviderEndpoint(ISettingsCommandService settings)
     : EndpointWithoutRequest<ApiResponse<GetProviderResponse>>

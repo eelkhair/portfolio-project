@@ -1,0 +1,93 @@
+:host {
+  display: block;
+}
+
+/* Unselected toggle */
+app-application-mode .p-selectbutton .p-togglebutton {
+  background: transparent !important;
+  border: 2px solid var(--p-surface-300) !important;
+  color: var(--p-surface-600) !important;
+  transition: all 0.25s ease-in-out !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+app-application-mode .p-selectbutton .p-togglebutton .p-togglebutton-content {
+  background: transparent !important;
+}
+
+app-application-mode .p-selectbutton .p-togglebutton .p-togglebutton-label {
+  color: var(--p-surface-600) !important;
+}
+
+app-application-mode .p-selectbutton .p-togglebutton:hover:not(:disabled) {
+  background: var(--p-surface-100) !important;
+  border-color: var(--p-surface-400) !important;
+}
+
+app-application-mode .p-selectbutton .p-togglebutton:hover:not(:disabled) .p-togglebutton-label {
+  color: var(--p-surface-700) !important;
+}
+
+/* Selected toggle */
+app-application-mode .p-selectbutton .p-togglebutton.p-togglebutton-checked {
+  background: #4F46E5 !important;
+  border-color: #4F46E5 !important;
+  color: #ffffff !important;
+}
+
+app-application-mode .p-selectbutton .p-togglebutton.p-togglebutton-checked .p-togglebutton-content {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+app-application-mode .p-selectbutton .p-togglebutton.p-togglebutton-checked .p-togglebutton-label {
+  color: #ffffff !important;
+}
+
+app-application-mode .p-selectbutton .p-togglebutton.p-togglebutton-checked:hover:not(:disabled) {
+  background: #4338CA !important;
+  border-color: #4338CA !important;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4) !important;
+}
+
+/* Dark mode - unselected */
+.dark app-application-mode .p-selectbutton .p-togglebutton {
+  border-color: var(--p-surface-600) !important;
+  color: var(--p-surface-400) !important;
+}
+
+.dark app-application-mode .p-selectbutton .p-togglebutton .p-togglebutton-label {
+  color: var(--p-surface-400) !important;
+}
+
+.dark app-application-mode .p-selectbutton .p-togglebutton:hover:not(:disabled) {
+  background: var(--p-surface-700) !important;
+  border-color: var(--p-surface-500) !important;
+}
+
+.dark app-application-mode .p-selectbutton .p-togglebutton:hover:not(:disabled) .p-togglebutton-label {
+  color: var(--p-surface-200) !important;
+}
+
+/* Dark mode - selected */
+.dark app-application-mode .p-selectbutton .p-togglebutton.p-togglebutton-checked {
+  background: #6366F1 !important;
+  border-color: #6366F1 !important;
+  color: #ffffff !important;
+}
+
+.dark app-application-mode .p-selectbutton .p-togglebutton.p-togglebutton-checked .p-togglebutton-content {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.dark app-application-mode .p-selectbutton .p-togglebutton.p-togglebutton-checked .p-togglebutton-label {
+  color: #ffffff !important;
+}
+
+.dark app-application-mode .p-selectbutton .p-togglebutton.p-togglebutton-checked:hover:not(:disabled) {
+  background: #4F46E5 !important;
+  border-color: #4F46E5 !important;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4) !important;
+}

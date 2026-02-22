@@ -1,4 +1,5 @@
-using JobBoard.Application.Actions.Settings;
+using JobBoard.Application.Actions.Settings.ApplicationMode;
+using JobBoard.Application.Actions.Settings.Provider;
 using JobBoard.Monolith.Contracts.Settings;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,4 +23,18 @@ public class SettingsController : BaseApiController
     [HttpPut("update-provider")]
     public async Task<IActionResult> UpdateProvider(UpdateProviderRequest request)
         => await ExecuteCommandAsync(new UpdateProviderCommand { Request = request }, Ok);
+
+    /// <summary>
+    /// Get current application mode (monolith or microservices)
+    /// </summary>
+    [HttpGet("mode")]
+    public async Task<IActionResult> GetApplicationMode()
+        => await ExecuteQueryAsync(new GetApplicationModeQuery(), Ok);
+
+    /// <summary>
+    /// Update application mode
+    /// </summary>
+    [HttpPut("mode")]
+    public async Task<IActionResult> UpdateApplicationMode(ApplicationModeDto request)
+        => await ExecuteCommandAsync(new UpdateApplicationModeCommand(request), Ok);
 }
