@@ -14,9 +14,24 @@ var builder = WebApplication.CreateBuilder(args);
     .AddOpenTelemetryServices(builder.Configuration, "gateway")
     .AddApplicationServices()
     .AddReverseProxy()
-    .LoadFromMemory(YarpProvider.GetRoutes(), YarpProvider.GetClusters());
+    .LoadFromMemory(YarpProvider.GetRoutes(),
+        YarpProvider.GetClusters(useDapr:  builder.Configuration.GetValue<bool>("Gateway:UseDaprInvocation")));
 
 var app = builder.Build();
+
+app.Use(async (context, next) =>
+{
+    context.Response.OnStarting(() =>
+    {
+        var traceId = context.Response.Headers["trace-id"].ToString();
+        if (!string.IsNullOrEmpty(traceId))
+        {
+            context.Response.Headers["x-trace-id"] = traceId;
+        }
+        return Task.CompletedTask;
+    });
+    await next();
+});
 
 app.Use(async (ctx, next) =>
 {

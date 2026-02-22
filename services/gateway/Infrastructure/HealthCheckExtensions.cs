@@ -38,7 +38,7 @@ internal static class HealthCheckExtensions
             .AddDapr()
             .AddDaprConfigurationStore("global", o =>
                 o.StoreName = "appconfig-global")
-            .AddDaprConfigurationStore("connector", o =>
+            .AddDaprConfigurationStore("gateway", o =>
                 o.StoreName = "appconfig-gateway");
 
         return builder;
