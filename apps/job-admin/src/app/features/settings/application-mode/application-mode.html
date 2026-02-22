@@ -1,0 +1,35 @@
+<div class="flex w-full justify-between mb-5">
+  <h1 class="text-3xl pl-2">Application Mode</h1>
+</div>
+
+<p-card>
+  @if (initialLoading()) {
+    <div class="flex justify-center p-4">
+      <p-progressSpinner strokeWidth="4" />
+    </div>
+  } @else {
+    <div class="flex flex-col gap-6">
+      <div class="flex flex-col gap-2">
+        <label class="font-semibold">Mode</label>
+        <p-selectButton
+          [options]="modeOptions"
+          [(ngModel)]="selectedMode"
+          optionLabel="label"
+          optionValue="value"
+          [allowEmpty]="false" />
+      </div>
+
+      <div class="flex items-center gap-3 p-4 border-round surface-ground">
+        <i [class]="currentModeOption.icon + ' text-2xl text-primary'"></i>
+        <div>
+          <div class="font-semibold">{{ currentModeOption.label }}</div>
+          <div class="text-sm text-color-secondary">{{ currentModeOption.description }}</div>
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        <p-button label="Save" icon="pi pi-save" (onClick)="saveSettings()" [loading]="loading()" />
+      </div>
+    </div>
+  }
+</p-card>

@@ -5,7 +5,7 @@ using JobBoard.Application.Interfaces.Infrastructure;
 using JobBoard.Monolith.Contracts.Settings;
 using Microsoft.Extensions.Logging;
 
-namespace JobBoard.Application.Actions.Settings;
+namespace JobBoard.Application.Actions.Settings.Provider;
 
 public class UpdateProviderCommand : BaseCommand<bool>, INoTransaction
 {

@@ -12,6 +12,10 @@ export interface UpdateProviderResponse {
   success: boolean;
 }
 
+export interface ApplicationMode {
+  isMonolith: boolean;
+}
+
 @Injectable({providedIn: 'root'})
 export class SettingsService {
   private http = inject(HttpClient);
@@ -25,6 +29,19 @@ export class SettingsService {
   updateProvider(request: ProviderSettings) {
     return this.http.put<ApiResponse<UpdateProviderResponse>>(
       `${environment.gatewayUrl}settings/update-provider`,
+      request
+    );
+  }
+
+  getApplicationMode() {
+    return this.http.get<ApiResponse<ApplicationMode>>(
+      `${environment.gatewayUrl}settings/mode`
+    );
+  }
+
+  updateApplicationMode(request: ApplicationMode) {
+    return this.http.put<ApiResponse<ApplicationMode>>(
+      `${environment.gatewayUrl}settings/mode`,
       request
     );
   }

@@ -206,6 +206,54 @@ public sealed class AiServiceClient(
             request.Provider,
             request.Model);
     }
+    
+    public async Task<ApplicationModeDto> GetApplicationMode(CancellationToken cancellationToken)
+    {
+        EnrichActivity(null, "settings.mode", AiServiceV2);
+
+        var request = CreateRequest(
+            HttpMethod.Get,
+            "settings/mode",
+            AiServiceV2);
+
+        using var response =
+            await client.InvokeMethodWithResponseAsync(request, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+            await ThrowExternalServiceError(response, "settings.mode", cancellationToken, AiServiceV2);
+
+        var result = await response.Content
+                         .ReadFromJsonAsync<ApiResponse<ApplicationModeDto>>(JsonOpts, cancellationToken)
+                     ?? throw new InvalidOperationException($"{AiServiceV2} returned empty JSON payload.");
+
+        logger.LogInformation(
+            "ai-service-v2 returned application mode {Mode}",
+            result.Data?.IsMonolith);
+
+        return result.Data!;
+    }
+    public async Task UpdateApplicationMode(ApplicationModeDto request, CancellationToken cancellationToken)
+    {
+        EnrichActivity(null, "settings.application-mode", AiServiceV2);
+
+        var httpRequest = CreateRequest(
+            HttpMethod.Put,
+            "settings/mode",
+            AiServiceV2);
+
+        httpRequest.Content = JsonContent.Create(request, options: JsonOpts);
+
+        using var response =
+            await client.InvokeMethodWithResponseAsync(httpRequest, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+            await ThrowExternalServiceError(response, "settings.application-mode", cancellationToken, AiServiceV2);
+
+        logger.LogInformation(
+            "{ServiceName} updated application mode to {Mode}",
+            AiServiceV2,
+            request.IsMonolith);
+    }
 
     private HttpRequestMessage CreateRequest(HttpMethod method, string path, string serviceName)
     {

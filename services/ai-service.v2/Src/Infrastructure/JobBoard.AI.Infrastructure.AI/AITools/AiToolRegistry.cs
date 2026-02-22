@@ -15,6 +15,7 @@ public class AiToolRegistry(
     IRedisStore redisStore,
     IUserAccessor userAccessor,
     IMemoryCache cache,
+    ISettingsService settingsService,
     ILogger<AiToolRegistry> logger,
     IAiNotificationHub notificationHub,
     IConversationContext conversationContext
@@ -32,7 +33,7 @@ public class AiToolRegistry(
         yield return DraftsByCompanyTool.Get(activityFactory, toolResolver, cache, conversationContext, ToolTtl);
         yield return ConversationIdTool.Get(activityFactory, conversationContext);
         yield return ProviderRetrievalTool.Get(activityFactory, toolResolver, logger);
-        yield return IsMonolithTool.Get(activityFactory, redisStore, logger);
-        yield return SetModeTool.Get(activityFactory, redisStore, logger);
+        yield return IsMonolithTool.Get(activityFactory, settingsService, logger);
+        yield return SetModeTool.Get(activityFactory, settingsService, logger);
     }
 }

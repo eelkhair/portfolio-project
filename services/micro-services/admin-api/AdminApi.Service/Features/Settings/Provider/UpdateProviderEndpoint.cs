@@ -3,7 +3,7 @@ using AdminAPI.Contracts.Models.Settings;
 using Elkhair.Dev.Common.Application;
 using FastEndpoints;
 
-namespace AdminApi.Features.Settings.UpdateProvider;
+namespace AdminApi.Features.Settings.Provider;
 
 public sealed class UpdateProviderEndpoint(ISettingsCommandService settings)
     : Endpoint<UpdateProviderRequest, ApiResponse<UpdateProviderResponse>>
