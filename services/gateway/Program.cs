@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Text.RegularExpressions;
 using Elkhair.Common.Observability;
 using Gateway.Api.Infrastructure;
 const string CorsPolicy = "AllowJobAdmin";
@@ -15,62 +14,12 @@ var builder = WebApplication.CreateBuilder(args);
     .AddApplicationServices()
     .AddReverseProxy()
     .LoadFromMemory(YarpProvider.GetRoutes(),
-        YarpProvider.GetClusters(useDapr:  builder.Configuration.GetValue<bool>("Gateway:UseDaprInvocation")));
+        YarpProvider.GetClusters(useDapr: builder.Configuration.GetValue<bool>("Gateway:UseDaprInvocation")));
 
 var app = builder.Build();
 
-app.Use(async (context, next) =>
-{
-    context.Response.OnStarting(() =>
-    {
-        var traceId = context.Response.Headers["trace-id"].ToString();
-        if (!string.IsNullOrEmpty(traceId))
-        {
-            context.Response.Headers["x-trace-id"] = traceId;
-        }
-        return Task.CompletedTask;
-    });
-    await next();
-});
-
-app.Use(async (ctx, next) =>
-{
-
-    if (ctx.Request.Path.StartsWithSegments("/ai/v2")
-        || ctx.Request.Path.StartsWithSegments("/dapr/config")
-        || ctx.Request.Path.StartsWithSegments("/dapr/subscribe"))
-    {
-        if(ctx.Request.Path.StartsWithSegments("/ai/v2"))
-            Activity.Current?.SetTag("service", "AI V2");
-
-        await next();
-        return;
-    }
-
-    var isMonolith = builder.Configuration.GetValue<bool>("FeatureFlags:Monolith");
-
-    // GET /jobs/{guid} (list jobs) only exists on the admin API
-    var adminOnly = isMonolith
-        && ctx.Request.Method == "GET"
-        && ctx.Request.Path.Value is { } p
-        && Regex.IsMatch(p, @"^/jobs/[0-9a-f-]+$", RegexOptions.IgnoreCase);
-
-    string mode;
-    if (adminOnly)
-    {
-        mode = "admin";
-    }
-    else
-    {
-        mode = isMonolith ? "monolith" : "admin";
-    }
-    ctx.Request.Headers["x-mode"] = mode;
-    Activity.Current?.SetTag("service", mode == "monolith" ? "Monolith" : "Admin");
-
-
-    await next();
-});
-
+app.UseMiddleware<TraceIdMiddleware>();
+app.UseMiddleware<RoutingMiddleware>();
 app.UseRouting();
 app.UseCors(CorsPolicy);
 app.MapReverseProxy();
