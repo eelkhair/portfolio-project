@@ -1,9 +1,13 @@
+using Microsoft.Extensions.Logging;
 using Yarp.ReverseProxy.Configuration;
 
 namespace Gateway.Api.Infrastructure;
 
 public static class YarpProvider
 {
+    private static readonly ILoggerFactory LogFactory = LoggerFactory.Create(b => b.AddConsole());
+    private static readonly ILogger Log = LogFactory.CreateLogger("YarpProvider");
+
     public static IReadOnlyList<RouteConfig> GetRoutes() => new[]
     {
         new RouteConfig
@@ -38,7 +42,6 @@ public static class YarpProvider
                     }
                 }
             }
-
         },
         new RouteConfig
         {
@@ -58,22 +61,33 @@ public static class YarpProvider
             }
         }
     };
-    public static IReadOnlyList<ClusterConfig> GetClusters() => new[]
-    {
-        DaprCluster("ai-v2", "ai-service-v2"),
-        DaprCluster("admin", "admin-api"),
-        DaprCluster("monolith", "monolith-api"),
-    };
 
-    private static ClusterConfig DaprCluster(string clusterId, string appId) => new()
+    public static IReadOnlyList<ClusterConfig> GetClusters(bool useDapr)
     {
-        ClusterId = clusterId,
-        Destinations = new Dictionary<string, DestinationConfig>
+        Log.LogInformation("Building YARP clusters — UseDapr: {UseDapr}", useDapr);
+        return new[]
         {
-            ["dapr"] = new()
+            Cluster("ai-v2", "ai-service-v2", useDapr),
+            Cluster("admin", "admin-api", useDapr),
+            Cluster("monolith", "monolith-api", useDapr),
+        };
+    }
+
+    private static ClusterConfig Cluster(string clusterId, string serviceName, bool useDapr)
+    {
+        var address = useDapr
+            ? $"http://localhost:3500/v1.0/invoke/{serviceName}/method/"
+            : $"http://{serviceName}:8080/";
+
+        Log.LogInformation("Cluster {ClusterId} -> {Address}", clusterId, address);
+
+        return new()
+        {
+            ClusterId = clusterId,
+            Destinations = new Dictionary<string, DestinationConfig>
             {
-                Address = $"http://localhost:3500/v1.0/invoke/{appId}/method/"
+                ["default"] = new() { Address = address }
             }
-        }
-    };
+        };
+    }
 }

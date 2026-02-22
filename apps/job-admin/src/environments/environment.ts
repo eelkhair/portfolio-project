@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  gatewayUrl: 'https://gateway.eelkhair.net/',
+  gatewayUrl: 'https://job-gateway.eelkhair.net/',
   // Direct URLs for SignalR WebSocket connections (can't proxy through Dapr invoke)
   monolithUrl: 'https://job-monolith.eelkhair.net/',
   microserviceUrl: 'https://job-admin-api.eelkhair.net/',

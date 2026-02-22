@@ -75,6 +75,10 @@
       "--resources-path", "./Dapr/Components/Secrets",
       "-config", "./Dapr/Config/config.yaml"
     ]
+  
+  
+  
+  
   user-api:
     build:
       context: ../services/user-api/
@@ -135,6 +139,35 @@
       "-config", "./Dapr/Config/config.yaml"
     ]
   
+  ai-service-v2:
+    image: registry.eelkhair.net/ai-service-v2:latest
+    ports:
+      - "5200:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    networks:
+      - ai-job-board-net
+
+  ai-service-v2-sidecar:
+    image: "daprio/daprd:1.15.8"
+    container_name: "ai-service-v2-side-car"
+    depends_on:
+      - ai-service-v2
+    volumes:
+      - "/home/eelkhair/Dapr/shared/Components:/Components"
+      - "/home/eelkhair/Dapr/ai-service-v2/:/Dapr"
+    network_mode: "service:ai-service-v2"
+    command: [
+      "./daprd",
+      "--app-id", "ai-service-v2",
+      "--app-port", "8080",
+      "--resources-path", "./Components",
+      "--resources-path", "./Dapr/Components",
+      "--resources-path", "./Dapr/Components/Secrets",
+      "--resources-path", "./Dapr/Components/Timers",
+      "-config", "./Dapr/Config/config.yaml"
+    ]
+
   connector-api:
     image: registry.eelkhair.net/connector-api:latest
     ports:
@@ -163,6 +196,36 @@
       "--resources-path", "./Dapr/Components/Timers",
       "-config", "./Dapr/Config/config.yaml"
     ]
+    
+  gateway:
+    image: registry.eelkhair.net/gateway:latest
+    ports:
+      - "5238:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    networks:
+      - ai-job-board-net
+
+  gateway-sidecar:
+    image: "daprio/daprd:1.15.8"
+    container_name: "gateway-side-car"
+    depends_on:
+      - gateway
+    volumes:
+      - "/home/eelkhair/Dapr/shared/Components:/Components"
+      - "/home/eelkhair/Dapr/gateway/:/Dapr"
+    network_mode: "service:gateway"
+    command: [
+      "./daprd",
+      "--app-id", "gateway",
+      "--app-port", "8080",
+      "--resources-path", "./Components",
+      "--resources-path", "./Dapr/Components",
+      "--resources-path", "./Dapr/Components/Secrets",
+      "--resources-path", "./Dapr/Components/Timers",
+      "-config", "./Dapr/Config/config.yaml"
+    ]
+
   company-api:
     build:
       context: ../services/company-api/
@@ -233,14 +296,19 @@
       - HealthChecksUI__HealthChecks__1__Uri=https://job-connector.eelkhair.net/healthzEndpoint
       - HealthChecksUI__HealthChecks__2__Name=AI Service
       - HealthChecksUI__HealthChecks__2__Uri=https://job-ai.eelkhair.net/healthzEndpoint
-      - HealthChecksUI__HealthChecks__3__Name=Admin API
-      - HealthChecksUI__HealthChecks__3__Uri=https://job-admin-api.eelkhair.net/healthzEndpoint
-      - HealthChecksUI__HealthChecks__4__Name=Company API
-      - HealthChecksUI__HealthChecks__4__Uri=https://job-company-api.eelkhair.net/healthzEndpoint
-      - HealthChecksUI__HealthChecks__5__Name=Job API
-      - HealthChecksUI__HealthChecks__5__Uri=https://job-api.eelkhair.net/healthzEndpoint
-      - HealthChecksUI__HealthChecks__6__Name=User API
-      - HealthChecksUI__HealthChecks__6__Uri=https://job-users-api.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__3__Name=AI Service V2
+      - HealthChecksUI__HealthChecks__3__Uri=https://job-ai-v2.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__4__Name=Admin API
+      - HealthChecksUI__HealthChecks__4__Uri=https://job-admin-api.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__5__Name=Company API
+      - HealthChecksUI__HealthChecks__5__Uri=https://job-company-api.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__6__Name=Job API
+      - HealthChecksUI__HealthChecks__6__Uri=https://job-api.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__7__Name=User API
+      - HealthChecksUI__HealthChecks__7__Uri=https://job-users-api.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__8__Name=Gateway
+      - HealthChecksUI__HealthChecks__8__Uri=https://job-gateway.eelkhair.net/healthzEndpoint
+
 
     ports:
       - "5107:8080"

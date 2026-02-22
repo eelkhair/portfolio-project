@@ -1,5 +1,6 @@
 using Dapr.Client;
 using Dapr.Extensions.Configuration;
+using Dapr.Extensions.Configuration.DaprSecretStore;
 using HealthChecks.UI.Client;
 using JobBoard.HealthChecks;
 
@@ -23,7 +24,7 @@ public static class DependencyInjection
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials()
-                .WithExposedHeaders("trace-id"));
+                .WithExposedHeaders("trace-id", "x-trace-id"));
         });
         return services;
     }
@@ -40,8 +41,12 @@ public static class DependencyInjection
 
         builder.Configuration.AddDaprSecretStore(
             "vault",
-            new DaprClientBuilder().Build(),
-            new Dictionary<string, string>()
+            new[]
+            {
+                new DaprSecretDescriptor("gateway"),
+                new DaprSecretDescriptor("shared")
+            },
+            new DaprClientBuilder().Build()
         );
 
         var daprClient = new DaprClientBuilder().Build();
