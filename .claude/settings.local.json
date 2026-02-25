@@ -3,7 +3,12 @@
     "allow": [
       "Bash(dotnet build:*)",
       "Bash(find:*)",
-      "Bash(npx ng build:*)"
+      "Bash(npx ng build:*)",
+      "WebFetch(domain:job-health.eelkhair.net)",
+      "WebFetch(domain:job-dapr.eelkhair.net)",
+      "WebFetch(domain:medium.com)",
+      "WebFetch(domain:webcache.googleusercontent.com)",
+      "Bash(dotnet test:*)"
     ]
   }
 }
