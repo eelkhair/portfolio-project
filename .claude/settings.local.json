@@ -8,7 +8,8 @@
       "WebFetch(domain:job-dapr.eelkhair.net)",
       "WebFetch(domain:medium.com)",
       "WebFetch(domain:webcache.googleusercontent.com)",
-      "Bash(dotnet test:*)"
+      "Bash(dotnet test:*)",
+      "Bash(ls:*)"
     ]
   }
 }
