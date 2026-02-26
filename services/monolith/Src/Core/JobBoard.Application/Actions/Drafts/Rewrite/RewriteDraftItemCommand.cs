@@ -5,7 +5,7 @@ using JobBoard.Application.Interfaces.Infrastructure;
 using JobBoard.Monolith.Contracts.Drafts;
 using Microsoft.Extensions.Logging;
 
-namespace JobBoard.Application.Actions.Jobs.Drafts;
+namespace JobBoard.Application.Actions.Drafts.Rewrite;
 
 public class RewriteDraftItemCommand : BaseCommand<DraftRewriteResponse>, INoTransaction
 {

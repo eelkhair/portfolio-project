@@ -1,4 +1,5 @@
 using JobBoard.Monolith.Contracts.Companies;
+using JobBoard.Monolith.Contracts.Jobs;
 using JobBoard.Monolith.Contracts.Users;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -22,6 +23,7 @@ public static class EdmModel
         
         var industrySet = builder.EntitySet<IndustryDto>("Industries");
         var userSet = builder.EntitySet<UserDto>("Users");
+        builder.EntitySet<JobResponse>("Jobs");   
 
         
         companySet.EntityType.HasRequired(c=>c.Industry);

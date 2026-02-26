@@ -6,10 +6,8 @@ using Microsoft.Extensions.Logging;
 
 namespace JobBoard.Application.Actions.Companies.Get;
 
-public class GetCompaniesQuery: BaseQuery<IQueryable<CompanyDto>>
-{
-    public Guid UId { get; set; }
-}
+public class GetCompaniesQuery : BaseQuery<IQueryable<CompanyDto>>;
+
 public class GetCompaniesQueryHandler(IJobBoardDbContext context, ILogger<GetCompaniesQueryHandler> logger)
     : BaseQueryHandler(context, logger), IHandler<GetCompaniesQuery, IQueryable<CompanyDto>>
 {

@@ -1,8 +1,8 @@
-﻿namespace JobAPI.Contracts.Models.Jobs.Responses;
+namespace JobBoard.Monolith.Contracts.Jobs;
 
 public class JobResponse
 {
-    public Guid UId { get; set; }
+    public Guid Id { get; set; }
     public string Title { get; set; }
     public Guid CompanyUId { get; set; }
     public string CompanyName { get; set; }
@@ -15,11 +15,3 @@ public class JobResponse
     public DateTime? UpdatedAt { get; set; }
     public DateTime CreatedAt { get; set; }
 };
-
-public enum JobType
-{
-    FullTime,
-    PartTime,
-    Contract,
-    Internship
-}

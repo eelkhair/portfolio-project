@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace JobBoard.Application.Actions.Jobs.Drafts;
+namespace JobBoard.Application.Actions.Drafts.Rewrite;
 
 public class RewriteDraftItemCommandValidator : AbstractValidator<RewriteDraftItemCommand>
 {

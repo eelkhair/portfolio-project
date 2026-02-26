@@ -6,7 +6,7 @@ using JobBoard.Application.Interfaces.Infrastructure;
 using JobBoard.Monolith.Contracts.Drafts;
 using Microsoft.Extensions.Logging;
 
-namespace JobBoard.Application.Actions.Jobs.Drafts;
+namespace JobBoard.Application.Actions.Drafts.List;
 
 public class ListDraftsQuery: BaseQuery<List<DraftResponse>>
 {

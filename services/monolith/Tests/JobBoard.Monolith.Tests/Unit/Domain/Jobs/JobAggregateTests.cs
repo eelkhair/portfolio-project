@@ -1,8 +1,8 @@
 using Shouldly;
 using JobBoard.Domain.Aggregates;
 using JobBoard.Domain.Entities;
-using JobBoard.Domain.Enums;
 using JobBoard.Domain.Exceptions;
+using JobBoard.Monolith.Contracts.Jobs;
 
 namespace JobBoard.Monolith.Tests.Unit.Domain.Jobs;
 
