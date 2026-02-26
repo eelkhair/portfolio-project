@@ -1,8 +1,8 @@
 ﻿using JobBoard.Domain.Aggregates;
-using JobBoard.Domain.Enums;
 using JobBoard.Domain.Exceptions;
 using JobBoard.Domain.Helpers;
 using JobBoard.Domain.ValueObjects.Job;
+using JobBoard.Monolith.Contracts.Jobs;
 
 namespace JobBoard.Domain.Entities;
 
@@ -124,7 +124,10 @@ public class Job : BaseAuditableEntity
                 job.AddQualification(qualification);
             }
         }
-
+ 
+        job.InternalId = jobInput.InternalId;
+        job.Id = jobInput.UId;
+        
         return job;
     }
 

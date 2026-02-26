@@ -1,4 +1,4 @@
-using JobBoard.Application.Actions.Jobs.Drafts;
+using JobBoard.Application.Actions.Drafts.List;
 using JobBoard.Application.Interfaces;
 using JobBoard.Application.Interfaces.Infrastructure;
 using JobBoard.Monolith.Contracts.Drafts;

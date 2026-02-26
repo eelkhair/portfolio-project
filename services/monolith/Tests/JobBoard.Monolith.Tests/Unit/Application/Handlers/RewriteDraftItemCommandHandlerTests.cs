@@ -1,4 +1,4 @@
-using JobBoard.Application.Actions.Jobs.Drafts;
+using JobBoard.Application.Actions.Drafts.Rewrite;
 using JobBoard.Application.Interfaces;
 using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Application.Interfaces.Infrastructure;

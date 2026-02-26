@@ -5,7 +5,7 @@ using JobBoard.Application.Interfaces.Infrastructure;
 using JobBoard.Monolith.Contracts.Drafts;
 using Microsoft.Extensions.Logging;
 
-namespace JobBoard.Application.Actions.Drafts;
+namespace JobBoard.Application.Actions.Drafts.Generate;
 
 public class GenerateDraftCommand : BaseCommand<DraftGenResponse>, INoTransaction
 {

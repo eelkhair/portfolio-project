@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace JobBoard.Application.Actions.Drafts;
+namespace JobBoard.Application.Actions.Drafts.Generate;
 
 public class GenerateDraftCommandValidator : AbstractValidator<GenerateDraftCommand>
 {

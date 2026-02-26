@@ -1,5 +1,5 @@
 using FluentValidation.TestHelper;
-using JobBoard.Application.Actions.Drafts;
+using JobBoard.Application.Actions.Drafts.Generate;
 using JobBoard.Monolith.Contracts.Drafts;
 
 namespace JobBoard.Monolith.Tests.Unit.Application.Validators;

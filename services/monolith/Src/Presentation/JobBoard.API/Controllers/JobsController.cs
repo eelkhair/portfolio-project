@@ -1,6 +1,9 @@
-﻿using JobBoard.Application.Actions.Drafts;
-using JobBoard.Application.Actions.Jobs.Drafts;
+﻿using JobBoard.Application.Actions.Drafts.Generate;
+using JobBoard.Application.Actions.Drafts.List;
+using JobBoard.Application.Actions.Drafts.Rewrite;
+using JobBoard.Application.Actions.Jobs.Create;
 using JobBoard.Monolith.Contracts.Drafts;
+using JobBoard.Monolith.Contracts.Jobs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoard.API.Controllers;
@@ -10,6 +13,15 @@ namespace JobBoard.API.Controllers;
 /// </summary>
 public class JobsController : BaseApiController
 {
+    /// <summary>
+    /// Create a new job listing
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public async Task<IActionResult> Create(CreateJobRequest request) =>
+     await ExecuteCommandAsync(new CreateJobCommand(request), Ok);
+    
     /// <summary>
     /// Generate a job draft via AI
     /// </summary>
@@ -38,4 +50,6 @@ public class JobsController : BaseApiController
     [HttpPut("drafts/rewrite")]
     public async Task<IActionResult> RewriteDraftItem(DraftItemRewriteRequest request)
         => await ExecuteCommandAsync(new RewriteDraftItemCommand{DraftItemRewriteRequest = request}, Ok);
+    
+    
 }
