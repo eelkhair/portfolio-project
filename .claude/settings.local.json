@@ -9,7 +9,12 @@
       "WebFetch(domain:medium.com)",
       "WebFetch(domain:webcache.googleusercontent.com)",
       "Bash(dotnet test:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(grep:*)",
+      "Bash(xargs basename:*)",
+      "Bash(cd:*)",
+      "Bash(xargs -I {} bash -c 'echo \"\"File: {}\"\"; head -50 {}')",
+      "Bash(dotnet list:*)"
     ]
   }
 }
