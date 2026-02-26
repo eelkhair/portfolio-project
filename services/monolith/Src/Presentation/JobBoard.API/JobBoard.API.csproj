@@ -12,6 +12,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <InternalsVisibleTo Include="JobBoard.Monolith.Tests" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="JobBoard.HealthChecks" Version="1.0.6" />
         <PackageReference Include="Microsoft.AspNetCore.OData" Version="9.4.1" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.6" />

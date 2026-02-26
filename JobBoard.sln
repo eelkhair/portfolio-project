@@ -279,6 +279,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{5AD6106A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.Monolith.Tests", "services\monolith\Tests\JobBoard.Monolith.Tests\JobBoard.Monolith.Tests.csproj", "{A6D5F20C-842E-4229-A99F-06EC2B286183}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "connector-api.tests", "services\connector-api.tests\connector-api.tests.csproj", "{17881808-7925-42BF-A455-4428F26F0D62}"
+EndProject
 Global
 				GlobalSection(SolutionConfigurationPlatforms) = preSolution
 								Debug|Any CPU = Debug|Any CPU
@@ -425,6 +427,10 @@ Global
 					{A6D5F20C-842E-4229-A99F-06EC2B286183}.Debug|Any CPU.Build.0 = Debug|Any CPU
 					{A6D5F20C-842E-4229-A99F-06EC2B286183}.Release|Any CPU.ActiveCfg = Release|Any CPU
 					{A6D5F20C-842E-4229-A99F-06EC2B286183}.Release|Any CPU.Build.0 = Release|Any CPU
+					{17881808-7925-42BF-A455-4428F26F0D62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{17881808-7925-42BF-A455-4428F26F0D62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{17881808-7925-42BF-A455-4428F26F0D62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{17881808-7925-42BF-A455-4428F26F0D62}.Release|Any CPU.Build.0 = Release|Any CPU
 				EndGlobalSection
 				GlobalSection(SolutionProperties) = preSolution
 								HideSolutionNode = FALSE
@@ -500,5 +506,6 @@ Global
 		{D21EA66F-9D34-46F0-883F-1DC0CA286D03} = {13C13C26-632A-4BF0-A4B8-8A739D2AC73B}
 		{5AD6106A-5E8C-4328-AF99-BDDAD9ABF608} = {315D5079-3539-49CA-93AF-2614E2A84E44}
 		{A6D5F20C-842E-4229-A99F-06EC2B286183} = {5AD6106A-5E8C-4328-AF99-BDDAD9ABF608}
+		{17881808-7925-42BF-A455-4428F26F0D62} = {5E0D2CFC-5C65-4046-9C74-2B06EA5B397C}
 	EndGlobalSection
 EndGlobal

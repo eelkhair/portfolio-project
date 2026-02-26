@@ -15,11 +15,24 @@ using JobBoard.Infrastructure.Smtp;
 
 var builder = WebApplication.CreateBuilder(args);
 #if DEBUG
-Debugger.Launch();
+// Debugger.Launch();
 #endif
+
+var isTesting = builder.Environment.IsEnvironment("Testing");
+
 builder.Services.AddSingleton<IFeatureFlagNotifier, SignalRFeatureFlagNotifier>();
 builder.Services.AddSingleton<ICompanyActivationNotifier, CompanyActivationNotifier>();
-(await builder.AddDaprServices("monolith-api")).ConfigureLogging("monolith-api").AddCustomHealthChecks().Services
+
+if (isTesting)
+{
+    builder.Services.AddHealthChecks();
+}
+else
+{
+    (await builder.AddDaprServices("monolith-api")).ConfigureLogging("monolith-api").AddCustomHealthChecks();
+}
+
+builder.Services
     .AddApplicationServices()
     .AddPersistenceServices(builder.Configuration)
     .AddHttpContextAccessor()
@@ -35,3 +48,6 @@ builder.Services.AddSingleton<ICompanyActivationNotifier, CompanyActivationNotif
 builder.Build().UseConfiguredSwagger(builder.Configuration)
     .UseApplicationServices()
     .Start();
+
+// Required for WebApplicationFactory<Program> in integration tests
+public partial class Program;
