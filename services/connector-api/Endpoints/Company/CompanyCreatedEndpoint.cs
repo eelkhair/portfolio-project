@@ -13,28 +13,40 @@ public static class CompanyCreatedEndpoint
     public static WebApplication MapCompanyCreatedEndpoint(this WebApplication app)
     {
         app.MapPost("/connector/company",
-            [Topic("rabbitmq.pubsub", "outbox-events")]
+            [Topic("rabbitmq.pubsub", "monolith.company-created.v1")]
             async (
                 EventDto<CompanyCreatedV1Event> @event,
-               CompanyProvisioningSaga saga,
+                CompanyProvisioningSaga saga,
                 ActivitySource activitySource,
                 DaprClient client,
                 ILogger<CompanyCreatedV1Event> logger,
                 CancellationToken cancellationToken) =>
             {
+                using var parentSpan = activitySource.StartActivity("provision.company");
+                parentSpan?.SetTag("company.uid", @event.Data.CompanyUId);
+                parentSpan?.SetTag("company.admin.uid", @event.Data.AdminUId);
+                parentSpan?.SetTag("event.type", @event.EventType);
+                parentSpan?.SetTag("idempotency.key", @event.IdempotencyKey);
+                parentSpan?.SetTag("userId", @event.UserId);
+
                 var stateKey = $"{IdempotencyOptions.Prefix}{@event.IdempotencyKey}";
                 using (var spanIdempotency =
                        activitySource.StartActivity("provision.company.idempotency"))
                 {
+                    spanIdempotency?.SetTag("idempotency.state_key", stateKey);
+
                     logger.LogInformation("Received company created event {CompanyUId}", @event.Data.CompanyUId);
                     logger.LogDebug("Checking idempotency key {IdempotencyKey}", @event.IdempotencyKey);
                     var existing = await client.GetStateAsync<string>(StateStores.Redis, stateKey, cancellationToken: cancellationToken);
 
                     if (existing is not null)
                     {
+                        spanIdempotency?.SetTag("idempotency.duplicate", true);
                         logger.LogInformation("Skipping company provisioning. Idempotency key already processed");
                         return Results.Accepted();
                     }
+
+                    spanIdempotency?.SetTag("idempotency.duplicate", false);
 
                     await client.SaveStateAsync(
                         StateStores.Redis,
@@ -43,19 +55,19 @@ public static class CompanyCreatedEndpoint
                         metadata: new Dictionary<string, string> { ["ttlInSeconds"] = IdempotencyOptions.PendingTTLSeconds.ToString() },
                         cancellationToken: cancellationToken);
                 }
+
                 try
                 {
                     await saga.HandleAsync(@event, cancellationToken);
                 }
                 catch (Exception ex)
                 {
-                    using var spanError =
-                        activitySource.StartActivity("provision.company.error");
-
-                    spanError?.SetTag("exception", true);
-                    spanError?.SetTag("exception.message", ex.Message);
-                    logger.LogError(ex, "Unhandled error while provisioning company");
+                    parentSpan?.AddException(ex);
+                    parentSpan?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                    logger.LogError(ex, "Unhandled error while provisioning company {CompanyUId}", @event.Data.CompanyUId);
+                    return Results.Accepted();
                 }
+
                 using (activitySource.StartActivity("provision.company.finalize"))
                 {
                     logger.LogInformation("Marking provisioning workflow as completed");

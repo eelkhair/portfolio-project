@@ -25,3 +25,20 @@ public static class PubSubNames
     public const string RabbitMq = "rabbitmq.pubsub";
     public const string Redis = "redis.pubsub";
 }
+
+public static class MonolithTopicNames
+{
+    public const string CompanyCreatedV1 = "monolith.company-created.v1";
+    public const string JobCreatedV1 = "monolith.job-created.v1";
+
+    private static readonly Dictionary<string, string> EventTypeToTopic = new()
+    {
+        ["company.created.v1"] = CompanyCreatedV1,
+        ["job.created.v1"] = JobCreatedV1,
+    };
+
+    public static string GetTopicForEventType(string eventType)
+        => EventTypeToTopic.TryGetValue(eventType, out var topic)
+            ? topic
+            : throw new ArgumentException($"No topic mapped for event type '{eventType}'");
+}

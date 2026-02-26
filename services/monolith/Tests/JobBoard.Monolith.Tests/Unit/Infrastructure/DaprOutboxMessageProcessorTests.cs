@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Dapr.Client;
+using JobBoard.Domain;
 using JobBoard.Domain.Entities.Infrastructure;
 using JobBoard.infrastructure.Dapr;
 using NSubstitute;
@@ -27,10 +28,33 @@ public class DaprOutboxMessageProcessorTests
         await _sut.ProcessAsync(message, CancellationToken.None);
 
         await _daprClient.Received(1).PublishEventAsync(
-            "rabbitmq.pubsub",
-            "outbox-events",
+            PubSubNames.RabbitMq,
+            MonolithTopicNames.CompanyCreatedV1,
             Arg.Any<EventDto<object>>(),
             cancellationToken: Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ProcessAsync_ShouldRouteJobEventToJobTopic()
+    {
+        var message = CreateMessage("job.created.v1", """{"id": 1}""");
+
+        await _sut.ProcessAsync(message, CancellationToken.None);
+
+        await _daprClient.Received(1).PublishEventAsync(
+            PubSubNames.RabbitMq,
+            MonolithTopicNames.JobCreatedV1,
+            Arg.Any<EventDto<object>>(),
+            cancellationToken: Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ProcessAsync_ShouldThrowForUnknownEventType()
+    {
+        var message = CreateMessage("unknown.event", """{}""");
+
+        await Should.ThrowAsync<ArgumentException>(
+            () => _sut.ProcessAsync(message, CancellationToken.None));
     }
 
     [Fact]
@@ -51,7 +75,7 @@ public class DaprOutboxMessageProcessorTests
     [Fact]
     public async Task ProcessAsync_ShouldSetUserIdFromCreatedBy()
     {
-        var message = CreateMessage("test.event", """{}""", "user-42");
+        var message = CreateMessage("company.created.v1", """{}""", "user-42");
 
         await _sut.ProcessAsync(message, CancellationToken.None);
 
@@ -65,7 +89,7 @@ public class DaprOutboxMessageProcessorTests
     [Fact]
     public async Task ProcessAsync_ShouldSetIdempotencyKey()
     {
-        var message = CreateMessage("test.event", """{}""");
+        var message = CreateMessage("company.created.v1", """{}""");
 
         await _sut.ProcessAsync(message, CancellationToken.None);
 
