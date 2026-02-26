@@ -43,9 +43,6 @@ public static class CompanyCreatedEndpoint
                         metadata: new Dictionary<string, string> { ["ttlInSeconds"] = IdempotencyOptions.PendingTTLSeconds.ToString() },
                         cancellationToken: cancellationToken);
                 }
-
-                
-
                 try
                 {
                     await saga.HandleAsync(@event, cancellationToken);
