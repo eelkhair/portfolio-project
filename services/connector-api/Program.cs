@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using ConnectorAPI.Endpoints.Company;
+using ConnectorAPI.Endpoints.Job;
 using ConnectorAPI.Infrastructure;
 using Elkhair.Common.Observability;
 
@@ -18,6 +19,7 @@ var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
     app.UseCors(CorsPolicy);
     app.MapCompanyCreatedEndpoint()
+        .MapJobCreatedEndpoint()
         .MapSubscribeHandler();
 
     app.MapServices().Run();

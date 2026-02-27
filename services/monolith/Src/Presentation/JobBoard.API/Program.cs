@@ -15,7 +15,7 @@ using JobBoard.Infrastructure.Smtp;
 
 var builder = WebApplication.CreateBuilder(args);
 #if DEBUG
-// Debugger.Launch();
+ Debugger.Launch();
 #endif
 
 var isTesting = builder.Environment.IsEnvironment("Testing");

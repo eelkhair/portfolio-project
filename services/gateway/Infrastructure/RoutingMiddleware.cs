@@ -9,10 +9,7 @@ namespace Gateway.Api.Infrastructure;
 /// </summary>
 public class RoutingMiddleware(RequestDelegate next, IConfiguration configuration)
 {
-    private static readonly Regex JobsByIdPattern =
-        new(@"^/jobs/[0-9a-f-]+$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
-    public async Task InvokeAsync(HttpContext context)
+  public async Task InvokeAsync(HttpContext context)
     {
         if (context.Request.Path.StartsWithSegments("/ai/v2")
             || context.Request.Path.StartsWithSegments("/dapr/config")
@@ -27,13 +24,8 @@ public class RoutingMiddleware(RequestDelegate next, IConfiguration configuratio
 
         var isMonolith = configuration.GetValue<bool>("FeatureFlags:Monolith");
 
-        // GET /jobs/{guid} (list jobs) only exists on the admin API
-        var adminOnly = isMonolith
-            && context.Request.Method == "GET"
-            && context.Request.Path.Value is { } p
-            && JobsByIdPattern.IsMatch(p);
 
-        var mode = adminOnly ? "admin" : isMonolith ? "monolith" : "admin";
+        var mode =  isMonolith ? "monolith" : "admin";
         context.Request.Headers["x-mode"] = mode;
         Activity.Current?.SetTag("service", mode == "monolith" ? "Monolith" : "Admin");
 

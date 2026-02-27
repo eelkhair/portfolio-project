@@ -1,6 +1,7 @@
 ﻿using JobBoard.Application.Actions.Drafts.Generate;
 using JobBoard.Application.Actions.Drafts.List;
 using JobBoard.Application.Actions.Drafts.Rewrite;
+using JobBoard.Application.Actions.Drafts.Save;
 using JobBoard.Application.Actions.Jobs.Create;
 using JobBoard.Monolith.Contracts.Drafts;
 using JobBoard.Monolith.Contracts.Jobs;
@@ -45,11 +46,24 @@ public class JobsController : BaseApiController
     /// <summary>
     /// Updates specific fields of a job draft with new values based on the provided rewrite request.
     /// </summary>
+    /// <param name="companyId"></param>
     /// <param name="request">The request containing the field to be updated, its new value, and additional context or style information.</param>
     /// <returns>An IActionResult indicating the success or failure of the operation.</returns>
+    [HttpPut("{companyId:guid}/save-draft")]
+    public async Task<IActionResult> SaveDraft(Guid companyId, DraftResponse request)
+        => await ExecuteCommandAsync(new SaveDraftCommand
+        {
+            CompanyId = companyId,
+            Draft = request
+        }, Ok);
+
+    /// <summary>
+    /// Rewrites a job draft with new content based on the provided rewrite request.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPut("drafts/rewrite")]
     public async Task<IActionResult> RewriteDraftItem(DraftItemRewriteRequest request)
         => await ExecuteCommandAsync(new RewriteDraftItemCommand{DraftItemRewriteRequest = request}, Ok);
-    
-    
+
 }
