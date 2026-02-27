@@ -20,6 +20,12 @@ public class UserContextCommandHandlerDecorator<TRequest, TResult>(
             var authenticatedUserId = userAccessor.UserId;
             if (string.IsNullOrEmpty(authenticatedUserId))
             {
+                if (request is ISystemCommand)
+                {
+                    request.UserId = authenticatedUserId ?? string.Empty;
+                    return await decorated.HandleAsync(request, cancellationToken);
+                }
+
                 throw new UnauthorizedAccessException("User is not authenticated for this request.");
             }
             request.UserId = authenticatedUserId;

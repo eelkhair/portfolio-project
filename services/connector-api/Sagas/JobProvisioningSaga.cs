@@ -59,7 +59,7 @@ public class JobProvisioningSaga
                 publishedEvent.Data.UId = @event.Data.UId;
                 publishedEvent.Data.DraftId = @event.Data.DraftId;
 
-                await _daprClient.PublishEventAsync("rabbitmq.pubsub", "job.published", publishedEvent, ct);
+                await _daprClient.PublishEventAsync("rabbitmq.pubsub", "job.published.v2", publishedEvent, ct);
                 _logger.LogInformation("Saga step: Published job.published event {JobUId}", @event.Data.UId);
             }
 

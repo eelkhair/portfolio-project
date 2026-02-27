@@ -128,7 +128,10 @@ app.UseAuthentication();
 app.UseAuthorization();  
 app.UseCloudEvents();
 app.MapSubscribeHandler();
-app.UseFastEndpoints()
+app.UseFastEndpoints(c =>
+    {
+        c.Serializer.Options.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    })
     .UseSwaggerGen(
         uiConfig: ui =>
         {

@@ -7,7 +7,7 @@ public class JobApiResponse
     public Guid CompanyUId { get; set; }
     public string CompanyName { get; set; } = string.Empty;
     public string Location { get; set; } = string.Empty;
-    public int JobType { get; set; }
+    public string JobType { get; set; } = string.Empty;
     public string AboutRole { get; set; } = string.Empty;
     public string? SalaryRange { get; set; }
     public List<string> Responsibilities { get; set; } = [];

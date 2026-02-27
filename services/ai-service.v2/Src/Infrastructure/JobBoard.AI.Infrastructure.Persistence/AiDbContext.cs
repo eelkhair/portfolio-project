@@ -8,7 +8,7 @@ namespace JobBoard.AI.Infrastructure.Persistence;
 public sealed class AiDbContext : DbContext, IAiDbContext
 {
     public DbSet<Draft> Drafts => Set<Draft>();
-    public DbSet<DraftEmbedding> DraftEmbeddings => Set<DraftEmbedding>();
+    public DbSet<JobEmbedding> JobEmbeddings => Set<JobEmbedding>();
     
 
     public AiDbContext(DbContextOptions<AiDbContext> options)
@@ -31,15 +31,11 @@ public sealed class AiDbContext : DbContext, IAiDbContext
 
             b.Property(x => x.ContentJson)
                 .HasColumnType("jsonb");
-
-            b.HasMany(x => x.Embeddings)
-                .WithOne(x => x.Draft)
-                .HasForeignKey(x => x.DraftId)
-                .OnDelete(DeleteBehavior.Cascade);
+            
         });
-        modelBuilder.Entity<DraftEmbedding>(b =>
+        modelBuilder.Entity<JobEmbedding>(b =>
         {
-            b.ToTable("draft_embeddings");
+            b.ToTable("job_embeddings");
 
             b.Property(x => x.VectorData)
                 .HasColumnType("vector(1536)")
@@ -53,10 +49,6 @@ public sealed class AiDbContext : DbContext, IAiDbContext
             b.Property(x => x.Model)
                 .HasConversion(v => v.Value, v => new(v));
             
-            b.HasOne(x => x.Draft)
-                .WithMany(x => x.Embeddings)
-                .HasForeignKey(x => x.DraftId)
-                .OnDelete(DeleteBehavior.Cascade);
         });
 
 
