@@ -4,16 +4,13 @@ namespace JobBoard.AI.Domain.Drafts;
 
 public sealed class Draft : AggregateRoot
 {
-    private readonly List<JobEmbedding> _embeddings = [];
-
+    
     private Draft() { } // EF
     public Guid CompanyId { get; private set; }
     public DraftType Type { get; private set; } = DraftType.Job;
     public DraftStatus Status { get; private set; } = DraftStatus.Draft;
     public string ContentJson { get; private set; } = "{}";
-
-    public IReadOnlyCollection<JobEmbedding> Embeddings => _embeddings;
-
+    
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
 
@@ -30,10 +27,5 @@ public sealed class Draft : AggregateRoot
         Status = DraftStatus.Generated;
         UpdatedAt = DateTime.UtcNow;
     }
-
-    public void AddEmbedding(JobEmbedding embedding)
-    {
-        _embeddings.Add(embedding);
-        UpdatedAt = DateTime.UtcNow;
-    }
+    
 }
