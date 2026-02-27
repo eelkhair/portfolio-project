@@ -156,6 +156,40 @@ public sealed class AiServiceClient(
         return result.Data!;
     }
 
+    public async Task<DraftResponse> SaveDraft(
+        Guid companyId,
+        DraftResponse draft,
+        CancellationToken cancellationToken)
+    {
+        var serviceName = AiSource;
+        EnrichActivity(companyId, "drafts.upsert", serviceName);
+
+        var request = CreateRequest(
+            HttpMethod.Put,
+            $"drafts/{companyId}/upsert",
+            serviceName);
+
+        request.Content = JsonContent.Create(draft, options: JsonOpts);
+
+        using var response =
+            await client.InvokeMethodWithResponseAsync(request, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+            await ThrowExternalServiceError(response, "drafts.upsert", cancellationToken, serviceName);
+
+        var result = await response.Content
+                         .ReadFromJsonAsync<ApiResponse<DraftResponse>>(JsonOpts, cancellationToken)
+                     ?? throw new InvalidOperationException($"{serviceName} returned empty JSON payload.");
+
+        logger.LogInformation(
+            "{ServiceName} saved draft {DraftId} for company {CompanyId}",
+            serviceName,
+            result.Data?.Id,
+            companyId);
+
+        return result.Data!;
+    }
+
     public async Task<ProviderSettings> GetProvider(CancellationToken cancellationToken)
     {
         EnrichActivity(null, "settings.get-provider", AiServiceV2);

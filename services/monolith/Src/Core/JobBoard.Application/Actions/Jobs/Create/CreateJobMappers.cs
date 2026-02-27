@@ -37,11 +37,13 @@ public static class CreateJobMappers
     {
         return new JobCreatedV1Event(
             UId: uid,
+            CompanyUId: request.CompanyUId,
             Title: request.Title,
             AboutRole: request.AboutRole,
             Location: request.Location,
             SalaryRange: request.SalaryRange,
             DraftId: request.DraftId,
+            DeleteDraft: request.DeleteDraft,
             Responsibilities: request.Responsibilities,
             Qualifications: request.Qualifications,
             JobType: request.JobType.ToString()
