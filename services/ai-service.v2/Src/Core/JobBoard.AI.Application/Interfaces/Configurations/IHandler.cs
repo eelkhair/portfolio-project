@@ -12,6 +12,7 @@ namespace JobBoard.AI.Application.Interfaces.Configurations;
     }
 
     public interface INoTransaction;
+    public interface ISystemCommand;
     public interface IRequest<TResult>
     {
         public string UserId { get; set; }

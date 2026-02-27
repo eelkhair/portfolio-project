@@ -5,11 +5,12 @@ using Pgvector;
 
 namespace JobBoard.AI.Domain.Drafts;
 
-public sealed class DraftEmbedding : Entity
+public sealed class JobEmbedding : Entity
 {
-    private DraftEmbedding() { }
-    public Guid DraftId { get; set; }
-    public Draft Draft { get; private set; } = default!;
+    private JobEmbedding() { }
+    public Guid JobId { get; private set; }
+    
+
     public Vector VectorData { get; private set; } = default!;
     
     public EmbeddingVector Vector => new(VectorData.ToArray());
@@ -18,11 +19,13 @@ public sealed class DraftEmbedding : Entity
     public ModelName Model { get; private set; } = default!;
     public DateTime CreatedAt { get; private set; }
 
-    public DraftEmbedding(
+    public JobEmbedding(
+        Guid jobId,
         EmbeddingVector vector,
         ProviderName provider,
         ModelName model)
     {
+        JobId = jobId;
         VectorData = new Vector(vector.Values);
         Provider = provider;
         Model = model;

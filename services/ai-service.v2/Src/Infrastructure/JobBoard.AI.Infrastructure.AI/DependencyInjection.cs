@@ -14,6 +14,7 @@ using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OpenAI.Chat;
+using OpenAI.Embeddings;
 
 namespace JobBoard.AI.Infrastructure.AI;
 
@@ -21,6 +22,9 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddAiServices(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddKeyedSingleton("openai.embedding", new EmbeddingClient(model: "text-embedding-3-small",
+            apiKey: configuration["AI:OPENAI_API_KEY"] ??
+                    throw new InvalidOperationException("Missing api key for OpenAI")).AsIEmbeddingGenerator());
 
         services.AddKeyedSingleton("openai", 
             new ChatClient(
@@ -55,6 +59,8 @@ public static class DependencyInjection
 
         services.AddScoped<IConversationStore, ConversationStore>();
         services.AddScoped<IChatService, ChatService>();
+        services.AddScoped<IEmbeddingService, EmbeddingService>();
+        services.AddScoped<IEmbeddingProviderResolver, EmbeddingProviderResolver>();
         return services;
     }
 }
