@@ -11,7 +11,7 @@
         <IsPackable>true</IsPackable>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Elkhair.Dev.Common" Version="1.0.17" />
+        <PackageReference Include="Elkhair.Dev.Common" Version="1.0.19" />
         <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.13.1" />
         <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.13.1" />
         <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.13.1" />
