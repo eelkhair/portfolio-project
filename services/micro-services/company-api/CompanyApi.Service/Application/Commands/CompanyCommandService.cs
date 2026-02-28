@@ -30,14 +30,16 @@ public class CompanyCommandService(ICompanyDbContext context): ICompanyCommandSe
         context.Companies.Add(company);
 
         await context.SaveChangesAsync(user, ct);
-        
-        return company.Adapt<CompanyResponse>();
+
+        var response = company.Adapt<CompanyResponse>();
+        response.IndustryUId = request.IndustryUId;
+        return response;
 
     }
 
     public async Task<CompanyResponse> UpdateAsync(Guid companyUId, UpdateCompanyRequest request, ClaimsPrincipal user, CancellationToken ct)
     {
-        var company = await context.Companies.SingleAsync(c => c.UId == companyUId, ct);
+        var company = await context.Companies.Include(c => c.Industry).SingleAsync(c => c.UId == companyUId, ct);
 
         company.Name = request.Name;
         company.Email = request.CompanyEmail;

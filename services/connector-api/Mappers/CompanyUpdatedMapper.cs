@@ -24,7 +24,7 @@ public static class CompanyUpdatedMapper
                 Founded = company.Founded,
                 Size = company.Size,
                 Logo = company.Logo,
-                IndustryUId = company.IndustryId
+                IndustryUId = company.IndustryUId
             },
             new CompanyUpdatedJobApiPayload
             {

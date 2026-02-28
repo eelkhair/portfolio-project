@@ -50,7 +50,7 @@ public class CompanyProvisioningSagaTests
             Name = "Test Company",
             Email = "test@company.com",
             Website = "https://test.com",
-            IndustryId = Guid.NewGuid()
+            IndustryUId = Guid.NewGuid()
         };
 
         _adminResult = new CompanyCreateUserResult
@@ -152,7 +152,7 @@ public class CompanyProvisioningSagaTests
                 p.CompanyId == _eventData.CompanyUId &&
                 p.Name == _companyResult.Name &&
                 p.CompanyEmail == _companyResult.Email &&
-                p.IndustryUId == _companyResult.IndustryId),
+                p.IndustryUId == _companyResult.IndustryUId),
             Arg.Any<CancellationToken>());
     }
 

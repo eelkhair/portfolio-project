@@ -21,7 +21,7 @@ public static class CompanyCreatedMapper
                 Name = company.Name,
                 CompanyEmail = company.Email,
                 CompanyWebsite = company.Website,
-                IndustryUId = company.IndustryId,
+                IndustryUId = company.IndustryUId,
                 UserId = evt.UserId
             },
             new EventDto<CompanyCreatedJobApiPayload>(evt.UserId, Guid.CreateVersion7().ToString(),
