@@ -17,7 +17,12 @@
       "Bash(dotnet list:*)",
       "Bash(dir /s \"C:\\\\Users\\\\elkha\\\\RiderProjects\\\\portfolio project\\\\services\\\\connector-api\")",
       "Bash(xargs:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(npx @angular/cli@latest version)",
+      "Bash(npx @angular/cli@21.2.0 new:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(node -e:*)"
     ]
   }
 }
