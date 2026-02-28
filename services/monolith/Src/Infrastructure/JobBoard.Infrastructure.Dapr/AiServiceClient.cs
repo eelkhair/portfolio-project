@@ -9,7 +9,6 @@ using JobBoard.Application.Interfaces.Infrastructure;
 using JobBoard.Application.Interfaces.Users;
 using JobBoard.Monolith.Contracts.Drafts;
 using JobBoard.Monolith.Contracts.Settings;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace JobBoard.infrastructure.Dapr;
@@ -17,13 +16,10 @@ namespace JobBoard.infrastructure.Dapr;
 public sealed class AiServiceClient(
     DaprClient client,
     IUserAccessor accessor,
-    IConfiguration configuration,
     ILogger<AiServiceClient> logger)
     : IAiServiceClient
 {
-    private const string AiServiceV1 = "ai-service";
     private const string AiServiceV2 = "ai-service-v2";
-    private string AiSource => configuration.GetValue<string>("ai-source") ?? AiServiceV2;
 
     private static readonly JsonSerializerOptions JsonOpts = new()
     {
@@ -36,46 +32,30 @@ public sealed class AiServiceClient(
         Guid companyId,
         CancellationToken cancellationToken)
     {
-        var serviceName = AiSource;
-        EnrichActivity(companyId, "drafts.list", serviceName);
-        
+        EnrichActivity(companyId, "drafts.list", AiServiceV2);
+
         var request = CreateRequest(
             HttpMethod.Get,
             $"drafts/{companyId}",
-            serviceName);
-        
+            AiServiceV2);
+
         using var response =
             await client.InvokeMethodWithResponseAsync(request, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
-            await ThrowExternalServiceError(response, "drafts.list", cancellationToken, serviceName);
+            await ThrowExternalServiceError(response, "drafts.list", cancellationToken, AiServiceV2);
 
-        if (serviceName == AiServiceV1)
-        {
-            var drafts = await response.Content
-                                     .ReadFromJsonAsync<List<DraftResponse>>(JsonOpts, cancellationToken)
-                                 ?? throw new InvalidOperationException($"{AiServiceV1} returned empty JSON payload.");
-            
-                    Activity.Current?.SetTag("ai.drafts.count", drafts.Count);
-            
-                    logger.LogInformation(
-                        "ai-service returned {DraftCount} drafts for company {CompanyId}",
-                        drafts.Count,
-                        companyId);
-            
-                    return drafts;
-        }
         var results = await response.Content
                          .ReadFromJsonAsync<ApiResponse<List<DraftResponse>>>(JsonOpts, cancellationToken)
-                     ?? throw new InvalidOperationException($"{AiServiceV1} returned empty JSON payload.");
-            
+                     ?? throw new InvalidOperationException($"{AiServiceV2} returned empty JSON payload.");
+
         Activity.Current?.SetTag("ai.drafts.count", results.Data?.Count);
-            
+
         logger.LogInformation(
-            "ai-service returned {DraftCount} drafts for company {CompanyId}",
+            "ai-service-v2 returned {DraftCount} drafts for company {CompanyId}",
             results.Data?.Count,
             companyId);
-            
+
         return results.Data!;
     }
 
@@ -83,13 +63,12 @@ public sealed class AiServiceClient(
         DraftItemRewriteRequest requestModel,
         CancellationToken cancellationToken)
     {
-        var serviceName = AiSource;
-        EnrichActivity(null, "drafts.rewrite.item", serviceName);
+        EnrichActivity(null, "drafts.rewrite.item", AiServiceV2);
 
         var request = CreateRequest(
             HttpMethod.Put,
             "drafts/rewrite/item",
-            serviceName);
+            AiServiceV2);
 
         request.Content = JsonContent.Create(requestModel, options: JsonOpts);
 
@@ -97,25 +76,13 @@ public sealed class AiServiceClient(
             await client.InvokeMethodWithResponseAsync(request, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
-            await ThrowExternalServiceError(response, "drafts.rewrite.item", cancellationToken, AiServiceV1);
+            await ThrowExternalServiceError(response, "drafts.rewrite.item", cancellationToken, AiServiceV2);
 
-        if (serviceName == AiServiceV1)
-        {
-             var result = await response.Content
-                                     .ReadFromJsonAsync<DraftRewriteResponse>(JsonOpts, cancellationToken)
-                                 ?? throw new InvalidOperationException($"{AiServiceV1} returned empty JSON payload.");
-            
-                    return result;
-        }
-        else
-        {
-            var result = await response.Content
-                             .ReadFromJsonAsync<ApiResponse<DraftRewriteResponse>>(JsonOpts, cancellationToken)
-                         ?? throw new InvalidOperationException($"{AiServiceV1} returned empty JSON payload.");
-            
-            return result.Data!;
-        }
-       
+        var result = await response.Content
+                         .ReadFromJsonAsync<ApiResponse<DraftRewriteResponse>>(JsonOpts, cancellationToken)
+                     ?? throw new InvalidOperationException($"{AiServiceV2} returned empty JSON payload.");
+
+        return result.Data!;
     }
 
     public async Task<DraftGenResponse> GenerateDraft(
@@ -123,13 +90,12 @@ public sealed class AiServiceClient(
         DraftGenRequest requestModel,
         CancellationToken cancellationToken)
     {
-        var serviceName = AiSource;
-        EnrichActivity(companyId, "drafts.generate", serviceName);
+        EnrichActivity(companyId, "drafts.generate", AiServiceV2);
 
         var request = CreateRequest(
             HttpMethod.Post,
             $"drafts/{companyId}/generate",
-            serviceName);
+            AiServiceV2);
 
         request.Content = JsonContent.Create(requestModel, options: JsonOpts);
 
@@ -137,18 +103,18 @@ public sealed class AiServiceClient(
             await client.InvokeMethodWithResponseAsync(request, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
-            await ThrowExternalServiceError(response, "drafts.generate", cancellationToken, serviceName);
+            await ThrowExternalServiceError(response, "drafts.generate", cancellationToken, AiServiceV2);
 
         var result = await response.Content
                          .ReadFromJsonAsync<ApiResponse<DraftGenResponse>>(JsonOpts, cancellationToken)
-                     ?? throw new InvalidOperationException($"{serviceName} returned empty JSON payload.");
+                     ?? throw new InvalidOperationException($"{AiServiceV2} returned empty JSON payload.");
 
         Activity.Current?.SetTag("ai.draft.id", result.Data?.DraftId);
         Activity.Current?.SetTag("ai.draft.title", result.Data?.Title);
 
         logger.LogInformation(
             "{ServiceName} generated draft {DraftId} with title '{Title}' for company {CompanyId}",
-            serviceName,
+            AiServiceV2,
             result.Data?.DraftId,
             result.Data?.Title,
             companyId);
@@ -161,13 +127,12 @@ public sealed class AiServiceClient(
         DraftResponse draft,
         CancellationToken cancellationToken)
     {
-        var serviceName = AiSource;
-        EnrichActivity(companyId, "drafts.upsert", serviceName);
+        EnrichActivity(companyId, "drafts.upsert", AiServiceV2);
 
         var request = CreateRequest(
             HttpMethod.Put,
             $"drafts/{companyId}/upsert",
-            serviceName);
+            AiServiceV2);
 
         request.Content = JsonContent.Create(draft, options: JsonOpts);
 
@@ -175,15 +140,15 @@ public sealed class AiServiceClient(
             await client.InvokeMethodWithResponseAsync(request, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
-            await ThrowExternalServiceError(response, "drafts.upsert", cancellationToken, serviceName);
+            await ThrowExternalServiceError(response, "drafts.upsert", cancellationToken, AiServiceV2);
 
         var result = await response.Content
                          .ReadFromJsonAsync<ApiResponse<DraftResponse>>(JsonOpts, cancellationToken)
-                     ?? throw new InvalidOperationException($"{serviceName} returned empty JSON payload.");
+                     ?? throw new InvalidOperationException($"{AiServiceV2} returned empty JSON payload.");
 
         logger.LogInformation(
             "{ServiceName} saved draft {DraftId} for company {CompanyId}",
-            serviceName,
+            AiServiceV2,
             result.Data?.Id,
             companyId);
 

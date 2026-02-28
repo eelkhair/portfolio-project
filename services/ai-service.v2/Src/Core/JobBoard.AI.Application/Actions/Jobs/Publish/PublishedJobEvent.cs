@@ -1,4 +1,4 @@
-namespace JobBoard.AI.Application.Actions.Jobs;
+namespace JobBoard.AI.Application.Actions.Jobs.Publish;
 
 public class PublishedJobEvent
 {

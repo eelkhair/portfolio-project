@@ -4,6 +4,7 @@ using Dapr;
 using Dapr.Client;
 using Elkhair.Dev.Common.Dapr;
 using JobBoard.AI.Application.Actions.Jobs;
+using JobBoard.AI.Application.Actions.Jobs.Publish;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
 using Microsoft.AspNetCore.Authorization;
