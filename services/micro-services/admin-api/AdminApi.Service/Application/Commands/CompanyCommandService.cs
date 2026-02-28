@@ -18,4 +18,13 @@ public class CompanyCommandService(DaprClient client, UserContextService accesso
             client.InvokeMethodAsync<CompanyResponse>(message,cancellationToken: ct));
     }
 
+    public async Task<ApiResponse<CompanyResponse>> UpdateAsync(Guid companyUId, UpdateCompanyRequest request, CancellationToken ct)
+    {
+        logger.LogInformation("Calling company-api to update company: {CompanyUId}", companyUId);
+        var message = client.CreateInvokeMethodRequest(HttpMethod.Put, "company-api", $"companies/{companyUId}");
+        message.Headers.Add("Authorization", accessor.GetHeader("Authorization"));
+        message.Content = JsonContent.Create(request);
+        return await DaprExtensions.Process(() =>
+            client.InvokeMethodAsync<CompanyResponse>(message, cancellationToken: ct));
+    }
 }
