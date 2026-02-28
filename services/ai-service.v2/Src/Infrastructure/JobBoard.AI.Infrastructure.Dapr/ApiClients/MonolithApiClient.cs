@@ -4,6 +4,7 @@ using Elkhair.Dev.Common.Application;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Infrastructure.Dapr.AITools.Monolith.Companies;
 using JobBoard.Monolith.Contracts.Companies;
+using JobAPI.Contracts.Models.Jobs.Responses;
 using Microsoft.Extensions.Logging;
 
 namespace JobBoard.AI.Infrastructure.Dapr.ApiClients;
@@ -60,6 +61,22 @@ public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<Mon
             var response = ex.Response;
             var body = await response.Content.ReadAsStringAsync(ct);
             logger.LogError(ex, "Error creating job in monolith-api: {Body}", body);
+            throw;
+        }
+    }
+
+    public async Task<ODataResponse<List<JobResponse>>> ListJobsAsync(Guid companyUId, CancellationToken ct)
+    {
+        try
+        {
+            var request = CreateRequest(HttpMethod.Get, $"odata/jobs/{companyUId}", "monolith-api");
+            return await Client.InvokeMethodAsync<ODataResponse<List<JobResponse>>>(request, ct);
+        }
+        catch (InvocationException ex)
+        {
+            var response = ex.Response;
+            var body = await response.Content.ReadAsStringAsync(ct);
+            logger.LogError(ex, "Error getting jobs from monolith-api: {Body}", body);
             throw;
         }
     }
