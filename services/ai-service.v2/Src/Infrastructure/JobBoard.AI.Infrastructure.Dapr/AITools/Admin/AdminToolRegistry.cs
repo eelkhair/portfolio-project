@@ -28,5 +28,6 @@ public class AdminToolRegistry(IAdminApiClient client,
         yield return ListIndustriesTool.Get(activityFactory, client, cache, conversation, TimeSpan.FromMinutes(5));
         yield return CreateCompanyTool.Get(activityFactory, client);
         yield return CreateJobTool.Get(activityFactory, client, dbContext, loggerFactory, notificationHub, userAccessor);
+        yield return ListJobsTool.Get(activityFactory, client, cache, conversation, TimeSpan.FromMinutes(5));
     }
 }

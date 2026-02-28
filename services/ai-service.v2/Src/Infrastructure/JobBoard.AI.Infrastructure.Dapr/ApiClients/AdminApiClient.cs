@@ -3,6 +3,7 @@ using AdminAPI.Contracts.Models.Companies.Requests;
 using CompanyAPI.Contracts.Models.Companies.Responses;
 using CompanyAPI.Contracts.Models.Industries.Responses;
 using Dapr.Client;
+using JobAPI.Contracts.Models.Jobs.Responses;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using Microsoft.Extensions.Logging;
 
@@ -58,6 +59,22 @@ public class AdminApiClient(DaprClient client, IUserAccessor accessor, ILogger<A
             var response = ex.Response;
             var body = await response.Content.ReadAsStringAsync(ct);
             logger.LogError(ex, "Error creating job in admin-api: {Body}", body);
+            throw;
+        }
+    }
+
+    public async Task<ApiResponse<List<JobResponse>>> ListJobsAsync(Guid companyUId, CancellationToken ct)
+    {
+        try
+        {
+            var request = CreateRequest(HttpMethod.Get, $"jobs/{companyUId}", "admin-api");
+            return await Client.InvokeMethodAsync<ApiResponse<List<JobResponse>>>(request, ct);
+        }
+        catch (InvocationException ex)
+        {
+            var response = ex.Response;
+            var body = await response.Content.ReadAsStringAsync(ct);
+            logger.LogError(ex, "Error getting jobs from admin-api: {Body}", body);
             throw;
         }
     }
