@@ -2,6 +2,8 @@ using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using JobBoard.AI.Application.Actions.Drafts;
+using JobBoard.AI.Application.Interfaces.Configurations;
+using JobBoard.AI.Application.Interfaces.Notifications;
 using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Application.Interfaces.Persistence;
 using JobBoard.AI.Infrastructure.Dapr.AITools.Shared;
@@ -20,7 +22,7 @@ public static class CreateJobTool
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
 
-    public static AIFunction Get(IActivityFactory activityFactory, IMonolithApiClient client, IAiDbContext dbContext, ILoggerFactory loggerFactory)
+    public static AIFunction Get(IActivityFactory activityFactory, IMonolithApiClient client, IAiDbContext dbContext, ILoggerFactory loggerFactory, IAiNotificationHub notificationHub, IUserAccessor userAccessor)
     {
         var logger = loggerFactory.CreateLogger(typeof(CreateJobTool));
         return AIFunctionFactory.Create(
@@ -77,6 +79,31 @@ public static class CreateJobTool
                 var result = await client.CreateJobAsync(request, ct);
 
                 logger.LogInformation("Job created from draft {DraftId} via monolith-api", draftId);
+
+                var userId = userAccessor.UserId
+                             ?? throw new InvalidOperationException("UserId is required for AI notifications.");
+
+                var jobId = draftId;
+                if (result.Data is JsonElement je && je.TryGetProperty("id", out var idProp))
+                    jobId = idProp.GetString() ?? draftId;
+
+                await notificationHub.SendToUserAsync(
+                    userId,
+                    AiNotificationMethods.Notification,
+                    new AiNotificationDto(
+                        Type: "job.published",
+                        Title: content.Title,
+                        EntityId: jobId,
+                        EntityType: "job",
+                        TraceParent: Activity.Current?.Id,
+                        TraceState: Activity.Current?.TraceStateString,
+                        CorrelationId: activity?.TraceId.ToString(),
+                        Timestamp: DateTimeOffset.UtcNow,
+                        Metadata: new Dictionary<string, object>
+                        {
+                            { "companyId", draft.CompanyId }
+                        }
+                    ), ct);
 
                 return result;
             },

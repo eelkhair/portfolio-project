@@ -72,6 +72,9 @@ export class AiRealtimeService {
               case 'draft.generated':
                 await this.handleDraftGenerated(msg, span);
                 break;
+              case 'job.published':
+                await this.handleJobPublished(msg, span);
+                break;
               default:
                 this.notify.info('AI Notification', msg.type);
             }
@@ -114,6 +117,27 @@ export class AiRealtimeService {
       console.error(err);
     } finally {
       this.starting = false;
+    }
+  }
+
+  private async handleJobPublished(msg: AiNotificationDto, span: Span) {
+    const companyId = msg.metadata?.['companyId']?.toString();
+
+    this.notify.success('Job Published', `"${msg.title}" has been published`);
+
+    if (companyId && companyId !== '') {
+      const res = await firstValueFrom(this.companyService.listCompanies());
+      const company = res.data?.find(c => c.uId === companyId);
+      if (!company) return;
+
+      this.companySelectionStore.selectedCompany.set(company);
+      this.jobsStore.loadJobs();
+
+      if (this.router.url !== '/jobs') {
+        span.setAttribute('ui.action', 'navigate');
+        span.setAttribute('ui.route', '/jobs');
+        await this.router.navigate(['/jobs']);
+      }
     }
   }
 
