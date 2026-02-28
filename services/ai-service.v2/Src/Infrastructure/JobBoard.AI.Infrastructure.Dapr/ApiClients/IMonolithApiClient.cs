@@ -9,6 +9,7 @@ public interface IMonolithApiClient
     Task<ODataResponse<List<CompanyDto>>> ListCompaniesAsync(CancellationToken cancellationToken = default);
     Task<CompanyDto> CreateCompanyAsync(CreateCompanyCommand cmd, CancellationToken ct);
     Task<ODataResponse<List<IndustryDto>>> ListIndustriesAsync(CancellationToken ct);
+    Task<ApiResponse<object>> CreateJobAsync(object cmd, CancellationToken ct);
 }
 
 public sealed class ODataResponse<T>
