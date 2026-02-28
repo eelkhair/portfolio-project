@@ -23,9 +23,9 @@ import { Job } from '../../../core/types/job.type';
               </h4>
               <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ job.companyName }}</p>
               <div class="mt-2 flex items-center gap-2 text-xs text-slate-400">
-                <span>{{ job.type }}</span>
+                <span>{{ job.jobType }}</span>
                 <span>-</span>
-                <span>{{ job.postedAt | dateAgo }}</span>
+                <span>{{ job.createdAt | dateAgo }}</span>
               </div>
             </a>
           }

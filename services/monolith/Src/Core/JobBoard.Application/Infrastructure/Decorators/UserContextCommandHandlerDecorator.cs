@@ -14,6 +14,9 @@ public class UserContextCommandHandlerDecorator<TRequest, TResult>(
 {
     public async Task<TResult> HandleAsync(TRequest request, CancellationToken cancellationToken)
     {
+        if (request is IAnonymousRequest)
+            return await decorated.HandleAsync(request, cancellationToken);
+
         using (var activity = activityFactory.StartActivity(
                    $"{typeof(TRequest).Name}.user_context",
                    ActivityKind.Internal))

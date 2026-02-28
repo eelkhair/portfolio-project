@@ -1,20 +1,20 @@
-import { Injectable, signal } from '@angular/core';
-import { MockDataService } from '../services/mock-data.service';
+import { inject, Injectable, signal } from '@angular/core';
+import { ApiService } from '../services/api.service';
 import { Job } from '../types/job.type';
 
 @Injectable({ providedIn: 'root' })
 export class JobStore {
+  private readonly api = inject(ApiService);
+
   readonly jobs = signal<Job[]>([]);
   readonly currentJob = signal<Job | undefined>(undefined);
   readonly similarJobs = signal<Job[]>([]);
-  readonly featuredJobs = signal<Job[]>([]);
+  readonly latestJobs = signal<Job[]>([]);
   readonly loading = signal(false);
-
-  constructor(private dataService: MockDataService) {}
 
   loadJobs(): void {
     this.loading.set(true);
-    this.dataService.getJobs().subscribe((jobs) => {
+    this.api.getJobs().subscribe((jobs) => {
       this.jobs.set(jobs);
       this.loading.set(false);
     });
@@ -24,20 +24,20 @@ export class JobStore {
     this.loading.set(true);
     this.currentJob.set(undefined);
     this.similarJobs.set([]);
-    this.dataService.getJobById(id).subscribe((job) => {
+    this.api.getJobById(id).subscribe((job) => {
       this.currentJob.set(job);
       this.loading.set(false);
       if (job) {
-        this.dataService.getSimilarJobs(job).subscribe((similar) => {
+        this.api.getSimilarJobs(id, job.companyUId, job.jobType).subscribe((similar) => {
           this.similarJobs.set(similar);
         });
       }
     });
   }
 
-  loadFeaturedJobs(): void {
-    this.dataService.getFeaturedJobs().subscribe((jobs) => {
-      this.featuredJobs.set(jobs);
+  loadLatestJobs(): void {
+    this.api.getLatestJobs(6).subscribe((jobs) => {
+      this.latestJobs.set(jobs);
     });
   }
 }

@@ -33,10 +33,9 @@ import { SearchStore } from '../../../core/stores/search.store';
 
         <select [(ngModel)]="jobType" (change)="onSearch()" class="input-field md:w-44">
           <option value="">All Types</option>
-          <option value="full-time">Full-time</option>
-          <option value="part-time">Part-time</option>
+          <option value="fullTime">Full-time</option>
+          <option value="partTime">Part-time</option>
           <option value="contract">Contract</option>
-          <option value="remote">Remote</option>
           <option value="internship">Internship</option>
         </select>
 

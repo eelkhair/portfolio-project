@@ -27,13 +27,15 @@ public static class DependencyInjection
             options.AddPolicy("AllowMyFrontendApp", policy =>
             {
                 policy.WithOrigins(
-                        "http://localhost:4200", 
-                        "http://localhost:5280",   
+                        "http://localhost:4200",
+                        "http://localhost:3000",
+                        "http://localhost:5280",
                         "https://localhost:5280",
                         "http://127.0.0.1:4200",
                         "http://192.168.1.112:9000",
                         "https://swagger.eelkhair.net",
                         "https://job-admin.eelkhair.net",
+                        "https://job.eelkhair.net",
                         "http://127.0.0.1:5280"
                     )
                     .AllowAnyHeader()

@@ -1,12 +1,13 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { DatePipe } from '@angular/common';
 import { JobCard } from '../jobs/components/job-card';
 import { LoadingSpinner } from '../../shared/components/loading-spinner';
 import { CompanyStore } from '../../core/stores/company.store';
 
 @Component({
   selector: 'app-company-detail',
-  imports: [RouterLink, JobCard, LoadingSpinner],
+  imports: [RouterLink, JobCard, LoadingSpinner, DatePipe],
   template: `
     @if (store.loading()) {
       <app-loading-spinner label="Loading company..." />
@@ -32,13 +33,11 @@ import { CompanyStore } from '../../core/stores/company.store';
             <div>
               <h1 class="text-3xl font-bold">{{ company.name }}</h1>
               <div class="mt-2 flex flex-wrap items-center gap-3 text-slate-300">
-                <span>{{ company.industry }}</span>
-                <span class="text-slate-600">|</span>
-                <span>{{ company.location }}</span>
+                <span>{{ company.industryName }}</span>
                 <span class="text-slate-600">|</span>
                 <span>{{ company.size }} employees</span>
                 <span class="text-slate-600">|</span>
-                <span>Founded {{ company.founded }}</span>
+                <span>Founded {{ company.founded ? (company.founded | date:'yyyy') : 'N/A' }}</span>
               </div>
             </div>
           </div>
@@ -62,19 +61,15 @@ import { CompanyStore } from '../../core/stores/company.store';
             <dl class="mt-4 space-y-3">
               <div>
                 <dt class="text-xs text-slate-500 dark:text-slate-400">Industry</dt>
-                <dd class="font-medium text-slate-900 dark:text-white">{{ company.industry }}</dd>
+                <dd class="font-medium text-slate-900 dark:text-white">{{ company.industryName }}</dd>
               </div>
               <div>
                 <dt class="text-xs text-slate-500 dark:text-slate-400">Company Size</dt>
                 <dd class="font-medium text-slate-900 dark:text-white">{{ company.size }}</dd>
               </div>
               <div>
-                <dt class="text-xs text-slate-500 dark:text-slate-400">Location</dt>
-                <dd class="font-medium text-slate-900 dark:text-white">{{ company.location }}</dd>
-              </div>
-              <div>
                 <dt class="text-xs text-slate-500 dark:text-slate-400">Founded</dt>
-                <dd class="font-medium text-slate-900 dark:text-white">{{ company.founded }}</dd>
+                <dd class="font-medium text-slate-900 dark:text-white">{{ company.founded ? (company.founded | date:'yyyy') : 'N/A' }}</dd>
               </div>
             </dl>
           </div>
