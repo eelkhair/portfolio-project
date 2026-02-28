@@ -9,8 +9,7 @@ using JobBoard.AI.Domain.AI;
 using JobBoard.AI.Domain.Drafts;
 using Microsoft.EntityFrameworkCore;
 
-
-namespace JobBoard.AI.Application.Actions.Jobs;
+namespace JobBoard.AI.Application.Actions.Jobs.Publish;
 
 public class PublishJobCommand(EventDto<PublishedJobEvent> @event) : BaseCommand<Unit>, ISystemCommand
 {
