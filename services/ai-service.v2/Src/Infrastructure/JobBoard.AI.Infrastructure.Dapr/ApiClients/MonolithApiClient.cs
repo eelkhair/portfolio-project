@@ -47,6 +47,23 @@ public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<Mon
     }
     
 
+    public async Task<ApiResponse<object>> CreateJobAsync(object cmd, CancellationToken ct)
+    {
+        try
+        {
+            var request = CreateRequest(HttpMethod.Post, "jobs", "monolith-api");
+            request.Content = JsonContent.Create(cmd);
+            return await Client.InvokeMethodAsync<ApiResponse<object>>(request, ct);
+        }
+        catch (InvocationException ex)
+        {
+            var response = ex.Response;
+            var body = await response.Content.ReadAsStringAsync(ct);
+            logger.LogError(ex, "Error creating job in monolith-api: {Body}", body);
+            throw;
+        }
+    }
+
     public async Task<ODataResponse<List<IndustryDto>>> ListIndustriesAsync(CancellationToken cancellationToken = default)
     {
         try

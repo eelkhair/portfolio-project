@@ -45,6 +45,23 @@ public class AdminApiClient(DaprClient client, IUserAccessor accessor, ILogger<A
         }
     }
 
+    public async Task<ApiResponse<object>> CreateJobAsync(object cmd, CancellationToken ct)
+    {
+        try
+        {
+            var request = CreateRequest(HttpMethod.Post, "jobs", "admin-api");
+            request.Content = JsonContent.Create(cmd);
+            return await Client.InvokeMethodAsync<ApiResponse<object>>(request, ct);
+        }
+        catch (InvocationException ex)
+        {
+            var response = ex.Response;
+            var body = await response.Content.ReadAsStringAsync(ct);
+            logger.LogError(ex, "Error creating job in admin-api: {Body}", body);
+            throw;
+        }
+    }
+
     public async Task<ApiResponse<List<IndustryResponse>>> ListIndustriesAsync(CancellationToken ct)
     {
         try
