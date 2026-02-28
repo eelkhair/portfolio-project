@@ -9,7 +9,7 @@ using Elkhair.Dev.Common.Application;
 
 namespace AdminApi.Application.Commands;
 
-public class OpenAICommandService(DaprClient client, UserContextService accessor, IConfiguration configuration, ILogger<OpenAICommandService> _logger): IOpenAICommandService
+public class OpenAICommandService(DaprClient client, UserContextService accessor, ILogger<OpenAICommandService> _logger): IOpenAICommandService
 {     
     static readonly JsonSerializerOptions JsonOpts = new()
          {
@@ -22,10 +22,9 @@ public class OpenAICommandService(DaprClient client, UserContextService accessor
     {
         try
         {
-            var service = configuration.GetValue<string>("ai-source") ?? "ai-service-v2";
             var req = client.CreateInvokeMethodRequest(
                 HttpMethod.Post,
-                appId: service,
+                appId: "ai-service-v2",
                 methodName: $"drafts/{companyId}/generate"
             );
 
@@ -42,26 +41,15 @@ public class OpenAICommandService(DaprClient client, UserContextService accessor
             if (!resp.IsSuccessStatusCode)
             {
 
-                _logger.LogError("ai-service returned {StatusCode}: {Body}", (int)resp.StatusCode, raw);
+                _logger.LogError("ai-service-v2 returned {StatusCode}: {Body}", (int)resp.StatusCode, raw);
 
                 throw new HttpRequestException(
-                    $"ai-service {resp.StatusCode}: {raw}", null, resp.StatusCode);
+                    $"ai-service-v2 {resp.StatusCode}: {raw}", null, resp.StatusCode);
             }
 
-            if (service == "ai-service-v2")
-            {
-                var result = JsonSerializer.Deserialize<ApiResponse<JobGenResponse>>(raw, JsonOpts);
+            var result = JsonSerializer.Deserialize<ApiResponse<JobGenResponse>>(raw, JsonOpts);
 
-                return result ?? throw new InvalidOperationException("Empty or invalid JSON from ai-service.");
-            }
-            else
-            {
-                var result = JsonSerializer.Deserialize<JobGenResponse>(raw, JsonOpts);
-                return new ApiResponse<JobGenResponse>()
-                    { Data = result, Success = true, StatusCode = HttpStatusCode.OK };
-            }
-
-           
+            return result ?? throw new InvalidOperationException("Empty or invalid JSON from ai-service-v2.");
         }catch (Exception e)
         {
             _logger.LogError(e, "Error generating job draft");

@@ -9,7 +9,7 @@ using JobAPI.Contracts.Models.Jobs.Responses;
 
 namespace AdminApi.Application.Queries;
 
-public class JobQueryService(DaprClient client, IConfiguration configuration, UserContextService accessor, ILogger<JobQueryService> _logger) : IJobQueryService
+public class JobQueryService(DaprClient client, UserContextService accessor, ILogger<JobQueryService> _logger) : IJobQueryService
 {
     static readonly JsonSerializerOptions JsonOpts = new()
     {
@@ -64,22 +64,20 @@ public class JobQueryService(DaprClient client, IConfiguration configuration, Us
             };
         }
     }
-    
+
     public async Task<ApiResponse<List<JobDraftResponse>>> ListDrafts(string companyId, CancellationToken ct = default)
     {
         try
         {
-            var service = configuration.GetValue<string>("ai-source") ?? "ai-service-v2";
-
             var req = client.CreateInvokeMethodRequest(
                 HttpMethod.Get,
-                appId: service,
+                appId: "ai-service-v2",
                 methodName: $"drafts/{companyId}"
             );
 
             if (accessor.GetHeader("Authorization") is { } auth && !string.IsNullOrWhiteSpace(auth))
                 req.Headers.TryAddWithoutValidation("Authorization", auth);
-            
+
 
             using var resp = await client.InvokeMethodWithResponseAsync(req, ct);
 
@@ -87,25 +85,18 @@ public class JobQueryService(DaprClient client, IConfiguration configuration, Us
 
             if (!resp.IsSuccessStatusCode)
             {
-
-                _logger.LogError("ai-service returned {StatusCode}: {Body}", (int)resp.StatusCode, raw);
+                _logger.LogError("ai-service-v2 returned {StatusCode}: {Body}", (int)resp.StatusCode, raw);
 
                 throw new HttpRequestException(
-                    $"ai-service {resp.StatusCode}: {raw}", null, resp.StatusCode);
+                    $"ai-service-v2 {resp.StatusCode}: {raw}", null, resp.StatusCode);
             }
 
-            if (service == "ai-service-v2")
-            {
-                var responses = JsonSerializer.Deserialize<ApiResponse<List<JobDraftResponse>>>(raw, JsonOpts);
+            var result = JsonSerializer.Deserialize<ApiResponse<List<JobDraftResponse>>>(raw, JsonOpts);
 
-                return responses ?? throw new InvalidOperationException("Empty or invalid JSON from ai-service.");
-            }
-            var result = JsonSerializer.Deserialize<List<JobDraftResponse>>(raw, JsonOpts);
-
-            return result is null ? throw new InvalidOperationException("Empty or invalid JSON from ai-service.") : new ApiResponse<List<JobDraftResponse>> { Data = result, Success = true, StatusCode = HttpStatusCode.OK };
+            return result ?? throw new InvalidOperationException("Empty or invalid JSON from ai-service-v2.");
         }catch (Exception e)
         {
-            _logger.LogError(e, "Error generating job draft");
+            _logger.LogError(e, "Error listing drafts");
             return new ApiResponse<List<JobDraftResponse>> { Success = false, StatusCode = HttpStatusCode.InternalServerError, Exceptions = new ApiError()
             {
                 Message = e.Message,

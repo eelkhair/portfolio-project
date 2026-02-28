@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using AdminApi.Application.Commands.Interfaces;
+using AdminAPI.Contracts.Models.Jobs.Events;
 using AdminAPI.Contracts.Models.Jobs.Requests;
 using Elkhair.Dev.Common.Application;
 using Elkhair.Dev.Common.Dapr;
@@ -27,22 +28,27 @@ public class CreateJobEndpoint(IJobCommandService service,
         act?.SetTag("job.create.start.sql", req);
         var response = await service.CreateJob(req, ct);
         act?.SetTag("job.create.end.sql", response);
-        if (response.Success)
+        if (response.Success && response.Data is { } job)
         {
-            if (req.DeleteDraft)
+            var publishedEvent = new JobPublishedEvent
             {
-                using var draftTrace = act?.SetTag("job.delete.draft.start", req.DraftId);
-                var deleteResponse = await service.DeleteDraft(req.DraftId, req.CompanyUId.ToString(), ct);
-                if (!deleteResponse.Success)
-                {
-                    response.StatusCode= deleteResponse.StatusCode;
-                    response.Exceptions= deleteResponse.Exceptions;
-                    response.Success= false;
-                }
-                draftTrace?.SetTag("job.delete.draft.end", deleteResponse);
-            }
-            
-            await sender.SendEventAsync(PubSubNames.RabbitMq, "job.published", User.GetUserId(), response.Data, ct);
+                UId = job.UId,
+                Title = job.Title,
+                CompanyUId = job.CompanyUId,
+                CompanyName = job.CompanyName,
+                Location = job.Location,
+                JobType = job.JobType.ToString(),
+                AboutRole = job.AboutRole,
+                SalaryRange = job.SalaryRange,
+                Responsibilities = job.Responsibilities,
+                Qualifications = job.Qualifications,
+                CreatedAt = job.CreatedAt,
+                UpdatedAt = job.UpdatedAt,
+                DraftId = req.DraftId,
+                DeleteDraft = req.DeleteDraft
+            };
+
+            await sender.SendEventAsync(PubSubNames.RabbitMq, "job.published.v2", User.GetUserId(), publishedEvent, ct);
         }
        
     
