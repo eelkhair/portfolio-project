@@ -16,7 +16,8 @@
       "Bash(xargs -I {} bash -c 'echo \"\"File: {}\"\"; head -50 {}')",
       "Bash(dotnet list:*)",
       "Bash(dir /s \"C:\\\\Users\\\\elkha\\\\RiderProjects\\\\portfolio project\\\\services\\\\connector-api\")",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "Bash(git checkout:*)"
     ]
   }
 }

@@ -51,7 +51,7 @@ public static class ListCompanyJobSummariesTool
             {
                 Name = "company_job_summaries",
                 Description =
-                    "Returns all companies with the number of published jobs for each company in a single call. ALWAYS use this tool instead of calling job_list multiple times when you need job counts, totals, or summaries across companies."
+                    "Returns all companies with their published jobs (title, location, type, salary range, date) and job count in a single call. ALWAYS use this tool first — it provides both summary counts AND full job listings for every company. Only use job_list if you need additional job details like responsibilities or qualifications."
             });
     }
 }

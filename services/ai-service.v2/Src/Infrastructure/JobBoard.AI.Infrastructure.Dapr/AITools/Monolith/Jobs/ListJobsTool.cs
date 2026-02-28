@@ -38,13 +38,13 @@ public static class ListJobsTool
                 var jobs = await client.ListJobsAsync(companyId, ct);
 
                 var envelope = new ToolResultEnvelope<List<JobResponse>>(
-                    jobs.Value,
-                    jobs.Value.Count,
+                    jobs,
+                    jobs.Count,
                     DateTimeOffset.UtcNow);
 
                 cache.Set(cacheKey, envelope, toolTtl);
 
-                activity?.SetTag("tool.result.count", jobs.Value.Count);
+                activity?.SetTag("tool.result.count", jobs.Count);
 
                 return envelope;
             },
@@ -52,7 +52,7 @@ public static class ListJobsTool
             {
                 Name = "job_list",
                 Description =
-                    "Returns detailed published jobs for a single company including title, location, job type, salary range, and creation date. Use only when you need full job details for one specific company. For job counts across companies, use company_job_summaries instead."
+                    "Returns detailed published jobs for a single company including responsibilities, qualifications, and about role. Use only when you need these extra details beyond what company_job_summaries already provides."
             });
     }
 }

@@ -22,11 +22,33 @@ public class JobQueryService(IJobDbContext context): IJobQueryService
 
     public async Task<List<CompanyJobSummaryResponse>> ListCompanyJobSummariesAsync(CancellationToken ct)
     {
-        return await context.Companies
-            .Select(c => new CompanyJobSummaryResponse(
+        var companies = await context.Companies
+            .Select(c => new
+            {
                 c.UId,
                 c.Name,
-                c.Jobs.Count))
+                Jobs = c.Jobs.Select(j => new
+                {
+                    j.Title,
+                    j.Location,
+                    j.JobType,
+                    j.SalaryRange,
+                    j.CreatedAt
+                }).ToList()
+            })
             .ToListAsync(ct);
+
+        return companies.Select(c => new CompanyJobSummaryResponse(
+            c.UId,
+            c.Name,
+            c.Jobs.Count,
+            c.Jobs.Select(j => new JobSummaryItem(
+                j.Title,
+                j.Location,
+                j.JobType.ToString(),
+                j.SalaryRange,
+                j.CreatedAt
+            )).ToList()
+        )).ToList();
     }
 }

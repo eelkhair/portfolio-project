@@ -1,4 +1,6 @@
-﻿using Dapr.Client;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using Dapr.Client;
 using Dapr.Extensions.Configuration;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Infrastructure.Dapr.AITools;
@@ -19,7 +21,12 @@ public static class DependencyInjection
         string serviceName)
     {
         // Dapr client
-        builder.Services.AddDaprClient();
+        builder.Services.AddDaprClient(dapr => dapr.UseJsonSerializationOptions(new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = true,
+            Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+        }));
         builder.Services.AddKeyedScoped<IAiTools, MonolithToolRegistry>("monolith");
         builder.Services.AddKeyedScoped<IAiTools, AdminToolRegistry>("micro");
         builder.Services.AddScoped<IMonolithApiClient, MonolithApiClient>();
