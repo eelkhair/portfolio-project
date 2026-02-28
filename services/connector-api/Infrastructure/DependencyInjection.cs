@@ -52,6 +52,7 @@ public static class DependencyInjection
         services.AddScoped<IJobApiClient, JobApiClient>();
         services.AddScoped<IUserApiClient, UserApiClient>();
         services.AddScoped<CompanyProvisioningSaga>();
+        services.AddScoped<UpdateCompanySaga>();
         services.AddScoped<JobProvisioningSaga>();
 
         return services;

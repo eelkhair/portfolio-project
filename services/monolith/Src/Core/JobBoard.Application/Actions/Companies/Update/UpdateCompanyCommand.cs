@@ -50,6 +50,8 @@ public class UpdateCompanyCommandHandler(
         var industryId = await companyRepository.GetIndustryIdByUId(request.IndustryUId, cancellationToken);
         company.SetIndustry(industryId);
 
+        var integrationEvent = request.ToIntegrationEvent(company.Id);
+        await OutboxPublisher.PublishAsync(integrationEvent, cancellationToken);
         await Context.SaveChangesAsync(request.UserId, cancellationToken);
 
         UnitOfWorkEvents.Enqueue(() =>

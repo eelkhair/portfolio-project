@@ -3,4 +3,5 @@
 public static class EventTypes
 {
     public const string CompanyCreated = "company.created";
+    public const string CompanyUpdated = "company.updated";
 }

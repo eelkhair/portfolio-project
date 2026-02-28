@@ -3,6 +3,7 @@ using ConnectorAPI.Interfaces;
 using ConnectorAPI.Interfaces.Clients;
 using ConnectorAPI.Models;
 using ConnectorAPI.Models.CompanyCreated;
+using ConnectorAPI.Models.CompanyUpdated;
 using ConnectorAPI.Models.JobCreated;
 using Dapr.Client;
 
@@ -27,5 +28,14 @@ public class JobApiClient(DaprClient client, ActivitySource activitySource, ILog
         var message = client.CreateInvokeMethodRequest(HttpMethod.Post, "job-api", "jobs");
         message.Content = JsonContent.Create(payload);
         return await client.InvokeMethodAsync<JobApiResponse>(message, cancellationToken);
+    }
+
+    public Task SendCompanyUpdatedAsync(Guid companyUId, CompanyUpdatedJobApiPayload payload, CancellationToken cancellationToken)
+    {
+        using var activity = activitySource.StartActivity("job-api.SendCompanyUpdatedAsync");
+        logger.LogInformation("Sending company updated event to job-api for {CompanyUId}", companyUId);
+        var message = client.CreateInvokeMethodRequest(HttpMethod.Put, "job-api", $"companies/{companyUId}");
+        message.Content = JsonContent.Create(payload);
+        return client.InvokeMethodAsync(message, cancellationToken);
     }
 }

@@ -29,11 +29,13 @@ public static class PubSubNames
 public static class MonolithTopicNames
 {
     public const string CompanyCreatedV1 = "monolith.company-created.v1";
+    public const string CompanyUpdatedV1 = "monolith.company-updated.v1";
     public const string JobCreatedV1 = "monolith.job-created.v1";
 
     private static readonly Dictionary<string, string> EventTypeToTopic = new()
     {
         ["company.created.v1"] = CompanyCreatedV1,
+        ["company.updated.v1"] = CompanyUpdatedV1,
         ["job.created.v1"] = JobCreatedV1,
     };
 
