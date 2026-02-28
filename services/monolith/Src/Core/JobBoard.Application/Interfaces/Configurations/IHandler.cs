@@ -14,6 +14,7 @@ namespace JobBoard.Application.Interfaces.Configurations;
     }
 
     public interface INoTransaction;
+    public interface IAnonymousRequest;
     public interface IRequest<TResult>
     {
         public string UserId { get; set; }

@@ -17,7 +17,7 @@ export const appConfig: ApplicationConfig = {
       ? [
           provideAuth0({
             domain: 'elkhair-dev.us.auth0.com',
-            clientId: 'YXnqj0gOfZJD8Ypje7mdZqdoenCHNzWA',
+            clientId: '32VHi7fNpZeUvHcYhM85fvVBRq9U38xV',
             authorizationParams: {
               audience: 'https://job-board.eelkhair.net',
               redirect_uri: window.location.origin,

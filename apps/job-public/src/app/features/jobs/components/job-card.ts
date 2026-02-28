@@ -27,13 +27,6 @@ import { Job } from '../../../core/types/job.type';
             <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ job().companyName }}</p>
           </div>
         </div>
-        @if (job().featured) {
-          <span
-            class="rounded-full bg-accent-500/10 px-3 py-1 text-xs font-medium text-accent-600 dark:text-accent-400"
-          >
-            Featured
-          </span>
-        }
       </div>
 
       <div class="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-500 dark:text-slate-400">
@@ -55,25 +48,13 @@ import { Job } from '../../../core/types/job.type';
         <span
           class="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700 dark:bg-slate-700 dark:text-slate-300"
         >
-          {{ job().type }}
+          {{ job().jobType }}
         </span>
-        <span class="font-medium text-slate-700 dark:text-slate-300">{{ job().salary }}</span>
+        <span class="font-medium text-slate-700 dark:text-slate-300">{{ job().salaryRange ?? 'Competitive' }}</span>
       </div>
 
-      <div class="mt-3 flex items-center justify-between">
-        <div class="flex flex-wrap gap-1.5">
-          @for (skill of job().skills.slice(0, 4); track skill) {
-            <span
-              class="rounded-md bg-primary-50 px-2 py-0.5 text-xs font-medium text-primary-700 dark:bg-primary-900/20 dark:text-primary-400"
-            >
-              {{ skill }}
-            </span>
-          }
-          @if (job().skills.length > 4) {
-            <span class="text-xs text-slate-400">+{{ job().skills.length - 4 }}</span>
-          }
-        </div>
-        <span class="text-xs text-slate-400 dark:text-slate-500">{{ job().postedAt | dateAgo }}</span>
+      <div class="mt-3 flex items-center justify-end">
+        <span class="text-xs text-slate-400 dark:text-slate-500">{{ job().createdAt | dateAgo }}</span>
       </div>
     </a>
   `,

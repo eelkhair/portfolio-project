@@ -32,7 +32,7 @@ import { JobStore } from '../../core/stores/job.store';
                 <h1 class="text-3xl font-bold">{{ job.title }}</h1>
                 <div class="mt-2 flex flex-wrap items-center gap-3 text-slate-300">
                   <a
-                    [routerLink]="['/companies', job.companyId]"
+                    [routerLink]="['/companies', job.companyUId]"
                     class="font-medium hover:text-white"
                   >
                     {{ job.companyName }}
@@ -40,11 +40,11 @@ import { JobStore } from '../../core/stores/job.store';
                   <span class="text-slate-600">|</span>
                   <span>{{ job.location }}</span>
                   <span class="text-slate-600">|</span>
-                  <span>{{ job.type }}</span>
+                  <span>{{ job.jobType }}</span>
                 </div>
                 <div class="mt-3 flex items-center gap-4">
-                  <span class="text-lg font-semibold text-accent-400">{{ job.salary }}</span>
-                  <span class="text-sm text-slate-400">Posted {{ job.postedAt | dateAgo }}</span>
+                  <span class="text-lg font-semibold text-accent-400">{{ job.salaryRange ?? 'Competitive' }}</span>
+                  <span class="text-sm text-slate-400">Posted {{ job.createdAt | dateAgo }}</span>
                 </div>
               </div>
             </div>
@@ -71,7 +71,7 @@ import { JobStore } from '../../core/stores/job.store';
             <section>
               <h2 class="section-heading">About this role</h2>
               <p class="mt-3 leading-relaxed text-slate-600 dark:text-slate-400">
-                {{ job.description }}
+                {{ job.aboutRole }}
               </p>
             </section>
 
@@ -118,19 +118,6 @@ import { JobStore } from '../../core/stores/job.store';
                 }
               </ul>
             </section>
-
-            <section>
-              <h2 class="section-heading">Skills</h2>
-              <div class="mt-3 flex flex-wrap gap-2">
-                @for (skill of job.skills; track skill) {
-                  <span
-                    class="rounded-lg bg-primary-50 px-3 py-1.5 text-sm font-medium text-primary-700 dark:bg-primary-900/20 dark:text-primary-400"
-                  >
-                    {{ skill }}
-                  </span>
-                }
-              </div>
-            </section>
           </div>
 
           <!-- Sidebar -->
@@ -148,7 +135,7 @@ import { JobStore } from '../../core/stores/job.store';
                 </div>
                 <div>
                   <a
-                    [routerLink]="['/companies', job.companyId]"
+                    [routerLink]="['/companies', job.companyUId]"
                     class="font-semibold text-slate-900 hover:text-primary-600 dark:text-white dark:hover:text-primary-400"
                   >
                     {{ job.companyName }}
@@ -156,7 +143,7 @@ import { JobStore } from '../../core/stores/job.store';
                 </div>
               </div>
               <a
-                [routerLink]="['/companies', job.companyId]"
+                [routerLink]="['/companies', job.companyUId]"
                 class="mt-4 inline-flex text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400"
               >
                 View company profile
@@ -173,12 +160,8 @@ import { JobStore } from '../../core/stores/job.store';
               </h3>
               <dl class="mt-4 space-y-3">
                 <div>
-                  <dt class="text-xs text-slate-500 dark:text-slate-400">Experience Level</dt>
-                  <dd class="font-medium text-slate-900 dark:text-white">{{ job.experienceLevel }}</dd>
-                </div>
-                <div>
                   <dt class="text-xs text-slate-500 dark:text-slate-400">Job Type</dt>
-                  <dd class="font-medium text-slate-900 dark:text-white">{{ job.type }}</dd>
+                  <dd class="font-medium text-slate-900 dark:text-white">{{ job.jobType }}</dd>
                 </div>
                 <div>
                   <dt class="text-xs text-slate-500 dark:text-slate-400">Location</dt>
@@ -186,7 +169,7 @@ import { JobStore } from '../../core/stores/job.store';
                 </div>
                 <div>
                   <dt class="text-xs text-slate-500 dark:text-slate-400">Salary</dt>
-                  <dd class="font-medium text-slate-900 dark:text-white">{{ job.salary }}</dd>
+                  <dd class="font-medium text-slate-900 dark:text-white">{{ job.salaryRange ?? 'Competitive' }}</dd>
                 </div>
               </dl>
             </div>

@@ -1,8 +1,8 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { JobCard } from '../jobs/components/job-card';
 import { JobStore } from '../../core/stores/job.store';
-import { MockDataService } from '../../core/services/mock-data.service';
+import { ApiService } from '../../core/services/api.service';
 
 @Component({
   selector: 'app-home',
@@ -54,11 +54,11 @@ import { MockDataService } from '../../core/services/mock-data.service';
       <div class="mx-auto max-w-7xl px-6 py-10">
         <div class="grid grid-cols-1 gap-8 sm:grid-cols-3">
           <div class="text-center">
-            <div class="text-3xl font-bold text-primary-600">{{ jobCount }}</div>
+            <div class="text-3xl font-bold text-primary-600">{{ jobCount() }}</div>
             <div class="mt-1 text-sm text-slate-500 dark:text-slate-400">Open Positions</div>
           </div>
           <div class="text-center">
-            <div class="text-3xl font-bold text-primary-600">{{ companyCount }}</div>
+            <div class="text-3xl font-bold text-primary-600">{{ companyCount() }}</div>
             <div class="mt-1 text-sm text-slate-500 dark:text-slate-400">Hiring Companies</div>
           </div>
           <div class="text-center">
@@ -69,12 +69,12 @@ import { MockDataService } from '../../core/services/mock-data.service';
       </div>
     </section>
 
-    <!-- Featured Jobs -->
+    <!-- Latest Jobs -->
     <section class="mx-auto max-w-7xl px-6 py-16">
       <div class="flex items-center justify-between">
         <div>
-          <h2 class="section-heading text-3xl">Featured Jobs</h2>
-          <p class="mt-2 section-subheading">Hand-picked opportunities from top companies.</p>
+          <h2 class="section-heading text-3xl">Latest Jobs</h2>
+          <p class="mt-2 section-subheading">Recently posted opportunities from top companies.</p>
         </div>
         <a
           routerLink="/jobs"
@@ -97,7 +97,7 @@ import { MockDataService } from '../../core/services/mock-data.service';
         </a>
       </div>
       <div class="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
-        @for (job of store.featuredJobs(); track job.id) {
+        @for (job of store.latestJobs(); track job.id) {
           <app-job-card [job]="job" class="animate-fade-in" />
         }
       </div>
@@ -148,12 +148,16 @@ import { MockDataService } from '../../core/services/mock-data.service';
 })
 export class Home implements OnInit {
   protected readonly store = inject(JobStore);
-  private readonly dataService = inject(MockDataService);
+  private readonly api = inject(ApiService);
 
-  readonly jobCount = this.dataService.getJobCount();
-  readonly companyCount = this.dataService.getCompanyCount();
+  readonly jobCount = signal(0);
+  readonly companyCount = signal(0);
 
   ngOnInit(): void {
-    this.store.loadFeaturedJobs();
+    this.store.loadLatestJobs();
+    this.api.getStats().subscribe((stats) => {
+      this.jobCount.set(stats.jobCount);
+      this.companyCount.set(stats.companyCount);
+    });
   }
 }

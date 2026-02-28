@@ -1,19 +1,16 @@
-export type JobType = 'Full-time' | 'Part-time' | 'Contract' | 'Remote' | 'Internship';
-export type ExperienceLevel = 'Entry' | 'Mid' | 'Senior' | 'Lead' | 'Principal';
+export type JobType = 'fullTime' | 'partTime' | 'contract' | 'internship';
 
 export interface Job {
   id: string;
   title: string;
-  companyId: string;
+  companyUId: string;
   companyName: string;
   location: string;
-  type: JobType;
-  experienceLevel: ExperienceLevel;
-  salary: string;
-  description: string;
+  jobType: JobType;
+  aboutRole: string;
+  salaryRange: string | null;
   responsibilities: string[];
   qualifications: string[];
-  skills: string[];
-  postedAt: Date;
-  featured: boolean;
+  createdAt: string;
+  updatedAt: string | null;
 }

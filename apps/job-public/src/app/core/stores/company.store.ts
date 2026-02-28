@@ -1,20 +1,20 @@
-import { Injectable, signal } from '@angular/core';
-import { MockDataService } from '../services/mock-data.service';
+import { inject, Injectable, signal } from '@angular/core';
+import { ApiService } from '../services/api.service';
 import { Company } from '../types/company.type';
 import { Job } from '../types/job.type';
 
 @Injectable({ providedIn: 'root' })
 export class CompanyStore {
+  private readonly api = inject(ApiService);
+
   readonly companies = signal<Company[]>([]);
   readonly currentCompany = signal<Company | undefined>(undefined);
   readonly companyJobs = signal<Job[]>([]);
   readonly loading = signal(false);
 
-  constructor(private dataService: MockDataService) {}
-
   loadCompanies(): void {
     this.loading.set(true);
-    this.dataService.getCompanies().subscribe((companies) => {
+    this.api.getCompanies().subscribe((companies) => {
       this.companies.set(companies);
       this.loading.set(false);
     });
@@ -24,11 +24,11 @@ export class CompanyStore {
     this.loading.set(true);
     this.currentCompany.set(undefined);
     this.companyJobs.set([]);
-    this.dataService.getCompanyById(id).subscribe((company) => {
+    this.api.getCompanyById(id).subscribe((company) => {
       this.currentCompany.set(company);
       this.loading.set(false);
       if (company) {
-        this.dataService.getJobsByCompany(company.id).subscribe((jobs) => {
+        this.api.getCompanyJobs(company.id).subscribe((jobs) => {
           this.companyJobs.set(jobs);
         });
       }
