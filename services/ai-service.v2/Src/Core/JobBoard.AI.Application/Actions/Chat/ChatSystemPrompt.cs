@@ -61,8 +61,8 @@ public sealed class ChatSystemPrompt : IChatSystemPrompt
                                      Execution:
                                      - Only after confirmation:
                                        - Execute the appropriate command tool exactly once.
-                                       - Report the result using values returned by the tool.             
-                                     
+                                       - Report the result using values returned by the tool.
+
                                      Cancellation:
                                      - If the user says “cancel”, “abort”, “never mind”, or “stop”:
                                        - Immediately cancel the current operation.
