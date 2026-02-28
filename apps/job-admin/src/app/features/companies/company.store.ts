@@ -3,6 +3,7 @@ import { CompanyService } from '../../core/services/company.service';
 import { Company } from '../../core/types/models/Company';
 import { Industry } from '../../core/types/models/Industry';
 import { CreateCompanyDto } from '../../core/types/Dtos/CreateCompanyDto';
+import { UpdateCompanyDto } from '../../core/types/Dtos/UpdateCompanyDto';
 import { NotificationService } from '../../core/services/notification.service';
 import { RealtimeNotificationsService } from '../../core/services/realtime-notifications.service';
 import { tap, finalize } from 'rxjs/operators';
@@ -89,6 +90,30 @@ export class CompanyStore {
             'Error',
             'Failed to create company'
           );
+        }
+      }),
+      finalize(() => this.loading.set(false))
+    );
+  }
+
+  updateCompany(id: string, dto: UpdateCompanyDto) {
+    this.loading.set(true);
+    this.error.set(null);
+
+    return this.companyService.updateCompany(id, dto).pipe(
+      tap({
+        next: response => {
+          if (response?.data) {
+            this.selectedCompany.set(response.data);
+            this.companies.update(list =>
+              list.map(c => c.uId === id ? { ...c, ...response.data! } : c)
+            );
+          }
+          this.notificationService.success('Success', 'Company updated successfully');
+        },
+        error: err => {
+          this.error.set(err.message ?? 'Failed to update company');
+          this.notificationService.error('Error', 'Failed to update company');
         }
       }),
       finalize(() => this.loading.set(false))

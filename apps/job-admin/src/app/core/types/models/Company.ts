@@ -13,6 +13,5 @@ export interface Company extends BaseAuditableEntity {
   logo?: string | undefined;
   status?: string | undefined;
   isActive?: boolean;
-
-
+  industryUId?: string;
 }

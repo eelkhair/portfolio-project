@@ -98,7 +98,7 @@ public class Company : BaseAuditableEntity
         Size = CompanySize.Create(size)
             .Ensure<CompanySize, string?>("Company.InvalidSize");
 
-    internal void SetIndustry(int industryId)
+    public void SetIndustry(int industryId)
     {
         IndustryId = industryId;
     }

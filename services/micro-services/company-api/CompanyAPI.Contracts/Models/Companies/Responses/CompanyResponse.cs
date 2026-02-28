@@ -13,4 +13,5 @@ public class CompanyResponse : BaseDto
     public string? Size { get; set; }
     public string? Logo { get; set; }
     public string Status { get; set; } = string.Empty;
+    public Guid IndustryUId { get; set; }
 }

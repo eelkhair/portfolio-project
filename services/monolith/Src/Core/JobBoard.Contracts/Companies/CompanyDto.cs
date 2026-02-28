@@ -25,5 +25,5 @@ public class CompanyDto : BaseDto
     public string Status { get; set; } = string.Empty;
     
     public IndustryDto? Industry { get; set; }
-    public Guid IndustryId { get; set; }
+    public Guid IndustryUId { get; set; }
 }

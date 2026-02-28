@@ -3,6 +3,7 @@ using JobBoard.API.Infrastructure.Authorization;
 using JobBoard.API.Infrastructure.SignalR.CompanyActivation;
 using JobBoard.Application.Actions.Companies.Activate;
 using JobBoard.Application.Actions.Companies.Create;
+using JobBoard.Application.Actions.Companies.Update;
 using JobBoard.Application.Interfaces.Users;
 using JobBoard.Monolith.Contracts.Companies;
 using Microsoft.AspNetCore.Authorization;
@@ -26,6 +27,18 @@ public class CompaniesController(IUserAccessor accessor, ICompanyActivationNotif
     public async Task<IActionResult> Create([FromBody] CreateCompanyCommand command)
         => await ExecuteCommandAsync(command, result =>
             CreatedOData("companies", result.Data!.Id, result));
+
+    /// <summary>
+    /// Update Company
+    /// </summary>
+    [HttpPut("{id:guid}")]
+    [StandardApiResponses]
+    [ProducesResponseType(typeof(ApiResponse<CompanyDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateCompanyCommand command)
+    {
+        command.Id = id;
+        return await ExecuteCommandAsync(command, Ok);
+    }
 
     /// <summary>
     /// Processes a request indicating that a company has been successfully created

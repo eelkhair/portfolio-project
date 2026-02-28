@@ -11,7 +11,8 @@ public class Mappers : IRegister
     public void Register(TypeAdapterConfig config)
     {
         #region Company
-        config.NewConfig<Company, CompanyResponse>();
+        config.NewConfig<Company, CompanyResponse>()
+            .Map(dest => dest.IndustryUId, src => src.Industry.UId);
         
         
         config.NewConfig<CreateCompanyRequest, Company>()
