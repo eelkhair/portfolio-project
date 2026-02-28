@@ -5,6 +5,7 @@ using CompanyAPI.Contracts.Models.Industries.Responses;
 using Dapr.Client;
 using JobAPI.Contracts.Models.Jobs.Responses;
 using JobBoard.AI.Application.Interfaces.Configurations;
+using JobBoard.AI.Infrastructure.Dapr.AITools.Shared;
 using Microsoft.Extensions.Logging;
 
 namespace JobBoard.AI.Infrastructure.Dapr.ApiClients;
@@ -75,6 +76,22 @@ public class AdminApiClient(DaprClient client, IUserAccessor accessor, ILogger<A
             var response = ex.Response;
             var body = await response.Content.ReadAsStringAsync(ct);
             logger.LogError(ex, "Error getting jobs from admin-api: {Body}", body);
+            throw;
+        }
+    }
+
+    public async Task<ApiResponse<List<CompanyJobSummaryDto>>> ListCompanyJobSummariesAsync(CancellationToken ct)
+    {
+        try
+        {
+            var request = CreateRequest(HttpMethod.Get, "companies/job-summaries", "admin-api");
+            return await Client.InvokeMethodAsync<ApiResponse<List<CompanyJobSummaryDto>>>(request, ct);
+        }
+        catch (InvocationException ex)
+        {
+            var response = ex.Response;
+            var body = await response.Content.ReadAsStringAsync(ct);
+            logger.LogError(ex, "Error getting company job summaries from admin-api: {Body}", body);
             throw;
         }
     }
