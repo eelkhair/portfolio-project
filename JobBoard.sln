@@ -196,6 +196,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ADRs", "ADRs", "{97769D49-1
 		docs\ADRs\ADR-006-RabbitMQ-vs-Azure-Service-Bus.md = docs\ADRs\ADR-006-RabbitMQ-vs-Azure-Service-Bus.md
 		docs\ADRs\ADR-007-Trace-Context-Propagation.md = docs\ADRs\ADR-007-Trace-Context-Propagation.md
 		docs\ADRs\ADR-008-YARP-Gateway-Direct-Proxy.md = docs\ADRs\ADR-008-YARP-Gateway-Direct-Proxy.md
+		docs\ADRs\ADR-009-AI-Service-Multi-Provider-Function-Calling.md = docs\ADRs\ADR-009-AI-Service-Multi-Provider-Function-Calling.md
+		docs\ADRs\ADR-010-Real-Time-AI-Notifications-SignalR.md = docs\ADRs\ADR-010-Real-Time-AI-Notifications-SignalR.md
+		docs\ADRs\ADR-011-Strangler-Fig-Connector-API-Provisioning-Sagas.md = docs\ADRs\ADR-011-Strangler-Fig-Connector-API-Provisioning-Sagas.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{5206DCD5-98FA-4BD9-BF78-26DBDCA37EF0}"
