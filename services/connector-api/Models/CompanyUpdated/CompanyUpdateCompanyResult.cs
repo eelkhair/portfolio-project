@@ -12,5 +12,5 @@ public class CompanyUpdateCompanyResult
     public DateTime? Founded { get; set; }
     public string? Size { get; set; }
     public string? Logo { get; set; }
-    public Guid IndustryId { get; set; }
+    public Guid IndustryUId { get; set; }
 }

@@ -22,7 +22,7 @@ public class CompanyCreatedMapperTests
         Name = "Acme Corp",
         Email = "info@acme.com",
         Website = "https://acme.com",
-        IndustryId = Guid.NewGuid()
+        IndustryUId = Guid.NewGuid()
     };
 
     private readonly CompanyCreateUserResult _admin = new()
@@ -63,7 +63,7 @@ public class CompanyCreatedMapperTests
     {
         var company = new CompanyCreateCompanyResult
         {
-            Name = "Test", Email = "test@test.com", Website = null, IndustryId = Guid.NewGuid()
+            Name = "Test", Email = "test@test.com", Website = null, IndustryUId = Guid.NewGuid()
         };
 
         var result = CompanyCreatedMapper.Map(_event, company, _admin);
@@ -76,7 +76,7 @@ public class CompanyCreatedMapperTests
     {
         var result = CompanyCreatedMapper.Map(_event, _company, _admin);
 
-        result.Company.IndustryUId.ShouldBe(_company.IndustryId);
+        result.Company.IndustryUId.ShouldBe(_company.IndustryUId);
         result.Company.UserId.ShouldBe(_event.UserId);
     }
 

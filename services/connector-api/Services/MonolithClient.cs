@@ -22,7 +22,7 @@ public class MonolithOClient(DaprClient daprClient, ILogger<MonolithOClient> log
     {
         var companyRoute = ODataRouteBuilder.CompanyById(companyId, q =>
         {
-            q["$select"] = "name,email,website,industryId";
+            q["$select"] = "name,email,website,industryUId";
         });
 
         var adminRoute = ODataRouteBuilder.UserById(adminId, q =>
@@ -76,7 +76,7 @@ public class MonolithOClient(DaprClient daprClient, ILogger<MonolithOClient> log
     {
         var companyRoute = ODataRouteBuilder.CompanyById(companyId, q =>
         {
-            q["$select"] = "name,email,website,phone,description,about,eeo,founded,size,logo,industryId";
+            q["$select"] = "name,email,website,phone,description,about,eeo,founded,size,logo,industryUId";
         });
 
         var companyRequest = CreateGetRequest(companyRoute, userId);
