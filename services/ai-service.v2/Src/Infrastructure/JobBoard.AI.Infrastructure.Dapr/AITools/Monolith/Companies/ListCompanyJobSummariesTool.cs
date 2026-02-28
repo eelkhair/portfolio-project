@@ -1,32 +1,31 @@
 using System.Diagnostics;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
+using JobBoard.AI.Infrastructure.Dapr.AITools.Shared;
 using JobBoard.AI.Infrastructure.Dapr.ApiClients;
-using JobAPI.Contracts.Models.Jobs.Responses;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace JobBoard.AI.Infrastructure.Dapr.AITools.Monolith.Jobs;
+namespace JobBoard.AI.Infrastructure.Dapr.AITools.Monolith.Companies;
 
-public static class ListJobsTool
+public static class ListCompanyJobSummariesTool
 {
     public static AIFunction Get(IActivityFactory activityFactory, IMonolithApiClient client, IMemoryCache cache, IConversationContext conversation, TimeSpan toolTtl)
     {
         return AIFunctionFactory.Create(
-            async (Guid companyId, CancellationToken ct) =>
+            async (CancellationToken ct) =>
             {
                 using var activity = activityFactory.StartActivity(
-                    "tool.job_list",
+                    "tool.company_job_summaries",
                     ActivityKind.Internal);
 
-                activity?.AddTag("ai.operation", "job_list");
-                activity?.AddTag("tool.company_id", companyId);
+                activity?.AddTag("ai.operation", "company_job_summaries");
 
-                var cacheKey = $"job_list:{conversation.ConversationId}:{companyId}";
+                var cacheKey = $"company_job_summaries:{conversation.ConversationId}";
                 activity?.SetTag("tool.cache.key", cacheKey);
                 activity?.SetTag("tool.ttl.seconds", toolTtl.TotalSeconds);
 
-                if (cache.TryGetValue(cacheKey, out ToolResultEnvelope<List<JobResponse>>? cached))
+                if (cache.TryGetValue(cacheKey, out ToolResultEnvelope<List<CompanyJobSummaryDto>>? cached))
                 {
                     activity?.SetTag("tool.cache.hit", true);
                     return cached;
@@ -35,24 +34,24 @@ public static class ListJobsTool
                 activity?.AddTag("tool.source", "monolith");
                 activity?.SetTag("tool.cache.hit", false);
 
-                var jobs = await client.ListJobsAsync(companyId, ct);
+                var summaries = await client.ListCompanyJobSummariesAsync(ct);
 
-                var envelope = new ToolResultEnvelope<List<JobResponse>>(
-                    jobs.Value,
-                    jobs.Value.Count,
+                var envelope = new ToolResultEnvelope<List<CompanyJobSummaryDto>>(
+                    summaries.Value,
+                    summaries.Value.Count,
                     DateTimeOffset.UtcNow);
 
                 cache.Set(cacheKey, envelope, toolTtl);
 
-                activity?.SetTag("tool.result.count", jobs.Value.Count);
+                activity?.SetTag("tool.result.count", summaries.Value.Count);
 
                 return envelope;
             },
             new AIFunctionFactoryOptions
             {
-                Name = "job_list",
+                Name = "company_job_summaries",
                 Description =
-                    "Returns detailed published jobs for a single company including title, location, job type, salary range, and creation date. Use only when you need full job details for one specific company. For job counts across companies, use company_job_summaries instead."
+                    "Returns all companies with the number of published jobs for each company in a single call. ALWAYS use this tool instead of calling job_list multiple times when you need job counts, totals, or summaries across companies."
             });
     }
 }

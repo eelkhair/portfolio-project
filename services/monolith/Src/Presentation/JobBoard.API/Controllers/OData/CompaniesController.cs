@@ -40,5 +40,16 @@ public class CompaniesController : BaseODataController
        var company = companies.FirstOrDefault(c => c.Id == id);
        return Ok(company);
     }
-        
+
+    /// <summary>
+    /// Returns all companies with their published job counts.
+    /// </summary>
+    [HttpGet]
+    [EnableQuery]
+    [Route("companies/job-summaries")]
+    public async Task<IActionResult> GetJobSummaries()
+    {
+        var summaries = await ExecuteODataQueryAsync(new GetCompanyJobSummariesQuery());
+        return Ok(summaries);
+    }
   }

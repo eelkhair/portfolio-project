@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using JobBoard.AI.Infrastructure.Dapr.AITools.Monolith.Companies;
+using JobBoard.AI.Infrastructure.Dapr.AITools.Shared;
 using JobBoard.Monolith.Contracts.Companies;
 using JobAPI.Contracts.Models.Jobs.Responses;
 
@@ -12,6 +13,7 @@ public interface IMonolithApiClient
     Task<ODataResponse<List<IndustryDto>>> ListIndustriesAsync(CancellationToken ct);
     Task<ApiResponse<object>> CreateJobAsync(object cmd, CancellationToken ct);
     Task<ODataResponse<List<JobResponse>>> ListJobsAsync(Guid companyUId, CancellationToken ct);
+    Task<ODataResponse<List<CompanyJobSummaryDto>>> ListCompanyJobSummariesAsync(CancellationToken ct);
 }
 
 public sealed class ODataResponse<T>
