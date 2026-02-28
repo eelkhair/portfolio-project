@@ -1,4 +1,5 @@
 ﻿using ConnectorAPI.Models.CompanyCreated;
+using ConnectorAPI.Models.CompanyUpdated;
 using JobBoard.IntegrationEvents.Company;
 
 namespace ConnectorAPI.Interfaces.Clients;
@@ -14,4 +15,9 @@ public interface IMonolithClient
 
     Task ActivateCompanyAsync(CompanyCreatedV1Event eventData, CompanyCreateCompanyResult company,
         CompanyCreatedUserApiPayload userApiResponse, CancellationToken cancellationToken);
+
+    Task<CompanyUpdateCompanyResult> GetCompanyForUpdatedEventAsync(
+        Guid companyId,
+        string userId,
+        CancellationToken cancellationToken);
 }
