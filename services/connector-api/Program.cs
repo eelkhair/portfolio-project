@@ -19,6 +19,7 @@ var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
     app.UseCors(CorsPolicy);
     app.MapCompanyCreatedEndpoint()
+        .MapCompanyUpdatedEndpoint()
         .MapJobCreatedEndpoint()
         .MapSubscribeHandler();
 

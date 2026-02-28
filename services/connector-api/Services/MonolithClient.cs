@@ -3,6 +3,7 @@ using ConnectorAPI.Interfaces;
 using ConnectorAPI.Interfaces.Clients;
 using ConnectorAPI.Models;
 using ConnectorAPI.Models.CompanyCreated;
+using ConnectorAPI.Models.CompanyUpdated;
 using Dapr.Client;
 using JobBoard.IntegrationEvents.Company;
 
@@ -66,6 +67,24 @@ public class MonolithOClient(DaprClient daprClient, ILogger<MonolithOClient> log
         var message = daprClient.CreateInvokeMethodRequest(HttpMethod.Post, MonolithAppId, "companies/company-created-success");
         message.Content= JsonContent.Create(model);
         await daprClient.InvokeMethodAsync(message, cancellationToken);
+    }
+
+    public async Task<CompanyUpdateCompanyResult> GetCompanyForUpdatedEventAsync(
+        Guid companyId,
+        string userId,
+        CancellationToken cancellationToken)
+    {
+        var companyRoute = ODataRouteBuilder.CompanyById(companyId, q =>
+        {
+            q["$select"] = "name,email,website,phone,description,about,eeo,founded,size,logo,industryId";
+        });
+
+        var companyRequest = CreateGetRequest(companyRoute, userId);
+
+        logger.LogDebug("Invoking monolith OData for company update: {CompanyRoute}", companyRoute);
+
+        return await daprClient.InvokeMethodAsync<CompanyUpdateCompanyResult>(
+            companyRequest, cancellationToken);
     }
 
     private HttpRequestMessage CreateGetRequest(string route, string userId)

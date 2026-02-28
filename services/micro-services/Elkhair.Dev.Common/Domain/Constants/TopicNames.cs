@@ -3,6 +3,5 @@
 public struct TopicNames
 {
     public const string CompanyCreate = "company.created";
- 
-
+    public const string CompanyUpdate = "company.updated";
 }
