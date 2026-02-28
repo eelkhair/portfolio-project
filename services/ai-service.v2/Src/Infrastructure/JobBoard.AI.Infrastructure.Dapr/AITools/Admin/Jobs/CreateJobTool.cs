@@ -111,7 +111,7 @@ public static class CreateJobTool
             {
                 Name = "create_job",
                 Description =
-                    "Creates a job from an existing draft. Takes the draftId and whether to delete the draft after publishing."
+                    "Creates a job from an existing draft. Requires draftId and deleteDraft (bool). Before calling this tool, you MUST ask the user whether they want to delete the draft after publishing and use their answer for the deleteDraft parameter."
             });
     }
 }
