@@ -14,7 +14,7 @@ public class CompanyQueryService(ICompanyDbContext companyDbContext)
     public async Task<List<CompanyResponse>> ListAsync(HttpContext context, CancellationToken ct)
     {
         List<Company> companies;
-        var companiesQuery = companyDbContext.Companies.AsNoTracking().AsQueryable();
+        var companiesQuery = companyDbContext.Companies.AsNoTracking().Include(c => c.Industry).AsQueryable();
         
         var uIds = FilteredUIds(context);
         if (uIds.Count > 0)

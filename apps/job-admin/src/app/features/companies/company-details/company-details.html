@@ -1,1 +1,136 @@
-<h1 class="text-6xl">{{store.selectedCompany()?.name}}</h1>
+@if (store.selectedCompany(); as company) {
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-3xl font-bold">{{ company.name }}</h1>
+    <span class="px-3 py-1 rounded-full text-sm font-medium"
+          [class]="company.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'">
+      {{ company.status }}
+    </span>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="saveForm()">
+    <div class="flex gap-6">
+      <!-- Left column: Company Info -->
+      <div class="flex-1">
+        <h2 class="text-xl font-semibold mb-4">Company Information</h2>
+
+        <div class="flex items-center gap-2 mt-4">
+          <label for="name" class="font-semibold w-32">Name<span class="text-red-500">*</span></label>
+          <input pInputText id="name" formControlName="name" class="flex-auto" autocomplete="off"/>
+        </div>
+        @if (form.controls.name.invalid && form.controls.name.touched) {
+          <span class="text-red-700 w-full text-right block">Company name is required.</span>
+        }
+        @if (errors()?.["name"]; as err) {
+          @for (error of err; track $index) {
+            <span class="text-red-700 w-full text-right block">{{ error }}</span>
+          }
+        }
+
+        <div class="flex items-center gap-2 mt-4">
+          <label for="companyEmail" class="font-semibold w-32">Email<span class="text-red-500">*</span></label>
+          <input pInputText id="companyEmail" type="email" formControlName="companyEmail" class="flex-auto" autocomplete="off"/>
+        </div>
+        @if (form.controls.companyEmail.invalid && form.controls.companyEmail.touched) {
+          <span class="text-red-700 w-full text-right block">A valid company email is required.</span>
+        }
+        @if (errors()?.["companyEmail"]; as err) {
+          @for (error of err; track $index) {
+            <span class="text-red-700 w-full text-right block">{{ error }}</span>
+          }
+        }
+
+        <div class="flex items-center gap-2 mt-4">
+          <label for="companyWebsite" class="font-semibold w-32">Website</label>
+          <input pInputText id="companyWebsite" formControlName="companyWebsite" class="flex-auto" autocomplete="off"/>
+        </div>
+        @if (errors()?.["companyWebsite"]; as err) {
+          @for (error of err; track $index) {
+            <span class="text-red-700 w-full text-right block">{{ error }}</span>
+          }
+        }
+
+        <div class="flex items-center gap-2 mt-4">
+          <label for="phone" class="font-semibold w-32">Phone</label>
+          <input pInputText id="phone" formControlName="phone" class="flex-auto" autocomplete="off"/>
+        </div>
+
+        <div class="flex items-center gap-2 mt-4">
+          <label for="industryUId" class="font-semibold w-32">Industry<span class="text-red-500">*</span></label>
+          <p-select
+            [options]="industries()"
+            formControlName="industryUId"
+            placeholder="Select Industry"
+            appendTo="body"
+            class="flex-auto"
+            optionValue="uId"
+            optionLabel="name">
+          </p-select>
+        </div>
+        @if (form.controls.industryUId.invalid && form.controls.industryUId.touched) {
+          <span class="text-red-700 w-full text-right block">Industry is required.</span>
+        }
+        @if (errors()?.["industryUId"]; as err) {
+          @for (error of err; track $index) {
+            <span class="text-red-700 w-full text-right block">{{ error }}</span>
+          }
+        }
+
+        <div class="flex flex-col gap-2 mt-4">
+          <label for="description" class="font-semibold">Description</label>
+          <textarea pTextarea id="description" formControlName="description" rows="3" class="w-full" autoResize="true"></textarea>
+        </div>
+
+        <div class="flex flex-col gap-2 mt-4">
+          <label for="about" class="font-semibold">About</label>
+          <textarea pTextarea id="about" formControlName="about" rows="4" class="w-full" autoResize="true"></textarea>
+        </div>
+
+        <div class="flex flex-col gap-2 mt-4">
+          <label for="eeo" class="font-semibold">EEO Statement</label>
+          <textarea pTextarea id="eeo" formControlName="eeo" rows="3" class="w-full" autoResize="true"></textarea>
+        </div>
+      </div>
+
+      <p-divider layout="vertical"/>
+
+      <!-- Right column: Metadata -->
+      <div class="w-80">
+        <h2 class="text-xl font-semibold mb-4">Details</h2>
+
+        <div class="flex items-center gap-2 mt-4">
+          <label for="founded" class="font-semibold w-24">Founded</label>
+          <input pInputText id="founded" type="date" formControlName="founded" class="flex-auto"/>
+        </div>
+
+        <div class="flex items-center gap-2 mt-4">
+          <label for="size" class="font-semibold w-24">Size</label>
+          <input pInputText id="size" formControlName="size" class="flex-auto" autocomplete="off" placeholder="e.g. 50-200"/>
+        </div>
+
+        <div class="flex items-center gap-2 mt-4">
+          <label for="logo" class="font-semibold w-24">Logo URL</label>
+          <input pInputText id="logo" formControlName="logo" class="flex-auto" autocomplete="off"/>
+        </div>
+
+        <p-divider/>
+
+        <div class="text-sm text-gray-500 mt-4">
+          <p><strong>Created:</strong> {{ company.createdAt | date:'medium' }}</p>
+          <p class="mt-1"><strong>Updated:</strong> {{ company.updatedAt | date:'medium' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <p-divider/>
+
+    <div class="flex justify-end gap-3 mt-4">
+      <button pButton type="submit" [disabled]="store.loading()">
+        <span class="pi pi-save mr-2"></span>Save Changes
+      </button>
+    </div>
+  </form>
+} @else {
+  <div class="flex items-center justify-center h-64">
+    <span class="pi pi-spin pi-spinner text-4xl"></span>
+  </div>
+}

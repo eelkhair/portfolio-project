@@ -31,7 +31,7 @@ public class GetCompaniesQueryHandler(IJobBoardDbContext context, ILogger<GetCom
             CreatedBy = x.CreatedBy,
             UpdatedAt = x.UpdatedAt,
             UpdatedBy = x.UpdatedBy,
-            IndustryId = x.Industry.Id,
+            IndustryUId = x.Industry.Id,
             Industry = new IndustryDto
             {
                 Id = x.Industry.Id,

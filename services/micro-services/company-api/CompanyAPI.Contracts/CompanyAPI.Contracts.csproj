@@ -7,7 +7,7 @@
         <RootNamespace>CompanyAPI.Contracts</RootNamespace>
         <PackageId>JobBoard.CompanyAPI.Contracts</PackageId>
         <Authors>Elkhair Elkhair</Authors>
-        <Version>1.0.5</Version>
+        <Version>1.0.6</Version>
         <Description>Shared components to CompanyApi</Description>
         <IsPackable>true</IsPackable>
     </PropertyGroup>

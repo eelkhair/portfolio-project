@@ -93,7 +93,7 @@ public class GetCompaniesQueryHandlerTests
         dto.Industry.ShouldNotBeNull();
         dto.Industry.Name.ShouldBe("Finance");
         dto.Industry.Id.ShouldBe(industry.Id);
-        dto.IndustryId.ShouldBe(industry.Id);
+        dto.IndustryUId.ShouldBe(industry.Id);
     }
 
     [Fact]

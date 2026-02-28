@@ -4,6 +4,7 @@ import { environment } from '../../../environments/environment';
 import { Company } from '../types/models/Company';
 import { Industry } from '../types/models/Industry';
 import { CreateCompanyDto } from '../types/Dtos/CreateCompanyDto';
+import { UpdateCompanyDto } from '../types/Dtos/UpdateCompanyDto';
 import { ApiResponse } from '../types/Dtos/ApiResponse';
 import { map, Observable } from 'rxjs';
 
@@ -27,6 +28,13 @@ export class CompanyService {
   createCompany(dto: CreateCompanyDto): Observable<ApiResponse<Company>> {
     return this.http.post<ApiResponse<Company>>(
       `${environment.gatewayUrl}companies`,
+      dto
+    );
+  }
+
+  updateCompany(id: string, dto: UpdateCompanyDto): Observable<ApiResponse<Company>> {
+    return this.http.put<ApiResponse<Company>>(
+      `${environment.gatewayUrl}companies/${id}`,
       dto
     );
   }
