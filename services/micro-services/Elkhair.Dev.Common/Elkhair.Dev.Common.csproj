@@ -7,7 +7,7 @@
         <RootNamespace>Elkhair.Dev.Common</RootNamespace>
         <PackageId>Elkhair.Dev.Common</PackageId>
         <Authors>Elkhair Elkhair</Authors>
-        <Version>1.0.18</Version>
+        <Version>1.0.19</Version>
         <Description>Shared components for any project</Description>
         <IsPackable>true</IsPackable>
     </PropertyGroup>

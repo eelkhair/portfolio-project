@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Security.Claims;
+using System.Text.Json;
 using Dapr.Client;
 using Microsoft.AspNetCore.Http;
 
@@ -36,7 +37,7 @@ public static class DaprExtensions
         catch (InvocationException e)
         {
             var errorText = await e.Response.Content.ReadAsStringAsync();
-            var error = await e.Response.Content.ReadFromJsonAsync<ApiError>();   
+            var error = JsonSerializer.Deserialize<ApiError>(errorText);
             return new ApiResponse<T>()
             {
                 StatusCode = e.Response.StatusCode,

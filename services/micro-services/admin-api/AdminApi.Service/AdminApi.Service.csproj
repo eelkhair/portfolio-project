@@ -15,7 +15,7 @@
 
         <PackageReference Include="Elkhair.Common.Observability" Version="1.0.4" />
 
-        <PackageReference Include="Elkhair.Dev.Common" Version="1.0.18" />
+        <PackageReference Include="Elkhair.Dev.Common" Version="1.0.19" />
 
         <PackageReference Include="FastEndpoints" Version="7.1.1" />
         <PackageReference Include="FastEndpoints.Security" Version="7.1.1" />
