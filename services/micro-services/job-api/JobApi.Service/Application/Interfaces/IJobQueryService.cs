@@ -9,4 +9,5 @@ public interface IJobQueryService
     Task<List<CompanyJobSummaryResponse>> ListCompanyJobSummariesAsync(CancellationToken ct);
 }
 
-public record CompanyJobSummaryResponse(Guid CompanyId, string CompanyName, int JobCount);
+public record CompanyJobSummaryResponse(Guid CompanyId, string CompanyName, int JobCount, List<JobSummaryItem> Jobs);
+public record JobSummaryItem(string Title, string Location, string JobType, string? SalaryRange, DateTime CreatedAt);
