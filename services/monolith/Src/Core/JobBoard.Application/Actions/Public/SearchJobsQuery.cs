@@ -48,7 +48,6 @@ public class SearchJobsQueryHandler(
             .Where(j => j != null)
             .ToList();
 
-        // Boost exact job type matches to the top, preserve vector rank within each group
         var orderedJobs = (!string.IsNullOrEmpty(request.JobType) && Enum.TryParse<JobType>(request.JobType, true, out var jobType)
             ? rankedJobs.OrderBy(j => j!.JobType == jobType ? 0 : 1).ToList()
             : rankedJobs)
