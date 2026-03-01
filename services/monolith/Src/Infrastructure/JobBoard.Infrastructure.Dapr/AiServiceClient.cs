@@ -4,8 +4,10 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Dapr.Client;
 using Elkhair.Dev.Common.Application;
+using JobBoard.Application.Actions.Public;
 using JobBoard.Application.Infrastructure.Exceptions;
 using JobBoard.Application.Interfaces.Infrastructure;
+using JobBoard.Application.Interfaces.Observability;
 using JobBoard.Application.Interfaces.Users;
 using JobBoard.Monolith.Contracts.Drafts;
 using JobBoard.Monolith.Contracts.Settings;
@@ -15,6 +17,7 @@ namespace JobBoard.infrastructure.Dapr;
 
 public sealed class AiServiceClient(
     DaprClient client,
+    IActivityFactory activityFactory,
     IUserAccessor accessor,
     ILogger<AiServiceClient> logger)
     : IAiServiceClient
@@ -231,6 +234,34 @@ public sealed class AiServiceClient(
 
         return result.Data!;
     }
+
+    public async Task<List<SimilarJobCandidate>> GetSimilarJobs(Guid jobId, CancellationToken cancellationToken)
+    {
+        using var activity = activityFactory.StartActivity("ai-service-v2.get-similar-jobs", ActivityKind.Internal);
+
+        var request = CreateRequest(
+            HttpMethod.Get,
+            $"jobs/{jobId}/similar",
+            AiServiceV2);
+
+        using var response =
+            await client.InvokeMethodWithResponseAsync(request, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+            await ThrowExternalServiceError(response, "ai-service-v2.get-similar-jobs", cancellationToken, AiServiceV2);
+
+        var result = await response.Content
+                         .ReadFromJsonAsync<ApiResponse<List<SimilarJobCandidate>>>(JsonOpts, cancellationToken)
+                     ?? throw new InvalidOperationException($"{AiServiceV2} returned empty JSON payload.");
+
+        var data = result.Data ?? [];
+        logger.LogInformation(
+            "ai-service-v2 returned result.Data?.Count {Count} for job {JobId}",
+            data.Count, jobId);
+
+        return data;
+    }
+
     public async Task UpdateApplicationMode(ApplicationModeDto request, CancellationToken cancellationToken)
     {
         EnrichActivity(null, "settings.application-mode", AiServiceV2);

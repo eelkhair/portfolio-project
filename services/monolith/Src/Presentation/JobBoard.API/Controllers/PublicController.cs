@@ -39,9 +39,9 @@ public class PublicController : ControllerBase
     }
 
     [HttpGet("jobs/{id:guid}/similar")]
-    public async Task<IActionResult> GetSimilarJobs(Guid id, [FromQuery] Guid companyUId, [FromQuery] JobType jobType)
+    public async Task<IActionResult> GetSimilarJobs(Guid id)
     {
-        return await ExecuteQueryAsync(new GetSimilarJobsQuery(id, companyUId, jobType), Ok);
+        return await ExecuteQueryAsync(new GetSimilarJobsQuery(id), Ok);
     }
 
     [HttpGet("jobs/latest")]

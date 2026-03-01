@@ -3,6 +3,7 @@ using JobBoard.Application.Actions.Drafts.List;
 using JobBoard.Application.Actions.Drafts.Rewrite;
 using JobBoard.Application.Actions.Drafts.Save;
 using JobBoard.Application.Actions.Jobs.Create;
+using JobBoard.Application.Actions.Public;
 using JobBoard.Monolith.Contracts.Drafts;
 using JobBoard.Monolith.Contracts.Jobs;
 using Microsoft.AspNetCore.Mvc;
@@ -65,5 +66,7 @@ public class JobsController : BaseApiController
     [HttpPut("drafts/rewrite")]
     public async Task<IActionResult> RewriteDraftItem(DraftItemRewriteRequest request)
         => await ExecuteCommandAsync(new RewriteDraftItemCommand{DraftItemRewriteRequest = request}, Ok);
+
+    
 
 }
