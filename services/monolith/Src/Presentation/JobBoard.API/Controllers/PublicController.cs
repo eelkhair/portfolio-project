@@ -99,10 +99,12 @@ public class PublicController : ControllerBase
                 ApiResponse.Fail<object>(
                     "Validation failed",
                     HttpStatusCode.BadRequest,
-                    vex.Errors.ToDictionary(
-                        e => e.PropertyName,
-                        e => new[] { e.ErrorMessage }
-                    )
+                    vex.Errors
+                        .GroupBy(e => e.PropertyName)
+                        .ToDictionary(
+                            g => g.Key,
+                            g => g.Select(e => e.ErrorMessage).ToArray()
+                        )
                 )
             ),
             UnauthorizedAccessException ex => Unauthorized(

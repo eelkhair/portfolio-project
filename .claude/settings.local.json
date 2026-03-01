@@ -22,7 +22,10 @@
       "Bash(npx @angular/cli@21.2.0 new:*)",
       "Bash(npm install:*)",
       "Bash(npm run build:*)",
-      "Bash(node -e:*)"
+      "Bash(node -e:*)",
+      "Bash(python3 -c \":*)",
+      "Bash(powershell -Command \"[System.Reflection.Assembly]::LoadFrom\\(''C:\\\\Users\\\\elkha\\\\.nuget\\\\packages\\\\jobboard.adminapi.contracts\\\\1.0.0\\\\lib\\\\net9.0\\\\AdminAPI.Contracts.dll''\\).GetTypes\\(\\) | ForEach-Object { $_.FullName }\")",
+      "Bash(powershell -Command \"Add-Type -Path ''lib/net9.0/JobBoard.Monolith.Contracts.dll''; [JobBoard.Monolith.Contracts.Companies.CompanyDto].GetProperties\\(\\) | ForEach-Object { $_.Name + '' : '' + $_.PropertyType.Name }\")"
     ]
   }
 }
