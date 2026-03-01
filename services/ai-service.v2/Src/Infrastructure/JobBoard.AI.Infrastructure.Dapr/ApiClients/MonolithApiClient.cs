@@ -49,6 +49,24 @@ public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<Mon
     }
     
 
+    public async Task<CompanyDto> UpdateCompanyAsync(Guid companyId, UpdateCompanyCommand cmd, CancellationToken ct)
+    {
+        try
+        {
+            var request = CreateRequest(HttpMethod.Put, $"companies/{companyId}", "monolith-api");
+            request.Content = JsonContent.Create(cmd);
+            var response = await Client.InvokeMethodAsync<ApiResponse<CompanyDto>>(request, ct);
+            return response.Data!;
+        }
+        catch (InvocationException ex)
+        {
+            var response = ex.Response;
+            var body = await response.Content.ReadAsStringAsync(ct);
+            logger.LogError(ex, "Error updating company in monolith-api: {Body}", body);
+            throw;
+        }
+    }
+
     public async Task<ApiResponse<object>> CreateJobAsync(object cmd, CancellationToken ct)
     {
         try

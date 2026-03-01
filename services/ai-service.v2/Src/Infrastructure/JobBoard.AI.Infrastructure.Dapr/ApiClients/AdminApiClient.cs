@@ -47,6 +47,24 @@ public class AdminApiClient(DaprClient client, IUserAccessor accessor, ILogger<A
         }
     }
 
+    public async Task<ApiResponse<CompanyResponse>> UpdateCompanyAsync(Guid companyId, UpdateCompanyRequest cmd, CancellationToken ct)
+    {
+        try
+        {
+            var request = CreateRequest(HttpMethod.Put, $"companies/{companyId}", "admin-api");
+            request.Content = JsonContent.Create(cmd);
+            var response = await Client.InvokeMethodAsync<ApiResponse<CompanyResponse>>(request, ct);
+            return response;
+        }
+        catch (InvocationException ex)
+        {
+            var response = ex.Response;
+            var body = await response.Content.ReadAsStringAsync(ct);
+            logger.LogError(ex, "Error updating company in admin-api: {Body}", body);
+            throw;
+        }
+    }
+
     public async Task<ApiResponse<object>> CreateJobAsync(object cmd, CancellationToken ct)
     {
         try
