@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 namespace JobBoard.AI.Application.Actions.SimilarJobs;
 
 public class GetSimilarJobsQuery(Guid jobId, int limit = 5)
-    : BaseQuery<List<SimilarJobCandidate>>
+    : BaseQuery<List<SimilarJobCandidate>>, ISystemCommand
 {
     public Guid JobId { get; } = jobId;
     public int Limit { get; } = limit;
