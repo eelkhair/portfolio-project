@@ -79,7 +79,6 @@ public class PublishJobCommandHandler(IHandlerContext context,
     {
         return $"""
                 Job Title: {job.Title}
-                Company: {job.CompanyName}
                 Location: {job.Location}
                 Job Type: {job.JobType}
 

@@ -79,6 +79,7 @@ public class JobsController : BaseApiController
     }
     
     [HttpGet("{jobId:guid}/similar")]
+    [Authorize("DaprInternal")]
     public async Task<IActionResult> GetSimilarJobs(
         Guid jobId,
         [FromQuery] int limit = 5) =>
