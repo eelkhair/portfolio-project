@@ -15,5 +15,6 @@ public interface IAiServiceClient
     Task UpdateApplicationMode(ApplicationModeDto request, CancellationToken cancellationToken);
     Task<ApplicationModeDto> GetApplicationMode(CancellationToken cancellationToken);
     
-    Task<List<SimilarJobCandidate>> GetSimilarJobs(Guid jobId, CancellationToken cancellationToken);
+    Task<List<JobCandidate>> GetSimilarJobs(Guid jobId, CancellationToken cancellationToken);
+    Task<List<JobCandidate>> SearchJobs(string? query, string? location, string? jobType, int limit = 50, CancellationToken cancellationToken = default);
 }

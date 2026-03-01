@@ -1,11 +1,12 @@
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DateAgoPipe } from '../../../shared/pipes/date-ago.pipe';
+import { JobTypeLabelPipe } from '../../../shared/pipes/job-type-label.pipe';
 import { Job } from '../../../core/types/job.type';
 
 @Component({
   selector: 'app-similar-jobs',
-  imports: [RouterLink, DateAgoPipe],
+  imports: [RouterLink, DateAgoPipe, JobTypeLabelPipe],
   template: `
     @if (jobs().length > 0) {
       <div>
@@ -23,7 +24,7 @@ import { Job } from '../../../core/types/job.type';
               </h4>
               <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ job.companyName }}</p>
               <div class="mt-2 flex items-center gap-2 text-xs text-slate-400">
-                <span>{{ job.jobType }}</span>
+                <span>{{ job.jobType | jobTypeLabel }}</span>
                 <span>-</span>
                 <span>{{ job.createdAt | dateAgo }}</span>
               </div>

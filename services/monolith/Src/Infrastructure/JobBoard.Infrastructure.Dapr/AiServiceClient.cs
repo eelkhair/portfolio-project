@@ -235,7 +235,7 @@ public sealed class AiServiceClient(
         return result.Data!;
     }
 
-    public async Task<List<SimilarJobCandidate>> GetSimilarJobs(Guid jobId, CancellationToken cancellationToken)
+    public async Task<List<JobCandidate>> GetSimilarJobs(Guid jobId, CancellationToken cancellationToken)
     {
         using var activity = activityFactory.StartActivity("ai-service-v2.get-similar-jobs", ActivityKind.Internal);
 
@@ -251,13 +251,47 @@ public sealed class AiServiceClient(
             await ThrowExternalServiceError(response, "ai-service-v2.get-similar-jobs", cancellationToken, AiServiceV2);
 
         var result = await response.Content
-                         .ReadFromJsonAsync<ApiResponse<List<SimilarJobCandidate>>>(JsonOpts, cancellationToken)
+                         .ReadFromJsonAsync<ApiResponse<List<JobCandidate>>>(JsonOpts, cancellationToken)
                      ?? throw new InvalidOperationException($"{AiServiceV2} returned empty JSON payload.");
 
         var data = result.Data ?? [];
         logger.LogInformation(
-            "ai-service-v2 returned result.Data?.Count {Count} for job {JobId}",
+            "ai-service-v2 returned {Count} matching jobs for  job {JobId}",
             data.Count, jobId);
+
+        return data;
+    }
+    
+    public async Task<List<JobCandidate>> SearchJobs(string? query, string? location, string? jobType, int limit = 50, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(query) && string.IsNullOrWhiteSpace(location) && string.IsNullOrWhiteSpace(jobType))
+            return [];
+        using var activity = activityFactory.StartActivity("ai-service-v2.search-jobs", ActivityKind.Internal);
+
+        var queryParams = new List<string> { $"limit={limit}" };
+        if (!string.IsNullOrWhiteSpace(query)) queryParams.Add($"query={Uri.EscapeDataString(query)}");
+        if (!string.IsNullOrWhiteSpace(location)) queryParams.Add($"location={Uri.EscapeDataString(location)}");
+        if (!string.IsNullOrWhiteSpace(jobType)) queryParams.Add($"jobType={Uri.EscapeDataString(jobType)}");
+
+        var request = CreateRequest(
+            HttpMethod.Get,
+            $"jobs/search?{string.Join("&", queryParams)}",
+            AiServiceV2);
+
+        using var response =
+            await client.InvokeMethodWithResponseAsync(request, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+            await ThrowExternalServiceError(response, "ai-service-v2.search-jobs", cancellationToken, AiServiceV2);
+
+        var result = await response.Content
+                         .ReadFromJsonAsync<ApiResponse<List<JobCandidate>>>(JsonOpts, cancellationToken)
+                     ?? throw new InvalidOperationException($"{AiServiceV2} returned empty JSON payload.");
+
+        var data = result.Data ?? [];
+        logger.LogInformation(
+            "ai-service-v2 returned {Count} jobs for query: {Query}",
+            data.Count, query);
 
         return data;
     }
