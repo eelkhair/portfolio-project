@@ -20,7 +20,7 @@ export class SearchStore {
     this.loading.set(true);
     this.hasSearched.set(true);
 
-    this.api.getJobs({ search: query, jobType: type, location }).subscribe((jobs) => {
+    this.api.searchJobs({ query, jobType: type, location }).subscribe((jobs) => {
       this.results.set(jobs);
       this.loading.set(false);
     });

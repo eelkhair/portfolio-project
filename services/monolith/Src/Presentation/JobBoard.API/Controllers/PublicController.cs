@@ -43,6 +43,12 @@ public class PublicController : ControllerBase
     {
         return await ExecuteQueryAsync(new GetSimilarJobsQuery(id), Ok);
     }
+    
+    [HttpGet("jobs/search")]
+    public async Task<IActionResult> SearchJobs([FromQuery] string? query, [FromQuery] string? jobType, [FromQuery] string? location, int limit = 30)
+    {
+        return await ExecuteQueryAsync(new SearchJobsQuery { Query = query, JobType = jobType, Location = location, Limit = limit }, Ok);
+    }
 
     [HttpGet("jobs/latest")]
     public async Task<IActionResult> GetLatestJobs([FromQuery] int count = 6)

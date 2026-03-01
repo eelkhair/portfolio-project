@@ -1,6 +1,6 @@
-namespace JobBoard.AI.Application.Actions.SimilarJobs;
+namespace JobBoard.AI.Application.Actions.Jobs.Similar;
 
-public sealed class SimilarJobCandidate
+public sealed class JobCandidate
 {
     public Guid JobId { get; set; }
     public double Similarity { get; set; }

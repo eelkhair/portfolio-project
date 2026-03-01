@@ -61,9 +61,9 @@ export class JobSearchBar {
   protected readonly searchStore = inject(SearchStore);
   readonly searched = output<void>();
 
-  protected query = signal('');
-  protected jobType = signal('');
-  protected location = signal('');
+  protected query = signal(this.searchStore.query());
+  protected jobType = signal(this.searchStore.jobType());
+  protected location = signal(this.searchStore.location());
 
   onSearch(): void {
     this.searchStore.search(this.query(), this.jobType(), this.location());

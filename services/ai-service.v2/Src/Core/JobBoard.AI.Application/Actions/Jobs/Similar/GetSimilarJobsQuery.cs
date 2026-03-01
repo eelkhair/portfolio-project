@@ -1,32 +1,33 @@
+using System.Diagnostics;
 using JobBoard.AI.Application.Actions.Base;
 using JobBoard.AI.Application.Interfaces.Configurations;
+using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Application.Interfaces.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace JobBoard.AI.Application.Actions.SimilarJobs;
+namespace JobBoard.AI.Application.Actions.Jobs.Similar;
 
 public class GetSimilarJobsQuery(Guid jobId, int limit = 5)
-    : BaseQuery<List<SimilarJobCandidate>>, ISystemCommand
+    : BaseQuery<List<JobCandidate>>, ISystemCommand
 {
     public Guid JobId { get; } = jobId;
     public int Limit { get; } = limit;
 }
 
-public class GetSimilarJobsQueryHandler(
+public partial class GetSimilarJobsQueryHandler(
     ILogger<GetSimilarJobsQuery> logger,
+    IActivityFactory activityFactory,
     IAiDbContext context)
     : BaseQueryHandler(logger),
-        IHandler<GetSimilarJobsQuery, List<SimilarJobCandidate>>
+        IHandler<GetSimilarJobsQuery, List<JobCandidate>>
 {
-    public async Task<List<SimilarJobCandidate>> HandleAsync(
+    public async Task<List<JobCandidate>> HandleAsync(
         GetSimilarJobsQuery request,
         CancellationToken cancellationToken)
     {
-        logger.LogInformation(
-            "Finding similar jobs for JobId {JobId} with limit {Limit}",
-            request.JobId,
-            request.Limit);
+        using var activity = activityFactory.StartActivity("GetSimilarJobsQueryHandler.HandleAsync", ActivityKind.Internal);
+        LogFindingSimilarJobsForJobIdWithLimit(Logger, request.JobId, request.Limit);
 
         const string sql = """
                            SELECT
@@ -42,7 +43,7 @@ public class GetSimilarJobsQueryHandler(
                            """;
 
         var results = await context
-            .Set<SimilarJobCandidate>()
+            .Set<JobCandidate>()
             .FromSqlRaw(
                 sql,
                 new Npgsql.NpgsqlParameter("jobId", request.JobId),
@@ -50,6 +51,7 @@ public class GetSimilarJobsQueryHandler(
             .AsNoTracking()
             .ToListAsync(cancellationToken);
 
+        activity?.SetTag("similarJobsCount", results.Count);
         // Assign ranks deterministically
         for (var i = 0; i < results.Count; i++)
         {
@@ -58,4 +60,7 @@ public class GetSimilarJobsQueryHandler(
 
         return results;
     }
+
+    [LoggerMessage(LogLevel.Information, "Finding similar jobs for JobId {JobId} with limit {Limit}")]
+    static partial void LogFindingSimilarJobsForJobIdWithLimit(ILogger logger, Guid JobId, int Limit);
 }

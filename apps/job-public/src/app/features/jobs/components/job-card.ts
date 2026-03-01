@@ -1,11 +1,12 @@
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DateAgoPipe } from '../../../shared/pipes/date-ago.pipe';
+import { JobTypeLabelPipe } from '../../../shared/pipes/job-type-label.pipe';
 import { Job } from '../../../core/types/job.type';
 
 @Component({
   selector: 'app-job-card',
-  imports: [RouterLink, DateAgoPipe],
+  imports: [RouterLink, DateAgoPipe, JobTypeLabelPipe],
   template: `
     <a
       [routerLink]="['/jobs', job().id]"
@@ -48,7 +49,7 @@ import { Job } from '../../../core/types/job.type';
         <span
           class="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700 dark:bg-slate-700 dark:text-slate-300"
         >
-          {{ job().jobType }}
+          {{ job().jobType | jobTypeLabel }}
         </span>
         <span class="font-medium text-slate-700 dark:text-slate-300">{{ job().salaryRange ?? 'Competitive' }}</span>
       </div>

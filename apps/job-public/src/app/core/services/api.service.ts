@@ -12,14 +12,21 @@ export class ApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = environment.apiUrl + 'public';
 
-  getJobs(filters?: { search?: string; jobType?: string; location?: string }): Observable<Job[]> {
+  getJobs(): Observable<Job[]> {
+    return this.http
+      .get<ApiResponse<Job[]>>(`${this.baseUrl}/jobs`)
+      .pipe(map((res) => res.data ?? []));
+  }
+
+  searchJobs(filters: { query?: string; jobType?: string; location?: string; limit?: number }): Observable<Job[]> {
     let params = new HttpParams();
-    if (filters?.search) params = params.set('search', filters.search);
-    if (filters?.jobType) params = params.set('jobType', filters.jobType);
-    if (filters?.location) params = params.set('location', filters.location);
+    if (filters.query) params = params.set('query', filters.query);
+    if (filters.jobType) params = params.set('jobType', filters.jobType);
+    if (filters.location) params = params.set('location', filters.location);
+    if (filters.limit) params = params.set('limit', filters.limit);
 
     return this.http
-      .get<ApiResponse<Job[]>>(`${this.baseUrl}/jobs`, { params })
+      .get<ApiResponse<Job[]>>(`${this.baseUrl}/jobs/search`, { params })
       .pipe(map((res) => res.data ?? []));
   }
 

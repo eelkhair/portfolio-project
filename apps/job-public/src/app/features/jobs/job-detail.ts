@@ -1,13 +1,15 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DateAgoPipe } from '../../shared/pipes/date-ago.pipe';
+import { JobTypeLabelPipe } from '../../shared/pipes/job-type-label.pipe';
 import { LoadingSpinner } from '../../shared/components/loading-spinner';
 import { SimilarJobs } from './components/similar-jobs';
 import { JobStore } from '../../core/stores/job.store';
 
 @Component({
   selector: 'app-job-detail',
-  imports: [RouterLink, DateAgoPipe, LoadingSpinner, SimilarJobs],
+  imports: [RouterLink, DateAgoPipe, JobTypeLabelPipe, LoadingSpinner, SimilarJobs],
   template: `
     @if (store.loading()) {
       <app-loading-spinner label="Loading job details..." />
@@ -40,7 +42,7 @@ import { JobStore } from '../../core/stores/job.store';
                   <span class="text-slate-600">|</span>
                   <span>{{ job.location }}</span>
                   <span class="text-slate-600">|</span>
-                  <span>{{ job.jobType }}</span>
+                  <span>{{ job.jobType | jobTypeLabel }}</span>
                 </div>
                 <div class="mt-3 flex items-center gap-4">
                   <span class="text-lg font-semibold text-accent-400">{{ job.salaryRange ?? 'Competitive' }}</span>
@@ -161,7 +163,7 @@ import { JobStore } from '../../core/stores/job.store';
               <dl class="mt-4 space-y-3">
                 <div>
                   <dt class="text-xs text-slate-500 dark:text-slate-400">Job Type</dt>
-                  <dd class="font-medium text-slate-900 dark:text-white">{{ job.jobType }}</dd>
+                  <dd class="font-medium text-slate-900 dark:text-white">{{ job.jobType | jobTypeLabel }}</dd>
                 </div>
                 <div>
                   <dt class="text-xs text-slate-500 dark:text-slate-400">Location</dt>
@@ -190,11 +192,16 @@ import { JobStore } from '../../core/stores/job.store';
 export class JobDetail implements OnInit {
   protected readonly store = inject(JobStore);
   private readonly route = inject(ActivatedRoute);
+  private readonly destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.store.loadJob(id);
-    }
+    this.route.paramMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        const id = params.get('id');
+        if (id) {
+          this.store.loadJob(id);
+        }
+      });
   }
 }
