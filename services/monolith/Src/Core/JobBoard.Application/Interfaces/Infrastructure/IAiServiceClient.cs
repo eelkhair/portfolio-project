@@ -1,4 +1,5 @@
-﻿using JobBoard.Monolith.Contracts.Drafts;
+﻿using JobBoard.Application.Actions.Public;
+using JobBoard.Monolith.Contracts.Drafts;
 using JobBoard.Monolith.Contracts.Settings;
 
 namespace JobBoard.Application.Interfaces.Infrastructure;
@@ -13,4 +14,6 @@ public interface IAiServiceClient
     Task UpdateProvider(UpdateProviderRequest request, CancellationToken cancellationToken);
     Task UpdateApplicationMode(ApplicationModeDto request, CancellationToken cancellationToken);
     Task<ApplicationModeDto> GetApplicationMode(CancellationToken cancellationToken);
+    
+    Task<List<SimilarJobCandidate>> GetSimilarJobs(Guid jobId, CancellationToken cancellationToken);
 }

@@ -32,12 +32,13 @@ npm run build          # Production build
 npm test               # Run Karma tests
 ```
 
-### Frontend - Public UI (Next.js 15)
+### Frontend - Public UI (Angular 21 + SSR + Tailwind v4)
 ```bash
 cd apps/job-public
-npm run dev            # Dev server with Turbopack
+npm start              # Dev server (ng serve)
 npm run build          # Production build
-npm run lint           # ESLint
+npm test               # Run tests
+npm run serve:ssr:job-public  # Serve SSR build
 ```
 
 ### AI Service (Node.js/TypeScript)

@@ -5,6 +5,7 @@ using Dapr.Client;
 using Elkhair.Dev.Common.Dapr;
 using JobBoard.AI.Application.Actions.Jobs;
 using JobBoard.AI.Application.Actions.Jobs.Publish;
+using JobBoard.AI.Application.Actions.SimilarJobs;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
 using Microsoft.AspNetCore.Authorization;
@@ -76,4 +77,13 @@ public class JobsController : BaseApiController
 
         return Accepted();
     }
+    
+    [HttpGet("{jobId:guid}/similar")]
+    public async Task<IActionResult> GetSimilarJobs(
+        Guid jobId,
+        [FromQuery] int limit = 5) =>
+        await ExecuteQueryAsync(
+            new GetSimilarJobsQuery(jobId, limit),
+            Ok
+        );
 }

@@ -8,4 +8,5 @@ public interface IAiDbContext
     DbSet<Draft> Drafts { get; }
     DbSet<JobEmbedding> JobEmbeddings { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+    DbSet<T> Set<T>() where T : class;
 }

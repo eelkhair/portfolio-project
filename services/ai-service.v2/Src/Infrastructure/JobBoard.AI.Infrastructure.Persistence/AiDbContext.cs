@@ -1,3 +1,4 @@
+using JobBoard.AI.Application.Actions.SimilarJobs;
 using JobBoard.AI.Application.Interfaces.Persistence;
 using JobBoard.AI.Domain.Drafts;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,7 @@ public sealed class AiDbContext : DbContext, IAiDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasPostgresExtension("vector");
-
+        modelBuilder.Entity<SimilarJobCandidate>().HasNoKey();
         modelBuilder.Entity<Draft>(b =>
         {
             b.ToTable("drafts");
