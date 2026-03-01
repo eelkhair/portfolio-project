@@ -37,6 +37,7 @@ public class GetSimilarJobsQueryHandler(
                            JOIN job_embeddings q
                              ON q."JobId" = @jobId
                            WHERE je."JobId" <> @jobId
+                           ORDER BY je."VectorData" <=> q."VectorData"
                            LIMIT @limit;
                            """;
 
