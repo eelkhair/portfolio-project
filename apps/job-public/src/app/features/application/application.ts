@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ResumeUpload } from './components/resume-upload';
 import { ApplicationForm } from './components/application-form';
@@ -69,14 +69,14 @@ import { ApplicationStore } from '../../core/stores/application.store';
           </div>
         </div>
 
-        <!-- Resume upload -->
+        <!-- Resume selection -->
         <div class="mt-8">
-          <h2 class="section-heading text-lg">Step 1: Upload Resume</h2>
+          <h2 class="section-heading text-lg">Step 1: Resume</h2>
           <p class="mt-1 text-sm section-subheading">
-            Upload your resume for AI-powered form auto-fill.
+            Choose an existing resume or upload a new one for AI-powered form auto-fill.
           </p>
           <div class="mt-4">
-            <app-resume-upload />
+            <app-resume-upload (resumeIdChange)="selectedResumeId.set($event)" />
           </div>
         </div>
 
@@ -87,7 +87,7 @@ import { ApplicationStore } from '../../core/stores/application.store';
             Review and complete your application details.
           </p>
           <div class="mt-4">
-            <app-application-form [resumeData]="appStore.resumeData()" [jobId]="job.id" />
+            <app-application-form [resumeData]="appStore.resumeData()" [jobId]="job.id" [resumeId]="selectedResumeId()" />
           </div>
         </div>
       </div>
@@ -104,6 +104,7 @@ export class Application implements OnInit, OnDestroy {
   protected readonly jobStore = inject(JobStore);
   protected readonly appStore = inject(ApplicationStore);
   private readonly route = inject(ActivatedRoute);
+  protected readonly selectedResumeId = signal('');
 
   ngOnInit(): void {
     const jobId = this.route.snapshot.paramMap.get('jobId');
