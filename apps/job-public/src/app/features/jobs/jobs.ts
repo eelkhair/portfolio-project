@@ -28,17 +28,41 @@ import { SearchStore } from '../../core/stores/search.store';
           message="Try adjusting your search terms or clearing filters."
         />
       } @else {
-        <div class="space-y-4">
+        <div class="flex flex-col gap-[5px]">
           @for (job of displayJobs(); track job.id) {
             <app-job-card [job]="job" class="animate-fade-in" />
           }
         </div>
+
+        @if (paginationTotalPages() > 1) {
+          <div class="mt-8 flex items-center justify-center gap-3">
+            <button
+              (click)="goToPage(paginationCurrentPage() - 1)"
+              [disabled]="!paginationHasPrev()"
+              class="btn-secondary px-4 py-2 text-sm disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:transform-none"
+            >
+              Previous
+            </button>
+
+            <span class="text-sm text-slate-600">
+              Page {{ paginationCurrentPage() }} of {{ paginationTotalPages() }}
+            </span>
+
+            <button
+              (click)="goToPage(paginationCurrentPage() + 1)"
+              [disabled]="!paginationHasNext()"
+              class="btn-secondary px-4 py-2 text-sm disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:transform-none"
+            >
+              Next
+            </button>
+          </div>
+        }
       }
     </div>
   `,
 })
 export class Jobs implements OnInit {
-  private readonly jobStore = inject(JobStore);
+  protected readonly jobStore = inject(JobStore);
   protected readonly searchStore = inject(SearchStore);
 
   protected readonly loading = computed(() => this.jobStore.loading() || this.searchStore.loading());
@@ -47,15 +71,37 @@ export class Jobs implements OnInit {
     this.searchStore.hasSearched() ? this.searchStore.results() : this.jobStore.jobs(),
   );
 
+  protected readonly paginationCurrentPage = computed(() =>
+    this.searchStore.hasSearched() ? this.searchStore.currentPage() : this.jobStore.currentPage(),
+  );
+  protected readonly paginationTotalPages = computed(() =>
+    this.searchStore.hasSearched() ? this.searchStore.totalPages() : this.jobStore.totalPages(),
+  );
+  protected readonly paginationHasPrev = computed(() =>
+    this.searchStore.hasSearched() ? this.searchStore.hasPreviousPage() : this.jobStore.hasPreviousPage(),
+  );
+  protected readonly paginationHasNext = computed(() =>
+    this.searchStore.hasSearched() ? this.searchStore.hasNextPage() : this.jobStore.hasNextPage(),
+  );
+
   protected readonly resultsSummary = computed(() => {
-    const count = this.displayJobs().length;
     if (this.searchStore.hasSearched()) {
+      const count = this.searchStore.totalCount();
       return `${count} result${count !== 1 ? 's' : ''} found`;
     }
-    return `Browse ${count} available position${count !== 1 ? 's' : ''}`;
+    const total = this.jobStore.totalCount();
+    return `Browse ${total} available position${total !== 1 ? 's' : ''}`;
   });
 
   ngOnInit(): void {
     this.jobStore.loadJobs();
+  }
+
+  goToPage(page: number): void {
+    if (this.searchStore.hasSearched()) {
+      this.searchStore.goToPage(page);
+    } else {
+      this.jobStore.loadJobs(page);
+    }
   }
 }
