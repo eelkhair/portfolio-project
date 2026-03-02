@@ -36,6 +36,7 @@ public static class DependencyInjection
                         "https://swagger.eelkhair.net",
                         "https://job-admin.eelkhair.net",
                         "https://job.eelkhair.net",
+                        "https://jobs.eelkhair.net",
                         "http://127.0.0.1:5280"
                     )
                     .AllowAnyHeader()
