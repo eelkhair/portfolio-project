@@ -38,10 +38,13 @@ public class PublicController : BaseApiController
     /// </returns>
     [HttpGet("jobs")]
     public async Task<IActionResult> GetJobs([FromQuery] string? search, [FromQuery] JobType? jobType,
-        [FromQuery] string? location)
+        [FromQuery] string? location, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
-        return await ExecuteQueryAsync(new ListPublicJobsQuery { Search = search, JobType = jobType, Location = location },
-            Ok);
+        return await ExecuteQueryAsync(new ListPublicJobsQuery
+        {
+            Search = search, JobType = jobType, Location = location,
+            Page = page, PageSize = pageSize
+        }, Ok);
     }
 
     /// <summary>

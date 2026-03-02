@@ -5,7 +5,7 @@ import { environment } from '../../../environments/environment';
 import { Job, JobType } from '../types/job.type';
 import { Company } from '../types/company.type';
 import { Stats } from '../types/stats.type';
-import { ApiResponse } from '../types/api-response.type';
+import { ApiResponse, PaginatedList } from '../types/api-response.type';
 import { SubmitApplicationRequest, ApplicationResponse } from '../types/application.type';
 import { ResumeData, ResumeResponse, UserProfile, UserProfileRequest } from '../types/resume-data.type';
 
@@ -15,10 +15,11 @@ export class ApiService {
   private readonly baseUrl = environment.apiUrl + 'public';
   private readonly applicantUrl = environment.apiUrl + 'applicant';
 
-  getJobs(): Observable<Job[]> {
+  getJobs(page = 1, pageSize = 10): Observable<PaginatedList<Job>> {
+    const params = new HttpParams().set('page', page).set('pageSize', pageSize);
     return this.http
-      .get<ApiResponse<Job[]>>(`${this.baseUrl}/jobs`)
-      .pipe(map((res) => res.data ?? []));
+      .get<ApiResponse<PaginatedList<Job>>>(`${this.baseUrl}/jobs`, { params })
+      .pipe(map((res) => res.data ?? { items: [], page: 1, pageSize, totalCount: 0, totalPages: 0, hasPreviousPage: false, hasNextPage: false }));
   }
 
   searchJobs(filters: { query?: string; jobType?: string; location?: string; limit?: number }): Observable<Job[]> {

@@ -12,10 +12,23 @@ export class JobStore {
   readonly latestJobs = signal<Job[]>([]);
   readonly loading = signal(false);
 
-  loadJobs(): void {
-    this.loading.set(true);
-    this.api.getJobs().subscribe((jobs) => {
-      this.jobs.set(jobs);
+  readonly currentPage = signal(1);
+  readonly totalPages = signal(0);
+  readonly totalCount = signal(0);
+  readonly hasPreviousPage = signal(false);
+  readonly hasNextPage = signal(false);
+
+  loadJobs(page = 1): void {
+    if (this.jobs().length === 0) {
+      this.loading.set(true);
+    }
+    this.api.getJobs(page, 8).subscribe((result) => {
+      this.jobs.set(result.items);
+      this.currentPage.set(result.page);
+      this.totalPages.set(result.totalPages);
+      this.totalCount.set(result.totalCount);
+      this.hasPreviousPage.set(result.hasPreviousPage);
+      this.hasNextPage.set(result.hasNextPage);
       this.loading.set(false);
     });
   }
