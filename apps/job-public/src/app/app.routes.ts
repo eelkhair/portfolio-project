@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { AuthGuard } from '@auth0/auth0-angular';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', loadComponent: () => import('./features/home/home').then((m) => m.Home) },
@@ -19,9 +19,14 @@ export const routes: Routes = [
   },
   {
     path: 'apply/:jobId',
-    canActivate: [AuthGuard],
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/application/application').then((m) => m.Application),
+  },
+  {
+    path: 'profile',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/profile/profile').then((m) => m.Profile),
   },
   { path: '**', redirectTo: '' },
 ];

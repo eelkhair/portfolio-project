@@ -25,7 +25,16 @@
       "Bash(node -e:*)",
       "Bash(python3 -c \":*)",
       "Bash(powershell -Command \"[System.Reflection.Assembly]::LoadFrom\\(''C:\\\\Users\\\\elkha\\\\.nuget\\\\packages\\\\jobboard.adminapi.contracts\\\\1.0.0\\\\lib\\\\net9.0\\\\AdminAPI.Contracts.dll''\\).GetTypes\\(\\) | ForEach-Object { $_.FullName }\")",
-      "Bash(powershell -Command \"Add-Type -Path ''lib/net9.0/JobBoard.Monolith.Contracts.dll''; [JobBoard.Monolith.Contracts.Companies.CompanyDto].GetProperties\\(\\) | ForEach-Object { $_.Name + '' : '' + $_.PropertyType.Name }\")"
+      "Bash(powershell -Command \"Add-Type -Path ''lib/net9.0/JobBoard.Monolith.Contracts.dll''; [JobBoard.Monolith.Contracts.Companies.CompanyDto].GetProperties\\(\\) | ForEach-Object { $_.Name + '' : '' + $_.PropertyType.Name }\")",
+      "Bash(dotnet ef migrations remove --project services/monolith/Src/Infrastructure/JobBoard.Infrastructure.Persistence/ --startup-project services/monolith/Src/Presentation/JobBoard.API/)",
+      "Bash(dotnet ef migrations add ProfileApplicationResume --project services/monolith/Src/Infrastructure/JobBoard.Infrastructure.Persistence/ --startup-project services/monolith/Src/Presentation/JobBoard.API/)",
+      "Bash(dotnet ef database update --project services/monolith/Src/Infrastructure/JobBoard.Infrastructure.Persistence/ --startup-project services/monolith/Src/Presentation/JobBoard.API/)",
+      "Bash(dotnet ef migrations has-pending-model-changes --project services/monolith/Src/Infrastructure/JobBoard.Infrastructure.Persistence/ --startup-project services/monolith/Src/Presentation/JobBoard.API/)",
+      "Bash(npx ng version)",
+      "Bash(timeout 15 npx ng serve)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/profile)",
+      "Bash(curl -s http://localhost:3000/profile)",
+      "Bash(dotnet sln JobBoard.sln add \"services/monolith/Src/Infrastructure/JobBoard.Infrastructure.BlobStorage/JobBoard.Infrastructure.BlobStorage.csproj\" --solution-folder \"monolith/Src/Infrastructure\")"
     ]
   }
 }

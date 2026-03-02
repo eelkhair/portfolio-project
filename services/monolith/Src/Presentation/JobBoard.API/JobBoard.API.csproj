@@ -45,6 +45,7 @@
       <ProjectReference Include="..\..\Infrastructure\JobBoard.Infrastructure.Outbox\JobBoard.Infrastructure.Outbox.csproj" />
       <ProjectReference Include="..\..\Infrastructure\JobBoard.Infrastructure.Persistence\JobBoard.Infrastructure.Persistence.csproj" />
       <ProjectReference Include="..\..\Infrastructure\JobBoard.Infrastructure.Smtp\JobBoard.Infrastructure.Smtp.csproj" />
+      <ProjectReference Include="..\..\Infrastructure\JobBoard.Infrastructure.BlobStorage\JobBoard.Infrastructure.BlobStorage.csproj" />
     </ItemGroup>
 
 </Project>
