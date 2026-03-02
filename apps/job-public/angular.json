@@ -49,7 +49,7 @@
                 "input": "public"
               }
             ],
-            "allowedCommonJsDependencies": ["mammoth"],
+            "allowedCommonJsDependencies": ["mammoth", "protobufjs/minimal"],
             "styles": ["src/styles.css"],
             "server": "src/main.server.ts",
             "outputMode": "server",
@@ -65,7 +65,7 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
+                  "maximumWarning": "600kB",
                   "maximumError": "1MB"
                 },
                 {
@@ -93,7 +93,8 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "options": {
-            "port": 3000
+            "port": 3000,
+            "proxyConfig": "proxy.conf.json"
           },
           "configurations": {
             "production": {

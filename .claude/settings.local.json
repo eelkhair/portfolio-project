@@ -34,7 +34,8 @@
       "Bash(timeout 15 npx ng serve)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/profile)",
       "Bash(curl -s http://localhost:3000/profile)",
-      "Bash(dotnet sln JobBoard.sln add \"services/monolith/Src/Infrastructure/JobBoard.Infrastructure.BlobStorage/JobBoard.Infrastructure.BlobStorage.csproj\" --solution-folder \"monolith/Src/Infrastructure\")"
+      "Bash(dotnet sln JobBoard.sln add \"services/monolith/Src/Infrastructure/JobBoard.Infrastructure.BlobStorage/JobBoard.Infrastructure.BlobStorage.csproj\" --solution-folder \"monolith/Src/Infrastructure\")",
+      "Bash(npm ls @opentelemetry/resources @opentelemetry/semantic-conventions @opentelemetry/sdk-trace-web @opentelemetry/sdk-trace-base)"
     ]
   }
 }
