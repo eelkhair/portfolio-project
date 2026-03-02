@@ -1,19 +1,22 @@
-import { Component, effect, inject, OnInit } from '@angular/core';
+import { Component, effect, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { LoadingSpinner } from '../../shared/components/loading-spinner';
+import { ConfirmDialog } from '../../shared/components/confirm-dialog';
 import { ProfileStore } from '../../core/stores/profile.store';
 import { AccountService } from '../../core/services/account.service';
+import { ResumePreviewModal } from './resume-preview-modal';
+import { ResumeResponse } from '../../core/types/resume-data.type';
 
 @Component({
   selector: 'app-profile',
-  imports: [ReactiveFormsModule, RouterLink, LoadingSpinner, DatePipe],
+  imports: [ReactiveFormsModule, RouterLink, LoadingSpinner, DatePipe, ResumePreviewModal, ConfirmDialog],
   template: `
     @if (store.loading()) {
       <app-loading-spinner label="Loading profile..." />
     } @else {
-      <div class="mx-auto max-w-3xl px-6 py-12">
+      <div class="mx-auto max-w-7xl px-6 py-12">
         <!-- Back link -->
         <a
           routerLink="/jobs"
@@ -100,14 +103,19 @@ import { AccountService } from '../../core/services/account.service';
             <ul class="mt-4 divide-y divide-slate-200 dark:divide-slate-700">
               @for (resume of store.resumes(); track resume.id) {
                 <li class="flex items-center justify-between py-3">
-                  <div class="flex items-center gap-3">
-                    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-700">
+                  <button
+                    type="button"
+                    class="flex min-w-0 flex-1 items-center gap-3 rounded-lg p-1 -m-1 text-left transition hover:bg-slate-50 dark:hover:bg-slate-700/50"
+                    (click)="onPreviewResume(resume)"
+                    title="Preview resume"
+                  >
+                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-700">
                       <svg class="h-5 w-5 text-slate-500 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                       </svg>
                     </div>
-                    <div>
-                      <p class="text-sm font-medium text-slate-900 dark:text-white">{{ resume.originalFileName }}</p>
+                    <div class="min-w-0">
+                      <p class="truncate text-sm font-medium text-slate-900 dark:text-white">{{ resume.originalFileName }}</p>
                       <p class="text-xs text-slate-500 dark:text-slate-400">
                         {{ resume.createdAt | date:'mediumDate' }}
                         @if (resume.fileSize) {
@@ -115,11 +123,11 @@ import { AccountService } from '../../core/services/account.service';
                         }
                       </p>
                     </div>
-                  </div>
+                  </button>
                   <button
                     type="button"
                     (click)="onDeleteResume(resume.id)"
-                    class="rounded p-1.5 text-slate-400 transition hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+                    class="ml-2 rounded p-1.5 text-slate-400 transition hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
                     title="Delete resume"
                   >
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -228,6 +236,17 @@ import { AccountService } from '../../core/services/account.service';
           </div>
         </form>
       </div>
+
+      <app-resume-preview-modal />
+      <app-confirm-dialog
+        [open]="showDeleteConfirm()"
+        title="Delete Resume"
+        message="This resume will be permanently removed. Are you sure?"
+        confirmLabel="Delete"
+        variant="danger"
+        (confirmed)="onConfirmDelete()"
+        (cancelled)="showDeleteConfirm.set(false)"
+      />
     }
   `,
 })
@@ -285,8 +304,21 @@ export class Profile implements OnInit {
     }
   }
 
+  onPreviewResume(resume: ResumeResponse): void {
+    this.store.openPreview(resume);
+  }
+
+  protected readonly showDeleteConfirm = signal(false);
+  private deleteResumeId = '';
+
   onDeleteResume(id: string): void {
-    this.store.deleteResume(id);
+    this.deleteResumeId = id;
+    this.showDeleteConfirm.set(true);
+  }
+
+  onConfirmDelete(): void {
+    this.showDeleteConfirm.set(false);
+    this.store.deleteResume(this.deleteResumeId);
   }
 
   formatFileSize(bytes: number): string {

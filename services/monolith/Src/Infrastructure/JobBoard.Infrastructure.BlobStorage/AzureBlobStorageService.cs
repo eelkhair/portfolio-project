@@ -29,4 +29,16 @@ public class AzureBlobStorageService(BlobServiceClient blobServiceClient) : IBlo
         var blobClient = containerClient.GetBlobClient(blobName);
         await blobClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
     }
+
+    public async Task<BlobDownloadResponse> DownloadAsync(string container, string blobName,
+        CancellationToken cancellationToken)
+    {
+        var containerClient = blobServiceClient.GetBlobContainerClient(container);
+        var blobClient = containerClient.GetBlobClient(blobName);
+
+        var response = await blobClient.DownloadStreamingAsync(cancellationToken: cancellationToken);
+        var contentType = response.Value.Details.ContentType ?? "application/octet-stream";
+
+        return new BlobDownloadResponse(response.Value.Content, contentType);
+    }
 }

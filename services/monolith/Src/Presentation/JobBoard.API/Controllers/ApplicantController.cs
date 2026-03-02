@@ -1,9 +1,14 @@
+using System.Net;
+using JobBoard.API.Helpers;
 using JobBoard.Application.Actions.Applications.Submit;
 using JobBoard.Application.Actions.Profiles.Get;
 using JobBoard.Application.Actions.Profiles.Upsert;
 using JobBoard.Application.Actions.Resumes.Delete;
+using JobBoard.Application.Actions.Resumes.Download;
 using JobBoard.Application.Actions.Resumes.List;
 using JobBoard.Application.Actions.Resumes.Upload;
+using JobBoard.Application.Infrastructure.Exceptions;
+using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Monolith.Contracts.Public;
 using Microsoft.AspNetCore.Mvc;
 
@@ -63,6 +68,46 @@ public class ApplicantController : BaseApiController
     public async Task<IActionResult> GetResumes()
     {
         return await ExecuteQueryAsync(new GetUserResumesQuery(), Ok);
+    }
+
+    /// <summary>
+    /// Downloads a specific resume file belonging to the authenticated user.
+    /// </summary>
+    /// <param name="id">The unique identifier of the resume to download.</param>
+    /// <param name="inline">When true, sets Content-Disposition to inline for browser preview (e.g. PDF in iframe).</param>
+    /// <returns>The resume file stream with appropriate Content-Type header.</returns>
+    [HttpGet("resumes/{id:guid}/download")]
+    public async Task<IActionResult> DownloadResume(Guid id, [FromQuery] bool inline = false)
+    {
+        try
+        {
+            var query = new DownloadResumeQuery(id);
+            var handler = HttpContext.RequestServices
+                .GetRequiredService<IHandler<DownloadResumeQuery, ResumeDownloadResult>>();
+
+            var result = await handler.HandleAsync(query, HttpContext.RequestAborted);
+
+            if (inline)
+            {
+                Response.Headers.ContentDisposition = $"inline; filename=\"{result.OriginalFileName}\"";
+                return File(result.Content, result.ContentType);
+            }
+
+            return File(result.Content, result.ContentType, result.OriginalFileName);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(ApiResponse.Fail<object>(ex.Message, HttpStatusCode.Unauthorized));
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(ApiResponse.Fail<object>(ex.Message, HttpStatusCode.NotFound));
+        }
+        catch (Exception)
+        {
+            return StatusCode(500,
+                ApiResponse.Fail<object>("An unexpected error occurred.", HttpStatusCode.InternalServerError));
+        }
     }
 
     /// <summary>

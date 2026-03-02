@@ -1,0 +1,134 @@
+import { Component, HostListener, inject } from '@angular/core';
+import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
+import { ProfileStore } from '../../core/stores/profile.store';
+import { LoadingSpinner } from '../../shared/components/loading-spinner';
+
+@Component({
+  selector: 'app-resume-preview-modal',
+  imports: [LoadingSpinner],
+  template: `
+    @if (store.previewResume()) {
+      <!-- Backdrop -->
+      <div
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in"
+        (click)="onBackdropClick($event)"
+      >
+        <!-- Modal -->
+        <div
+          class="relative mx-4 flex max-h-[90vh] w-full max-w-7xl flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-800"
+          (click)="$event.stopPropagation()"
+        >
+          <!-- Header -->
+          <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4 dark:border-slate-700">
+            <div class="min-w-0 flex-1">
+              <h2 class="truncate text-base font-semibold text-slate-900 dark:text-white">
+                {{ store.previewResume()!.originalFileName }}
+              </h2>
+              <p class="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                {{ store.previewResume()!.contentType }}
+                @if (store.previewResume()!.fileSize) {
+                  <span class="mx-1">&middot;</span>{{ formatFileSize(store.previewResume()!.fileSize!) }}
+                }
+              </p>
+            </div>
+            <button
+              type="button"
+              (click)="onClose()"
+              class="ml-4 rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-300"
+              title="Close preview"
+            >
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Body -->
+          <div class="flex-1 overflow-auto p-6">
+            @if (store.previewLoading()) {
+              <div class="flex items-center justify-center py-16">
+                <app-loading-spinner label="Loading resume..." />
+              </div>
+            } @else if (store.previewError()) {
+              <div class="rounded-lg bg-red-50 px-4 py-3 text-center text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400">
+                {{ store.previewError() }}
+              </div>
+            } @else if (isPdf()) {
+              <iframe
+                [src]="safePreviewUrl()"
+                class="h-[65vh] w-full rounded-lg border border-slate-200 dark:border-slate-700"
+                title="Resume PDF preview"
+              ></iframe>
+            } @else if (store.previewHtml()) {
+              <div
+                class="resume-preview h-[65vh] overflow-auto rounded-lg border border-slate-200 bg-white p-6 text-sm text-slate-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                [innerHTML]="safePreviewHtml()"
+              ></div>
+            }
+          </div>
+
+          <!-- Footer -->
+          <div class="flex items-center justify-end gap-3 border-t border-slate-200 px-6 py-4 dark:border-slate-700">
+            <button type="button" (click)="onClose()" class="btn-secondary">
+              Close
+            </button>
+            <button type="button" (click)="onDownload()" class="btn-primary">
+              <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+              </svg>
+              Download
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  `,
+})
+export class ResumePreviewModal {
+  protected readonly store = inject(ProfileStore);
+  private readonly sanitizer = inject(DomSanitizer);
+
+  @HostListener('document:keydown.escape')
+  onEscapeKey(): void {
+    if (this.store.previewResume()) {
+      this.onClose();
+    }
+  }
+
+  isPdf(): boolean {
+    return this.store.previewResume()?.contentType === 'application/pdf';
+  }
+
+  safePreviewUrl(): SafeResourceUrl | null {
+    const url = this.store.previewUrl();
+    return url ? this.sanitizer.bypassSecurityTrustResourceUrl(url) : null;
+  }
+
+  safePreviewHtml(): SafeHtml | null {
+    const html = this.store.previewHtml();
+    return html ? this.sanitizer.bypassSecurityTrustHtml(html) : null;
+  }
+
+  formatFileSize(bytes: number): string {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  onBackdropClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.onClose();
+    }
+  }
+
+  onClose(): void {
+    this.store.closePreview();
+  }
+
+  onDownload(): void {
+    const resume = this.store.previewResume();
+    if (resume) {
+      this.store.downloadResume(resume);
+    }
+  }
+}

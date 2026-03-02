@@ -1,4 +1,5 @@
 import { inject, Injectable, signal } from '@angular/core';
+import mammoth from 'mammoth';
 import { ApiService } from '../services/api.service';
 import { ResumeResponse, UserProfile, UserProfileRequest } from '../types/resume-data.type';
 
@@ -16,6 +17,13 @@ export class ProfileStore {
   readonly resumes = signal<ResumeResponse[]>([]);
   readonly uploading = signal(false);
   readonly uploadError = signal<string | null>(null);
+
+  // Preview state
+  readonly previewResume = signal<ResumeResponse | null>(null);
+  readonly previewUrl = signal<string | null>(null);
+  readonly previewHtml = signal<string | null>(null);
+  readonly previewLoading = signal(false);
+  readonly previewError = signal<string | null>(null);
 
   loadProfile(): void {
     this.loading.set(true);
@@ -84,5 +92,81 @@ export class ProfileStore {
         this.uploadError.set(err?.error?.exceptions?.message ?? 'Failed to delete resume.');
       },
     });
+  }
+
+  openPreview(resume: ResumeResponse): void {
+    this.previewResume.set(resume);
+    this.previewLoading.set(true);
+    this.previewError.set(null);
+    this.previewUrl.set(null);
+    this.previewHtml.set(null);
+
+    this.api.downloadResumeBlob(resume.id).subscribe({
+      next: (blob) => this.processPreviewBlob(blob, resume.contentType),
+      error: (err) => {
+        this.previewLoading.set(false);
+        this.previewError.set(err?.error?.exceptions?.message ?? 'Failed to load resume.');
+      },
+    });
+  }
+
+  private async processPreviewBlob(blob: Blob, contentType?: string): Promise<void> {
+    try {
+      if (contentType === 'application/pdf') {
+        this.previewUrl.set(URL.createObjectURL(blob));
+      } else if (
+        contentType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      ) {
+        const arrayBuffer = await blob.arrayBuffer();
+        const result = await mammoth.convertToHtml({ arrayBuffer });
+        this.previewHtml.set(result.value);
+      } else if (contentType === 'text/plain') {
+        const text = await blob.text();
+        this.previewHtml.set(`<pre>${text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>`);
+      }
+      this.previewLoading.set(false);
+    } catch {
+      this.previewLoading.set(false);
+      this.previewError.set('Failed to render resume preview.');
+    }
+  }
+
+  closePreview(): void {
+    const url = this.previewUrl();
+    if (url) {
+      URL.revokeObjectURL(url);
+    }
+    this.previewResume.set(null);
+    this.previewUrl.set(null);
+    this.previewHtml.set(null);
+    this.previewError.set(null);
+  }
+
+  downloadResume(resume: ResumeResponse): void {
+    const existingUrl = this.previewUrl();
+    if (existingUrl && this.previewResume()?.id === resume.id) {
+      this.triggerDownload(existingUrl, resume.originalFileName);
+      return;
+    }
+
+    this.api.downloadResumeBlob(resume.id).subscribe({
+      next: (blob) => {
+        const url = URL.createObjectURL(blob);
+        this.triggerDownload(url, resume.originalFileName);
+        URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        this.uploadError.set(err?.error?.exceptions?.message ?? 'Failed to download resume.');
+      },
+    });
+  }
+
+  private triggerDownload(url: string, fileName: string): void {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   }
 }
