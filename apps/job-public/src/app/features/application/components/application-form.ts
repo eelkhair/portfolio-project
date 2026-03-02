@@ -1,34 +1,13 @@
-import { Component, computed, effect, inject, input, OnInit } from '@angular/core';
+import { Component, computed, effect, inject, input } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { ApplicationStore } from '../../../core/stores/application.store';
-import { ProfileStore } from '../../../core/stores/profile.store';
 import { ResumeData } from '../../../core/types/resume-data.type';
 
 @Component({
   selector: 'app-application-form',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule],
   template: `
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
-      <!-- Resume Selector -->
-      @if (profileStore.resumes().length > 0) {
-        <div>
-          <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-            Attach Resume
-          </label>
-          <select formControlName="resumeId" class="input-field">
-            <option value="">No resume selected</option>
-            @for (resume of profileStore.resumes(); track resume.id) {
-              <option [value]="resume.id">{{ resume.originalFileName }}</option>
-            }
-          </select>
-          <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            Select a resume you uploaded on your
-            <a routerLink="/profile" class="text-primary-600 hover:underline dark:text-primary-400">profile</a>.
-          </p>
-        </div>
-      }
-
       <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
         <!-- Full Name -->
         <div>
@@ -156,16 +135,15 @@ import { ResumeData } from '../../../core/types/resume-data.type';
     </form>
   `,
 })
-export class ApplicationForm implements OnInit {
+export class ApplicationForm {
   protected readonly store = inject(ApplicationStore);
-  protected readonly profileStore = inject(ProfileStore);
   private readonly fb = inject(FormBuilder);
 
   resumeData = input<ResumeData | null>(null);
   jobId = input.required<string>();
+  resumeId = input<string>('');
 
   protected readonly form = this.fb.group({
-    resumeId: [''],
     fullName: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
     phone: [''],
@@ -228,10 +206,6 @@ export class ApplicationForm implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-    this.profileStore.loadResumes();
-  }
-
   onSubmit(): void {
     if (this.form.valid) {
       const val = this.form.value;
@@ -247,7 +221,7 @@ export class ApplicationForm implements OnInit {
           experience: val.experience || undefined,
           skills: (val.skills ?? '').split(',').map((s: string) => s.trim()).filter(Boolean),
         },
-        val.resumeId || undefined,
+        this.resumeId() || undefined,
       );
     }
   }

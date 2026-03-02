@@ -73,11 +73,15 @@ export class ApplicationStore {
     });
   }
 
-  reset(): void {
+  resetParse(): void {
     this.parseStatus.set('idle');
     this.resumeData.set(null);
-    this.applicationStatus.set('idle');
     this.fileName.set('');
+  }
+
+  reset(): void {
+    this.resetParse();
+    this.applicationStatus.set('idle');
     this.profileLoaded.set(false);
     this.error.set(null);
   }
