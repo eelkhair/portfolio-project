@@ -5,6 +5,7 @@ using JobBoard.Application.Actions.Profiles.Get;
 using JobBoard.Application.Actions.Profiles.Upsert;
 using JobBoard.Application.Actions.Resumes.Delete;
 using JobBoard.Application.Actions.Resumes.Download;
+using JobBoard.Application.Actions.Resumes.GetParsedContent;
 using JobBoard.Application.Actions.Resumes.List;
 using JobBoard.Application.Actions.Resumes.Upload;
 using JobBoard.Application.Infrastructure.Exceptions;
@@ -68,6 +69,17 @@ public class ApplicantController : BaseApiController
     public async Task<IActionResult> GetResumes()
     {
         return await ExecuteQueryAsync(new GetUserResumesQuery(), Ok);
+    }
+
+    /// <summary>
+    /// Returns the AI-parsed content (contact info, skills, experience) for a specific resume.
+    /// </summary>
+    /// <param name="id">The unique identifier of the resume.</param>
+    /// <returns>Parsed resume data if available; null data if the resume has not been parsed yet.</returns>
+    [HttpGet("resumes/{id:guid}/parsed-content")]
+    public async Task<IActionResult> GetResumeParsedContent(Guid id)
+    {
+        return await ExecuteQueryAsync(new GetResumeParsedContentQuery(id), Ok);
     }
 
     /// <summary>

@@ -7,7 +7,7 @@ import { Company } from '../types/company.type';
 import { Stats } from '../types/stats.type';
 import { ApiResponse } from '../types/api-response.type';
 import { SubmitApplicationRequest, ApplicationResponse } from '../types/application.type';
-import { ResumeResponse, UserProfile, UserProfileRequest } from '../types/resume-data.type';
+import { ResumeData, ResumeResponse, UserProfile, UserProfileRequest } from '../types/resume-data.type';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
@@ -112,6 +112,12 @@ export class ApiService {
     return this.http
       .get<ApiResponse<ResumeResponse[]>>(`${this.applicantUrl}/resumes`)
       .pipe(map((res) => res.data ?? []));
+  }
+
+  getResumeParsedContent(id: string): Observable<ResumeData | null> {
+    return this.http
+      .get<ApiResponse<ResumeData | null>>(`${this.applicantUrl}/resumes/${id}/parsed-content`)
+      .pipe(map((res) => res.data ?? null));
   }
 
   deleteResume(id: string): Observable<void> {
