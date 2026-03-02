@@ -1,4 +1,9 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
+import {
+  ApplicationConfig,
+  ErrorHandler,
+  provideBrowserGlobalErrorListeners,
+  provideZonelessChangeDetection,
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { provideAuth0 } from '@auth0/auth0-angular';
@@ -6,13 +11,16 @@ import { provideAuth0 } from '@auth0/auth0-angular';
 import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { tracingInterceptor } from './core/interceptors/tracing.interceptor';
+import { TracingErrorHandler } from './core/error-handler/tracing-error-handler';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
+    { provide: ErrorHandler, useClass: TracingErrorHandler },
     provideRouter(routes),
-    provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
+    provideHttpClient(withFetch(), withInterceptors([authInterceptor, tracingInterceptor])),
     provideClientHydration(withEventReplay()),
     ...(typeof window !== 'undefined'
       ? [

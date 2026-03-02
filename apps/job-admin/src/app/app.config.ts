@@ -1,4 +1,5 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
+import { ApplicationConfig, ErrorHandler, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
+import { TracingErrorHandler } from './core/error-handler/tracing-error-handler';
 import {provideRouter, withComponentInputBinding, withViewTransitions} from '@angular/router';
 import Aura from '@primeng/themes/aura';
 import { routes } from './app.routes';
@@ -22,6 +23,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
+    { provide: ErrorHandler, useClass: TracingErrorHandler },
     provideHttpClient(withFetch(), withInterceptors([authInterceptor, tracingInterceptor, idempotencyInterceptor])),
     provideRouter(routes, withComponentInputBinding(), withViewTransitions()),
     provideAnimationsAsync(),
