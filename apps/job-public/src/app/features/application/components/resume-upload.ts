@@ -63,10 +63,30 @@ type ResumeMode = 'select' | 'upload';
             <option [value]="resume.id">{{ resume.originalFileName }}</option>
           }
         </select>
-        <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">
-          Manage your resumes on your
-          <a routerLink="/profile" class="text-primary-600 hover:underline dark:text-primary-400">profile</a>.
-        </p>
+
+        <!-- Parsing feedback -->
+        @if (store.parseStatus() === 'parsing') {
+          <div class="mt-3 flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+            <div class="h-4 w-4 rounded-full border-2 border-slate-300 border-t-primary-600 animate-spin dark:border-slate-600"></div>
+            Extracting resume data...
+          </div>
+        } @else if (store.parseStatus() === 'parsed' && store.resumeData()) {
+          <div class="mt-3 flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            </svg>
+            Form auto-filled from resume
+          </div>
+        } @else if (store.parseStatus() === 'error') {
+          <div class="mt-3 text-sm text-red-500 dark:text-red-400">
+            Could not extract resume data. You can still fill the form manually.
+          </div>
+        } @else {
+          <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+            Manage your resumes on your
+            <a routerLink="/profile" class="text-primary-600 hover:underline dark:text-primary-400">profile</a>.
+          </p>
+        }
       </div>
     }
 
@@ -284,6 +304,16 @@ export class ResumeUpload implements OnInit {
     const select = event.target as HTMLSelectElement;
     this.selectedResumeId.set(select.value);
     this.resumeIdChange.emit(select.value);
+
+    // Trigger AI auto-fill for selected resume
+    if (select.value) {
+      const resume = this.profileStore.resumes().find((r) => r.id === select.value);
+      if (resume) {
+        this.store.loadParsedContent(resume.id, resume.originalFileName);
+      }
+    } else {
+      this.store.resetParse();
+    }
   }
 
   removeUpload(): void {

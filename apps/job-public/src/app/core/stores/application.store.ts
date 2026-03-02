@@ -46,6 +46,29 @@ export class ApplicationStore {
       });
   }
 
+  loadParsedContent(resumeId: string, fileName: string): void {
+    this.fileName.set(fileName);
+    this.parseStatus.set('parsing');
+
+    this.api.getResumeParsedContent(resumeId).subscribe({
+      next: (data) => {
+        if (data) {
+          this.resumeData.set(data);
+          this.parseStatus.set('parsed');
+        } else {
+          // No cached parse — trigger AI parsing via mock for now
+          this.mockData.parseResume().subscribe((mockData) => {
+            this.resumeData.set(mockData);
+            this.parseStatus.set('parsed');
+          });
+        }
+      },
+      error: () => {
+        this.parseStatus.set('error');
+      },
+    });
+  }
+
   submitApplication(jobId: string, coverLetter: string, profileData: UserProfileRequest, resumeId?: string): void {
     this.applicationStatus.set('submitting');
     this.error.set(null);
