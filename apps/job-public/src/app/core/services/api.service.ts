@@ -117,4 +117,11 @@ export class ApiService {
   deleteResume(id: string): Observable<void> {
     return this.http.delete<void>(`${this.applicantUrl}/resumes/${id}`);
   }
+
+  downloadResumeBlob(id: string): Observable<Blob> {
+    return this.http.get(`${this.applicantUrl}/resumes/${id}/download`, {
+      params: { inline: 'true' },
+      responseType: 'blob',
+    });
+  }
 }

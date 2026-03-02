@@ -49,6 +49,7 @@
                 "input": "public"
               }
             ],
+            "allowedCommonJsDependencies": ["mammoth"],
             "styles": ["src/styles.css"],
             "server": "src/main.server.ts",
             "outputMode": "server",

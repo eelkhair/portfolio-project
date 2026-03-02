@@ -232,3 +232,19 @@
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
 }
+
+/* Resume preview rendered content (mammoth DOCX / plain text) */
+.resume-preview h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+.resume-preview h2 { font-size: 1.25rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.375rem; }
+.resume-preview h3 { font-size: 1.1rem; font-weight: 600; margin-top: 0.75rem; margin-bottom: 0.25rem; }
+.resume-preview p { margin-bottom: 0.5rem; line-height: 1.6; }
+.resume-preview ul, .resume-preview ol { padding-left: 1.5rem; margin-bottom: 0.5rem; }
+.resume-preview ul { list-style-type: disc; }
+.resume-preview ol { list-style-type: decimal; }
+.resume-preview li { margin-bottom: 0.25rem; }
+.resume-preview table { width: 100%; border-collapse: collapse; margin-bottom: 0.75rem; }
+.resume-preview th, .resume-preview td { border: 1px solid var(--color-slate-300); padding: 0.375rem 0.75rem; text-align: left; }
+.resume-preview pre { white-space: pre-wrap; word-wrap: break-word; font-family: monospace; font-size: 0.85rem; line-height: 1.6; }
+
+:where(.dark, .dark *) .resume-preview th,
+:where(.dark, .dark *) .resume-preview td { border-color: var(--color-slate-600); }
