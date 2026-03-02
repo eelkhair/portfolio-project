@@ -13,7 +13,10 @@ namespace JobBoard.Application.Interfaces;
 public interface IJobBoardQueryDbContext
 {
     DbSet<User> Users { get; set; }
+    DbSet<UserProfile> UserProfiles { get; set; }
+    DbSet<Resume> Resumes { get; set; }
     DbSet<Job> Jobs { get; set; }
+    DbSet<JobApplication> JobApplications { get; set; }
     DbSet<Qualification> Qualifications { get; set; }
     DbSet<Responsibility> Responsibilities { get; set; }
     DbSet<Industry> Industries { get; set; }

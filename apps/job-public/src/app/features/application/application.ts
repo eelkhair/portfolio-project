@@ -87,7 +87,7 @@ import { ApplicationStore } from '../../core/stores/application.store';
             Review and complete your application details.
           </p>
           <div class="mt-4">
-            <app-application-form [resumeData]="appStore.resumeData()" />
+            <app-application-form [resumeData]="appStore.resumeData()" [jobId]="job.id" />
           </div>
         </div>
       </div>
@@ -110,6 +110,7 @@ export class Application implements OnInit, OnDestroy {
     if (jobId) {
       this.jobStore.loadJob(jobId);
     }
+    this.appStore.loadProfile();
   }
 
   ngOnDestroy(): void {

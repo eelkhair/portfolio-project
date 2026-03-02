@@ -11,6 +11,7 @@ using JobBoard.Infrastructure.Dapr;
 using JobBoard.Infrastructure.Diagnostics;
 using JobBoard.Infrastructure.Outbox;
 using JobBoard.Infrastructure.Persistence;
+using JobBoard.Infrastructure.BlobStorage;
 using JobBoard.Infrastructure.Smtp;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,6 +42,7 @@ builder.Services
     .AddODataServices()
     .AddAuthorizationService(builder.Configuration)
     .AddSmtpServices(builder.Configuration)
+    .AddBlobStorageServices(builder.Configuration)
     .AddConfiguredSwagger(builder.Configuration)
     .AddOpenTelemetryServices(builder.Configuration, "monolith-api")
     .AddSignalR();

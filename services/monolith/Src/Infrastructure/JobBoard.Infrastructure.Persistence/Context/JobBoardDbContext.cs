@@ -10,10 +10,13 @@ namespace JobBoard.Infrastructure.Persistence.Context;
 public partial class JobBoardDbContext
 {
     public DbSet<User> Users { get; set; }
+    public DbSet<UserProfile> UserProfiles { get; set; }
+    public DbSet<Resume> Resumes { get; set; }
     public DbSet<OutboxMessage> OutboxMessages { get; set; }
     public DbSet<OutboxArchivedMessage> OutboxArchivedMessages { get; set; }
     public DbSet<OutboxDeadLetter> OutboxDeadLetters { get; set; }
     public DbSet<Job> Jobs { get; set; }
+    public DbSet<JobApplication> JobApplications { get; set; }
     public DbSet<Qualification> Qualifications { get; set; }
     public DbSet<Responsibility> Responsibilities { get; set; }
     public DbSet<Industry> Industries { get; set; }

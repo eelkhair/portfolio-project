@@ -6,11 +6,14 @@ import { Job, JobType } from '../types/job.type';
 import { Company } from '../types/company.type';
 import { Stats } from '../types/stats.type';
 import { ApiResponse } from '../types/api-response.type';
+import { SubmitApplicationRequest, ApplicationResponse } from '../types/application.type';
+import { ResumeResponse, UserProfile, UserProfileRequest } from '../types/resume-data.type';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = environment.apiUrl + 'public';
+  private readonly applicantUrl = environment.apiUrl + 'applicant';
 
   getJobs(): Observable<Job[]> {
     return this.http
@@ -73,5 +76,45 @@ export class ApiService {
     return this.http
       .get<ApiResponse<Stats>>(`${this.baseUrl}/stats`)
       .pipe(map((res) => res.data ?? { jobCount: 0, companyCount: 0 }));
+  }
+
+  // --- Authenticated applicant endpoints ---
+
+  getProfile(): Observable<UserProfile | null> {
+    return this.http
+      .get<ApiResponse<UserProfile>>(`${this.applicantUrl}/profile`)
+      .pipe(map((res) => res.data ?? null));
+  }
+
+  upsertProfile(profile: UserProfileRequest): Observable<UserProfile> {
+    return this.http
+      .put<ApiResponse<UserProfile>>(`${this.applicantUrl}/profile`, profile)
+      .pipe(map((res) => res.data!));
+  }
+
+  submitApplication(request: SubmitApplicationRequest): Observable<ApplicationResponse> {
+    return this.http
+      .post<ApiResponse<ApplicationResponse>>(`${this.applicantUrl}/applications`, request)
+      .pipe(map((res) => res.data!));
+  }
+
+  // --- Resume endpoints ---
+
+  uploadResume(file: File): Observable<ResumeResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http
+      .post<ApiResponse<ResumeResponse>>(`${this.applicantUrl}/resumes`, formData)
+      .pipe(map((res) => res.data!));
+  }
+
+  getResumes(): Observable<ResumeResponse[]> {
+    return this.http
+      .get<ApiResponse<ResumeResponse[]>>(`${this.applicantUrl}/resumes`)
+      .pipe(map((res) => res.data ?? []));
+  }
+
+  deleteResume(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.applicantUrl}/resumes/${id}`);
   }
 }
