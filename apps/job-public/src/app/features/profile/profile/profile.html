@@ -126,67 +126,255 @@
     </div>
 
     <form [formGroup]="form" (ngSubmit)="onSave()" class="mt-6 space-y-6">
-      <!-- Contact & Links -->
-      <div class="card p-6">
-        <h2 class="text-base font-semibold text-slate-900 dark:text-white">Contact & Links</h2>
-        <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Phone</label>
-            <input type="tel" formControlName="phone" class="input-field" placeholder="+1 (555) 000-0000" />
-          </div>
-          <div>
-            <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">LinkedIn</label>
-            <input type="text" formControlName="linkedin" class="input-field" placeholder="linkedin.com/in/you" />
-          </div>
-          <div class="sm:col-span-2">
-            <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Portfolio</label>
-            <input type="text" formControlName="portfolio" class="input-field" placeholder="yoursite.com" />
-          </div>
-        </div>
+      <!-- Section Navigation -->
+      <div class="flex gap-1 overflow-x-auto border-b border-slate-200 dark:border-slate-700">
+        @for (section of sections; track section; let i = $index) {
+          <button
+            type="button"
+            (click)="goToSection(i)"
+            class="whitespace-nowrap px-4 py-2.5 text-sm font-medium transition-colors"
+            [class]="activeSection() === i
+              ? 'border-b-2 border-primary-600 text-primary-600 dark:text-primary-400 dark:border-primary-400'
+              : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'"
+          >
+            {{ section }}
+          </button>
+        }
       </div>
 
-      <!-- Skills & Experience -->
-      <div class="card p-6">
-        <h2 class="text-base font-semibold text-slate-900 dark:text-white">Skills & Experience</h2>
-        <div class="mt-4 space-y-4">
-          <div>
-            <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Key Skills</label>
-            <input type="text" formControlName="skills" class="input-field" placeholder="TypeScript, React, Node.js, AWS" />
-            <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Comma-separated list of your top skills.</p>
-          </div>
-          <div>
-            <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Experience Summary</label>
-            <textarea
-              formControlName="experience"
-              rows="4"
-              class="input-field"
-              placeholder="Brief summary of your professional experience..."
-            ></textarea>
+      <!-- Section 0: Contact & Links -->
+      @if (activeSection() === 0) {
+        <div class="card p-6">
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Phone</label>
+              <input type="tel" formControlName="phone" class="input-field" placeholder="+1 (555) 000-0000" />
+            </div>
+            <div>
+              <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">LinkedIn</label>
+              <input type="text" formControlName="linkedin" class="input-field" placeholder="linkedin.com/in/you" />
+            </div>
+            <div class="sm:col-span-2">
+              <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Portfolio</label>
+              <input type="text" formControlName="portfolio" class="input-field" placeholder="yoursite.com" />
+            </div>
           </div>
         </div>
-      </div>
+      }
 
-      <!-- Job Preferences -->
-      <div class="card p-6">
-        <h2 class="text-base font-semibold text-slate-900 dark:text-white">Job Preferences</h2>
-        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Used for daily job matching recommendations.</p>
-        <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Preferred Location</label>
-            <input type="text" formControlName="preferredLocation" class="input-field" placeholder="Portland, OR" />
+      <!-- Section 1: Work History -->
+      @if (activeSection() === 1) {
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <p class="text-sm text-slate-500 dark:text-slate-400">Add your relevant work experience.</p>
+            <button
+              type="button"
+              (click)="addWorkHistory()"
+              class="inline-flex items-center gap-1.5 rounded-lg bg-primary-50 px-3 py-1.5 text-sm font-medium text-primary-700 hover:bg-primary-100 dark:bg-primary-900/20 dark:text-primary-400 dark:hover:bg-primary-900/40"
+            >
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              Add Position
+            </button>
           </div>
-          <div>
-            <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Preferred Job Type</label>
-            <select formControlName="preferredJobType" class="input-field">
-              <option value="">No preference</option>
-              <option value="fullTime">Full Time</option>
-              <option value="partTime">Part Time</option>
-              <option value="contract">Contract</option>
-              <option value="internship">Internship</option>
-            </select>
+
+          @for (wh of workHistoryArray.controls; track wh; let i = $index) {
+            <div class="card p-4" [formGroupName]="'workHistory'">
+              <div [formGroupName]="i">
+                <div class="mb-3 flex items-center justify-between">
+                  <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Position {{ i + 1 }}</span>
+                  <button type="button" (click)="removeWorkHistory(i)" class="text-sm text-red-500 hover:text-red-700 dark:hover:text-red-400">Remove</button>
+                </div>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">Company <span class="text-red-500">*</span></label>
+                    <input type="text" formControlName="company" class="input-field" placeholder="Company name" />
+                  </div>
+                  <div>
+                    <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">Job Title <span class="text-red-500">*</span></label>
+                    <input type="text" formControlName="jobTitle" class="input-field" placeholder="Software Engineer" />
+                  </div>
+                  <div>
+                    <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">Start Date <span class="text-red-500">*</span></label>
+                    <input type="date" formControlName="startDate" class="input-field" />
+                  </div>
+                  <div>
+                    <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">End Date</label>
+                    <input type="date" formControlName="endDate" class="input-field" />
+                  </div>
+                  <div class="sm:col-span-2">
+                    <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">Description</label>
+                    <textarea formControlName="description" rows="2" class="input-field" placeholder="Key responsibilities and achievements..."></textarea>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <input type="checkbox" formControlName="isCurrent" id="profile-isCurrent-{{i}}" class="h-4 w-4 rounded border-slate-300" />
+                    <label for="profile-isCurrent-{{i}}" class="text-sm text-slate-600 dark:text-slate-400">I currently work here</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+
+          @if (workHistoryArray.length === 0) {
+            <div class="rounded-lg border-2 border-dashed border-slate-200 py-8 text-center dark:border-slate-700">
+              <p class="text-sm text-slate-500 dark:text-slate-400">No work history added yet. Click "Add Position" to get started.</p>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Section 2: Education -->
+      @if (activeSection() === 2) {
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <p class="text-sm text-slate-500 dark:text-slate-400">Add your educational background.</p>
+            <button
+              type="button"
+              (click)="addEducation()"
+              class="inline-flex items-center gap-1.5 rounded-lg bg-primary-50 px-3 py-1.5 text-sm font-medium text-primary-700 hover:bg-primary-100 dark:bg-primary-900/20 dark:text-primary-400 dark:hover:bg-primary-900/40"
+            >
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              Add Education
+            </button>
+          </div>
+
+          @for (ed of educationArray.controls; track ed; let i = $index) {
+            <div class="card p-4" [formGroupName]="'education'">
+              <div [formGroupName]="i">
+                <div class="mb-3 flex items-center justify-between">
+                  <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Education {{ i + 1 }}</span>
+                  <button type="button" (click)="removeEducation(i)" class="text-sm text-red-500 hover:text-red-700 dark:hover:text-red-400">Remove</button>
+                </div>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">Institution <span class="text-red-500">*</span></label>
+                    <input type="text" formControlName="institution" class="input-field" placeholder="University name" />
+                  </div>
+                  <div>
+                    <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">Degree <span class="text-red-500">*</span></label>
+                    <input type="text" formControlName="degree" class="input-field" placeholder="Bachelor of Science" />
+                  </div>
+                  <div>
+                    <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">Field of Study</label>
+                    <input type="text" formControlName="fieldOfStudy" class="input-field" placeholder="Computer Science" />
+                  </div>
+                  <div></div>
+                  <div>
+                    <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">Start Date <span class="text-red-500">*</span></label>
+                    <input type="date" formControlName="startDate" class="input-field" />
+                  </div>
+                  <div>
+                    <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">End Date</label>
+                    <input type="date" formControlName="endDate" class="input-field" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+
+          @if (educationArray.length === 0) {
+            <div class="rounded-lg border-2 border-dashed border-slate-200 py-8 text-center dark:border-slate-700">
+              <p class="text-sm text-slate-500 dark:text-slate-400">No education added yet. Click "Add Education" to get started.</p>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Section 3: Certifications -->
+      @if (activeSection() === 3) {
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <p class="text-sm text-slate-500 dark:text-slate-400">Add any relevant certifications.</p>
+            <button
+              type="button"
+              (click)="addCertification()"
+              class="inline-flex items-center gap-1.5 rounded-lg bg-primary-50 px-3 py-1.5 text-sm font-medium text-primary-700 hover:bg-primary-100 dark:bg-primary-900/20 dark:text-primary-400 dark:hover:bg-primary-900/40"
+            >
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              Add Certification
+            </button>
+          </div>
+
+          @for (cert of certificationsArray.controls; track cert; let i = $index) {
+            <div class="card p-4" [formGroupName]="'certifications'">
+              <div [formGroupName]="i">
+                <div class="mb-3 flex items-center justify-between">
+                  <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Certification {{ i + 1 }}</span>
+                  <button type="button" (click)="removeCertification(i)" class="text-sm text-red-500 hover:text-red-700 dark:hover:text-red-400">Remove</button>
+                </div>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">Certification Name <span class="text-red-500">*</span></label>
+                    <input type="text" formControlName="name" class="input-field" placeholder="AWS Solutions Architect" />
+                  </div>
+                  <div>
+                    <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">Issuing Organization</label>
+                    <input type="text" formControlName="issuingOrganization" class="input-field" placeholder="Amazon Web Services" />
+                  </div>
+                  <div>
+                    <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">Issue Date</label>
+                    <input type="date" formControlName="issueDate" class="input-field" />
+                  </div>
+                  <div>
+                    <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">Expiration Date</label>
+                    <input type="date" formControlName="expirationDate" class="input-field" />
+                  </div>
+                  <div class="sm:col-span-2">
+                    <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">Credential ID</label>
+                    <input type="text" formControlName="credentialId" class="input-field" placeholder="ABC-123-XYZ" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+
+          @if (certificationsArray.length === 0) {
+            <div class="rounded-lg border-2 border-dashed border-slate-200 py-8 text-center dark:border-slate-700">
+              <p class="text-sm text-slate-500 dark:text-slate-400">No certifications added yet. Click "Add Certification" to get started.</p>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Section 4: Skills & Preferences -->
+      @if (activeSection() === 4) {
+        <div class="space-y-6">
+          <div class="card p-6">
+            <h2 class="text-base font-semibold text-slate-900 dark:text-white">Skills</h2>
+            <div class="mt-4">
+              <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Key Skills</label>
+              <input type="text" formControlName="skills" class="input-field" placeholder="TypeScript, React, Node.js, AWS" />
+              <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Separate skills with commas</p>
+            </div>
+          </div>
+
+          <div class="card p-6">
+            <h2 class="text-base font-semibold text-slate-900 dark:text-white">Job Preferences</h2>
+            <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Used for daily job matching recommendations.</p>
+            <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Preferred Location</label>
+                <input type="text" formControlName="preferredLocation" class="input-field" placeholder="Portland, OR" />
+              </div>
+              <div>
+                <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Preferred Job Type</label>
+                <select formControlName="preferredJobType" class="input-field">
+                  <option value="">No preference</option>
+                  <option value="fullTime">Full Time</option>
+                  <option value="partTime">Part Time</option>
+                  <option value="contract">Contract</option>
+                  <option value="internship">Internship</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      }
 
       <!-- Error -->
       @if (store.error()) {

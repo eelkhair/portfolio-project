@@ -86,7 +86,7 @@ export class ResumeUpload implements OnInit {
     const data = this.store.resumeData();
     if (!data) return [];
     return [
-      { label: 'Name', value: data.fullName },
+      { label: 'Name', value: `${data.firstName} ${data.lastName}`.trim() },
       { label: 'Email', value: data.email },
       { label: 'Phone', value: data.phone },
       { label: 'LinkedIn', value: data.linkedin },

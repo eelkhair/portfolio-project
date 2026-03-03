@@ -56,7 +56,8 @@ export class ApplicationForm {
     const data = this.resumeData();
     const fields = new Set<string>();
     if (data) {
-      if (data.fullName) { fields.add('firstName'); fields.add('lastName'); }
+      if (data.firstName) fields.add('firstName');
+      if (data.lastName) fields.add('lastName');
       if (data.email) fields.add('email');
       if (data.phone) fields.add('phone');
       if (data.linkedin) fields.add('linkedin');
@@ -86,10 +87,9 @@ export class ApplicationForm {
     effect(() => {
       const data = this.resumeData();
       if (data) {
-        const [firstName, ...rest] = data.fullName.split(' ');
         this.form.patchValue({
-          firstName: firstName ?? '',
-          lastName: rest.join(' ') ?? '',
+          firstName: data.firstName,
+          lastName: data.lastName,
           email: data.email,
           phone: data.phone,
           linkedin: data.linkedin,

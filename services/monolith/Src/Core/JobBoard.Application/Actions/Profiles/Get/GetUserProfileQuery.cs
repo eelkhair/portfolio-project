@@ -50,19 +50,6 @@ public class GetUserProfileQueryHandler(
             "Profile lookup complete for user {UserUId}: profile_exists={ProfileExists}",
             user.Id, hasProfile);
 
-        return new UserProfileResponse
-        {
-            Id = user.Id,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            Email = user.Email,
-            Phone = profile?.Phone,
-            LinkedIn = profile?.LinkedIn,
-            Portfolio = profile?.Portfolio,
-            Experience = profile?.Experience,
-            Skills = profile?.Skills?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList() ?? [],
-            PreferredLocation = profile?.PreferredLocation,
-            PreferredJobType = profile?.PreferredJobType
-        };
+        return ProfileMapper.ToResponse(user, profile, hasProfile);
     }
 }

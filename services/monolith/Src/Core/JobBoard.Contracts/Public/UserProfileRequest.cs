@@ -7,8 +7,10 @@ public class UserProfileRequest
     public string? Phone { get; set; }
     public string? LinkedIn { get; set; }
     public string? Portfolio { get; set; }
-    public string? Experience { get; set; }
     public List<string>? Skills { get; set; }
     public string? PreferredLocation { get; set; }
     public JobType? PreferredJobType { get; set; }
+    public List<WorkHistoryDto>? WorkHistory { get; set; }
+    public List<EducationDto>? Education { get; set; }
+    public List<CertificationDto>? Certifications { get; set; }
 }
