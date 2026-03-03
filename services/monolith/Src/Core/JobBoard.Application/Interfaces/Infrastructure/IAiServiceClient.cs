@@ -1,11 +1,13 @@
 ﻿using JobBoard.Application.Actions.Public;
 using JobBoard.Monolith.Contracts.Drafts;
+using JobBoard.Monolith.Contracts.Public;
 using JobBoard.Monolith.Contracts.Settings;
 
 namespace JobBoard.Application.Interfaces.Infrastructure;
 
 public interface IAiServiceClient
 {
+    Task<ResumeParsedContentResponse> ParseResume(string fileName, string contentType, Stream fileContent, CancellationToken cancellationToken);
     Task<List<DraftResponse>> ListDrafts(Guid companyId, CancellationToken cancellationToken);
     Task<DraftRewriteResponse> RewriteItem(DraftItemRewriteRequest requestModel, CancellationToken cancellationToken);
     Task<DraftGenResponse> GenerateDraft(Guid companyId, DraftGenRequest requestModel, CancellationToken cancellationToken);

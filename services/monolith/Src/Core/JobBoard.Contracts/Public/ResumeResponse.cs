@@ -7,5 +7,8 @@ public class ResumeResponse
     public string? ContentType { get; set; }
     public long? FileSize { get; set; }
     public bool HasParsedContent { get; set; }
+    public string ParseStatus { get; set; } = "Pending";
+    public int ParseRetryCount { get; set; }
     public DateTime CreatedAt { get; set; }
+    public ResumeParsedContentResponse? ParsedContent { get; set; }
 }

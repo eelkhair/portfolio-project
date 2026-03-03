@@ -83,6 +83,32 @@ export class Profile implements OnInit {
         }
       }
     });
+
+    // Auto-fill from resume parsed content after upload
+    effect(() => {
+      const data = this.store.lastParsedContent();
+      if (data) {
+        this.form.patchValue({
+          phone: data.phone || this.form.value.phone,
+          linkedin: data.linkedin || this.form.value.linkedin,
+          portfolio: data.portfolio || this.form.value.portfolio,
+          skills: data.skills.length > 0 ? data.skills.join(', ') : this.form.value.skills,
+        });
+
+        if (data.workHistory?.length) {
+          this.workHistoryArray.clear();
+          data.workHistory.forEach(wh => this.addWorkHistory(wh));
+        }
+        if (data.education?.length) {
+          this.educationArray.clear();
+          data.education.forEach(ed => this.addEducation(ed));
+        }
+        if (data.certifications?.length) {
+          this.certificationsArray.clear();
+          data.certifications.forEach(cert => this.addCertification(cert));
+        }
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -184,6 +210,25 @@ export class Profile implements OnInit {
   onSave(): void {
     const val = this.form.value;
 
+    // Sanitize dates: empty strings → undefined so the backend receives null instead of ""
+    const workHistory = (val.workHistory ?? []).map((wh: any) => ({
+      ...wh,
+      startDate: wh.startDate || undefined,
+      endDate: wh.endDate || undefined,
+    })) as WorkHistoryDto[];
+
+    const education = (val.education ?? []).map((ed: any) => ({
+      ...ed,
+      startDate: ed.startDate || undefined,
+      endDate: ed.endDate || undefined,
+    })) as EducationDto[];
+
+    const certifications = (val.certifications ?? []).map((cert: any) => ({
+      ...cert,
+      issueDate: cert.issueDate || undefined,
+      expirationDate: cert.expirationDate || undefined,
+    })) as CertificationDto[];
+
     this.store.saveProfile({
       phone: val.phone || undefined,
       linkedin: val.linkedin || undefined,
@@ -191,9 +236,9 @@ export class Profile implements OnInit {
       skills: (val.skills ?? '').split(',').map((s: string) => s.trim()).filter(Boolean),
       preferredLocation: val.preferredLocation || undefined,
       preferredJobType: val.preferredJobType || undefined,
-      workHistory: (val.workHistory ?? []) as WorkHistoryDto[],
-      education: (val.education ?? []) as EducationDto[],
-      certifications: (val.certifications ?? []) as CertificationDto[],
+      workHistory,
+      education,
+      certifications,
     });
   }
 }

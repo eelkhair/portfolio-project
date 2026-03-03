@@ -29,6 +29,16 @@ public class ResumeConfiguration : IEntityTypeConfiguration<Resume>
         builder.Property(r => r.ParsedContent)
             .HasMaxLength(10000);
 
+        builder.Property(r => r.ParseStatus)
+            .HasDefaultValue(ResumeParseStatus.Pending)
+            .HasConversion<string>()
+            .HasMaxLength(20);
+
+        builder.Property(r => r.ParseRetryCount)
+            .HasDefaultValue(0);
+
+        builder.HasIndex(r => r.ParseStatus);
+
         builder.HasOne(r => r.User)
             .WithMany()
             .HasForeignKey(r => r.UserId)

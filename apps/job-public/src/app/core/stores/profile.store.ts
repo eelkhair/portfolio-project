@@ -1,7 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import mammoth from 'mammoth';
 import { ApiService } from '../services/api.service';
-import { ResumeResponse, UserProfile, UserProfileRequest } from '../types/resume-data.type';
+import { ResumeData, ResumeResponse, UserProfile, UserProfileRequest } from '../types/resume-data.type';
 
 @Injectable({ providedIn: 'root' })
 export class ProfileStore {
@@ -17,6 +17,7 @@ export class ProfileStore {
   readonly resumes = signal<ResumeResponse[]>([]);
   readonly uploading = signal(false);
   readonly uploadError = signal<string | null>(null);
+  readonly lastParsedContent = signal<ResumeData | null>(null);
 
   // Preview state
   readonly previewResume = signal<ResumeResponse | null>(null);
@@ -70,11 +71,15 @@ export class ProfileStore {
   uploadResume(file: File): void {
     this.uploading.set(true);
     this.uploadError.set(null);
+    this.lastParsedContent.set(null);
 
     this.api.uploadResume(file).subscribe({
       next: (resume) => {
         this.resumes.update((list) => [resume, ...list]);
         this.uploading.set(false);
+        if (resume.parsedContent) {
+          this.lastParsedContent.set(resume.parsedContent);
+        }
       },
       error: (err) => {
         this.uploading.set(false);
