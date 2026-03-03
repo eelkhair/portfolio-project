@@ -8,6 +8,7 @@ using JobBoard.AI.Application.Interfaces.Notifications;
 using JobBoard.AI.Infrastructure.AI;
 using JobBoard.AI.Infrastructure.Configuration;
 using JobBoard.AI.Infrastructure.Dapr;
+using Azure.Storage.Blobs;
 using JobBoard.AI.Infrastructure.Diagnostics;
 using JobBoard.AI.Infrastructure.Persistence;
 
@@ -28,6 +29,9 @@ Debugger.Launch();
     .AddSignalR();
 
 builder.Services.AddScoped<IAiNotificationHub, AiNotificationHubNotifier>();
+
+var blobConnectionString = builder.Configuration.GetConnectionString("BlobStorage") ?? "UseDevelopmentStorage=true";
+builder.Services.AddSingleton(new BlobServiceClient(blobConnectionString));
 
 builder.Build().UseConfiguredSwagger(builder.Configuration)
     .UseApplicationServices()

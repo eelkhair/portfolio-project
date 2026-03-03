@@ -132,6 +132,38 @@ public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<Mon
             throw;
         }
     }
+
+    public async Task NotifyResumeParseCompletedAsync(ResumeParseCompletedRequest model, CancellationToken ct)
+    {
+        try
+        {
+            var request = CreateRequest(HttpMethod.Post, "api/applicant/resumes/parse-completed", "monolith-api");
+            request.Content = JsonContent.Create(model);
+            await Client.InvokeMethodAsync(request, ct);
+        }
+        catch (InvocationException ex)
+        {
+            var body = await ex.Response.Content.ReadAsStringAsync(ct);
+            logger.LogError(ex, "Error notifying monolith of resume parse completion: {Body}", body);
+            throw;
+        }
+    }
+
+    public async Task NotifyResumeParseFailedAsync(ResumeParseFailedRequest model, CancellationToken ct)
+    {
+        try
+        {
+            var request = CreateRequest(HttpMethod.Post, "api/applicant/resumes/parse-failed", "monolith-api");
+            request.Content = JsonContent.Create(model);
+            await Client.InvokeMethodAsync(request, ct);
+        }
+        catch (InvocationException ex)
+        {
+            var body = await ex.Response.Content.ReadAsStringAsync(ct);
+            logger.LogError(ex, "Error notifying monolith of resume parse failure: {Body}", body);
+            throw;
+        }
+    }
 }
 
 public  class ApiResponse<T>

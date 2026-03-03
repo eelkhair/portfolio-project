@@ -4,6 +4,7 @@ using JobBoard.API.Infrastructure.Authorization;
 using JobBoard.API.Infrastructure.OpenApi;
 using JobBoard.API.Infrastructure.SignalR.CompanyActivation;
 using JobBoard.API.Infrastructure.SignalR.FeatureFlags;
+using JobBoard.API.Infrastructure.SignalR.ResumeParse;
 using JobBoard.Application;
 using JobBoard.Application.Interfaces.Users;
 using JobBoard.infrastructure.Dapr;
@@ -23,6 +24,7 @@ var isTesting = builder.Environment.IsEnvironment("Testing");
 
 builder.Services.AddSingleton<IFeatureFlagNotifier, SignalRFeatureFlagNotifier>();
 builder.Services.AddSingleton<ICompanyActivationNotifier, CompanyActivationNotifier>();
+builder.Services.AddSingleton<IResumeParseNotifier, ResumeParseNotifier>();
 
 if (isTesting)
 {

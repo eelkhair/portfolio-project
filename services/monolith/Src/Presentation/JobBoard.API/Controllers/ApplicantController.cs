@@ -1,16 +1,21 @@
 using System.Net;
 using JobBoard.API.Helpers;
+using JobBoard.API.Infrastructure.SignalR.ResumeParse;
 using JobBoard.Application.Actions.Applications.Submit;
 using JobBoard.Application.Actions.Profiles.Get;
 using JobBoard.Application.Actions.Profiles.Upsert;
+using JobBoard.Application.Actions.Resumes.CompleteParse;
 using JobBoard.Application.Actions.Resumes.Delete;
 using JobBoard.Application.Actions.Resumes.Download;
+using JobBoard.Application.Actions.Resumes.FailParse;
 using JobBoard.Application.Actions.Resumes.GetParsedContent;
 using JobBoard.Application.Actions.Resumes.List;
 using JobBoard.Application.Actions.Resumes.Upload;
 using JobBoard.Application.Infrastructure.Exceptions;
 using JobBoard.Application.Interfaces.Configurations;
+using JobBoard.Application.Interfaces.Users;
 using JobBoard.Monolith.Contracts.Public;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoard.API.Controllers;
@@ -19,12 +24,11 @@ namespace JobBoard.API.Controllers;
 /// Handles authenticated applicant operations: profile management, resume management, and job applications.
 /// </summary>
 [Route("api/[controller]")]
-public class ApplicantController : BaseApiController
+public class ApplicantController(IUserAccessor accessor, IResumeParseNotifier resumeParseNotifier) : BaseApiController
 {
     /// <summary>
     /// Retrieves the authenticated user's profile data.
     /// </summary>
-    /// <returns>An IActionResult containing the user's profile details wrapped in an ApiResponse if the operation is successful; otherwise, an appropriate error response.</returns>
     [HttpGet("profile")]
     public async Task<IActionResult> GetProfile()
     {
@@ -34,8 +38,6 @@ public class ApplicantController : BaseApiController
     /// <summary>
     /// Updates or creates the authenticated user's profile based on the provided request data.
     /// </summary>
-    /// <param name="request">An instance of UserProfileRequest containing the user's profile details such as phone, LinkedIn, portfolio, experience, skills, preferred location, and job type.</param>
-    /// <returns>An IActionResult containing an ApiResponse that encapsulates the outcome of the operation, including the updated or created profile details if successful; otherwise, an appropriate error response.</returns>
     [HttpPut("profile")]
     public async Task<IActionResult> UpsertProfile([FromBody] UserProfileRequest request)
     {
@@ -43,19 +45,20 @@ public class ApplicantController : BaseApiController
     }
 
     /// <summary>
-    /// Uploads a resume file for the authenticated user.
+    /// Uploads a resume file for the authenticated user. Parsing is async via outbox + AI service.
     /// </summary>
     /// <param name="file">The resume file (PDF, DOCX, or TXT, max 5 MB).</param>
-    /// <returns>201 Created with the resume details if successful; otherwise, an appropriate error response.</returns>
+    /// <param name="currentPage">The frontend route the user is currently on, propagated through the event chain for UX decisions.</param>
     [HttpPost("resumes")]
     [RequestSizeLimit(5 * 1024 * 1024)]
-    public async Task<IActionResult> UploadResume(IFormFile file)
+    public async Task<IActionResult> UploadResume(IFormFile file, [FromQuery] string? currentPage)
     {
         var command = new UploadResumeCommand(
             file.OpenReadStream(),
             file.FileName,
             file.ContentType,
-            file.Length);
+            file.Length,
+            currentPage);
 
         return await ExecuteCommandAsync(command,
             result => StatusCode(StatusCodes.Status201Created, result));
@@ -64,7 +67,6 @@ public class ApplicantController : BaseApiController
     /// <summary>
     /// Returns all resumes uploaded by the authenticated user.
     /// </summary>
-    /// <returns>An IActionResult containing a list of resume details wrapped in an ApiResponse.</returns>
     [HttpGet("resumes")]
     public async Task<IActionResult> GetResumes()
     {
@@ -74,8 +76,6 @@ public class ApplicantController : BaseApiController
     /// <summary>
     /// Returns the AI-parsed content (contact info, skills, experience) for a specific resume.
     /// </summary>
-    /// <param name="id">The unique identifier of the resume.</param>
-    /// <returns>Parsed resume data if available; null data if the resume has not been parsed yet.</returns>
     [HttpGet("resumes/{id:guid}/parsed-content")]
     public async Task<IActionResult> GetResumeParsedContent(Guid id)
     {
@@ -85,9 +85,6 @@ public class ApplicantController : BaseApiController
     /// <summary>
     /// Downloads a specific resume file belonging to the authenticated user.
     /// </summary>
-    /// <param name="id">The unique identifier of the resume to download.</param>
-    /// <param name="inline">When true, sets Content-Disposition to inline for browser preview (e.g. PDF in iframe).</param>
-    /// <returns>The resume file stream with appropriate Content-Type header.</returns>
     [HttpGet("resumes/{id:guid}/download")]
     public async Task<IActionResult> DownloadResume(Guid id, [FromQuery] bool inline = false)
     {
@@ -125,8 +122,6 @@ public class ApplicantController : BaseApiController
     /// <summary>
     /// Deletes a specific resume belonging to the authenticated user.
     /// </summary>
-    /// <param name="id">The unique identifier of the resume to delete.</param>
-    /// <returns>204 No Content if successful; 404 if the resume is not found.</returns>
     [HttpDelete("resumes/{id:guid}")]
     public async Task<IActionResult> DeleteResume(Guid id)
     {
@@ -137,13 +132,53 @@ public class ApplicantController : BaseApiController
     /// <summary>
     /// Submits a job application for the authenticated user.
     /// </summary>
-    /// <param name="request">The request payload containing the job ID, resume ID, and an optional cover letter.</param>
-    /// <returns>An IActionResult containing the application response wrapped in an ApiResponse if the operation is successful, with a 201 Created status code; otherwise, an appropriate error response.</returns>
     [HttpPost("applications")]
     public async Task<IActionResult> SubmitApplication([FromBody] SubmitApplicationRequest request)
     {
         return await ExecuteCommandAsync(
             new SubmitApplicationCommand(request),
             result => StatusCode(StatusCodes.Status201Created, result));
+    }
+
+    /// <summary>
+    /// Callback from AI service after resume parsing completes successfully.
+    /// </summary>
+    [HttpPost("resumes/parse-completed")]
+    [Authorize(Policy = "DaprInternal")]
+    public async Task<IActionResult> ResumeParseCompleted([FromBody] ResumeParseCompletedModel request,
+        CancellationToken cancellationToken)
+    {
+        accessor.UserId = request.UserId;
+
+        await ExecuteCommandAsync(new CompleteResumeParseCommand(request), Ok);
+
+        await resumeParseNotifier.NotifyParsedAsync(
+            request.ResumeUId, request.UserId, request.CurrentPage, cancellationToken);
+
+        return Ok();
+    }
+
+    /// <summary>
+    /// Callback from AI service after resume parsing fails.
+    /// </summary>
+    [HttpPost("resumes/parse-failed")]
+    [Authorize(Policy = "DaprInternal")]
+    public async Task<IActionResult> ResumeParseFailed([FromBody] ResumeParseFailedModel request,
+        CancellationToken cancellationToken)
+    {
+        accessor.UserId = request.UserId;
+
+        var command = new FailResumeParseCommand(request);
+        var handler = HttpContext.RequestServices
+            .GetRequiredService<IHandler<FailResumeParseCommand, ResumeParseFailureResult>>();
+
+        var failureResult = await handler.HandleAsync(command, cancellationToken);
+
+        await resumeParseNotifier.NotifyParseFailedAsync(
+            request.ResumeUId, request.UserId, request.CurrentPage,
+            failureResult.Attempt, failureResult.MaxAttempts, failureResult.IsFinal,
+            cancellationToken);
+
+        return Ok();
     }
 }
