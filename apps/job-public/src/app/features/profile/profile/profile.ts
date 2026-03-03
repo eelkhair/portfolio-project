@@ -1,5 +1,5 @@
 import { Component, effect, inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { LoadingSpinner } from '../../../shared/components/loading-spinner';
@@ -8,6 +8,8 @@ import { ProfileStore } from '../../../core/stores/profile.store';
 import { AccountService } from '../../../core/services/account.service';
 import { ResumePreviewModal } from '../resume-preview-modal/resume-preview-modal';
 import { ResumeResponse } from '../../../core/types/resume-data.type';
+import { WorkHistoryDto, EducationDto, CertificationDto } from '../../../core/types/application.type';
+import { Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-profile',
@@ -19,15 +21,39 @@ export class Profile implements OnInit {
   protected readonly account = inject(AccountService);
   private readonly fb = inject(FormBuilder);
 
+  protected readonly activeSection = signal(0);
+
+  protected readonly sections = [
+    'Contact & Links',
+    'Work History',
+    'Education',
+    'Certifications',
+    'Skills & Preferences',
+  ];
+
   protected readonly form = this.fb.group({
     phone: [''],
     linkedin: [''],
     portfolio: [''],
     skills: [''],
-    experience: [''],
     preferredLocation: [''],
     preferredJobType: [''],
+    workHistory: this.fb.array<FormGroup>([]),
+    education: this.fb.array<FormGroup>([]),
+    certifications: this.fb.array<FormGroup>([]),
   });
+
+  get workHistoryArray(): FormArray {
+    return this.form.controls.workHistory;
+  }
+
+  get educationArray(): FormArray {
+    return this.form.controls.education;
+  }
+
+  get certificationsArray(): FormArray {
+    return this.form.controls.certifications;
+  }
 
   constructor() {
     // Pre-fill form when profile loads
@@ -39,10 +65,22 @@ export class Profile implements OnInit {
           linkedin: profile.linkedin ?? '',
           portfolio: profile.portfolio ?? '',
           skills: profile.skills.join(', '),
-          experience: profile.experience ?? '',
           preferredLocation: profile.preferredLocation ?? '',
           preferredJobType: profile.preferredJobType ?? '',
         });
+
+        if (profile.workHistory?.length) {
+          this.workHistoryArray.clear();
+          profile.workHistory.forEach(wh => this.addWorkHistory(wh));
+        }
+        if (profile.education?.length) {
+          this.educationArray.clear();
+          profile.education.forEach(ed => this.addEducation(ed));
+        }
+        if (profile.certifications?.length) {
+          this.certificationsArray.clear();
+          profile.certifications.forEach(cert => this.addCertification(cert));
+        }
       }
     });
   }
@@ -52,6 +90,58 @@ export class Profile implements OnInit {
     this.store.loadResumes();
   }
 
+  // --- Work History ---
+  addWorkHistory(initial?: WorkHistoryDto): void {
+    this.workHistoryArray.push(this.fb.group({
+      company: [initial?.company ?? '', Validators.required],
+      jobTitle: [initial?.jobTitle ?? '', Validators.required],
+      startDate: [initial?.startDate ?? '', Validators.required],
+      endDate: [initial?.endDate ?? ''],
+      description: [initial?.description ?? ''],
+      isCurrent: [initial?.isCurrent ?? false],
+    }));
+  }
+
+  removeWorkHistory(i: number): void {
+    this.workHistoryArray.removeAt(i);
+  }
+
+  // --- Education ---
+  addEducation(initial?: EducationDto): void {
+    this.educationArray.push(this.fb.group({
+      institution: [initial?.institution ?? '', Validators.required],
+      degree: [initial?.degree ?? '', Validators.required],
+      fieldOfStudy: [initial?.fieldOfStudy ?? ''],
+      startDate: [initial?.startDate ?? '', Validators.required],
+      endDate: [initial?.endDate ?? ''],
+    }));
+  }
+
+  removeEducation(i: number): void {
+    this.educationArray.removeAt(i);
+  }
+
+  // --- Certifications ---
+  addCertification(initial?: CertificationDto): void {
+    this.certificationsArray.push(this.fb.group({
+      name: [initial?.name ?? '', Validators.required],
+      issuingOrganization: [initial?.issuingOrganization ?? ''],
+      issueDate: [initial?.issueDate ?? ''],
+      expirationDate: [initial?.expirationDate ?? ''],
+      credentialId: [initial?.credentialId ?? ''],
+    }));
+  }
+
+  removeCertification(i: number): void {
+    this.certificationsArray.removeAt(i);
+  }
+
+  // --- Section nav ---
+  goToSection(index: number): void {
+    this.activeSection.set(index);
+  }
+
+  // --- Resume ---
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files?.length) {
@@ -98,10 +188,12 @@ export class Profile implements OnInit {
       phone: val.phone || undefined,
       linkedin: val.linkedin || undefined,
       portfolio: val.portfolio || undefined,
-      experience: val.experience || undefined,
       skills: (val.skills ?? '').split(',').map((s: string) => s.trim()).filter(Boolean),
       preferredLocation: val.preferredLocation || undefined,
       preferredJobType: val.preferredJobType || undefined,
+      workHistory: (val.workHistory ?? []) as WorkHistoryDto[],
+      education: (val.education ?? []) as EducationDto[],
+      certifications: (val.certifications ?? []) as CertificationDto[],
     });
   }
 }

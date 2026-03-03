@@ -1,4 +1,5 @@
 using JobBoard.Domain.Entities.Users;
+using JobBoard.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -22,9 +23,6 @@ public class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
         builder.Property(p => p.Portfolio)
             .HasMaxLength(300);
 
-        builder.Property(p => p.Experience)
-            .HasMaxLength(3000);
-
         builder.Property(p => p.Skills)
             .HasMaxLength(1000);
 
@@ -33,6 +31,21 @@ public class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
 
         builder.Property(p => p.PreferredJobType)
             .HasConversion<int?>();
+
+        builder.OwnsMany(p => p.WorkHistory, wh =>
+        {
+            wh.ToJson();
+        });
+
+        builder.OwnsMany(p => p.Education, ed =>
+        {
+            ed.ToJson();
+        });
+
+        builder.OwnsMany(p => p.Certifications, cert =>
+        {
+            cert.ToJson();
+        });
 
         builder.HasOne(p => p.User)
             .WithOne()

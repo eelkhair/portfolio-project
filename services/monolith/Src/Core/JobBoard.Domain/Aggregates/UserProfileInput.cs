@@ -1,3 +1,4 @@
+using JobBoard.Domain.ValueObjects;
 using JobBoard.Monolith.Contracts.Jobs;
 
 namespace JobBoard.Domain.Aggregates;
@@ -8,10 +9,12 @@ public class UserProfileInput
     public string? Phone { get; set; }
     public string? LinkedIn { get; set; }
     public string? Portfolio { get; set; }
-    public string? Experience { get; set; }
     public List<string>? Skills { get; set; }
     public string? PreferredLocation { get; set; }
     public JobType? PreferredJobType { get; set; }
+    public List<WorkHistoryEntry>? WorkHistory { get; set; }
+    public List<EducationEntry>? Education { get; set; }
+    public List<CertificationEntry>? Certifications { get; set; }
 
     public DateTime? CreatedAt { get; set; }
     public string? CreatedBy { get; set; }
