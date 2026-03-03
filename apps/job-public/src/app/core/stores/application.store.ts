@@ -51,6 +51,7 @@ export class ApplicationStore {
   loadParsedContent(resumeId: string, fileName: string): void {
     this.fileName.set(fileName);
     this.resumeId.set(resumeId);
+    this.resumeData.set(null);
     this.parseStatus.set('parsing');
 
     this.api.getResumeParsedContent(resumeId).subscribe({
