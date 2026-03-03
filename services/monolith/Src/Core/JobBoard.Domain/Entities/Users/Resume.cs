@@ -4,6 +4,13 @@ using JobBoard.Domain.Helpers;
 
 namespace JobBoard.Domain.Entities.Users;
 
+public enum ResumeParseStatus
+{
+    Pending = 0,
+    Parsed = 1,
+    Failed = 2
+}
+
 public class Resume : BaseAuditableEntity
 {
     protected Resume()
@@ -20,9 +27,27 @@ public class Resume : BaseAuditableEntity
     public string? ContentType { get; private set; }
     public long? FileSize { get; private set; }
     public string? ParsedContent { get; private set; }
+    public ResumeParseStatus ParseStatus { get; private set; } = ResumeParseStatus.Pending;
+    public int ParseRetryCount { get; private set; }
 
     internal void SetUser(int userId) => UserId = userId;
-    public void SetParsedContent(string? parsedContent) => ParsedContent = parsedContent;
+
+    public void MarkParsed(string parsedContent)
+    {
+        ParsedContent = parsedContent;
+        ParseStatus = ResumeParseStatus.Parsed;
+    }
+
+    public void MarkParseFailed()
+    {
+        ParseStatus = ResumeParseStatus.Failed;
+        ParseRetryCount++;
+    }
+
+    public void ResetForRetry()
+    {
+        ParseStatus = ResumeParseStatus.Pending;
+    }
 
     public static Resume Create(ResumeInput input)
     {

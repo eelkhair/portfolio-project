@@ -51,6 +51,8 @@ public class GetUserResumesQueryHandler(
                 ContentType = r.ContentType,
                 FileSize = r.FileSize,
                 HasParsedContent = r.ParsedContent != null,
+                ParseStatus = r.ParseStatus.ToString(),
+                ParseRetryCount = r.ParseRetryCount,
                 CreatedAt = r.CreatedAt
             })
             .ToListAsync(cancellationToken);

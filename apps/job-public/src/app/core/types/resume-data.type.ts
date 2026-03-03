@@ -47,7 +47,10 @@ export interface ResumeResponse {
   contentType?: string;
   fileSize?: number;
   hasParsedContent: boolean;
+  parseStatus: 'Pending' | 'Parsed' | 'Failed';
+  parseRetryCount: number;
   createdAt: string;
+  parsedContent?: ResumeData;
 }
 
 export type ParseStatus = 'idle' | 'uploading' | 'parsing' | 'parsed' | 'error';

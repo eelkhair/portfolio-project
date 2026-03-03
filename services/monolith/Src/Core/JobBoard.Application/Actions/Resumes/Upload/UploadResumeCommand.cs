@@ -1,7 +1,9 @@
 using System.Diagnostics;
+using System.Text.Json;
 using JobBoard.Application.Actions.Base;
 using JobBoard.Application.Interfaces;
 using JobBoard.Application.Interfaces.Configurations;
+using JobBoard.Application.Interfaces.Infrastructure;
 using JobBoard.Application.Interfaces.Observability;
 using JobBoard.Application.Interfaces.Storage;
 using JobBoard.Domain.Aggregates;
@@ -25,7 +27,8 @@ public class UploadResumeCommandHandler(
     IHandlerContext context,
     IActivityFactory activityFactory,
     IJobBoardDbContext db,
-    IBlobStorageService blobStorage)
+    IBlobStorageService blobStorage,
+    IAiServiceClient aiServiceClient)
     : BaseCommandHandler(context),
       IHandler<UploadResumeCommand, ResumeResponse>
 {
@@ -67,14 +70,19 @@ public class UploadResumeCommandHandler(
         await db.Resumes.AddAsync(resume, cancellationToken);
         await Context.SaveChangesAsync(command.UserId, cancellationToken);
 
+        // Parse resume via AI service
+        var parsedContent = await TryParseResumeAsync(resume, blobName, command, cancellationToken);
+
         UnitOfWorkEvents.Enqueue(() =>
         {
             activity?.SetTag("resume.resume_uid", resume.Id.ToString());
             activity?.SetTag("resume.file_size", command.FileSize);
+            activity?.SetTag("resume.has_parsed_content", !string.IsNullOrEmpty(resume.ParsedContent));
 
             Logger.LogInformation(
-                "Successfully uploaded resume {ResumeUId} for user {UserUId} ({FileName}, {FileSize} bytes)",
-                resume.Id, user.Id, command.OriginalFileName, command.FileSize);
+                "Successfully uploaded resume {ResumeUId} for user {UserUId} ({FileName}, {FileSize} bytes, parsed={Parsed})",
+                resume.Id, user.Id, command.OriginalFileName, command.FileSize,
+                !string.IsNullOrEmpty(resume.ParsedContent));
 
             return Task.CompletedTask;
         });
@@ -86,7 +94,49 @@ public class UploadResumeCommandHandler(
             ContentType = resume.ContentType,
             FileSize = resume.FileSize,
             HasParsedContent = !string.IsNullOrEmpty(resume.ParsedContent),
-            CreatedAt = resume.CreatedAt
+            ParseStatus = resume.ParseStatus.ToString(),
+            ParseRetryCount = resume.ParseRetryCount,
+            CreatedAt = resume.CreatedAt,
+            ParsedContent = parsedContent
         };
+    }
+
+    private async Task<ResumeParsedContentResponse?> TryParseResumeAsync(
+        Resume resume,
+        string blobName,
+        UploadResumeCommand command,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            Logger.LogInformation("Requesting AI resume parsing for {FileName}", command.OriginalFileName);
+
+            var blob = await blobStorage.DownloadAsync(ContainerName, blobName, cancellationToken);
+            var parsed = await aiServiceClient.ParseResume(
+                command.OriginalFileName,
+                command.ContentType,
+                blob.Content,
+                cancellationToken);
+
+            var json = JsonSerializer.Serialize(parsed, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+
+            resume.MarkParsed(json);
+            await Context.SaveChangesAsync(command.UserId, cancellationToken);
+
+            Logger.LogInformation("AI resume parsing succeeded for {FileName}", command.OriginalFileName);
+            return parsed;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogWarning(ex, "AI resume parsing failed for {FileName} — upload will proceed without parsed content",
+                command.OriginalFileName);
+
+            resume.MarkParseFailed();
+            await Context.SaveChangesAsync(command.UserId, cancellationToken);
+            return null;
+        }
     }
 }

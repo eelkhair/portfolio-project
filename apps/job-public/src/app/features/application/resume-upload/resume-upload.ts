@@ -22,7 +22,7 @@ export class ResumeUpload implements OnInit {
   readonly resumeIdChange = output<string>();
 
   constructor() {
-    // Auto-select newly uploaded resume once it appears in the profile list
+    // Auto-select newly uploaded resume and bridge parsed content to ApplicationStore
     effect(() => {
       const resumes = this.profileStore.resumes();
       if (
@@ -34,7 +34,25 @@ export class ResumeUpload implements OnInit {
         const newResume = resumes[0];
         this.selectedResumeId.set(newResume.id);
         this.resumeIdChange.emit(newResume.id);
+        this.store.resumeId.set(newResume.id);
         this.resumesCountBeforeUpload = resumes.length;
+      }
+    });
+
+    // Bridge: when profile upload completes with parsed content → update ApplicationStore
+    effect(() => {
+      const content = this.profileStore.lastParsedContent();
+      if (content) {
+        this.store.resumeData.set(content);
+        this.store.parseStatus.set('parsed');
+      }
+    });
+
+    // Bridge: handle upload error
+    effect(() => {
+      const error = this.profileStore.uploadError();
+      if (error && this.store.parseStatus() === 'uploading') {
+        this.store.parseStatus.set('error');
       }
     });
   }
@@ -119,11 +137,11 @@ export class ResumeUpload implements OnInit {
   }
 
   private uploadFile(file: File): void {
-    // Save to profile (adds to existing resumes list)
+    // Single upload via ProfileStore — bridge effects in constructor
+    // push parsed content to ApplicationStore automatically
     this.resumesCountBeforeUpload = this.profileStore.resumes().length;
+    this.store.fileName.set(file.name);
+    this.store.parseStatus.set('uploading');
     this.profileStore.uploadResume(file);
-
-    // AI parse for form auto-fill
-    this.store.parseResume(file);
   }
 }
