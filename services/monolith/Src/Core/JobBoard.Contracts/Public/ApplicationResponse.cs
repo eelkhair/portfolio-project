@@ -8,4 +8,10 @@ public class ApplicationResponse
     public string CompanyName { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
+
+    public PersonalInfoDto? PersonalInfo { get; set; }
+    public List<WorkHistoryDto>? WorkHistory { get; set; }
+    public List<EducationDto>? Education { get; set; }
+    public List<CertificationDto>? Certifications { get; set; }
+    public List<string>? Skills { get; set; }
 }

@@ -3,7 +3,7 @@ import { of, switchMap } from 'rxjs';
 import { catchError, delay } from 'rxjs/operators';
 import { ApiService } from '../services/api.service';
 import { MockDataService } from '../services/mock-data.service';
-import { ApplicationStatus, SubmitApplicationRequest } from '../types/application.type';
+import { ApplicationStatus, PersonalInfoDto, WorkHistoryDto, EducationDto, CertificationDto, SubmitApplicationRequest } from '../types/application.type';
 import { ParseStatus, ResumeData, UserProfile, UserProfileRequest } from '../types/resume-data.type';
 
 @Injectable({ providedIn: 'root' })
@@ -69,7 +69,19 @@ export class ApplicationStore {
     });
   }
 
-  submitApplication(jobId: string, coverLetter: string, profileData: UserProfileRequest, resumeId?: string): void {
+  submitApplication(
+    jobId: string,
+    coverLetter: string,
+    profileData: UserProfileRequest,
+    resumeId?: string,
+    applicationData?: {
+      personalInfo?: PersonalInfoDto;
+      workHistory?: WorkHistoryDto[];
+      education?: EducationDto[];
+      certifications?: CertificationDto[];
+      skills?: string[];
+    },
+  ): void {
     this.applicationStatus.set('submitting');
     this.error.set(null);
 
@@ -77,6 +89,11 @@ export class ApplicationStore {
       jobId,
       resumeId: resumeId || undefined,
       coverLetter: coverLetter || undefined,
+      personalInfo: applicationData?.personalInfo,
+      workHistory: applicationData?.workHistory,
+      education: applicationData?.education,
+      certifications: applicationData?.certifications,
+      skills: applicationData?.skills,
     };
 
     // Sequential: save profile first, then submit application

@@ -2,6 +2,7 @@ using JobBoard.Domain.Aggregates;
 using JobBoard.Domain.Entities.Users;
 using JobBoard.Domain.Exceptions;
 using JobBoard.Domain.Helpers;
+using JobBoard.Domain.ValueObjects;
 
 namespace JobBoard.Domain.Entities;
 
@@ -23,6 +24,12 @@ public class JobApplication : BaseAuditableEntity
     public string? CoverLetter { get; private set; }
     public ApplicationStatus Status { get; private set; }
 
+    public PersonalInfo PersonalInfo { get; private set; } = new();
+    public List<WorkHistoryEntry> WorkHistory { get; private set; } = [];
+    public List<EducationEntry> Education { get; private set; } = [];
+    public List<CertificationEntry> Certifications { get; private set; } = [];
+    public List<string> Skills { get; private set; } = [];
+
     internal void SetJob(int jobId) => JobId = jobId;
     internal void SetUser(int userId) => UserId = userId;
     public void SetStatus(ApplicationStatus status) => Status = status;
@@ -41,7 +48,12 @@ public class JobApplication : BaseAuditableEntity
         {
             CoverLetter = input.CoverLetter?.Trim(),
             Status = ApplicationStatus.Submitted,
-            ResumeId = input.ResumeId
+            ResumeId = input.ResumeId,
+            PersonalInfo = input.PersonalInfo ?? new PersonalInfo(),
+            WorkHistory = input.WorkHistory ?? [],
+            Education = input.Education ?? [],
+            Certifications = input.Certifications ?? [],
+            Skills = input.Skills ?? []
         };
 
         application.SetJob(input.JobId);
