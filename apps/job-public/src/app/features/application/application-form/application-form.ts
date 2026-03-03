@@ -83,7 +83,7 @@ export class ApplicationForm {
   }
 
   constructor() {
-    // Auto-fill from resume parsing
+    // Auto-fill from resume parsing — clears form when switching resumes
     effect(() => {
       const data = this.resumeData();
       if (data) {
@@ -97,18 +97,26 @@ export class ApplicationForm {
           skills: data.skills.join(', '),
         });
 
+        this.workHistoryArray.clear();
         if (data.workHistory?.length) {
-          this.workHistoryArray.clear();
           data.workHistory.forEach(wh => this.addWorkHistory(wh));
         }
+
+        this.educationArray.clear();
         if (data.education?.length) {
-          this.educationArray.clear();
           data.education.forEach(ed => this.addEducation(ed));
         }
+
+        this.certificationsArray.clear();
         if (data.certifications?.length) {
-          this.certificationsArray.clear();
           data.certifications.forEach(cert => this.addCertification(cert));
         }
+      } else {
+        // Resume switched or cleared — reset all form fields
+        this.form.reset();
+        this.workHistoryArray.clear();
+        this.educationArray.clear();
+        this.certificationsArray.clear();
       }
     });
 

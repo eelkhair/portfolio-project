@@ -76,11 +76,14 @@ export class ResumeUpload implements OnInit {
   onResumeSelected(event: Event): void {
     const select = event.target as HTMLSelectElement;
     this.selectedResumeId.set(select.value);
-    this.resumeIdChange.emit(select.value);
+  }
 
-    // Trigger AI auto-fill for selected resume
-    if (select.value) {
-      const resume = this.profileStore.resumes().find((r) => r.id === select.value);
+  confirmResumeSelection(): void {
+    const id = this.selectedResumeId();
+    this.resumeIdChange.emit(id);
+
+    if (id) {
+      const resume = this.profileStore.resumes().find((r) => r.id === id);
       if (resume) {
         this.store.loadParsedContent(resume.id, resume.originalFileName);
       }
