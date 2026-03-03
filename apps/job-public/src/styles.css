@@ -19,6 +19,12 @@
   --color-accent-600: #d97706;
 }
 
+@layer base {
+  button, [role="button"] {
+    cursor: pointer;
+  }
+}
+
 /* Utility component classes */
 @layer components {
   .btn-primary {

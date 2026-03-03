@@ -22,7 +22,7 @@ export class ResumeUpload implements OnInit {
   readonly resumeIdChange = output<string>();
 
   constructor() {
-    // Auto-select newly uploaded resume and bridge parsed content to ApplicationStore
+    // Auto-select newly uploaded resume and transition to parsing state
     effect(() => {
       const resumes = this.profileStore.resumes();
       if (
@@ -35,23 +35,15 @@ export class ResumeUpload implements OnInit {
         this.selectedResumeId.set(newResume.id);
         this.resumeIdChange.emit(newResume.id);
         this.store.resumeId.set(newResume.id);
+        this.store.parseStatus.set('parsing'); // Async: wait for SignalR notification
         this.resumesCountBeforeUpload = resumes.length;
-      }
-    });
-
-    // Bridge: when profile upload completes with parsed content → update ApplicationStore
-    effect(() => {
-      const content = this.profileStore.lastParsedContent();
-      if (content) {
-        this.store.resumeData.set(content);
-        this.store.parseStatus.set('parsed');
       }
     });
 
     // Bridge: handle upload error
     effect(() => {
       const error = this.profileStore.uploadError();
-      if (error && this.store.parseStatus() === 'uploading') {
+      if (error && (this.store.parseStatus() === 'uploading' || this.store.parseStatus() === 'parsing')) {
         this.store.parseStatus.set('error');
       }
     });
@@ -104,7 +96,7 @@ export class ResumeUpload implements OnInit {
   }
 
   get parsedFields() {
-    const data = this.store.resumeData();
+    const data = this.store.resumeData() ?? this.store.pendingResumeData();
     if (!data) return [];
     return [
       { label: 'Name', value: `${data.firstName} ${data.lastName}`.trim() },

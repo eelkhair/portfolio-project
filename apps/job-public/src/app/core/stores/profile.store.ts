@@ -1,11 +1,16 @@
 import { inject, Injectable, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import mammoth from 'mammoth';
+import { propagation, ROOT_CONTEXT, SpanKind, trace } from '@opentelemetry/api';
 import { ApiService } from '../services/api.service';
 import { ResumeData, ResumeResponse, UserProfile, UserProfileRequest } from '../types/resume-data.type';
 
 @Injectable({ providedIn: 'root' })
 export class ProfileStore {
   private readonly api = inject(ApiService);
+  private readonly router = inject(Router);
+  private readonly tracer = trace.getTracer('public-fe');
+  private lastTraceParent: string | undefined;
 
   readonly profile = signal<UserProfile | null>(null);
   readonly loading = signal(false);
@@ -17,7 +22,12 @@ export class ProfileStore {
   readonly resumes = signal<ResumeResponse[]>([]);
   readonly uploading = signal(false);
   readonly uploadError = signal<string | null>(null);
-  readonly lastParsedContent = signal<ResumeData | null>(null);
+
+  // Resume parse confirmation (profile page)
+  readonly profileParseStatus = signal<'idle' | 'parsing' | 'ready' | 'applied' | 'error' | 'retrying'>('idle');
+  readonly pendingParsedContent = signal<ResumeData | null>(null);
+  readonly lastUploadedResumeId = signal<string | null>(null);
+  readonly lastUploadedFileName = signal('');
 
   // Preview state
   readonly previewResume = signal<ResumeResponse | null>(null);
@@ -71,21 +81,79 @@ export class ProfileStore {
   uploadResume(file: File): void {
     this.uploading.set(true);
     this.uploadError.set(null);
-    this.lastParsedContent.set(null);
+    this.pendingParsedContent.set(null);
+    this.lastUploadedFileName.set(file.name);
 
-    this.api.uploadResume(file).subscribe({
+    const currentPage = this.router.url;
+
+    this.api.uploadResume(file, currentPage).subscribe({
       next: (resume) => {
         this.resumes.update((list) => [resume, ...list]);
         this.uploading.set(false);
-        if (resume.parsedContent) {
-          this.lastParsedContent.set(resume.parsedContent);
-        }
+        this.lastUploadedResumeId.set(resume.id);
+        this.profileParseStatus.set('parsing');
+        // Parsed content arrives asynchronously via SignalR
       },
       error: (err) => {
         this.uploading.set(false);
         this.uploadError.set(err?.error?.exceptions?.message ?? 'Failed to upload resume.');
+        this.profileParseStatus.set('error');
       },
     });
+  }
+
+  /** Called by ResumeRealtimeService when SignalR "ResumeParsed" arrives */
+  onResumeParsed(resumeId: string, traceParent?: string): void {
+    if (this.lastUploadedResumeId() !== resumeId) return;
+    this.lastTraceParent = traceParent;
+
+    this.api.getResumeParsedContent(resumeId, traceParent).subscribe({
+      next: (data) => {
+        if (data) {
+          this.pendingParsedContent.set(data);
+          this.profileParseStatus.set('ready');
+        }
+      },
+      error: () => this.profileParseStatus.set('error'),
+    });
+  }
+
+  /** Called by ResumeRealtimeService when SignalR "ResumeParseFailed" arrives */
+  onResumeParseFailed(retrying: boolean): void {
+    if (!this.lastUploadedResumeId()) return;
+    this.profileParseStatus.set(retrying ? 'retrying' : 'error');
+  }
+
+  /** Recover from missed SignalR messages (tab backgrounded or reconnect) */
+  recoverIfParsing(): void {
+    const status = this.profileParseStatus();
+    const id = this.lastUploadedResumeId();
+    if (!id || (status !== 'parsing' && status !== 'retrying')) return;
+
+    this.api.getResumeParsedContent(id).subscribe({
+      next: (data) => {
+        if (data) {
+          this.pendingParsedContent.set(data);
+          this.profileParseStatus.set('ready');
+        }
+        // null → still processing, stay in current state
+      },
+      error: () => this.profileParseStatus.set('error'),
+    });
+  }
+
+  /** User confirms they want AI-parsed data applied to the profile form */
+  applyParsedContent(): void {
+    this.emitUserDecisionSpan('applied');
+    this.profileParseStatus.set('applied');
+    // pendingParsedContent stays available for the component effect to read
+  }
+
+  /** User declines AI auto-fill */
+  dismissParsedContent(): void {
+    this.emitUserDecisionSpan('dismissed');
+    this.pendingParsedContent.set(null);
+    this.profileParseStatus.set('applied');
   }
 
   deleteResume(id: string): void {
@@ -173,5 +241,25 @@ export class ProfileStore {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+  }
+
+  private emitUserDecisionSpan(decision: 'applied' | 'dismissed'): void {
+    const parentCtx = this.extractTraceContext(this.lastTraceParent);
+    const span = this.tracer.startSpan('resume.parse.user_decision', {
+      kind: SpanKind.INTERNAL,
+      attributes: {
+        'resume.parse.user_action': decision,
+        'resume.id': this.lastUploadedResumeId() ?? '',
+        'resume.parse.page': 'profile',
+      },
+    }, parentCtx);
+    span.end();
+    this.lastTraceParent = undefined;
+  }
+
+  private extractTraceContext(traceParent?: string) {
+    if (!traceParent) return undefined;
+    const carrier: Record<string, string> = { traceparent: traceParent };
+    return propagation.extract(ROOT_CONTEXT, carrier);
   }
 }

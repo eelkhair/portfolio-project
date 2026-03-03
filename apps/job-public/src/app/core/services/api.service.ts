@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Job, JobType } from '../types/job.type';
@@ -101,11 +101,13 @@ export class ApiService {
 
   // --- Resume endpoints ---
 
-  uploadResume(file: File): Observable<ResumeResponse> {
+  uploadResume(file: File, currentPage?: string): Observable<ResumeResponse> {
     const formData = new FormData();
     formData.append('file', file);
+    let params = new HttpParams();
+    if (currentPage) params = params.set('currentPage', currentPage);
     return this.http
-      .post<ApiResponse<ResumeResponse>>(`${this.applicantUrl}/resumes`, formData)
+      .post<ApiResponse<ResumeResponse>>(`${this.applicantUrl}/resumes`, formData, { params })
       .pipe(map((res) => res.data!));
   }
 
@@ -115,9 +117,10 @@ export class ApiService {
       .pipe(map((res) => res.data ?? []));
   }
 
-  getResumeParsedContent(id: string): Observable<ResumeData | null> {
+  getResumeParsedContent(id: string, traceParent?: string): Observable<ResumeData | null> {
+    const options = traceParent ? { headers: new HttpHeaders({ traceparent: traceParent }) } : {};
     return this.http
-      .get<ApiResponse<ResumeData | null>>(`${this.applicantUrl}/resumes/${id}/parsed-content`)
+      .get<ApiResponse<ResumeData | null>>(`${this.applicantUrl}/resumes/${id}/parsed-content`, options)
       .pipe(map((res) => res.data ?? null));
   }
 

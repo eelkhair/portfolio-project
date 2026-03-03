@@ -43,6 +43,16 @@ export class Profile implements OnInit {
     certifications: this.fb.array<FormGroup>([]),
   });
 
+  get parsedFields() {
+    const data = this.store.pendingParsedContent();
+    if (!data) return [];
+    return [
+      { label: 'Phone', value: data.phone },
+      { label: 'LinkedIn', value: data.linkedin },
+      { label: 'Portfolio', value: data.portfolio },
+    ];
+  }
+
   get workHistoryArray(): FormArray {
     return this.form.controls.workHistory;
   }
@@ -84,28 +94,33 @@ export class Profile implements OnInit {
       }
     });
 
-    // Auto-fill from resume parsed content after upload
+    // Apply parsed content only after user confirms
     effect(() => {
-      const data = this.store.lastParsedContent();
-      if (data) {
-        this.form.patchValue({
-          phone: data.phone || this.form.value.phone,
-          linkedin: data.linkedin || this.form.value.linkedin,
-          portfolio: data.portfolio || this.form.value.portfolio,
-          skills: data.skills.length > 0 ? data.skills.join(', ') : this.form.value.skills,
-        });
+      const status = this.store.profileParseStatus();
+      if (status === 'applied') {
+        const data = this.store.pendingParsedContent();
+        if (data) {
+          this.form.patchValue({
+            phone: data.phone || this.form.value.phone,
+            linkedin: data.linkedin || this.form.value.linkedin,
+            portfolio: data.portfolio || this.form.value.portfolio,
+            skills: data.skills.length > 0 ? data.skills.join(', ') : this.form.value.skills,
+          });
 
-        if (data.workHistory?.length) {
-          this.workHistoryArray.clear();
-          data.workHistory.forEach(wh => this.addWorkHistory(wh));
-        }
-        if (data.education?.length) {
-          this.educationArray.clear();
-          data.education.forEach(ed => this.addEducation(ed));
-        }
-        if (data.certifications?.length) {
-          this.certificationsArray.clear();
-          data.certifications.forEach(cert => this.addCertification(cert));
+          if (data.workHistory?.length) {
+            this.workHistoryArray.clear();
+            data.workHistory.forEach(wh => this.addWorkHistory(wh));
+          }
+          if (data.education?.length) {
+            this.educationArray.clear();
+            data.education.forEach(ed => this.addEducation(ed));
+          }
+          if (data.certifications?.length) {
+            this.certificationsArray.clear();
+            data.certifications.forEach(cert => this.addCertification(cert));
+          }
+          // Clear pending data after applying
+          this.store.pendingParsedContent.set(null);
         }
       }
     });

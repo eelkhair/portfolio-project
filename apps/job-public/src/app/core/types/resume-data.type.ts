@@ -47,10 +47,27 @@ export interface ResumeResponse {
   contentType?: string;
   fileSize?: number;
   hasParsedContent: boolean;
-  parseStatus: 'Pending' | 'Parsed' | 'Failed';
+  parseStatus: 'Pending' | 'Processing' | 'Parsed' | 'Failed';
   parseRetryCount: number;
   createdAt: string;
   parsedContent?: ResumeData;
 }
 
-export type ParseStatus = 'idle' | 'uploading' | 'parsing' | 'parsed' | 'error';
+export type ParseStatus = 'idle' | 'uploading' | 'parsing' | 'ready' | 'parsed' | 'error' | 'retrying';
+
+export interface ResumeParsedMsg {
+  resumeId: string;
+  currentPage?: string;
+  traceParent?: string;
+  traceState?: string;
+}
+
+export interface ResumeParseFailedMsg {
+  resumeId: string;
+  currentPage?: string;
+  status: 'retrying' | 'failed';
+  attempt: number;
+  maxAttempts: number;
+  traceParent?: string;
+  traceState?: string;
+}

@@ -7,8 +7,9 @@ namespace JobBoard.Domain.Entities.Users;
 public enum ResumeParseStatus
 {
     Pending = 0,
-    Parsed = 1,
-    Failed = 2
+    Processing = 1,
+    Parsed = 2,
+    Failed = 3
 }
 
 public class Resume : BaseAuditableEntity
@@ -32,6 +33,11 @@ public class Resume : BaseAuditableEntity
 
     internal void SetUser(int userId) => UserId = userId;
 
+    public void MarkProcessing()
+    {
+        ParseStatus = ResumeParseStatus.Processing;
+    }
+
     public void MarkParsed(string parsedContent)
     {
         ParsedContent = parsedContent;
@@ -46,7 +52,7 @@ public class Resume : BaseAuditableEntity
 
     public void ResetForRetry()
     {
-        ParseStatus = ResumeParseStatus.Pending;
+        ParseStatus = ResumeParseStatus.Processing;
     }
 
     public static Resume Create(ResumeInput input)
