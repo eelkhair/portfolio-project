@@ -1,106 +1,321 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
-  <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-    <!-- Full Name -->
-    <div>
-      <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-        Full Name
-        @if (aiFields().has('fullName')) {
-          <span class="ml-1 text-xs text-purple-500" title="AI auto-filled">&#10024;</span>
+  <!-- Section Navigation -->
+  <div class="flex gap-1 overflow-x-auto border-b border-slate-200 dark:border-slate-700">
+    @for (section of sections; track section; let i = $index) {
+      <button
+        type="button"
+        (click)="goToSection(i)"
+        class="whitespace-nowrap px-4 py-2.5 text-sm font-medium transition-colors"
+        [class]="activeSection() === i
+          ? 'border-b-2 border-primary-600 text-primary-600 dark:text-primary-400 dark:border-primary-400'
+          : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'"
+      >
+        {{ section }}
+        @if (
+          (i === 0 && aiFields().has('firstName')) ||
+          (i === 1 && aiFields().has('workHistory')) ||
+          (i === 2 && aiFields().has('education')) ||
+          (i === 3 && aiFields().has('certifications')) ||
+          (i === 4 && aiFields().has('skills'))
+        ) {
+          <span class="ml-1 text-xs text-purple-500">&#10024;</span>
         }
-      </label>
-      <input type="text" formControlName="fullName" class="input-field" placeholder="Your full name" />
-    </div>
-
-    <!-- Email -->
-    <div>
-      <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-        Email
-        @if (aiFields().has('email')) {
-          <span class="ml-1 text-xs text-purple-500" title="AI auto-filled">&#10024;</span>
-        }
-      </label>
-      <input type="email" formControlName="email" class="input-field" placeholder="you@example.com" />
-    </div>
-
-    <!-- Phone -->
-    <div>
-      <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-        Phone
-        @if (aiFields().has('phone')) {
-          <span class="ml-1 text-xs text-purple-500" title="AI auto-filled">&#10024;</span>
-        }
-      </label>
-      <input type="tel" formControlName="phone" class="input-field" placeholder="+1 (555) 000-0000" />
-    </div>
-
-    <!-- LinkedIn -->
-    <div>
-      <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-        LinkedIn
-        @if (aiFields().has('linkedin')) {
-          <span class="ml-1 text-xs text-purple-500" title="AI auto-filled">&#10024;</span>
-        }
-      </label>
-      <input type="text" formControlName="linkedin" class="input-field" placeholder="linkedin.com/in/you" />
-    </div>
-
-    <!-- Portfolio -->
-    <div>
-      <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-        Portfolio
-        @if (aiFields().has('portfolio')) {
-          <span class="ml-1 text-xs text-purple-500" title="AI auto-filled">&#10024;</span>
-        }
-      </label>
-      <input type="text" formControlName="portfolio" class="input-field" placeholder="yoursite.com" />
-    </div>
-
-    <!-- Skills -->
-    <div>
-      <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-        Key Skills
-        @if (aiFields().has('skills')) {
-          <span class="ml-1 text-xs text-purple-500" title="AI auto-filled">&#10024;</span>
-        }
-      </label>
-      <input type="text" formControlName="skills" class="input-field" placeholder="TypeScript, React, Node.js" />
-    </div>
+      </button>
+    }
   </div>
 
-  <!-- Experience -->
-  <div>
-    <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-      Experience Summary
-      @if (aiFields().has('experience')) {
-        <span class="ml-1 text-xs text-purple-500" title="AI auto-filled">&#10024;</span>
+  <!-- Section 0: Personal Information -->
+  @if (activeSection() === 0) {
+    <div class="space-y-6">
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+            First Name <span class="text-red-500">*</span>
+            @if (aiFields().has('firstName')) {
+              <span class="ml-1 text-xs text-purple-500" title="AI auto-filled">&#10024;</span>
+            }
+          </label>
+          <input type="text" formControlName="firstName" class="input-field" placeholder="John" />
+        </div>
+
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+            Last Name <span class="text-red-500">*</span>
+            @if (aiFields().has('lastName')) {
+              <span class="ml-1 text-xs text-purple-500" title="AI auto-filled">&#10024;</span>
+            }
+          </label>
+          <input type="text" formControlName="lastName" class="input-field" placeholder="Doe" />
+        </div>
+
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+            Email <span class="text-red-500">*</span>
+            @if (aiFields().has('email')) {
+              <span class="ml-1 text-xs text-purple-500" title="AI auto-filled">&#10024;</span>
+            }
+          </label>
+          <input type="email" formControlName="email" class="input-field" placeholder="you@example.com" />
+        </div>
+
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+            Phone
+            @if (aiFields().has('phone')) {
+              <span class="ml-1 text-xs text-purple-500" title="AI auto-filled">&#10024;</span>
+            }
+          </label>
+          <input type="tel" formControlName="phone" class="input-field" placeholder="+1 (555) 000-0000" />
+        </div>
+
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+            LinkedIn
+            @if (aiFields().has('linkedin')) {
+              <span class="ml-1 text-xs text-purple-500" title="AI auto-filled">&#10024;</span>
+            }
+          </label>
+          <input type="text" formControlName="linkedin" class="input-field" placeholder="linkedin.com/in/you" />
+        </div>
+
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+            Portfolio
+            @if (aiFields().has('portfolio')) {
+              <span class="ml-1 text-xs text-purple-500" title="AI auto-filled">&#10024;</span>
+            }
+          </label>
+          <input type="text" formControlName="portfolio" class="input-field" placeholder="yoursite.com" />
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Section 1: Work History -->
+  @if (activeSection() === 1) {
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <p class="text-sm text-slate-500 dark:text-slate-400">Add your relevant work experience.</p>
+        <button
+          type="button"
+          (click)="addWorkHistory()"
+          class="inline-flex items-center gap-1.5 rounded-lg bg-primary-50 px-3 py-1.5 text-sm font-medium text-primary-700 hover:bg-primary-100 dark:bg-primary-900/20 dark:text-primary-400 dark:hover:bg-primary-900/40"
+        >
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          Add Position
+        </button>
+      </div>
+
+      @for (wh of workHistoryArray.controls; track wh; let i = $index) {
+        <div class="rounded-lg border border-slate-200 p-4 dark:border-slate-700" [formGroupName]="'workHistory'">
+          <div [formGroupName]="i">
+            <div class="mb-3 flex items-center justify-between">
+              <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Position {{ i + 1 }}</span>
+              <button
+                type="button"
+                (click)="removeWorkHistory(i)"
+                class="text-sm text-red-500 hover:text-red-700 dark:hover:text-red-400"
+              >Remove</button>
+            </div>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">Company <span class="text-red-500">*</span></label>
+                <input type="text" formControlName="company" class="input-field" placeholder="Company name" />
+              </div>
+              <div>
+                <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">Job Title <span class="text-red-500">*</span></label>
+                <input type="text" formControlName="jobTitle" class="input-field" placeholder="Software Engineer" />
+              </div>
+              <div>
+                <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">Start Date <span class="text-red-500">*</span></label>
+                <input type="date" formControlName="startDate" class="input-field" />
+              </div>
+              <div>
+                <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">End Date</label>
+                <input type="date" formControlName="endDate" class="input-field" />
+              </div>
+              <div class="sm:col-span-2">
+                <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">Description</label>
+                <textarea formControlName="description" rows="2" class="input-field" placeholder="Key responsibilities and achievements..."></textarea>
+              </div>
+              <div class="flex items-center gap-2">
+                <input type="checkbox" formControlName="isCurrent" id="isCurrent-{{i}}" class="h-4 w-4 rounded border-slate-300" />
+                <label for="isCurrent-{{i}}" class="text-sm text-slate-600 dark:text-slate-400">I currently work here</label>
+              </div>
+            </div>
+          </div>
+        </div>
       }
-    </label>
-    <textarea
-      formControlName="experience"
-      rows="3"
-      class="input-field"
-      placeholder="Brief summary of your relevant experience..."
-    ></textarea>
-  </div>
 
-  <!-- Cover Letter -->
-  <div>
-    <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-      Cover Letter
-    </label>
-    <textarea
-      formControlName="coverLetter"
-      rows="5"
-      class="input-field"
-      placeholder="Why are you interested in this position..."
-    ></textarea>
-  </div>
+      @if (workHistoryArray.length === 0) {
+        <div class="rounded-lg border-2 border-dashed border-slate-200 py-8 text-center dark:border-slate-700">
+          <p class="text-sm text-slate-500 dark:text-slate-400">No work history added yet. Click "Add Position" to get started.</p>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Section 2: Education -->
+  @if (activeSection() === 2) {
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <p class="text-sm text-slate-500 dark:text-slate-400">Add your educational background.</p>
+        <button
+          type="button"
+          (click)="addEducation()"
+          class="inline-flex items-center gap-1.5 rounded-lg bg-primary-50 px-3 py-1.5 text-sm font-medium text-primary-700 hover:bg-primary-100 dark:bg-primary-900/20 dark:text-primary-400 dark:hover:bg-primary-900/40"
+        >
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          Add Education
+        </button>
+      </div>
+
+      @for (ed of educationArray.controls; track ed; let i = $index) {
+        <div class="rounded-lg border border-slate-200 p-4 dark:border-slate-700" [formGroupName]="'education'">
+          <div [formGroupName]="i">
+            <div class="mb-3 flex items-center justify-between">
+              <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Education {{ i + 1 }}</span>
+              <button
+                type="button"
+                (click)="removeEducation(i)"
+                class="text-sm text-red-500 hover:text-red-700 dark:hover:text-red-400"
+              >Remove</button>
+            </div>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">Institution <span class="text-red-500">*</span></label>
+                <input type="text" formControlName="institution" class="input-field" placeholder="University name" />
+              </div>
+              <div>
+                <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">Degree <span class="text-red-500">*</span></label>
+                <input type="text" formControlName="degree" class="input-field" placeholder="Bachelor of Science" />
+              </div>
+              <div>
+                <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">Field of Study</label>
+                <input type="text" formControlName="fieldOfStudy" class="input-field" placeholder="Computer Science" />
+              </div>
+              <div></div>
+              <div>
+                <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">Start Date <span class="text-red-500">*</span></label>
+                <input type="date" formControlName="startDate" class="input-field" />
+              </div>
+              <div>
+                <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">End Date</label>
+                <input type="date" formControlName="endDate" class="input-field" />
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (educationArray.length === 0) {
+        <div class="rounded-lg border-2 border-dashed border-slate-200 py-8 text-center dark:border-slate-700">
+          <p class="text-sm text-slate-500 dark:text-slate-400">No education added yet. Click "Add Education" to get started.</p>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Section 3: Certifications -->
+  @if (activeSection() === 3) {
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <p class="text-sm text-slate-500 dark:text-slate-400">Add any relevant certifications.</p>
+        <button
+          type="button"
+          (click)="addCertification()"
+          class="inline-flex items-center gap-1.5 rounded-lg bg-primary-50 px-3 py-1.5 text-sm font-medium text-primary-700 hover:bg-primary-100 dark:bg-primary-900/20 dark:text-primary-400 dark:hover:bg-primary-900/40"
+        >
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          Add Certification
+        </button>
+      </div>
+
+      @for (cert of certificationsArray.controls; track cert; let i = $index) {
+        <div class="rounded-lg border border-slate-200 p-4 dark:border-slate-700" [formGroupName]="'certifications'">
+          <div [formGroupName]="i">
+            <div class="mb-3 flex items-center justify-between">
+              <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Certification {{ i + 1 }}</span>
+              <button
+                type="button"
+                (click)="removeCertification(i)"
+                class="text-sm text-red-500 hover:text-red-700 dark:hover:text-red-400"
+              >Remove</button>
+            </div>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">Certification Name <span class="text-red-500">*</span></label>
+                <input type="text" formControlName="name" class="input-field" placeholder="AWS Solutions Architect" />
+              </div>
+              <div>
+                <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">Issuing Organization</label>
+                <input type="text" formControlName="issuingOrganization" class="input-field" placeholder="Amazon Web Services" />
+              </div>
+              <div>
+                <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">Issue Date</label>
+                <input type="date" formControlName="issueDate" class="input-field" />
+              </div>
+              <div>
+                <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">Expiration Date</label>
+                <input type="date" formControlName="expirationDate" class="input-field" />
+              </div>
+              <div class="sm:col-span-2">
+                <label class="mb-1 block text-sm text-slate-600 dark:text-slate-400">Credential ID</label>
+                <input type="text" formControlName="credentialId" class="input-field" placeholder="ABC-123-XYZ" />
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (certificationsArray.length === 0) {
+        <div class="rounded-lg border-2 border-dashed border-slate-200 py-8 text-center dark:border-slate-700">
+          <p class="text-sm text-slate-500 dark:text-slate-400">No certifications added yet. Click "Add Certification" to get started.</p>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Section 4: Skills -->
+  @if (activeSection() === 4) {
+    <div class="space-y-6">
+      <div>
+        <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+          Key Skills
+          @if (aiFields().has('skills')) {
+            <span class="ml-1 text-xs text-purple-500" title="AI auto-filled">&#10024;</span>
+          }
+        </label>
+        <input type="text" formControlName="skills" class="input-field" placeholder="TypeScript, React, Node.js, AWS..." />
+        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Separate skills with commas</p>
+      </div>
+
+      <!-- Cover Letter -->
+      <div>
+        <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+          Cover Letter
+        </label>
+        <textarea
+          formControlName="coverLetter"
+          rows="5"
+          class="input-field"
+          placeholder="Why are you interested in this position..."
+        ></textarea>
+      </div>
+    </div>
+  }
 
   @if (aiFields().size > 0) {
     <div class="flex items-center gap-2 rounded-lg bg-purple-50 px-4 py-3 text-sm dark:bg-purple-900/20">
       <span class="text-purple-500">&#10024;</span>
       <span class="text-purple-700 dark:text-purple-300">
-        {{ aiFields().size }} fields were auto-filled by AI from your resume.
+        Some fields were auto-filled by AI from your resume.
       </span>
     </div>
   }
@@ -111,16 +326,44 @@
     </div>
   }
 
-  <button
-    type="submit"
-    [disabled]="form.invalid || store.applicationStatus() === 'submitting'"
-    class="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
-  >
-    @if (store.applicationStatus() === 'submitting') {
-      <div class="mr-2 h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin"></div>
-      Submitting...
+  <!-- Navigation & Submit -->
+  <div class="flex items-center justify-between">
+    <button
+      type="button"
+      (click)="prevSection()"
+      [disabled]="activeSection() === 0"
+      class="inline-flex items-center gap-1 rounded-lg px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed dark:text-slate-400 dark:hover:bg-slate-800"
+    >
+      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+      </svg>
+      Previous
+    </button>
+
+    @if (activeSection() < sections.length - 1) {
+      <button
+        type="button"
+        (click)="nextSection()"
+        class="inline-flex items-center gap-1 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600"
+      >
+        Next
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+        </svg>
+      </button>
     } @else {
-      Submit Application
+      <button
+        type="submit"
+        [disabled]="form.invalid || store.applicationStatus() === 'submitting'"
+        class="btn-primary disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+      >
+        @if (store.applicationStatus() === 'submitting') {
+          <div class="mr-2 h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin"></div>
+          Submitting...
+        } @else {
+          Submit Application
+        }
+      </button>
     }
-  </button>
+  </div>
 </form>

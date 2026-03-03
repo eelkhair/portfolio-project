@@ -1,3 +1,5 @@
+import { WorkHistoryDto, EducationDto, CertificationDto } from './application.type';
+
 export interface ResumeData {
   fullName: string;
   email: string;
@@ -6,6 +8,9 @@ export interface ResumeData {
   portfolio: string;
   experience: string;
   skills: string[];
+  workHistory?: WorkHistoryDto[];
+  education?: EducationDto[];
+  certifications?: CertificationDto[];
 }
 
 export interface UserProfile {

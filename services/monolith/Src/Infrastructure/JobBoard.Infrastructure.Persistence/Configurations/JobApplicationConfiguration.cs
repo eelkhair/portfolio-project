@@ -1,4 +1,5 @@
 using JobBoard.Domain.Entities;
+using JobBoard.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -19,6 +20,29 @@ public class JobApplicationConfiguration : IEntityTypeConfiguration<JobApplicati
         builder.Property(a => a.Status)
             .HasConversion<int>()
             .IsRequired();
+
+        builder.OwnsOne(a => a.PersonalInfo, pi =>
+        {
+            pi.ToJson();
+        });
+
+        builder.OwnsMany(a => a.WorkHistory, wh =>
+        {
+            wh.ToJson();
+        });
+
+        builder.OwnsMany(a => a.Education, ed =>
+        {
+            ed.ToJson();
+        });
+
+        builder.OwnsMany(a => a.Certifications, cert =>
+        {
+            cert.ToJson();
+        });
+
+        builder.Property(a => a.Skills)
+            .HasColumnType("nvarchar(max)");
 
         builder.HasOne(a => a.Job)
             .WithMany()
