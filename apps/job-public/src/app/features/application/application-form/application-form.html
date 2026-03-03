@@ -1,0 +1,126 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
+  <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+    <!-- Full Name -->
+    <div>
+      <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+        Full Name
+        @if (aiFields().has('fullName')) {
+          <span class="ml-1 text-xs text-purple-500" title="AI auto-filled">&#10024;</span>
+        }
+      </label>
+      <input type="text" formControlName="fullName" class="input-field" placeholder="Your full name" />
+    </div>
+
+    <!-- Email -->
+    <div>
+      <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+        Email
+        @if (aiFields().has('email')) {
+          <span class="ml-1 text-xs text-purple-500" title="AI auto-filled">&#10024;</span>
+        }
+      </label>
+      <input type="email" formControlName="email" class="input-field" placeholder="you@example.com" />
+    </div>
+
+    <!-- Phone -->
+    <div>
+      <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+        Phone
+        @if (aiFields().has('phone')) {
+          <span class="ml-1 text-xs text-purple-500" title="AI auto-filled">&#10024;</span>
+        }
+      </label>
+      <input type="tel" formControlName="phone" class="input-field" placeholder="+1 (555) 000-0000" />
+    </div>
+
+    <!-- LinkedIn -->
+    <div>
+      <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+        LinkedIn
+        @if (aiFields().has('linkedin')) {
+          <span class="ml-1 text-xs text-purple-500" title="AI auto-filled">&#10024;</span>
+        }
+      </label>
+      <input type="text" formControlName="linkedin" class="input-field" placeholder="linkedin.com/in/you" />
+    </div>
+
+    <!-- Portfolio -->
+    <div>
+      <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+        Portfolio
+        @if (aiFields().has('portfolio')) {
+          <span class="ml-1 text-xs text-purple-500" title="AI auto-filled">&#10024;</span>
+        }
+      </label>
+      <input type="text" formControlName="portfolio" class="input-field" placeholder="yoursite.com" />
+    </div>
+
+    <!-- Skills -->
+    <div>
+      <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+        Key Skills
+        @if (aiFields().has('skills')) {
+          <span class="ml-1 text-xs text-purple-500" title="AI auto-filled">&#10024;</span>
+        }
+      </label>
+      <input type="text" formControlName="skills" class="input-field" placeholder="TypeScript, React, Node.js" />
+    </div>
+  </div>
+
+  <!-- Experience -->
+  <div>
+    <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+      Experience Summary
+      @if (aiFields().has('experience')) {
+        <span class="ml-1 text-xs text-purple-500" title="AI auto-filled">&#10024;</span>
+      }
+    </label>
+    <textarea
+      formControlName="experience"
+      rows="3"
+      class="input-field"
+      placeholder="Brief summary of your relevant experience..."
+    ></textarea>
+  </div>
+
+  <!-- Cover Letter -->
+  <div>
+    <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+      Cover Letter
+    </label>
+    <textarea
+      formControlName="coverLetter"
+      rows="5"
+      class="input-field"
+      placeholder="Why are you interested in this position..."
+    ></textarea>
+  </div>
+
+  @if (aiFields().size > 0) {
+    <div class="flex items-center gap-2 rounded-lg bg-purple-50 px-4 py-3 text-sm dark:bg-purple-900/20">
+      <span class="text-purple-500">&#10024;</span>
+      <span class="text-purple-700 dark:text-purple-300">
+        {{ aiFields().size }} fields were auto-filled by AI from your resume.
+      </span>
+    </div>
+  }
+
+  @if (store.error()) {
+    <div class="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400">
+      {{ store.error() }}
+    </div>
+  }
+
+  <button
+    type="submit"
+    [disabled]="form.invalid || store.applicationStatus() === 'submitting'"
+    class="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+  >
+    @if (store.applicationStatus() === 'submitting') {
+      <div class="mr-2 h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin"></div>
+      Submitting...
+    } @else {
+      Submit Application
+    }
+  </button>
+</form>

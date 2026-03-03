@@ -1,0 +1,49 @@
+<div class="mx-auto max-w-7xl px-6 py-12">
+  <div class="mb-8">
+    <h1 class="section-heading text-3xl">Find Your Next Role</h1>
+    <p class="mt-2 section-subheading">{{ resultsSummary() }}</p>
+  </div>
+
+  <div class="sticky top-0 z-10 pb-6">
+    <app-job-search-bar />
+  </div>
+
+  @if (loading()) {
+    <app-loading-spinner label="Searching jobs..." />
+  } @else if (displayJobs().length === 0 && searchStore.hasSearched()) {
+    <app-empty-state
+      title="No jobs found"
+      message="Try adjusting your search terms or clearing filters."
+    />
+  } @else {
+    <div class="flex flex-col gap-[5px]">
+      @for (job of displayJobs(); track job.id) {
+        <app-job-card [job]="job" class="animate-fade-in" />
+      }
+    </div>
+
+    @if (paginationTotalPages() > 1) {
+      <div class="mt-8 flex items-center justify-center gap-3">
+        <button
+          (click)="goToPage(paginationCurrentPage() - 1)"
+          [disabled]="!paginationHasPrev()"
+          class="btn-secondary px-4 py-2 text-sm disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:transform-none"
+        >
+          Previous
+        </button>
+
+        <span class="text-sm text-slate-600">
+          Page {{ paginationCurrentPage() }} of {{ paginationTotalPages() }}
+        </span>
+
+        <button
+          (click)="goToPage(paginationCurrentPage() + 1)"
+          [disabled]="!paginationHasNext()"
+          class="btn-secondary px-4 py-2 text-sm disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:transform-none"
+        >
+          Next
+        </button>
+      </div>
+    }
+  }
+</div>
