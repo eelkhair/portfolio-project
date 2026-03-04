@@ -4,11 +4,12 @@ import { RouterOutlet } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
 import { Header } from './layout/header/header';
 import { Footer } from './layout/footer/footer';
+import { Chat } from './shared/chat/chat';
 import { ResumeRealtimeService } from './core/services/resume-realtime.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Header, Footer],
+  imports: [RouterOutlet, Header, Footer, Chat],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })

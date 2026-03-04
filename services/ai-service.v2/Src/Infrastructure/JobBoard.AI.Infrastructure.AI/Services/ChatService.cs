@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using JobBoard.AI.Application.Actions.Chat;
 using JobBoard.AI.Application.Interfaces.AI;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
@@ -32,7 +33,7 @@ public class ChatService(
     public async Task<ChatResponse> RunChatAsync(
         string systemPrompt,
         string userMessage,
-        bool allowTools,
+        ChatScope scope,
         CancellationToken cancellationToken)
     {
         var client = new FunctionInvokingChatClient(GetClient());
@@ -45,7 +46,7 @@ public class ChatService(
         var savedMessages = await conversationStore.GetChatMessages(conversationContext.ConversationId!.Value, userAccessor.UserId!);
         messages.AddRange(savedMessages);
 
-        var options = chatOptionsFactory.Create(serviceProvider, allowTools);
+        var options = chatOptionsFactory.Create(serviceProvider, scope);
         
         messages.Add(new(ChatRole.User, userMessage));
 
@@ -99,7 +100,7 @@ public class ChatService(
         };
         try
         {
-            var chatOptions = chatOptionsFactory.Create(serviceProvider, allowTools);
+            var chatOptions = chatOptionsFactory.Create(serviceProvider, allowTools ? ChatScope.Admin : ChatScope.Public);
 
             var response = await client.GetResponseAsync(
                 messages, chatOptions,

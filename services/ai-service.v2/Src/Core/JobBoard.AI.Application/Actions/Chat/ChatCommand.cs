@@ -9,22 +9,26 @@ namespace JobBoard.AI.Application.Actions.Chat;
 public sealed class ChatCommand(
     string message,
     Guid? companyId,
-    Guid? conversationId
+    Guid? conversationId,
+    ChatScope scope = ChatScope.Admin
 ) : BaseCommand<ChatResponse>, IConversationContext
 {
     public string Message { get; } = message;
     public Guid? CompanyId { get; } = companyId;
     public Guid? ConversationId { get; set; } = conversationId;
+    public ChatScope Scope { get; } = scope;
 }
 
 public sealed class ChatCommandHandler(
     IHandlerContext context,
-    IChatSystemPrompt systemPrompt,
+    IChatSystemPrompt adminSystemPrompt,
     IChatService chatService,
     IActivityFactory activityFactory
 ) : BaseCommandHandler(context),
     IHandler<ChatCommand, ChatResponse>
 {
+    private static readonly PublicChatSystemPrompt PublicPrompt = new();
+
     public async Task<ChatResponse> HandleAsync(
         ChatCommand request,
         CancellationToken cancellationToken)
@@ -33,21 +37,24 @@ public sealed class ChatCommandHandler(
             "ChatCommand",
             ActivityKind.Internal);
 
-    
         activity?.SetTag("chat.message", request.Message);
         activity?.SetTag("chat.companyId", request.CompanyId);
+        activity?.SetTag("chat.scope", request.Scope.ToString());
         activity?.SetTag("ai.operation", "chat");
         activity?.SetTag("ai.userId", request.UserId);
+
+        var prompt = request.Scope == ChatScope.Public
+            ? PublicPrompt.Value
+            : adminSystemPrompt.Value;
 
         var effectiveUserMessage = request.CompanyId is not null
             ? $"Context:\n- companyId: {request.CompanyId}\n\nUser:\n{request.Message}"
             : request.Message;
-        
-        
+
         return await chatService.RunChatAsync(
-            systemPrompt.Value,
+            prompt,
             effectiveUserMessage,
-            true,
+            request.Scope,
             cancellationToken);
     }
 }

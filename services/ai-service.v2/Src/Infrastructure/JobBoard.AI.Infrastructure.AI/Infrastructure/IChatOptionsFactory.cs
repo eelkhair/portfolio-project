@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using JobBoard.AI.Application.Actions.Chat;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
 using Microsoft.Extensions.AI;
@@ -9,7 +10,7 @@ namespace JobBoard.AI.Infrastructure.AI.Infrastructure;
 
 public interface IChatOptionsFactory
 {
-    ChatOptions Create(IServiceProvider sp, bool allowTools);
+    ChatOptions Create(IServiceProvider sp, ChatScope scope);
 }
 
 public sealed class ChatOptionsFactory(
@@ -17,48 +18,68 @@ public sealed class ChatOptionsFactory(
     IActivityFactory activityFactory)
     : IChatOptionsFactory
 {
-    public ChatOptions Create(IServiceProvider sp,bool allowTools)
+    public ChatOptions Create(IServiceProvider sp, ChatScope scope)
     {
-        var isMonolith = configuration.GetValue<bool>("FeatureFlags:Monolith");
-
-        var topologyTools =
-            sp.GetRequiredKeyedService<IAiTools>(isMonolith ? "monolith" : "micro")
-                .GetTools()
-                .ToList();
-
-        var aiTools =
-            sp.GetRequiredKeyedService<IAiTools>("ai")
-                .GetTools()
-                .ToList();
-
-        var allTools = topologyTools.Concat(aiTools).ToList();
-
-        var duplicates = allTools
-            .GroupBy(t => t.Name)
-            .Where(g => g.Count() > 1)
-            .Select(g => g.Key)
-            .ToList();
-
-        if (duplicates.Any())
-            throw new InvalidOperationException(
-                $"Duplicate AI tools detected: {string.Join(", ", duplicates)}");
+        var tools = ResolveTools(sp, scope);
 
         using var activity = activityFactory.StartActivity("ai.chat.options", ActivityKind.Internal);
-
-        activity?.AddTag("ai.tools", isMonolith ? "Monolith,AI" : "Micro,AI");
-        activity?.AddTag("ai.tools.topology.count", topologyTools.Count);
-        activity?.AddTag("ai.tools.ai.count", aiTools.Count);
-        activity?.SetTag("ai.tools.allowed", allowTools);
-        activity?.SetTag("ai.tools.count", allowTools ? allTools.Count : 0);
+        activity?.SetTag("ai.chat.scope", scope.ToString());
+        activity?.SetTag("ai.tools.count", tools.Count);
 
         return new ChatOptions
         {
-            Tools = allowTools ? allTools : [],
+            Tools = tools,
             MaxOutputTokens = 5000,
             Temperature = 1,
             ModelId = configuration["AIModel"]!
         };
     }
+
+    private List<AITool> ResolveTools(IServiceProvider sp, ChatScope scope)
+    {
+        switch (scope)
+        {
+            case ChatScope.Admin:
+            {
+                var isMonolith = configuration.GetValue<bool>("FeatureFlags:Monolith");
+
+                var topologyTools =
+                    sp.GetRequiredKeyedService<IAiTools>(isMonolith ? "monolith" : "micro")
+                        .GetTools()
+                        .ToList();
+
+                var aiTools =
+                    sp.GetRequiredKeyedService<IAiTools>("ai")
+                        .GetTools()
+                        .ToList();
+
+                var allTools = topologyTools.Concat(aiTools).ToList();
+
+                var duplicates = allTools
+                    .GroupBy(t => t.Name)
+                    .Where(g => g.Count() > 1)
+                    .Select(g => g.Key)
+                    .ToList();
+
+                if (duplicates.Any())
+                    throw new InvalidOperationException(
+                        $"Duplicate AI tools detected: {string.Join(", ", duplicates)}");
+
+                return allTools;
+            }
+
+            case ChatScope.CompanyAdmin:
+                return sp.GetRequiredKeyedService<IAiTools>("company-admin")
+                    .GetTools()
+                    .ToList();
+
+            case ChatScope.Public:
+                return sp.GetRequiredKeyedService<IAiTools>("public")
+                    .GetTools()
+                    .ToList();
+
+            default:
+                return [];
+        }
+    }
 }
-
-
