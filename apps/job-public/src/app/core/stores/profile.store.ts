@@ -156,6 +156,19 @@ export class ProfileStore {
     this.profileParseStatus.set('applied');
   }
 
+  setDefaultResume(id: string): void {
+    this.api.setDefaultResume(id).subscribe({
+      next: () => {
+        this.resumes.update((list) =>
+          list.map((r) => ({ ...r, isDefault: r.id === id }))
+        );
+      },
+      error: (err) => {
+        this.uploadError.set(err?.error?.exceptions?.message ?? 'Failed to set default resume.');
+      },
+    });
+  }
+
   deleteResume(id: string): void {
     this.api.deleteResume(id).subscribe({
       next: () => {

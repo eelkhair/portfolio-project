@@ -49,6 +49,7 @@ export interface ResumeResponse {
   hasParsedContent: boolean;
   parseStatus: 'Pending' | 'Processing' | 'Parsed' | 'Failed';
   parseRetryCount: number;
+  isDefault: boolean;
   createdAt: string;
   parsedContent?: ResumeData;
 }

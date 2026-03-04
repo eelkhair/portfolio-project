@@ -50,7 +50,7 @@
       >
         <option value="">-- Choose a resume --</option>
         @for (resume of profileStore.resumes(); track resume.id) {
-          <option [value]="resume.id">{{ resume.originalFileName }}</option>
+          <option [value]="resume.id">{{ resume.originalFileName }}{{ resume.isDefault ? ' (Default)' : '' }}</option>
         }
       </select>
       <button

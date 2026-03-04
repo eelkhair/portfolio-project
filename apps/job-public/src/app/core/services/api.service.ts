@@ -125,6 +125,10 @@ export class ApiService {
       .pipe(map((res) => res.data ?? null));
   }
 
+  setDefaultResume(id: string): Observable<void> {
+    return this.http.patch<void>(`${this.resumesUrl}/${id}/default`, null);
+  }
+
   deleteResume(id: string): Observable<void> {
     return this.http.delete<void>(`${this.resumesUrl}/${id}`);
   }

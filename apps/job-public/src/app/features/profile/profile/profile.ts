@@ -203,6 +203,10 @@ export class Profile implements OnInit {
     this.store.openPreview(resume);
   }
 
+  onSetDefault(id: string): void {
+    this.store.setDefaultResume(id);
+  }
+
   protected readonly showDeleteConfirm = signal(false);
   private deleteResumeId = '';
 
