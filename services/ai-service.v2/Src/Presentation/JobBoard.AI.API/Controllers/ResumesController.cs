@@ -1,8 +1,10 @@
 using Dapr;
 using Elkhair.Dev.Common.Dapr;
+using JobBoard.AI.Application.Actions.Resumes.DeleteEmbedding;
 using JobBoard.AI.Application.Actions.Resumes.Embed;
 using JobBoard.AI.Application.Actions.Resumes.Parse;
 using JobBoard.AI.Application.Interfaces.Configurations;
+using JobBoard.IntegrationEvents.Resume;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,6 +17,7 @@ public class ResumesController : BaseApiController
 {
     private const string ParseIdempotencyPrefix = "resume.parse:";
     private const string EmbedIdempotencyPrefix = "resume.embed:";
+    private const string DeleteEmbeddingIdempotencyPrefix = "resume.delete-embedding:";
 
     /// <summary>
     /// Parse a resume file and extract structured content (synchronous, Dapr invoke)
@@ -32,7 +35,7 @@ public class ResumesController : BaseApiController
     [Topic("rabbitmq.pubsub", "monolith.resume-uploaded.v1")]
     public async Task<IActionResult> ParseResumeEvent(
         [FromServices] IUserAccessor userAccessor,
-        EventDto<ResumeUploadedEvent> request)
+        EventDto<ResumeUploadedV1Event> request)
     {
         userAccessor.UserId = request.UserId;
 
@@ -51,7 +54,7 @@ public class ResumesController : BaseApiController
     [Topic("rabbitmq.pubsub", "monolith.resume-parsed.v1")]
     public async Task<IActionResult> EmbedResumeEvent(
         [FromServices] IUserAccessor userAccessor,
-        EventDto<ResumeParsedEvent> request)
+        EventDto<ResumeParsedV1Event> request)
     {
         userAccessor.UserId = request.UserId;
 
@@ -59,5 +62,24 @@ public class ResumesController : BaseApiController
             new EmbedResumeCommand(request),
             request.IdempotencyKey,
             EmbedIdempotencyPrefix);
+    }
+
+    /// <summary>
+    /// Handles resume.deleted events from the monolith outbox via Dapr pub/sub.
+    /// Removes the corresponding embedding from Postgres.
+    /// </summary>
+    [HttpPost("delete-embedding-event")]
+    [Authorize("DaprInternal")]
+    [Topic("rabbitmq.pubsub", "monolith.resume-deleted.v1")]
+    public async Task<IActionResult> DeleteResumeEmbeddingEvent(
+        [FromServices] IUserAccessor userAccessor,
+        EventDto<ResumeDeletedV1Event> request)
+    {
+        userAccessor.UserId = request.UserId;
+
+        return await ExecuteEventCommandAsync(
+            new DeleteResumeEmbeddingCommand(request),
+            request.IdempotencyKey,
+            DeleteEmbeddingIdempotencyPrefix);
     }
 }

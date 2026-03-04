@@ -15,7 +15,7 @@ namespace JobBoard.Application.Actions.Resumes.GetParsedContent;
 /// Internal query for service-to-service retrieval of parsed resume content.
 /// Unlike <see cref="GetResumeParsedContentQuery"/>, this does not enforce user ownership.
 /// </summary>
-public class GetResumeParsedContentInternalQuery(Guid resumeId) : BaseQuery<ResumeParsedContentResponse?>
+public class GetResumeParsedContentInternalQuery(Guid resumeId) : BaseQuery<ResumeParsedContentResponse?>, IAnonymousRequest
 {
     public Guid ResumeId { get; set; } = resumeId;
 }

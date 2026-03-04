@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,11 +10,13 @@ namespace JobBoard.Infrastructure.BlobStorage;
 
 public class AzureBlobStorageService(BlobServiceClient blobServiceClient) : IBlobStorageService
 {
+    private static readonly ConcurrentDictionary<string, bool> EnsuredContainers = new();
+
     public async Task<string> UploadAsync(string container, string blobName, Stream stream, string contentType,
         CancellationToken cancellationToken)
     {
         var containerClient = blobServiceClient.GetBlobContainerClient(container);
-        await containerClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
+        await EnsureContainerExistsAsync(containerClient, container, cancellationToken);
 
         var blobClient = containerClient.GetBlobClient(blobName);
 
@@ -21,6 +24,16 @@ public class AzureBlobStorageService(BlobServiceClient blobServiceClient) : IBlo
             cancellationToken: cancellationToken);
 
         return blobClient.Uri.ToString();
+    }
+
+    private static async Task EnsureContainerExistsAsync(BlobContainerClient containerClient, string containerName,
+        CancellationToken cancellationToken)
+    {
+        if (EnsuredContainers.ContainsKey(containerName))
+            return;
+
+        await containerClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
+        EnsuredContainers.TryAdd(containerName, true);
     }
 
     public async Task DeleteAsync(string container, string blobName, CancellationToken cancellationToken)
