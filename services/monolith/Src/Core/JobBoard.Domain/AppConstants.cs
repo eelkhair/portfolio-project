@@ -33,6 +33,7 @@ public static class MonolithTopicNames
     public const string JobCreatedV1 = "monolith.job-created.v1";
     public const string ResumeUploadedV1 = "monolith.resume-uploaded.v1";
     public const string ResumeParsedV1 = "monolith.resume-parsed.v1";
+    public const string ResumeDeletedV1 = "monolith.resume-deleted.v1";
 
     private static readonly Dictionary<string, string> EventTypeToTopic = new()
     {
@@ -41,6 +42,7 @@ public static class MonolithTopicNames
         ["job.created.v1"] = JobCreatedV1,
         ["resume.uploaded.v1"] = ResumeUploadedV1,
         ["resume.parsed.v1"] = ResumeParsedV1,
+        ["resume.deleted.v1"] = ResumeDeletedV1,
     };
 
     public static string GetTopicForEventType(string eventType)

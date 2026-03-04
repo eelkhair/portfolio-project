@@ -4,6 +4,7 @@ using JobBoard.AI.Application.Actions.Base;
 using JobBoard.AI.Application.Interfaces.Clients;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
+using JobBoard.IntegrationEvents.Resume;
 using Microsoft.Extensions.Logging;
 
 namespace JobBoard.AI.Application.Actions.Resumes.Parse;
@@ -12,9 +13,9 @@ namespace JobBoard.AI.Application.Actions.Resumes.Parse;
 /// Orchestrates the full resume-uploaded flow:
 /// download blob → parse via <see cref="ParseResumeCommand"/> → notify monolith.
 /// </summary>
-public class ProcessResumeUploadedCommand(EventDto<ResumeUploadedEvent> @event) : BaseCommand<Unit>, ISystemCommand
+public class ProcessResumeUploadedCommand(EventDto<ResumeUploadedV1Event> @event) : BaseCommand<Unit>, ISystemCommand
 {
-    public EventDto<ResumeUploadedEvent> Event { get; set; } = @event;
+    public EventDto<ResumeUploadedV1Event> Event { get; set; } = @event;
 }
 
 public class ProcessResumeUploadedCommandHandler(

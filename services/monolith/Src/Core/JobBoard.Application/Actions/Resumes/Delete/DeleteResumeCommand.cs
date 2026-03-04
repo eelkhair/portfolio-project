@@ -5,6 +5,7 @@ using JobBoard.Application.Interfaces;
 using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Application.Interfaces.Observability;
 using JobBoard.Application.Interfaces.Storage;
+using JobBoard.IntegrationEvents.Resume;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -51,6 +52,13 @@ public class DeleteResumeCommandHandler(
         await blobStorage.DeleteAsync(ContainerName, resume.FileName, cancellationToken);
 
         db.Resumes.Remove(resume);
+
+        var integrationEvent = new ResumeDeletedV1Event(ResumeUId: resume.Id)
+        {
+            UserId = command.UserId
+        };
+
+        await OutboxPublisher.PublishAsync(integrationEvent, cancellationToken);
         await Context.SaveChangesAsync(command.UserId, cancellationToken);
 
         UnitOfWorkEvents.Enqueue(() =>

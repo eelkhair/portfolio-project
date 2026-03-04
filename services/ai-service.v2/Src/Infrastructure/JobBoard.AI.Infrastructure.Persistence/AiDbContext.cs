@@ -10,6 +10,7 @@ public sealed class AiDbContext : DbContext, IAiDbContext
 {
     public DbSet<Draft> Drafts => Set<Draft>();
     public DbSet<JobEmbedding> JobEmbeddings => Set<JobEmbedding>();
+    public DbSet<ResumeEmbedding> ResumeEmbeddings => Set<ResumeEmbedding>();
     
 
     public AiDbContext(DbContextOptions<AiDbContext> options)
@@ -49,9 +50,25 @@ public sealed class AiDbContext : DbContext, IAiDbContext
 
             b.Property(x => x.Model)
                 .HasConversion(v => v.Value, v => new(v));
-            
+
         });
 
+        modelBuilder.Entity<ResumeEmbedding>(b =>
+        {
+            b.ToTable("resume_embeddings");
+
+            b.Property(x => x.VectorData)
+                .HasColumnType("vector(1536)")
+                .IsRequired();
+
+            b.Ignore(x => x.Vector);
+
+            b.Property(x => x.Provider)
+                .HasConversion(v => v.Value, v => new(v));
+
+            b.Property(x => x.Model)
+                .HasConversion(v => v.Value, v => new(v));
+        });
 
     }
 }
