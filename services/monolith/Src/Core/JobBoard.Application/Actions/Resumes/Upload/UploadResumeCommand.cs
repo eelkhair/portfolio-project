@@ -68,6 +68,12 @@ public class UploadResumeCommandHandler(
 
         resume.MarkProcessing();
 
+        var hasExistingResumes = await db.Resumes
+            .AnyAsync(r => r.UserId == user.InternalId, cancellationToken);
+
+        if (!hasExistingResumes)
+            resume.SetAsDefault();
+
         await db.Resumes.AddAsync(resume, cancellationToken);
 
         var integrationEvent = new ResumeUploadedV1Event(
@@ -104,6 +110,7 @@ public class UploadResumeCommandHandler(
             HasParsedContent = false,
             ParseStatus = resume.ParseStatus.ToString(),
             ParseRetryCount = resume.ParseRetryCount,
+            IsDefault = resume.IsDefault,
             CreatedAt = resume.CreatedAt
         };
     }

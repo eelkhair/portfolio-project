@@ -9,6 +9,7 @@ public class ResumeResponse
     public bool HasParsedContent { get; set; }
     public string ParseStatus { get; set; } = "Pending";
     public int ParseRetryCount { get; set; }
+    public bool IsDefault { get; set; }
     public DateTime CreatedAt { get; set; }
     public ResumeParsedContentResponse? ParsedContent { get; set; }
 }
