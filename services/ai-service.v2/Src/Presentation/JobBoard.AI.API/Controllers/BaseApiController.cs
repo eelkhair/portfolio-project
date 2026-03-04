@@ -76,13 +76,51 @@ public abstract class BaseApiController : ControllerBase
 
         return StatusCode(StatusCodes.Status201Created, body);
     }
+    /// <summary>
+    /// Dispatches a Dapr pub/sub event command with idempotency handling.
+    /// Always returns Accepted() — Dapr requires a success response to stop retries.
+    /// </summary>
+    protected async Task<IActionResult> ExecuteEventCommandAsync<TResult>(
+        BaseCommand<TResult> command,
+        string idempotencyKey,
+        string idempotencyPrefix)
+    {
+        var idempotency = HttpContext.RequestServices.GetRequiredService<IIdempotencyService>();
+        var logger = HttpContext.RequestServices.GetRequiredService<ILogger<BaseApiController>>();
+
+        if (await idempotency.IsProcessedAsync(idempotencyPrefix, idempotencyKey, HttpContext.RequestAborted))
+        {
+            logger.LogInformation(
+                "Skipping event. Idempotency key {IdempotencyKey} already processed (prefix: {Prefix})",
+                idempotencyKey, idempotencyPrefix);
+            return Accepted();
+        }
+
+        await idempotency.MarkProcessingAsync(idempotencyPrefix, idempotencyKey, ct: HttpContext.RequestAborted);
+
+        try
+        {
+            await ExecuteCoreAsync(command);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex,
+                "Failed to process event (idempotency key: {IdempotencyKey}, prefix: {Prefix})",
+                idempotencyKey, idempotencyPrefix);
+            return Accepted();
+        }
+
+        await idempotency.MarkCompletedAsync(idempotencyPrefix, idempotencyKey, ct: HttpContext.RequestAborted);
+        return Accepted();
+    }
+
     private Task<TResult> ExecuteCoreAsync<TResult>(IRequest<TResult> request)
     {
         var handlerType = typeof(IHandler<,>).MakeGenericType(request.GetType(), typeof(TResult));
         var handler = HttpContext.RequestServices.GetRequiredService(handlerType);
         return ((dynamic)handler).HandleAsync((dynamic)request, HttpContext.RequestAborted);
     }
-    
+
     private IActionResult HandleException(Exception exception)
     {
         return exception switch

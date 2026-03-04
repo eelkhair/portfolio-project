@@ -9,7 +9,7 @@ using UglyToad.PdfPig;
 
 namespace JobBoard.AI.Application.Actions.Resumes.Parse;
 
-public class ParseResumeCommand(ResumeParseRequest request) : BaseCommand<ResumeParseResponse>
+public class ParseResumeCommand(ResumeParseRequest request) : BaseCommand<ResumeParseResponse>, ISystemCommand
 {
     public ResumeParseRequest Request { get; } = request;
 }
