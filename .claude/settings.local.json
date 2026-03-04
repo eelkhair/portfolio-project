@@ -36,7 +36,8 @@
       "Bash(curl -s http://localhost:3000/profile)",
       "Bash(dotnet sln JobBoard.sln add \"services/monolith/Src/Infrastructure/JobBoard.Infrastructure.BlobStorage/JobBoard.Infrastructure.BlobStorage.csproj\" --solution-folder \"monolith/Src/Infrastructure\")",
       "Bash(npm ls @opentelemetry/resources @opentelemetry/semantic-conventions @opentelemetry/sdk-trace-web @opentelemetry/sdk-trace-base)",
-      "Bash(xxd)"
+      "Bash(xxd)",
+      "Bash(dotnet ef database update --project services/monolith/Src/Infrastructure/JobBoard.Infrastructure.Persistence/JobBoard.Infrastructure.Persistence.csproj --startup-project services/monolith/Src/Presentation/JobBoard.API/JobBoard.API.csproj)"
     ]
   }
 }

@@ -7,6 +7,7 @@ using JobBoard.Application.Actions.Resumes.Download;
 using JobBoard.Application.Actions.Resumes.FailParse;
 using JobBoard.Application.Actions.Resumes.GetParsedContent;
 using JobBoard.Application.Actions.Resumes.List;
+using JobBoard.Application.Actions.Resumes.SetDefault;
 using JobBoard.Application.Actions.Resumes.Upload;
 using JobBoard.Application.Infrastructure.Exceptions;
 using JobBoard.Application.Interfaces.Configurations;
@@ -106,6 +107,15 @@ public class ResumesController(IUserAccessor accessor, IResumeParseNotifier resu
             return StatusCode(500,
                 ApiResponse.Fail<object>("An unexpected error occurred.", HttpStatusCode.InternalServerError));
         }
+    }
+
+    /// <summary>
+    /// Sets a specific resume as the default for job matching.
+    /// </summary>
+    [HttpPatch("{id:guid}/default")]
+    public async Task<IActionResult> SetDefaultResume(Guid id)
+    {
+        return await ExecuteCommandAsync(new SetDefaultResumeCommand(id), _ => NoContent());
     }
 
     /// <summary>

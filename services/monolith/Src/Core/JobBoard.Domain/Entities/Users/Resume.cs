@@ -30,8 +30,13 @@ public class Resume : BaseAuditableEntity
     public string? ParsedContent { get; private set; }
     public ResumeParseStatus ParseStatus { get; private set; } = ResumeParseStatus.Pending;
     public int ParseRetryCount { get; private set; }
+    public bool IsDefault { get; private set; }
 
     internal void SetUser(int userId) => UserId = userId;
+
+    public void SetAsDefault() => IsDefault = true;
+
+    public void ClearDefault() => IsDefault = false;
 
     public void MarkProcessing()
     {

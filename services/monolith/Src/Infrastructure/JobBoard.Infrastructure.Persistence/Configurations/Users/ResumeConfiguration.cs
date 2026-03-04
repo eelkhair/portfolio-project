@@ -37,6 +37,9 @@ public class ResumeConfiguration : IEntityTypeConfiguration<Resume>
         builder.Property(r => r.ParseRetryCount)
             .HasDefaultValue(0);
 
+        builder.Property(r => r.IsDefault)
+            .HasDefaultValue(false);
+
         builder.HasIndex(r => r.ParseStatus);
 
         builder.HasOne(r => r.User)
