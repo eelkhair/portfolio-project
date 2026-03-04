@@ -54,6 +54,8 @@ public static class DependencyInjection
 
         
         services.AddKeyedScoped<IAiTools, AiToolRegistry>("ai");
+        services.AddKeyedScoped<IAiTools, PublicToolRegistry>("public");
+        services.AddKeyedScoped<IAiTools, CompanyAdminToolRegistry>("company-admin");
         services.AddScoped<IChatOptionsFactory, ChatOptionsFactory>();
 
 

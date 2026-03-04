@@ -16,8 +16,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req);
   }
 
-  // Only attach tokens to our API
-  if (!req.url.startsWith(environment.apiUrl)) {
+  // Only attach tokens to our APIs
+  if (!req.url.startsWith(environment.apiUrl) && !req.url.startsWith(environment.aiUrl)) {
     return next(req);
   }
 

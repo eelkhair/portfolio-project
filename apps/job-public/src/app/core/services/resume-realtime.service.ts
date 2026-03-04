@@ -70,6 +70,8 @@ export class ResumeRealtimeService {
       );
     });
 
+    this.hub.on('featureFlagsUpdated', () => {});
+
     this.hub.on('ResumeParseFailed', (msg: ResumeParseFailedMsg) => {
       const parentCtx = this.extractTraceContext(msg);
       this.tracer.startActiveSpan(

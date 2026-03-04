@@ -6,6 +6,6 @@ public interface IChatService
 {
     Task<T> GetResponseAsync<T>(string systemPrompt, string userPrompt, bool allowTools,
         CancellationToken cancellationToken);
-    Task<ChatResponse> RunChatAsync(string systemPrompt, string userMessage, bool allowTools,
+    Task<ChatResponse> RunChatAsync(string systemPrompt, string userMessage, ChatScope scope,
         CancellationToken cancellationToken);
 }
