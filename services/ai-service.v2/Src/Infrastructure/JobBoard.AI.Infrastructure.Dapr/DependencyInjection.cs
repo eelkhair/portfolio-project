@@ -2,12 +2,13 @@
 using System.Text.Json.Serialization;
 using Dapr.Client;
 using Dapr.Extensions.Configuration;
+using JobBoard.AI.Application.Interfaces.Clients;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Infrastructure.Dapr.AITools;
 using JobBoard.AI.Infrastructure.Dapr.AITools.Admin;
 using JobBoard.AI.Infrastructure.Dapr.AITools.Monolith;
-using JobBoard.AI.Application.Interfaces.Clients;
 using JobBoard.AI.Infrastructure.Dapr.ApiClients;
+using JobBoard.AI.Infrastructure.Dapr.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,6 +33,7 @@ public static class DependencyInjection
         builder.Services.AddKeyedScoped<IAiTools, AdminToolRegistry>("micro");
         builder.Services.AddScoped<IMonolithApiClient, MonolithApiClient>();
         builder.Services.AddScoped<IAdminApiClient, AdminApiClient>();
+        builder.Services.AddScoped<IIdempotencyService, DaprIdempotencyService>();
         // Vault secrets
         builder.Configuration.AddDaprSecretStore(
             "vault",

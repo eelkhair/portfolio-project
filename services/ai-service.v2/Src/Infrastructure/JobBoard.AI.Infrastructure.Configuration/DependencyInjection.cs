@@ -1,3 +1,4 @@
+using JobBoard.AI.Application.Interfaces.Clients;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Infrastructure.Configuration.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +16,7 @@ public static class DependencyInjection
         services.AddSingleton<IConnectionMultiplexer>(_ =>
             ConnectionMultiplexer.Connect("192.168.1.160:6379")
         );
+        services.AddSingleton<IBlobStorageService, BlobStorageService>();
         return services;
     }
 }
