@@ -22,26 +22,26 @@ export class SettingsService {
 
   getProvider() {
     return this.http.get<ApiResponse<ProviderSettings>>(
-      `${environment.gatewayUrl}settings/provider`
+      `${environment.gatewayUrl}api/settings/provider`
     );
   }
 
   updateProvider(request: ProviderSettings) {
     return this.http.put<ApiResponse<UpdateProviderResponse>>(
-      `${environment.gatewayUrl}settings/update-provider`,
+      `${environment.gatewayUrl}api/settings/update-provider`,
       request
     );
   }
 
   getApplicationMode() {
     return this.http.get<ApiResponse<ApplicationMode>>(
-      `${environment.gatewayUrl}settings/mode`
+      `${environment.gatewayUrl}api/settings/mode`
     );
   }
 
   updateApplicationMode(request: ApplicationMode) {
     return this.http.put<ApiResponse<ApplicationMode>>(
-      `${environment.gatewayUrl}settings/mode`,
+      `${environment.gatewayUrl}api/settings/mode`,
       request
     );
   }

@@ -17,7 +17,7 @@ namespace JobBoard.API.Controllers;
 /// </summary>
 [ApiController]
 [Authorize]
-[Route("[controller]")]
+[Route("api/[controller]")]
 [Produces("application/json")]
 public abstract class BaseApiController : ControllerBase
 {

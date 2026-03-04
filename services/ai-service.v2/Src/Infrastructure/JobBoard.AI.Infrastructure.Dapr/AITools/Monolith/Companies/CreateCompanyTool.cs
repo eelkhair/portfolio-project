@@ -1,6 +1,6 @@
 using System.Diagnostics;
+using JobBoard.AI.Application.Interfaces.Clients;
 using JobBoard.AI.Application.Interfaces.Observability;
-using JobBoard.AI.Infrastructure.Dapr.ApiClients;
 using Microsoft.Extensions.AI;
 
 namespace JobBoard.AI.Infrastructure.Dapr.AITools.Monolith.Companies;
@@ -27,15 +27,4 @@ public static class CreateCompanyTool
             });
 
     }
-}
-
-public class CreateCompanyCommand
-{
-    public string Name { get; set; } = string.Empty;
-    public string CompanyEmail { get; set; } = string.Empty;
-    public string? CompanyWebsite { get; set; }
-    public Guid IndustryUId { get; set; }
-    public string AdminFirstName { get; set; } = string.Empty;
-    public string AdminLastName { get; set; } = string.Empty;
-    public string AdminEmail { get; set; } = string.Empty;
 }

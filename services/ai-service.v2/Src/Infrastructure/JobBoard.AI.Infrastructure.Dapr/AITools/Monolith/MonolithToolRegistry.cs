@@ -5,7 +5,7 @@ using JobBoard.AI.Application.Interfaces.Persistence;
 using JobBoard.AI.Infrastructure.Dapr.AITools.Monolith.Companies;
 using JobBoard.AI.Infrastructure.Dapr.AITools.Monolith.Industries;
 using JobBoard.AI.Infrastructure.Dapr.AITools.Monolith.Jobs;
-using JobBoard.AI.Infrastructure.Dapr.ApiClients;
+using JobBoard.AI.Application.Interfaces.Clients;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;

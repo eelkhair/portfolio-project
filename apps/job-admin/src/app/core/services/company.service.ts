@@ -27,14 +27,14 @@ export class CompanyService {
 
   createCompany(dto: CreateCompanyDto): Observable<ApiResponse<Company>> {
     return this.http.post<ApiResponse<Company>>(
-      `${environment.gatewayUrl}companies`,
+      `${environment.gatewayUrl}api/companies`,
       dto
     );
   }
 
   updateCompany(id: string, dto: UpdateCompanyDto): Observable<ApiResponse<Company>> {
     return this.http.put<ApiResponse<Company>>(
-      `${environment.gatewayUrl}companies/${id}`,
+      `${environment.gatewayUrl}api/companies/${id}`,
       dto
     );
   }

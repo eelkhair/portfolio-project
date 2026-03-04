@@ -1,0 +1,102 @@
+@startuml
+title Resume Upload → Async AI Parsing (Trace-Backed)
+
+actor User
+participant "Public FE\n(public-fe)" as FE
+participant "Monolith API\n(monolith-api)" as MONO
+database "SQL Server\n(Job-board-Monolith)" as SQL
+participant "Outbox Processor" as OUTBOX
+participant "Dapr PubSub" as BUS
+participant "AI Service v2\n(ai-service-v2)" as AI
+participant "OpenAI API" as OAI
+database "Postgres\n(Embeddings)" as PG
+participant "SignalR Hub" as SR
+
+== Upload Resume (HTTP request path) ==
+User -> FE : Upload resume
+FE -> MONO : POST /api/resumes
+note right of MONO
+  Span:
+  POST api/resumes
+  UploadResumeCommand.handle
+end note
+
+MONO -> SQL : Insert Resume (ParseStatus=Pending)
+note right
+  EF Core spans:
+  INSERT User.Resumes
+end note
+
+MONO -> SQL : Insert Outbox(resume.uploaded.v1)
+note right
+  outbox.message.eventType=resume.uploaded.v1
+end note
+
+MONO -> FE : 201 Created (~768ms)
+FE -> FE : Show "Processing resume..." toast
+
+== Outbox → PubSub ==
+OUTBOX -> BUS : Publish resume.uploaded.v1
+note right
+  Dapr PublishEvent
+  messaging.destination=monolith.resume-uploaded.v1
+end note
+
+BUS -> AI : POST /Resumes/parse-event
+note right
+  Span:
+  POST Resumes/parse-event (202)
+end note
+
+== AI Parsing (Async, slow path) ==
+AI -> AI : parseResumeEvent.IdempotencyCheck
+note right
+  idempotency.new=true
+end note
+
+AI -> OAI : POST /v1/chat/completions
+note right of OAI
+  🔥 Dominant latency
+  ~22s
+  tokens.total=3216
+end note
+
+OAI --> AI : Parsed resume text
+
+AI -> PG : Store embeddings
+note right
+  Embedding persistence
+end note
+
+== Result Fan-Out ==
+AI -> BUS : Publish resume.parsed.v1
+note right
+  messaging.destination=monolith.resume-parsed.v1
+end note
+
+AI -> SR : SignalR ResumeParsed
+note right
+  messaging.system=signalr
+  resume.id=...
+end note
+
+== Monolith Completion ==
+BUS -> MONO : resume.parsed.v1
+MONO -> MONO : CompleteResumeParseCommand.handle
+note right
+  ParseStatus=Completed
+  ParsedContent updated
+end note
+
+MONO -> SQL : UPDATE User.Resumes
+MONO -> SQL : Insert Outbox(resume.parsed.v1)
+
+== Frontend UX ==
+SR -> FE : signalr.message.received
+alt User still on page
+    FE -> FE : Show "Fill form using AI?" popup
+else User navigated away
+    FE -> FE : Defer prompt / badge
+end
+
+@enduml

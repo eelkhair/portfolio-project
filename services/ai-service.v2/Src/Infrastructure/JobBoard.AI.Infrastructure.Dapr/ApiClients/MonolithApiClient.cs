@@ -1,16 +1,16 @@
 using System.Net.Http.Json;
 using Dapr.Client;
 using Elkhair.Dev.Common.Application;
+using JobBoard.AI.Application.Interfaces.Clients;
 using JobBoard.AI.Application.Interfaces.Configurations;
-using JobBoard.AI.Infrastructure.Dapr.AITools.Monolith.Companies;
+using JobBoard.AI.Application.Interfaces.Resumes;
 using JobBoard.Monolith.Contracts.Companies;
 using JobAPI.Contracts.Models.Jobs.Responses;
-using JobBoard.AI.Infrastructure.Dapr.AITools.Shared;
 using Microsoft.Extensions.Logging;
 
 namespace JobBoard.AI.Infrastructure.Dapr.ApiClients;
 
-public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<MonolithApiClient> logger) 
+public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<MonolithApiClient> logger)
     : BaseApiClient(_, accessor), IMonolithApiClient
 {
     public async Task<ODataResponse<List<CompanyDto>>> ListCompaniesAsync(CancellationToken cancellationToken = default)
@@ -24,7 +24,7 @@ public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<Mon
         {
             var response = ex.Response;
             var body = await response.Content.ReadAsStringAsync(cancellationToken);
-            
+
             logger.LogError(ex, "Error getting companies from monolith-api: {Body}", body);
             throw;
         }
@@ -34,7 +34,7 @@ public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<Mon
     {
         try
         {
-            var request = CreateRequest(HttpMethod.Post, "companies", "monolith-api");
+            var request = CreateRequest(HttpMethod.Post, "api/companies", "monolith-api");
             request.Content = JsonContent.Create(cmd);
             var response = await Client.InvokeMethodAsync<ApiResponse<CompanyDto>>(request, ct);
             return response.Data!;
@@ -47,13 +47,13 @@ public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<Mon
             throw;
         }
     }
-    
+
 
     public async Task<CompanyDto> UpdateCompanyAsync(Guid companyId, UpdateCompanyCommand cmd, CancellationToken ct)
     {
         try
         {
-            var request = CreateRequest(HttpMethod.Put, $"companies/{companyId}", "monolith-api");
+            var request = CreateRequest(HttpMethod.Put, $"api/companies/{companyId}", "monolith-api");
             request.Content = JsonContent.Create(cmd);
             var response = await Client.InvokeMethodAsync<ApiResponse<CompanyDto>>(request, ct);
             return response.Data!;
@@ -71,7 +71,7 @@ public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<Mon
     {
         try
         {
-            var request = CreateRequest(HttpMethod.Post, "jobs", "monolith-api");
+            var request = CreateRequest(HttpMethod.Post, "api/jobs", "monolith-api");
             request.Content = JsonContent.Create(cmd);
             return await Client.InvokeMethodAsync<ApiResponse<object>>(request, ct);
         }
@@ -137,7 +137,7 @@ public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<Mon
     {
         try
         {
-            var request = CreateRequest(HttpMethod.Post, "api/applicant/resumes/parse-completed", "monolith-api");
+            var request = CreateRequest(HttpMethod.Post, "api/resumes/parse-completed", "monolith-api");
             request.Content = JsonContent.Create(model);
             await Client.InvokeMethodAsync(request, ct);
         }
@@ -153,7 +153,7 @@ public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<Mon
     {
         try
         {
-            var request = CreateRequest(HttpMethod.Post, "api/applicant/resumes/parse-failed", "monolith-api");
+            var request = CreateRequest(HttpMethod.Post, "api/resumes/parse-failed", "monolith-api");
             request.Content = JsonContent.Create(model);
             await Client.InvokeMethodAsync(request, ct);
         }
@@ -164,12 +164,20 @@ public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<Mon
             throw;
         }
     }
-}
 
-public  class ApiResponse<T>
-{
-    public ApiError? Exceptions { get; set; }
-    public T? Data { get; set; }
-    public bool Success { get; set; }
-    public string StatusCode { get; set; } = default!;
+    public async Task<ResumeParsedContentResponse?> GetResumeParsedContentAsync(Guid resumeUId, CancellationToken ct)
+    {
+        try
+        {
+            var request = CreateRequest(HttpMethod.Get, $"api/resumes/{resumeUId}/parsed-content/internal", "monolith-api");
+            var response = await Client.InvokeMethodAsync<ApiResponse<ResumeParsedContentResponse>>(request, ct);
+            return response.Data;
+        }
+        catch (InvocationException ex)
+        {
+            var body = await ex.Response.Content.ReadAsStringAsync(ct);
+            logger.LogError(ex, "Error getting resume parsed content from monolith-api: {Body}", body);
+            throw;
+        }
+    }
 }

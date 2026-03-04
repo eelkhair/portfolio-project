@@ -1,4 +1,4 @@
-namespace JobBoard.AI.Infrastructure.Dapr.AITools.Shared;
+namespace JobBoard.AI.Application.Interfaces.Clients;
 
 public class CompanyJobSummaryDto
 {
