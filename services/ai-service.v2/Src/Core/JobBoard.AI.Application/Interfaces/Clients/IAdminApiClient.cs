@@ -1,10 +1,10 @@
 using AdminAPI.Contracts.Models.Companies.Requests;
 using CompanyAPI.Contracts.Models.Companies.Responses;
 using CompanyAPI.Contracts.Models.Industries.Responses;
+using Elkhair.Dev.Common.Application;
 using JobAPI.Contracts.Models.Jobs.Responses;
-using JobBoard.AI.Infrastructure.Dapr.AITools.Shared;
 
-namespace JobBoard.AI.Infrastructure.Dapr.ApiClients;
+namespace JobBoard.AI.Application.Interfaces.Clients;
 
 public interface IAdminApiClient
 {

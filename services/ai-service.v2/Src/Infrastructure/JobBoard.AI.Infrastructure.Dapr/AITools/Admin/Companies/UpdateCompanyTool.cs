@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using AdminAPI.Contracts.Models.Companies.Requests;
 using JobBoard.AI.Application.Interfaces.Observability;
-using JobBoard.AI.Infrastructure.Dapr.ApiClients;
+using JobBoard.AI.Application.Interfaces.Clients;
 using Microsoft.Extensions.AI;
 
 namespace JobBoard.AI.Infrastructure.Dapr.AITools.Admin.Companies;

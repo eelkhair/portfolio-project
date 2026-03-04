@@ -31,48 +31,7 @@ public sealed class AiServiceClient(
         DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
-
-    public async Task<ResumeParsedContentResponse> ParseResume(
-        string fileName,
-        string contentType,
-        Stream fileContent,
-        CancellationToken cancellationToken)
-    {
-        EnrichActivity(null, "resumes.parse", AiServiceV2);
-
-        using var ms = new MemoryStream();
-        await fileContent.CopyToAsync(ms, cancellationToken);
-        var base64 = Convert.ToBase64String(ms.ToArray());
-
-        var request = CreateRequest(
-            HttpMethod.Post,
-            "resumes/parse",
-            AiServiceV2);
-
-        request.Content = JsonContent.Create(new
-        {
-            fileName,
-            contentType,
-            fileContent = base64
-        }, options: JsonOpts);
-
-        using var response =
-            await client.InvokeMethodWithResponseAsync(request, cancellationToken);
-
-        if (!response.IsSuccessStatusCode)
-            await ThrowExternalServiceError(response, "resumes.parse", cancellationToken, AiServiceV2);
-
-        var result = await response.Content
-                         .ReadFromJsonAsync<ApiResponse<ResumeParsedContentResponse>>(JsonOpts, cancellationToken)
-                     ?? throw new InvalidOperationException($"{AiServiceV2} returned empty JSON payload.");
-
-        logger.LogInformation(
-            "{ServiceName} parsed resume {FileName}",
-            AiServiceV2,
-            fileName);
-
-        return result.Data!;
-    }
+    
 
     public async Task<List<DraftResponse>> ListDrafts(
         Guid companyId,

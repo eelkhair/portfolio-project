@@ -14,6 +14,7 @@ export class ApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = environment.apiUrl + 'public';
   private readonly applicantUrl = environment.apiUrl + 'applicant';
+  private readonly resumesUrl = environment.apiUrl + 'resumes';
 
   getJobs(page = 1, pageSize = 10): Observable<PaginatedList<Job>> {
     const params = new HttpParams().set('page', page).set('pageSize', pageSize);
@@ -107,29 +108,29 @@ export class ApiService {
     let params = new HttpParams();
     if (currentPage) params = params.set('currentPage', currentPage);
     return this.http
-      .post<ApiResponse<ResumeResponse>>(`${this.applicantUrl}/resumes`, formData, { params })
+      .post<ApiResponse<ResumeResponse>>(`${this.resumesUrl}`, formData, { params })
       .pipe(map((res) => res.data!));
   }
 
   getResumes(): Observable<ResumeResponse[]> {
     return this.http
-      .get<ApiResponse<ResumeResponse[]>>(`${this.applicantUrl}/resumes`)
+      .get<ApiResponse<ResumeResponse[]>>(`${this.resumesUrl}`)
       .pipe(map((res) => res.data ?? []));
   }
 
   getResumeParsedContent(id: string, traceParent?: string): Observable<ResumeData | null> {
     const options = traceParent ? { headers: new HttpHeaders({ traceparent: traceParent }) } : {};
     return this.http
-      .get<ApiResponse<ResumeData | null>>(`${this.applicantUrl}/resumes/${id}/parsed-content`, options)
+      .get<ApiResponse<ResumeData | null>>(`${this.resumesUrl}/${id}/parsed-content`, options)
       .pipe(map((res) => res.data ?? null));
   }
 
   deleteResume(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.applicantUrl}/resumes/${id}`);
+    return this.http.delete<void>(`${this.resumesUrl}/${id}`);
   }
 
   downloadResumeBlob(id: string): Observable<Blob> {
-    return this.http.get(`${this.applicantUrl}/resumes/${id}/download`, {
+    return this.http.get(`${this.resumesUrl}/${id}/download`, {
       params: { inline: 'true' },
       responseType: 'blob',
     });

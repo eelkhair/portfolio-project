@@ -3,9 +3,10 @@ using AdminAPI.Contracts.Models.Companies.Requests;
 using CompanyAPI.Contracts.Models.Companies.Responses;
 using CompanyAPI.Contracts.Models.Industries.Responses;
 using Dapr.Client;
+using Elkhair.Dev.Common.Application;
 using JobAPI.Contracts.Models.Jobs.Responses;
+using JobBoard.AI.Application.Interfaces.Clients;
 using JobBoard.AI.Application.Interfaces.Configurations;
-using JobBoard.AI.Infrastructure.Dapr.AITools.Shared;
 using Microsoft.Extensions.Logging;
 
 namespace JobBoard.AI.Infrastructure.Dapr.ApiClients;

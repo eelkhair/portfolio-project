@@ -14,10 +14,7 @@ namespace JobBoard.API.Controllers;
 /// <remarks>
 /// All endpoints in this controller are accessible without authentication.
 /// </remarks>
-[ApiController]
 [AllowAnonymous]
-[Route("api/[controller]")]
-[Produces("application/json")]
 public class PublicController : BaseApiController
 {
     /// <summary>

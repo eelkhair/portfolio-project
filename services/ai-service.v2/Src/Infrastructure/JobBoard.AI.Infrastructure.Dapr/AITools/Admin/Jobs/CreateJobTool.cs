@@ -7,7 +7,7 @@ using JobBoard.AI.Application.Interfaces.Notifications;
 using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Application.Interfaces.Persistence;
 using JobBoard.AI.Infrastructure.Dapr.AITools.Shared;
-using JobBoard.AI.Infrastructure.Dapr.ApiClients;
+using JobBoard.AI.Application.Interfaces.Clients;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;

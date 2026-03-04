@@ -6,6 +6,7 @@ using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Infrastructure.Dapr.AITools;
 using JobBoard.AI.Infrastructure.Dapr.AITools.Admin;
 using JobBoard.AI.Infrastructure.Dapr.AITools.Monolith;
+using JobBoard.AI.Application.Interfaces.Clients;
 using JobBoard.AI.Infrastructure.Dapr.ApiClients;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;

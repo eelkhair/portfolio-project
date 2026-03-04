@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
-using JobBoard.AI.Infrastructure.Dapr.ApiClients;
+using JobBoard.AI.Application.Interfaces.Clients;
 using JobAPI.Contracts.Models.Jobs.Responses;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Caching.Memory;

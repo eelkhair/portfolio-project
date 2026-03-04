@@ -26,23 +26,23 @@ export class JobService {
   }
 
   generateDraft(uId: string, payload: JobGenRequest) {
-    return this.http.post<ApiResponse<JobGenResponse>>(`${this.baseUrl}jobs/${uId}/generate`, payload);
+    return this.http.post<ApiResponse<JobGenResponse>>(`${this.baseUrl}api/jobs/${uId}/generate`, payload);
   }
 
   saveDraft(uId: string, payload: Draft) {
-    return this.http.put<ApiResponse<Draft>>(`${this.baseUrl}jobs/${uId}/save-draft`, payload);
+    return this.http.put<ApiResponse<Draft>>(`${this.baseUrl}api/jobs/${uId}/save-draft`, payload);
   }
 
   loadDrafts(companyId: string) {
-    return this.http.get<ApiResponse<Draft[]>>(`${this.baseUrl}jobs/${companyId}/list-drafts`);
+    return this.http.get<ApiResponse<Draft[]>>(`${this.baseUrl}api/jobs/${companyId}/list-drafts`);
   }
 
   rewrite(model: EnhancementRequest) {
-    return this.http.put<ApiResponse<EnhancementResponse>>(`${this.baseUrl}jobs/drafts/rewrite`, model);
+    return this.http.put<ApiResponse<EnhancementResponse>>(`${this.baseUrl}api/jobs/drafts/rewrite`, model);
   }
 
   createJob(model: CreateJobDto) {
-    return this.http.post<ApiResponse<Job[]>>(`${this.baseUrl}jobs`, model);
+    return this.http.post<ApiResponse<Job[]>>(`${this.baseUrl}api/jobs`, model);
   }
 
   private normalize(response: any): ApiResponse<Job[]> {
