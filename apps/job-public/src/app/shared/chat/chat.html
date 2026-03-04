@@ -1,0 +1,104 @@
+@if (isBrowser) {
+  @if (account.isAuthenticated()) {
+    <!-- Chat FAB -->
+    @if (!isOpen()) {
+      <button
+        (click)="toggle()"
+        class="chat-fab"
+        aria-label="Open chat"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      </button>
+    }
+
+    <!-- Chat Panel -->
+    @if (isOpen()) {
+      <div class="chat-panel">
+        <!-- Header -->
+        <div class="chat-header">
+          <span class="font-semibold">AI Assistant</span>
+          <button (click)="toggle()" class="chat-close-btn" aria-label="Close chat">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Messages -->
+        <div class="chat-messages" #messagesContainer>
+          @for (msg of store.messages(); track $index) {
+            <div class="chat-bubble" [class.chat-bubble-user]="msg.role === 'user'" [class.chat-bubble-assistant]="msg.role === 'assistant'">
+              @if (msg.html) {
+                <div class="chat-content" [innerHTML]="msg.html"></div>
+              } @else {
+                <div class="chat-content">{{ msg.content }}</div>
+              }
+              <span class="chat-time">
+                {{ msg.time }}
+                @if (store.showJaeger() && msg.duration) {
+                  <span class="chat-duration">{{ msg.duration }}</span>
+                }
+              </span>
+              @if (store.showJaeger() && msg.traceId) {
+                <div class="chat-trace-links">
+                  <a class="chat-trace-link chat-trace-grafana"
+                     [href]="'https://grafana.eelkhair.net/d/bf5m5dwukfncwd/find-by-trace-id?orgId=1&var-TraceId=' + msg.traceId"
+                     target="_blank"
+                     rel="noopener"
+                     title="View trace in Grafana">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    grafana
+                  </a>
+                  <a class="chat-trace-link chat-trace-jaeger"
+                     [href]="'https://jaeger.eelkhair.net/trace/' + msg.traceId"
+                     target="_blank"
+                     rel="noopener"
+                     title="View trace in Jaeger">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    jaeger
+                  </a>
+                </div>
+              }
+            </div>
+          }
+          @if (store.loading()) {
+            <div class="chat-bubble chat-bubble-assistant">
+              <div class="chat-typing">
+                <span></span><span></span><span></span>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Jaeger notification -->
+        @if (store.jaegerNotification()) {
+          <div class="chat-debug-notification">{{ store.jaegerNotification() }}</div>
+        }
+
+        <!-- Input -->
+        <div class="chat-input-area">
+          <textarea
+            #chatInput
+            [(ngModel)]="message"
+            (keydown)="onKeydown($event)"
+            placeholder="Type a message..."
+            rows="1"
+            class="chat-input"
+          ></textarea>
+          <button
+            (click)="send()"
+            [disabled]="!message.trim() || store.loading()"
+            class="chat-send-btn"
+            aria-label="Send message"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    }
+  }
+}
