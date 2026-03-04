@@ -1,6 +1,7 @@
 using System.Net;
 using JobBoard.API.Helpers;
 using JobBoard.API.Infrastructure.SignalR.ResumeParse;
+using JobBoard.Application.Actions.Jobs.MatchingJobs;
 using JobBoard.Application.Actions.Resumes.CompleteParse;
 using JobBoard.Application.Actions.Resumes.Delete;
 using JobBoard.Application.Actions.Resumes.Download;
@@ -168,5 +169,17 @@ public class ResumesController(IUserAccessor accessor, IResumeParseNotifier resu
             cancellationToken);
 
         return Ok();
+    }
+    
+    /// <summary>
+    /// Retrieves a list of jobs that match the user's resume.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the matching jobs.</returns>
+    [HttpGet("jobs/matching")]
+    public async Task<IActionResult> GetMatchingJobs(int limit = 10)
+    {
+        var jobs = await ExecuteQueryAsync(new ListMatchingJobsQuery(limit), Ok);
+       
+        return Ok(jobs);
     }
 }

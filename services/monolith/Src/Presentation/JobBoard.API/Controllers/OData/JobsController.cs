@@ -23,6 +23,4 @@ public class JobsController: BaseODataController
        
         return Ok(jobs);
     }
-    
-    
 }

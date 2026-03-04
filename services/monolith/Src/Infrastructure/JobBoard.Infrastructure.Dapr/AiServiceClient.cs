@@ -10,7 +10,6 @@ using JobBoard.Application.Interfaces.Infrastructure;
 using JobBoard.Application.Interfaces.Observability;
 using JobBoard.Application.Interfaces.Users;
 using JobBoard.Monolith.Contracts.Drafts;
-using JobBoard.Monolith.Contracts.Public;
 using JobBoard.Monolith.Contracts.Settings;
 using Microsoft.Extensions.Logging;
 
@@ -260,6 +259,33 @@ public sealed class AiServiceClient(
         logger.LogInformation(
             "ai-service-v2 returned {Count} matching jobs for  job {JobId}",
             data.Count, jobId);
+
+        return data;
+    }
+
+    public async Task<List<JobCandidate>> GetMatchingJobsForResumeAsync(Guid resumeId, int requestLimit,
+        CancellationToken cancellationToken)
+    {
+        using var activity = activityFactory.StartActivity("ai-service-v2.get-matching-jobs", ActivityKind.Internal);
+        var request = CreateRequest(
+            HttpMethod.Get,
+            $"resumes/{resumeId}/matching?limit={requestLimit}",
+            AiServiceV2);
+
+        using var response =
+            await client.InvokeMethodWithResponseAsync(request, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+            await ThrowExternalServiceError(response, "ai-service-v2.get-matching-jobs", cancellationToken, AiServiceV2);
+
+        var result = await response.Content
+                         .ReadFromJsonAsync<ApiResponse<List<JobCandidate>>>(JsonOpts, cancellationToken)
+                     ?? throw new InvalidOperationException($"{AiServiceV2} returned empty JSON payload.");
+
+        var data = result.Data ?? [];
+        logger.LogInformation(
+            "ai-service-v2 returned {Count} matching jobs for  resume {ResumeId}",
+            data.Count, resumeId);
 
         return data;
     }

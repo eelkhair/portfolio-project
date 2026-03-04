@@ -2,6 +2,7 @@ using Dapr;
 using Elkhair.Dev.Common.Dapr;
 using JobBoard.AI.Application.Actions.Resumes.DeleteEmbedding;
 using JobBoard.AI.Application.Actions.Resumes.Embed;
+using JobBoard.AI.Application.Actions.Resumes.MatchingJobs;
 using JobBoard.AI.Application.Actions.Resumes.Parse;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.IntegrationEvents.Resume;
@@ -82,4 +83,16 @@ public class ResumesController : BaseApiController
             request.IdempotencyKey,
             DeleteEmbeddingIdempotencyPrefix);
     }
+
+    /// <summary>
+    /// Gets a list of matching jobs for a given resume.
+    /// </summary>
+    /// <param name="resumeId"></param>
+    /// <param name="limit"></param>
+    /// <returns></returns>
+    [HttpGet("{resumeId}/matching")]
+    [Authorize("DaprInternal")]
+    public async Task<IActionResult> GetMatchingJobsForResume([FromRoute] Guid resumeId,
+        [FromQuery] int limit = 10)
+    => await ExecuteQueryAsync(new ListMatchingJobsQuery(resumeId, limit), Ok);
 }
