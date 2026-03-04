@@ -342,7 +342,7 @@
   max-width: 85%;
   padding: 0.5rem 0.75rem;
   border-radius: 0.75rem;
-  font-size: 0.8125rem;
+  font-size: 0.9375rem;
   line-height: 1.5;
   word-break: break-word;
 }
@@ -365,7 +365,7 @@
 .chat-content p:last-child { margin-bottom: 0; }
 .chat-content ul, .chat-content ol { padding-left: 1.25rem; margin: 0.25rem 0; }
 .chat-content code {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   background-color: rgb(0 0 0 / 0.06);
   padding: 0.125rem 0.25rem;
   border-radius: 0.25rem;
@@ -373,7 +373,7 @@
 
 .chat-time {
   display: block;
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   opacity: 0.6;
   margin-top: 0.25rem;
 }
@@ -406,7 +406,7 @@
   resize: none;
   border: none;
   outline: none;
-  font-size: 0.8125rem;
+  font-size: 0.9375rem;
   line-height: 1.5;
   max-height: 5rem;
   background: transparent;
@@ -470,16 +470,15 @@
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  font-size: 0.625rem;
-  font-weight: 500;
+  font-size: 0.875rem;
+  font-weight: 700;
   text-decoration: none;
-  opacity: 0.7;
   transition: opacity 0.15s;
 }
-.chat-trace-link:hover { opacity: 1; }
+.chat-trace-link:hover { opacity: 0.75; }
 
-.chat-trace-jaeger { color: #3b82f6; }
-.chat-trace-grafana { color: #f97316; }
+.chat-trace-jaeger { color: #f472b6; }
+.chat-trace-grafana { color: #fb923c; }
 
 .chat-debug-notification {
   text-align: center;
