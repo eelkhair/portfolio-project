@@ -9,7 +9,7 @@ import { AccountService } from '../../../core/services/account.service';
 import { ApplicationsListStore } from '../../../core/stores/applications-list.store';
 import { MatchingJobs } from '../../../shared/components/matching-jobs/matching-jobs';
 import { ResumePreviewModal } from '../resume-preview-modal/resume-preview-modal';
-import { ResumeResponse, ProjectDto } from '../../../core/types/resume-data.type';
+import { ResumeResponse, ProjectDto, ResumeSection, SectionStatus, ALL_RESUME_SECTIONS, SECTION_LABELS } from '../../../core/types/resume-data.type';
 import { WorkHistoryDto, EducationDto, CertificationDto } from '../../../core/types/application.type';
 import { Validators } from '@angular/forms';
 
@@ -28,10 +28,10 @@ export class Profile implements OnInit {
 
   protected readonly sections = [
     'Personal Info',
+    'Skills & Preferences',
     'Work History',
     'Education',
     'Certifications',
-    'Skills & Preferences',
     'Projects',
   ];
 
@@ -111,41 +111,37 @@ export class Profile implements OnInit {
       }
     });
 
-    // Apply parsed content only after user confirms
+    // Progressive auto-apply: patches form fields as each section's data arrives
     effect(() => {
-      const status = this.store.profileParseStatus();
-      if (status === 'applied') {
-        const data = this.store.pendingParsedContent();
-        if (data) {
-          this.form.patchValue({
-            phone: data.phone || this.form.value.phone,
-            linkedin: data.linkedin || this.form.value.linkedin,
-            portfolio: data.portfolio || this.form.value.portfolio,
-            about: data.summary || this.form.value.about,
-          });
-          if (data.skills?.length) {
-            this.skillsList.set(data.skills);
-          }
+      const data = this.store.progressiveParsedContent();
+      if (!data) return;
 
-          if (data.workHistory?.length) {
-            this.workHistoryArray.clear();
-            data.workHistory.forEach(wh => this.addWorkHistory(wh));
-          }
-          if (data.education?.length) {
-            this.educationArray.clear();
-            data.education.forEach(ed => this.addEducation(ed));
-          }
-          if (data.certifications?.length) {
-            this.certificationsArray.clear();
-            data.certifications.forEach(cert => this.addCertification(cert));
-          }
-          if (data.projects?.length) {
-            this.projectsArray.clear();
-            data.projects.forEach(proj => this.addProject(proj));
-          }
-          // Clear pending data after applying
-          this.store.pendingParsedContent.set(null);
-        }
+      // Patch contact info + summary
+      this.form.patchValue({
+        phone: data.phone || this.form.value.phone,
+        linkedin: data.linkedin || this.form.value.linkedin,
+        portfolio: data.portfolio || this.form.value.portfolio,
+        about: data.summary || this.form.value.about,
+      });
+      if (data.skills?.length) {
+        this.skillsList.set(data.skills);
+      }
+
+      if (data.workHistory?.length) {
+        this.workHistoryArray.clear();
+        data.workHistory.forEach(wh => this.addWorkHistory(wh));
+      }
+      if (data.education?.length) {
+        this.educationArray.clear();
+        data.education.forEach(ed => this.addEducation(ed));
+      }
+      if (data.certifications?.length) {
+        this.certificationsArray.clear();
+        data.certifications.forEach(cert => this.addCertification(cert));
+      }
+      if (data.projects?.length) {
+        this.projectsArray.clear();
+        data.projects.forEach(proj => this.addProject(proj));
       }
     });
   }
@@ -264,6 +260,13 @@ export class Profile implements OnInit {
   // --- Section nav ---
   goToSection(index: number): void {
     this.activeSection.set(index);
+  }
+
+  readonly parseSections = ALL_RESUME_SECTIONS;
+  readonly parseSectionLabels = SECTION_LABELS;
+
+  sectionStatus(section: ResumeSection): SectionStatus {
+    return this.store.sectionStatuses()[section];
   }
 
   // --- Resume ---

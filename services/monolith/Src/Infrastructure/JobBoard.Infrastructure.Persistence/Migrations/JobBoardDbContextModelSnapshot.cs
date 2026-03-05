@@ -761,6 +761,10 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("FailedSections")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<string>("FileName")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -797,6 +801,10 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                     b.Property<string>("ParsedContent")
                         .HasMaxLength(10000)
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ParsedSections")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<DateTime>("PeriodEnd")
                         .ValueGeneratedOnAddOrUpdate()

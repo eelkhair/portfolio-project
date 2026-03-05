@@ -3,6 +3,7 @@ using JobBoard.API.Helpers;
 using JobBoard.API.Infrastructure.SignalR.ResumeParse;
 using JobBoard.Application.Actions.Jobs.MatchingJobs;
 using JobBoard.Application.Actions.Resumes.CompleteParse;
+using JobBoard.Application.Actions.Resumes.SectionParsed;
 using JobBoard.Application.Actions.Resumes.Delete;
 using JobBoard.Application.Actions.Resumes.Download;
 using JobBoard.Application.Actions.Resumes.FailParse;
@@ -181,6 +182,62 @@ public class ResumesController(IUserAccessor accessor, IResumeParseNotifier resu
     {
         await resumeParseNotifier.NotifyEmbeddedAsync(
             request.ResumeUId, request.UserId, cancellationToken);
+
+        return Ok();
+    }
+
+    /// <summary>
+    /// Callback from AI service after a single section is parsed.
+    /// </summary>
+    [HttpPost("section-parsed")]
+    [Authorize(Policy = "DaprInternal")]
+    public async Task<IActionResult> ResumeSectionParsed([FromBody] ResumeSectionParsedModel request,
+        CancellationToken cancellationToken)
+    {
+        accessor.UserId = request.UserId;
+
+        await ExecuteCommandAsync(new CompleteResumeSectionParseCommand(request), Ok);
+
+        await resumeParseNotifier.NotifySectionParsedAsync(
+            request.ResumeUId, request.UserId, request.Section,
+            request.CurrentPage, cancellationToken);
+
+        return Ok();
+    }
+
+    /// <summary>
+    /// Callback from AI service when a section extraction fails.
+    /// </summary>
+    [HttpPost("section-failed")]
+    [Authorize(Policy = "DaprInternal")]
+    public async Task<IActionResult> ResumeSectionFailed([FromBody] ResumeSectionFailedModel request,
+        CancellationToken cancellationToken)
+    {
+        accessor.UserId = request.UserId;
+
+        await ExecuteCommandAsync(new FailResumeSectionParseCommand(request), Ok);
+
+        await resumeParseNotifier.NotifySectionFailedAsync(
+            request.ResumeUId, request.UserId, request.Section,
+            request.CurrentPage, cancellationToken);
+
+        return Ok();
+    }
+
+    /// <summary>
+    /// Callback from AI service after all sections have been processed.
+    /// </summary>
+    [HttpPost("all-sections-completed")]
+    [Authorize(Policy = "DaprInternal")]
+    public async Task<IActionResult> AllSectionsCompleted([FromBody] ResumeAllSectionsCompletedModel request,
+        CancellationToken cancellationToken)
+    {
+        accessor.UserId = request.UserId;
+
+        await ExecuteCommandAsync(new CompleteAllSectionsCommand(request), Ok);
+
+        await resumeParseNotifier.NotifyAllSectionsCompletedAsync(
+            request.ResumeUId, request.UserId, request.CurrentPage, cancellationToken);
 
         return Ok();
     }

@@ -37,6 +37,12 @@ public class ResumeConfiguration : IEntityTypeConfiguration<Resume>
         builder.Property(r => r.ParseRetryCount)
             .HasDefaultValue(0);
 
+        builder.Property(r => r.ParsedSections)
+            .HasMaxLength(200);
+
+        builder.Property(r => r.FailedSections)
+            .HasMaxLength(200);
+
         builder.Property(r => r.IsDefault)
             .HasDefaultValue(false);
 

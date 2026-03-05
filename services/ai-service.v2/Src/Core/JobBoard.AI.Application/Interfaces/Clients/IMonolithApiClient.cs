@@ -19,6 +19,9 @@ public interface IMonolithApiClient
     Task NotifyResumeParseFailedAsync(ResumeParseFailedRequest model, CancellationToken ct);
     Task NotifyResumeEmbeddedAsync(ResumeEmbeddedRequest model, CancellationToken ct);
     Task<ResumeParsedContentResponse?> GetResumeParsedContentAsync(Guid resumeUId, CancellationToken ct);
+    Task NotifySectionParsedAsync(ResumeSectionParsedRequest model, CancellationToken ct);
+    Task NotifySectionFailedAsync(ResumeSectionFailedRequest model, CancellationToken ct);
+    Task NotifyAllSectionsCompletedAsync(ResumeAllSectionsCompletedRequest model, CancellationToken ct);
 }
 
 public class ResumeParseCompletedRequest
@@ -74,4 +77,29 @@ public class UpdateCompanyCommand
     public string? Size { get; set; }
     public string? Logo { get; set; }
     public Guid IndustryUId { get; set; }
+}
+
+public class ResumeSectionParsedRequest
+{
+    public Guid ResumeUId { get; set; }
+    public string Section { get; set; } = string.Empty;
+    public object SectionContent { get; set; } = null!;
+    public string UserId { get; set; } = string.Empty;
+    public string? CurrentPage { get; set; }
+}
+
+public class ResumeSectionFailedRequest
+{
+    public Guid ResumeUId { get; set; }
+    public string Section { get; set; } = string.Empty;
+    public string Reason { get; set; } = string.Empty;
+    public string UserId { get; set; } = string.Empty;
+    public string? CurrentPage { get; set; }
+}
+
+public class ResumeAllSectionsCompletedRequest
+{
+    public Guid ResumeUId { get; set; }
+    public string UserId { get; set; } = string.Empty;
+    public string? CurrentPage { get; set; }
 }

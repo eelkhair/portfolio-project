@@ -1,10 +1,19 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import mammoth from 'mammoth';
 import { propagation, ROOT_CONTEXT, SpanKind, trace } from '@opentelemetry/api';
 import { ApiService } from '../services/api.service';
 import { MatchingJob } from '../types/job.type';
-import { ResumeData, ResumeResponse, UserProfile, UserProfileRequest } from '../types/resume-data.type';
+import {
+  ALL_RESUME_SECTIONS,
+  ResumeData,
+  ResumeResponse,
+  ResumeSection,
+  SECTION_LABELS,
+  SectionStatus,
+  UserProfile,
+  UserProfileRequest,
+} from '../types/resume-data.type';
 
 @Injectable({ providedIn: 'root' })
 export class ProfileStore {
@@ -24,11 +33,34 @@ export class ProfileStore {
   readonly uploading = signal(false);
   readonly uploadError = signal<string | null>(null);
 
-  // Resume parse confirmation (profile page)
-  readonly profileParseStatus = signal<'idle' | 'parsing' | 'ready' | 'applied' | 'error' | 'retrying'>('idle');
-  readonly pendingParsedContent = signal<ResumeData | null>(null);
+  // Progressive parse state
+  readonly profileParseStatus = signal<'idle' | 'parsing' | 'partial' | 'complete' | 'error' | 'retrying'>('idle');
+  readonly sectionStatuses = signal<Record<ResumeSection, SectionStatus>>({
+    quick: 'pending',
+    workHistory: 'pending',
+    education: 'pending',
+    certifications: 'pending',
+    projects: 'pending',
+  });
+  readonly currentParsingSection = signal<string | null>(null);
+  readonly progressiveParsedContent = signal<ResumeData | null>(null);
   readonly lastUploadedResumeId = signal<string | null>(null);
   readonly lastUploadedFileName = signal('');
+
+  // Backward compat — old flow still uses these
+  readonly pendingParsedContent = signal<ResumeData | null>(null);
+
+  // Computed: how many sections are done or failed
+  readonly sectionsComplete = computed(() => {
+    const statuses = this.sectionStatuses();
+    return ALL_RESUME_SECTIONS.filter(s => statuses[s] === 'done' || statuses[s] === 'failed').length;
+  });
+
+  readonly currentParsingSectionLabel = computed(() => {
+    const section = this.currentParsingSection();
+    if (!section) return null;
+    return SECTION_LABELS[section as ResumeSection] ?? section;
+  });
 
   // Default resume parsed content (for summary display)
   readonly defaultResumeParsedContent = signal<ResumeData | null>(null);
@@ -113,9 +145,6 @@ export class ProfileStore {
         this.matchingJobsLoading.set(false);
       },
       error: (err) => {
-        // 404 = no default resume / no embeddings yet
-        // 401 = token not ready (race with auth interceptor)
-        // Both are expected — silently show empty state
         if (err?.status === 404 || err?.status === 401) {
           this.matchingJobs.set([]);
         } else {
@@ -131,8 +160,19 @@ export class ProfileStore {
   uploadResume(file: File): void {
     this.uploading.set(true);
     this.uploadError.set(null);
+    this.progressiveParsedContent.set(null);
     this.pendingParsedContent.set(null);
     this.lastUploadedFileName.set(file.name);
+
+    // Reset section statuses
+    this.sectionStatuses.set({
+      quick: 'pending',
+      workHistory: 'pending',
+      education: 'pending',
+      certifications: 'pending',
+      projects: 'pending',
+    });
+    this.currentParsingSection.set('quick');
 
     const currentPage = this.router.url;
 
@@ -142,7 +182,7 @@ export class ProfileStore {
         this.uploading.set(false);
         this.lastUploadedResumeId.set(resume.id);
         this.profileParseStatus.set('parsing');
-        // Parsed content arrives asynchronously via SignalR
+        this.sectionStatuses.update(s => ({ ...s, quick: 'parsing' }));
       },
       error: (err) => {
         this.uploading.set(false);
@@ -152,7 +192,72 @@ export class ProfileStore {
     });
   }
 
-  /** Called by ResumeRealtimeService when SignalR "ResumeParsed" arrives */
+  /** Called when SignalR "ResumeSectionParsed" arrives */
+  onSectionParsed(resumeId: string, section: ResumeSection, traceParent?: string): void {
+    if (this.lastUploadedResumeId() !== resumeId) return;
+    this.lastTraceParent = traceParent;
+
+    // Mark this section done
+    this.sectionStatuses.update(s => ({ ...s, [section]: 'done' }));
+
+    // Determine next section being parsed
+    const nextSection = this.getNextPendingSection();
+    if (nextSection) {
+      this.currentParsingSection.set(nextSection);
+      this.sectionStatuses.update(s => ({ ...s, [nextSection]: 'parsing' }));
+    } else {
+      this.currentParsingSection.set(null);
+    }
+
+    this.profileParseStatus.set('partial');
+
+    // Fetch latest merged parsed content from API and auto-apply
+    this.api.getResumeParsedContent(resumeId, traceParent).subscribe({
+      next: (data) => {
+        if (data) {
+          this.progressiveParsedContent.set(data);
+          this.defaultResumeParsedContent.set(data);
+        }
+      },
+      error: () => {}, // Non-critical — next section will re-fetch
+    });
+  }
+
+  /** Called when SignalR "ResumeSectionFailed" arrives */
+  onSectionFailed(resumeId: string, section: ResumeSection): void {
+    if (this.lastUploadedResumeId() !== resumeId) return;
+
+    this.sectionStatuses.update(s => ({ ...s, [section]: 'failed' }));
+
+    const nextSection = this.getNextPendingSection();
+    if (nextSection) {
+      this.currentParsingSection.set(nextSection);
+      this.sectionStatuses.update(s => ({ ...s, [nextSection]: 'parsing' }));
+    } else {
+      this.currentParsingSection.set(null);
+    }
+  }
+
+  /** Called when SignalR "ResumeAllSectionsCompleted" arrives */
+  onAllSectionsCompleted(resumeId: string, traceParent?: string): void {
+    if (this.lastUploadedResumeId() !== resumeId) return;
+
+    this.profileParseStatus.set('complete');
+    this.currentParsingSection.set(null);
+
+    // Fetch final merged content
+    this.api.getResumeParsedContent(resumeId, traceParent).subscribe({
+      next: (data) => {
+        if (data) {
+          this.progressiveParsedContent.set(data);
+          this.defaultResumeParsedContent.set(data);
+        }
+      },
+      error: () => {},
+    });
+  }
+
+  /** Backward compat: called by old "ResumeParsed" SignalR message */
   onResumeParsed(resumeId: string, traceParent?: string): void {
     if (this.lastUploadedResumeId() !== resumeId) return;
     this.lastTraceParent = traceParent;
@@ -160,8 +265,9 @@ export class ProfileStore {
     this.api.getResumeParsedContent(resumeId, traceParent).subscribe({
       next: (data) => {
         if (data) {
-          this.pendingParsedContent.set(data);
-          this.profileParseStatus.set('ready');
+          this.progressiveParsedContent.set(data);
+          this.defaultResumeParsedContent.set(data);
+          this.profileParseStatus.set('complete');
         }
       },
       error: () => this.profileParseStatus.set('error'),
@@ -170,8 +276,6 @@ export class ProfileStore {
 
   /** Called by ResumeRealtimeService when SignalR "ResumeEmbedded" arrives */
   onResumeEmbedded(_resumeId: string, traceParent?: string): void {
-    // Always refresh — the API uses the default resume regardless,
-    // so a redundant call after a non-default embed is harmless.
     this.loadMatchingJobs(traceParent);
   }
 
@@ -185,37 +289,36 @@ export class ProfileStore {
   recoverIfParsing(): void {
     const status = this.profileParseStatus();
     const id = this.lastUploadedResumeId();
-    if (!id || (status !== 'parsing' && status !== 'retrying')) return;
+    if (!id || (status !== 'parsing' && status !== 'partial' && status !== 'retrying')) return;
 
     this.api.getResumeParsedContent(id).subscribe({
       next: (data) => {
         if (data) {
-          this.pendingParsedContent.set(data);
-          this.profileParseStatus.set('ready');
+          this.progressiveParsedContent.set(data);
+          this.defaultResumeParsedContent.set(data);
+          // Check if we should consider it complete
+          // (conservative: keep polling until AllSectionsCompleted arrives)
         }
-        // null → still processing, stay in current state
       },
       error: () => this.profileParseStatus.set('error'),
     });
   }
 
-  /** User confirms they want AI-parsed data applied to the profile form */
+  /** User confirms they want AI-parsed data applied to the profile form (backward compat) */
   applyParsedContent(): void {
     this.emitUserDecisionSpan('applied');
-    // Update default resume summary from the parsed content
     const pending = this.pendingParsedContent();
     if (pending) {
       this.defaultResumeParsedContent.set(pending);
     }
-    this.profileParseStatus.set('applied');
-    // pendingParsedContent stays available for the component effect to read
+    this.profileParseStatus.set('complete');
   }
 
-  /** User declines AI auto-fill */
+  /** User declines AI auto-fill (backward compat) */
   dismissParsedContent(): void {
     this.emitUserDecisionSpan('dismissed');
     this.pendingParsedContent.set(null);
-    this.profileParseStatus.set('applied');
+    this.profileParseStatus.set('idle');
   }
 
   setDefaultResume(id: string): void {
@@ -321,6 +424,11 @@ export class ProfileStore {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+  }
+
+  private getNextPendingSection(): ResumeSection | null {
+    const statuses = this.sectionStatuses();
+    return ALL_RESUME_SECTIONS.find(s => statuses[s] === 'pending') ?? null;
   }
 
   private emitUserDecisionSpan(decision: 'applied' | 'dismissed'): void {

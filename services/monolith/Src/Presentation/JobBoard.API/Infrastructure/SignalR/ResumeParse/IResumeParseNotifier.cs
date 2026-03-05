@@ -10,4 +10,13 @@ public interface IResumeParseNotifier
         bool isFinal, CancellationToken cancellationToken);
 
     Task NotifyEmbeddedAsync(Guid resumeUId, string userId, CancellationToken cancellationToken);
+
+    Task NotifySectionParsedAsync(Guid resumeUId, string userId, string section, string? currentPage,
+        CancellationToken cancellationToken);
+
+    Task NotifySectionFailedAsync(Guid resumeUId, string userId, string section, string? currentPage,
+        CancellationToken cancellationToken);
+
+    Task NotifyAllSectionsCompletedAsync(Guid resumeUId, string userId, string? currentPage,
+        CancellationToken cancellationToken);
 }
