@@ -28,8 +28,8 @@ public class WorkHistoryDto
 {
     public string Company { get; set; } = string.Empty;
     public string JobTitle { get; set; } = string.Empty;
-    public DateTime StartDate { get; set; }
-    public DateTime? EndDate { get; set; }
+    public string? StartDate { get; set; }
+    public string? EndDate { get; set; }
     public string? Description { get; set; }
     public bool IsCurrent { get; set; }
 }
@@ -39,15 +39,15 @@ public class EducationDto
     public string Institution { get; set; } = string.Empty;
     public string Degree { get; set; } = string.Empty;
     public string? FieldOfStudy { get; set; }
-    public DateTime StartDate { get; set; }
-    public DateTime? EndDate { get; set; }
+    public string? StartDate { get; set; }
+    public string? EndDate { get; set; }
 }
 
 public class CertificationDto
 {
     public string Name { get; set; } = string.Empty;
     public string? IssuingOrganization { get; set; }
-    public DateTime? IssueDate { get; set; }
-    public DateTime? ExpirationDate { get; set; }
+    public string? IssueDate { get; set; }
+    public string? ExpirationDate { get; set; }
     public string? CredentialId { get; set; }
 }

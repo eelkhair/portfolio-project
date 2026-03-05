@@ -73,6 +73,7 @@
           [loading]="profileStore.matchingJobsLoading()"
           [error]="profileStore.matchingJobsError()"
           [hasResumes]="profileStore.resumes().length > 0"
+          (reEmbedClick)="profileStore.reEmbedDefaultResume()"
         />
       </div>
     </div>

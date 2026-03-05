@@ -10,4 +10,8 @@
         <Version>1.0.3</Version>
     </PropertyGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\JobBoard.IntegrationEvents\JobBoard.IntegrationEvents.csproj" />
+    </ItemGroup>
+
 </Project>

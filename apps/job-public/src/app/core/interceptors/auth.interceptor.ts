@@ -2,8 +2,11 @@ import { HttpInterceptorFn } from '@angular/common/http';
 import { inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformServer } from '@angular/common';
 import { AuthService } from '@auth0/auth0-angular';
-import { switchMap, first, catchError } from 'rxjs';
+import { switchMap, first, catchError, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
+
+/** Endpoints that don't require authentication */
+const PUBLIC_PATHS = ['/api/public'];
 
 /**
  * SSR-safe HTTP interceptor that attaches Auth0 Bearer tokens
@@ -21,6 +24,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req);
   }
 
+  // Allow public endpoints without auth
+  if (PUBLIC_PATHS.some((p) => req.url.includes(p))) {
+    return next(req);
+  }
+
   const auth = inject(AuthService, { optional: true });
   if (!auth) {
     return next(req);
@@ -34,6 +42,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       });
       return next(authReq);
     }),
-    catchError(() => next(req)),
+    catchError((err) => throwError(() => err)),
   );
 };

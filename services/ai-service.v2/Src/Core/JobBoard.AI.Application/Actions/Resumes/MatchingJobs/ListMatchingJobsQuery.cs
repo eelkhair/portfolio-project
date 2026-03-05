@@ -38,7 +38,11 @@ public class ListMatchingJobsQueryHandler(
             .FirstOrDefaultAsync(e => e.ResumeUId == request.ResumeId, cancellationToken);
 
         if (resume is null)
-            throw new InvalidOperationException($"Resume with ID {request.ResumeId} does not have an embedding.");
+        {
+            activity?.SetTag("matching.mode", "no_embedding");
+            logger.LogInformation("Resume {ResumeId} has no embedding yet — returning empty matches", request.ResumeId);
+            return [];
+        }
 
         var hasSections = resume.SkillsVectorData is not null || resume.ExperienceVectorData is not null;
 

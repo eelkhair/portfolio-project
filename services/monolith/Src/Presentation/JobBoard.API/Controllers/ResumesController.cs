@@ -9,6 +9,7 @@ using JobBoard.Application.Actions.Resumes.Download;
 using JobBoard.Application.Actions.Resumes.FailParse;
 using JobBoard.Application.Actions.Resumes.GetParsedContent;
 using JobBoard.Application.Actions.Resumes.List;
+using JobBoard.Application.Actions.Resumes.ReEmbed;
 using JobBoard.Application.Actions.Resumes.SetDefault;
 using JobBoard.Application.Actions.Resumes.Upload;
 using JobBoard.Application.Infrastructure.Exceptions;
@@ -245,8 +246,14 @@ public class ResumesController(IUserAccessor accessor, IResumeParseNotifier resu
     /// <summary>
     /// Retrieves a list of jobs that match the user's resume.
     /// </summary>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the matching jobs.</returns>
     [HttpGet("jobs/matching")]
     public async Task<IActionResult> GetMatchingJobs(int limit = 10)
         => await ExecuteQueryAsync(new ListMatchingJobsQuery(limit), Ok);
+
+    /// <summary>
+    /// Re-triggers the embedding pipeline for a parsed resume.
+    /// </summary>
+    [HttpPost("{id:guid}/re-embed")]
+    public async Task<IActionResult> ReEmbed(Guid id)
+        => await ExecuteCommandAsync(new ReEmbedResumeCommand(id), Ok);
 }
