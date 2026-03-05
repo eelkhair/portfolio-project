@@ -37,7 +37,12 @@
       "Bash(dotnet sln JobBoard.sln add \"services/monolith/Src/Infrastructure/JobBoard.Infrastructure.BlobStorage/JobBoard.Infrastructure.BlobStorage.csproj\" --solution-folder \"monolith/Src/Infrastructure\")",
       "Bash(npm ls @opentelemetry/resources @opentelemetry/semantic-conventions @opentelemetry/sdk-trace-web @opentelemetry/sdk-trace-base)",
       "Bash(xxd)",
-      "Bash(dotnet ef database update --project services/monolith/Src/Infrastructure/JobBoard.Infrastructure.Persistence/JobBoard.Infrastructure.Persistence.csproj --startup-project services/monolith/Src/Presentation/JobBoard.API/JobBoard.API.csproj)"
+      "Bash(dotnet ef database update --project services/monolith/Src/Infrastructure/JobBoard.Infrastructure.Persistence/JobBoard.Infrastructure.Persistence.csproj --startup-project services/monolith/Src/Presentation/JobBoard.API/JobBoard.API.csproj)",
+      "Bash(dotnet ef migrations add SimplifyEmbeddingVectors --project \"services/ai-service.v2/Src/Infrastructure/JobBoard.AI.Infrastructure.Persistence/JobBoard.AI.Infrastructure.Persistence.csproj\" --startup-project \"services/ai-service.v2/Src/Presentation/JobBoard.AI.API/JobBoard.AI.API.csproj\" --output-dir \"Infrastructure/Data/Migrations\")",
+      "Bash(dotnet ef migrations add SimplifyEmbeddingVectors --project \"Src/Infrastructure/JobBoard.AI.Infrastructure.Persistence/JobBoard.AI.Infrastructure.Persistence.csproj\" --startup-project \"Src/Presentation/JobBoard.AI.API/JobBoard.AI.API.csproj\")",
+      "Bash(dotnet ef database update --project \"Src/Infrastructure/JobBoard.AI.Infrastructure.Persistence/JobBoard.AI.Infrastructure.Persistence.csproj\" --startup-project \"Src/Presentation/JobBoard.AI.API/JobBoard.AI.API.csproj\")",
+      "Bash(dotnet ef migrations add AddProfileAboutAndProjects --project Src/Infrastructure/JobBoard.Infrastructure.Persistence/ --startup-project Src/Presentation/JobBoard.API/)",
+      "Bash(dotnet ef database update --project Src/Infrastructure/JobBoard.Infrastructure.Persistence/ --startup-project Src/Presentation/JobBoard.API/)"
     ]
   }
 }

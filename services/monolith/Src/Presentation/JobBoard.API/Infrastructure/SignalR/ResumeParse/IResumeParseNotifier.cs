@@ -8,4 +8,6 @@ public interface IResumeParseNotifier
 
     Task NotifyParseFailedAsync(Guid resumeUId, string userId, string? currentPage, int attempt, int maxAttempts,
         bool isFinal, CancellationToken cancellationToken);
+
+    Task NotifyEmbeddedAsync(Guid resumeUId, string userId, CancellationToken cancellationToken);
 }

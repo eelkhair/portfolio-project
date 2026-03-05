@@ -89,6 +89,37 @@ public class ChatService(
         };
     }
 
+    public async Task<string> GetTextResponseAsync(string systemPrompt, string userPrompt,
+        CancellationToken cancellationToken)
+    {
+        var client = GetClient();
+        var messages = new[]
+        {
+            new ChatMessage(ChatRole.System, systemPrompt),
+            new ChatMessage(ChatRole.User, userPrompt)
+        };
+        try
+        {
+            var chatOptions = chatOptionsFactory.Create(serviceProvider, ChatScope.Public);
+            var response = await client.GetResponseAsync(
+                messages, chatOptions,
+                cancellationToken: cancellationToken);
+
+            Activity.Current?.SetTag("ai.response.length", response.Text.Length);
+            Activity.Current?.SetTag("ai.tokens.total", response.Usage?.TotalTokenCount ?? 0);
+            Activity.Current?.SetTag("ai.tokens.input", response.Usage?.InputTokenCount ?? 0);
+            Activity.Current?.SetTag("ai.tokens.output", response.Usage?.OutputTokenCount ?? 0);
+
+            return response.Text;
+        }
+        catch (Exception ex)
+        {
+            Activity.Current?.SetTag("ai.error", true);
+            Activity.Current?.SetTag("ai.error.message", ex.Message);
+            throw;
+        }
+    }
+
     public async Task<T> GetResponseAsync<T>(string systemPrompt, string userPrompt, bool allowTools,
         CancellationToken cancellationToken)
     {

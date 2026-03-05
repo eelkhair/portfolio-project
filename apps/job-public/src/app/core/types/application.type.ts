@@ -41,6 +41,7 @@ export interface SubmitApplicationRequest {
   education?: EducationDto[];
   certifications?: CertificationDto[];
   skills?: string[];
+  projects?: { name: string; description?: string; technologies: string[]; url?: string }[];
 }
 
 export interface ApplicationResponse {

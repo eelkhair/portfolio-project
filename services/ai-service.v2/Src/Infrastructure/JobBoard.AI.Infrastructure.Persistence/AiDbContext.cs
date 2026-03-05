@@ -60,8 +60,17 @@ public sealed class AiDbContext : DbContext, IAiDbContext
             b.Property(x => x.VectorData)
                 .HasColumnType("vector(1536)")
                 .IsRequired();
-
             b.Ignore(x => x.Vector);
+
+            b.Property(x => x.SkillsVectorData)
+                .HasColumnName("skills_vector")
+                .HasColumnType("vector(1536)");
+            b.Ignore(x => x.SkillsVector);
+
+            b.Property(x => x.ExperienceVectorData)
+                .HasColumnName("experience_vector")
+                .HasColumnType("vector(1536)");
+            b.Ignore(x => x.ExperienceVector);
 
             b.Property(x => x.Provider)
                 .HasConversion(v => v.Value, v => new(v));

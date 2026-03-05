@@ -6,7 +6,7 @@ import { propagation, ROOT_CONTEXT, SpanKind, SpanStatusCode, trace } from '@ope
 import { environment } from '../../../environments/environment';
 import { ApplicationStore } from '../stores/application.store';
 import { ProfileStore } from '../stores/profile.store';
-import { ResumeParsedMsg, ResumeParseFailedMsg } from '../types/resume-data.type';
+import { ResumeEmbeddedMsg, ResumeParsedMsg, ResumeParseFailedMsg } from '../types/resume-data.type';
 
 @Injectable({ providedIn: 'root' })
 export class ResumeRealtimeService {
@@ -56,9 +56,46 @@ export class ResumeRealtimeService {
         },
         parentCtx,
         (span) => {
+          let hasError = false;
           try {
             this.store.onResumeParsed(msg.resumeId, msg.currentPage, msg.traceParent);
+          } catch (err: any) {
+            hasError = true;
+            span.recordException(err);
+          }
+          try {
             this.profileStore.onResumeParsed(msg.resumeId, msg.traceParent);
+          } catch (err: any) {
+            hasError = true;
+            span.recordException(err);
+          }
+          span.setStatus(
+            hasError
+              ? { code: SpanStatusCode.ERROR, message: 'partial failure' }
+              : { code: SpanStatusCode.OK },
+          );
+          span.end();
+        },
+      );
+    });
+
+    this.hub.on('ResumeEmbedded', (msg: ResumeEmbeddedMsg) => {
+      const parentCtx = this.extractTraceContext(msg);
+      this.tracer.startActiveSpan(
+        'signalr.message.received',
+        {
+          kind: SpanKind.CONSUMER,
+          attributes: {
+            'messaging.system': 'signalr',
+            'messaging.operation': 'process',
+            'messaging.destination.name': 'ResumeEmbedded',
+            'resume.id': msg.resumeId,
+          },
+        },
+        parentCtx,
+        (span) => {
+          try {
+            this.profileStore.onResumeEmbedded(msg.resumeId, msg.traceParent);
             span.setStatus({ code: SpanStatusCode.OK });
           } catch (err: any) {
             span.recordException(err);

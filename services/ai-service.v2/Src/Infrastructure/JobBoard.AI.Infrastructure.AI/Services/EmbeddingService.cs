@@ -38,7 +38,25 @@ public class EmbeddingService(IEmbeddingProviderResolver resolver, IConfiguratio
         return embedding.Vector.ToArray();
     }
 
+    public async Task<IReadOnlyList<float[]>> GenerateBatchEmbeddingsAsync(
+        IReadOnlyList<string> texts,
+        CancellationToken cancellationToken)
+    {
+        using var activity = activityFactory.StartActivity("text.embedding.batch", ActivityKind.Internal);
+        activity?.SetTag("embedding.batch.count", texts.Count);
+        activity?.SetTag("embedding.batch.total_chars", texts.Sum(t => t.Length));
 
+        var client = GetClient();
+        var options = new EmbeddingGenerationOptions { Dimensions = 1536 };
+
+        var tasks = texts.Select(text =>
+            client.GenerateAsync(text, options, cancellationToken));
+
+        var results = await Task.WhenAll(tasks);
+
+        activity?.SetTag("embedding.batch.results", results.Length);
+        return results.Select(e => e.Vector.ToArray()).ToList();
+    }
 }
 
 

@@ -16,6 +16,7 @@ internal static class ProfileMapper
             Phone = profile.Phone,
             LinkedIn = profile.LinkedIn,
             Portfolio = profile.Portfolio,
+            About = profile.About,
             Skills = profile.Skills?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList() ?? [],
             PreferredLocation = profile.PreferredLocation,
             PreferredJobType = profile.PreferredJobType,
@@ -43,6 +44,13 @@ internal static class ProfileMapper
                 IssueDate = cert.IssueDate,
                 ExpirationDate = cert.ExpirationDate,
                 CredentialId = cert.CredentialId
+            }).ToList(),
+            Projects = profile.Projects.Select(proj => new ProjectDto
+            {
+                Name = proj.Name,
+                Description = proj.Description,
+                Technologies = proj.Technologies,
+                Url = proj.Url
             }).ToList()
         };
     }

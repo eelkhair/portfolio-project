@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Job, JobType } from '../types/job.type';
+import { Job, JobType, MatchingJob } from '../types/job.type';
 import { Company } from '../types/company.type';
 import { Stats } from '../types/stats.type';
 import { ApiResponse, PaginatedList } from '../types/api-response.type';
@@ -131,6 +131,14 @@ export class ApiService {
 
   deleteResume(id: string): Observable<void> {
     return this.http.delete<void>(`${this.resumesUrl}/${id}`);
+  }
+
+  getMatchingJobs(limit = 10, traceParent?: string): Observable<MatchingJob[]> {
+    const params = new HttpParams().set('limit', limit);
+    const headers = traceParent ? new HttpHeaders({ traceparent: traceParent }) : undefined;
+    return this.http
+      .get<ApiResponse<MatchingJob[]>>(`${this.resumesUrl}/jobs/matching`, { params, headers })
+      .pipe(map((res) => res.data ?? []));
   }
 
   downloadResumeBlob(id: string): Observable<Blob> {

@@ -45,12 +45,26 @@ public class EmbedResumeCommandHandler(
             return Unit.Value;
         }
 
-        var embeddingText = BuildEmbeddingText(parsedContent);
-        activity?.SetTag("embedding.text.length", embeddingText.Length);
+        // Build section-specific texts
+        var sections = BuildSectionTexts(parsedContent);
 
-        var vector = await embeddingService.GenerateEmbeddingsAsync(embeddingText, cancellationToken);
+        // Collect texts to embed: full + optional skills + optional experience
+        var textsToEmbed = new List<string> { sections.Full };
+        var sectionKeys = new List<string> { "full" };
 
-        var embeddingVector = new EmbeddingVector(vector);
+        if (sections.Skills is not null) { textsToEmbed.Add(sections.Skills); sectionKeys.Add("skills"); }
+        if (sections.Experience is not null) { textsToEmbed.Add(sections.Experience); sectionKeys.Add("experience"); }
+
+        activity?.SetTag("embedding.batch.count", textsToEmbed.Count);
+
+        // Batch embed
+        var vectors = await embeddingService.GenerateBatchEmbeddingsAsync(textsToEmbed, cancellationToken);
+
+        // Map results to named vectors
+        var vectorMap = new Dictionary<string, EmbeddingVector>();
+        for (var i = 0; i < sectionKeys.Count; i++)
+            vectorMap[sectionKeys[i]] = new EmbeddingVector(vectors[i]);
+
         var provider = new ProviderName("openai.embedding");
         var model = new ModelName("text-embedding-3-small");
 
@@ -59,13 +73,20 @@ public class EmbedResumeCommandHandler(
 
         if (existing is not null)
         {
-            existing.Update(embeddingVector, provider, model);
+            existing.Update(
+                vectorMap["full"], provider, model,
+                skillsVector: vectorMap.GetValueOrDefault("skills"),
+                experienceVector: vectorMap.GetValueOrDefault("experience"));
             activity?.SetTag("embedding.upsert", "updated");
             Logger.LogInformation("Updated existing embedding for resume {ResumeUId}", resumeUId);
         }
         else
         {
-            var resumeEmbedding = new ResumeEmbedding(resumeUId, embeddingVector, provider, model);
+            var resumeEmbedding = new ResumeEmbedding(
+                resumeUId,
+                vectorMap["full"], provider, model,
+                skillsVector: vectorMap.GetValueOrDefault("skills"),
+                experienceVector: vectorMap.GetValueOrDefault("experience"));
             await dbContext.ResumeEmbeddings.AddAsync(resumeEmbedding, cancellationToken);
             activity?.SetTag("embedding.upsert", "created");
             Logger.LogInformation("Created new embedding for resume {ResumeUId}", resumeUId);
@@ -73,42 +94,69 @@ public class EmbedResumeCommandHandler(
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
+        await monolithClient.NotifyResumeEmbeddedAsync(new ResumeEmbeddedRequest
+        {
+            ResumeUId = resumeUId,
+            UserId = request.Event.UserId
+        }, cancellationToken);
+
         return Unit.Value;
     }
 
-    private static string BuildEmbeddingText(ResumeParsedContentResponse content)
+    private record SectionTexts(string Full, string? Skills, string? Experience);
+
+    private static SectionTexts BuildSectionTexts(ResumeParsedContentResponse content)
     {
         var skills = content.Skills.Count > 0
-            ? string.Join(", ", content.Skills)
-            : "N/A";
+            ? $"Skills: {string.Join(", ", content.Skills)}"
+            : null;
 
-        var workHistory = content.WorkHistory.Count > 0
-            ? string.Join("\n", content.WorkHistory.Select(w =>
+        var experience = content.WorkHistory.Count > 0
+            ? "Work Experience:\n" + string.Join("\n", content.WorkHistory.Select(w =>
                 $"- {w.JobTitle} at {w.Company}{(string.IsNullOrWhiteSpace(w.Description) ? "" : $": {w.Description}")}"))
-            : "N/A";
+            : null;
 
         var education = content.Education.Count > 0
-            ? string.Join("\n", content.Education.Select(e =>
+            ? "Education:\n" + string.Join("\n", content.Education.Select(e =>
                 $"- {e.Degree}{(string.IsNullOrWhiteSpace(e.FieldOfStudy) ? "" : $" in {e.FieldOfStudy}")} at {e.Institution}"))
-            : "N/A";
+            : null;
 
         var certifications = content.Certifications.Count > 0
-            ? string.Join("\n", content.Certifications.Select(c =>
+            ? "Certifications:\n" + string.Join("\n", content.Certifications.Select(c =>
                 $"- {c.Name}{(string.IsNullOrWhiteSpace(c.IssuingOrganization) ? "" : $" ({c.IssuingOrganization})")}"))
-            : "N/A";
+            : null;
 
-        return $"""
+        var projects = content.Projects.Count > 0
+            ? "Projects:\n" + string.Join("\n", content.Projects.Select(p =>
+                $"- {p.Name}{(string.IsNullOrWhiteSpace(p.Description) ? "" : $": {p.Description}")}" +
+                (p.Technologies.Count > 0 ? $" [{string.Join(", ", p.Technologies)}]" : "")))
+            : null;
+
+        var summary = !string.IsNullOrWhiteSpace(content.Summary)
+            ? content.Summary
+            : null;
+
+        // Full text concatenates all sections for broad semantic coverage
+        var full = $"""
+                Summary:
+                {summary ?? "N/A"}
+
                 Skills:
-                {skills}
+                {skills ?? "N/A"}
 
                 Work History:
-                {workHistory}
+                {experience ?? "N/A"}
 
                 Education:
-                {education}
+                {education ?? "N/A"}
 
                 Certifications:
-                {certifications}
+                {certifications ?? "N/A"}
+
+                Projects:
+                {projects ?? "N/A"}
                 """;
+
+        return new SectionTexts(full, skills, experience);
     }
 }

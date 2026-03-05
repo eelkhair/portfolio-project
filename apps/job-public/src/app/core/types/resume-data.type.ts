@@ -1,5 +1,12 @@
 import { WorkHistoryDto, EducationDto, CertificationDto } from './application.type';
 
+export interface ProjectDto {
+  name: string;
+  description?: string;
+  technologies: string[];
+  url?: string;
+}
+
 export interface ResumeData {
   firstName: string;
   lastName: string;
@@ -11,6 +18,8 @@ export interface ResumeData {
   workHistory?: WorkHistoryDto[];
   education?: EducationDto[];
   certifications?: CertificationDto[];
+  summary?: string;
+  projects?: ProjectDto[];
 }
 
 export interface UserProfile {
@@ -21,24 +30,29 @@ export interface UserProfile {
   phone?: string;
   linkedin?: string;
   portfolio?: string;
+  about?: string;
   skills: string[];
   preferredLocation?: string;
   preferredJobType?: string;
   workHistory?: WorkHistoryDto[];
   education?: EducationDto[];
   certifications?: CertificationDto[];
+  summary?: string;
+  projects?: ProjectDto[];
 }
 
 export interface UserProfileRequest {
   phone?: string;
   linkedin?: string;
   portfolio?: string;
+  about?: string;
   skills?: string[];
   preferredLocation?: string;
   preferredJobType?: string;
   workHistory?: WorkHistoryDto[];
   education?: EducationDto[];
   certifications?: CertificationDto[];
+  projects?: ProjectDto[];
 }
 
 export interface ResumeResponse {
@@ -59,6 +73,12 @@ export type ParseStatus = 'idle' | 'uploading' | 'parsing' | 'ready' | 'parsed' 
 export interface ResumeParsedMsg {
   resumeId: string;
   currentPage?: string;
+  traceParent?: string;
+  traceState?: string;
+}
+
+export interface ResumeEmbeddedMsg {
+  resumeId: string;
   traceParent?: string;
   traceState?: string;
 }

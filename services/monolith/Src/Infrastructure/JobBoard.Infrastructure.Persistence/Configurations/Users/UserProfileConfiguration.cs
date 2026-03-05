@@ -23,6 +23,9 @@ public class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
         builder.Property(p => p.Portfolio)
             .HasMaxLength(300);
 
+        builder.Property(p => p.About)
+            .HasMaxLength(2000);
+
         builder.Property(p => p.Skills)
             .HasMaxLength(1000);
 
@@ -45,6 +48,11 @@ public class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
         builder.OwnsMany(p => p.Certifications, cert =>
         {
             cert.ToJson();
+        });
+
+        builder.OwnsMany(p => p.Projects, proj =>
+        {
+            proj.ToJson();
         });
 
         builder.HasOne(p => p.User)

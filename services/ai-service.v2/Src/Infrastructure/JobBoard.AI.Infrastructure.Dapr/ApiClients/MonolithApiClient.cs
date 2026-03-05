@@ -165,6 +165,22 @@ public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<Mon
         }
     }
 
+    public async Task NotifyResumeEmbeddedAsync(ResumeEmbeddedRequest model, CancellationToken ct)
+    {
+        try
+        {
+            var request = CreateRequest(HttpMethod.Post, "api/resumes/embedded", "monolith-api");
+            request.Content = JsonContent.Create(model);
+            await Client.InvokeMethodAsync(request, ct);
+        }
+        catch (InvocationException ex)
+        {
+            var body = await ex.Response.Content.ReadAsStringAsync(ct);
+            logger.LogError(ex, "Error notifying monolith of resume embedding completion: {Body}", body);
+            throw;
+        }
+    }
+
     public async Task<ResumeParsedContentResponse?> GetResumeParsedContentAsync(Guid resumeUId, CancellationToken ct)
     {
         try

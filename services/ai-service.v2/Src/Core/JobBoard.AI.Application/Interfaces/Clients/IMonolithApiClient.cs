@@ -17,6 +17,7 @@ public interface IMonolithApiClient
     Task<List<CompanyJobSummaryDto>> ListCompanyJobSummariesAsync(CancellationToken ct);
     Task NotifyResumeParseCompletedAsync(ResumeParseCompletedRequest model, CancellationToken ct);
     Task NotifyResumeParseFailedAsync(ResumeParseFailedRequest model, CancellationToken ct);
+    Task NotifyResumeEmbeddedAsync(ResumeEmbeddedRequest model, CancellationToken ct);
     Task<ResumeParsedContentResponse?> GetResumeParsedContentAsync(Guid resumeUId, CancellationToken ct);
 }
 
@@ -34,6 +35,12 @@ public class ResumeParseFailedRequest
     public string Reason { get; set; } = string.Empty;
     public string UserId { get; set; } = string.Empty;
     public string? CurrentPage { get; set; }
+}
+
+public class ResumeEmbeddedRequest
+{
+    public Guid ResumeUId { get; set; }
+    public string UserId { get; set; } = string.Empty;
 }
 
 public sealed class ODataResponse<T>

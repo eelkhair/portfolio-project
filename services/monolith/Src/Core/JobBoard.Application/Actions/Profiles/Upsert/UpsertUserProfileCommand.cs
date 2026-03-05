@@ -47,6 +47,7 @@ public class UpsertUserProfileCommandHandler(
         var workHistory = req.WorkHistory?.Select(MapWorkHistory).ToList();
         var education = req.Education?.Select(MapEducation).ToList();
         var certifications = req.Certifications?.Select(MapCertification).ToList();
+        var projects = req.Projects?.Select(MapProject).ToList();
 
         if (profile is not null)
         {
@@ -54,12 +55,14 @@ public class UpsertUserProfileCommandHandler(
             profile.SetPhone(req.Phone);
             profile.SetLinkedIn(req.LinkedIn);
             profile.SetPortfolio(req.Portfolio);
+            profile.SetAbout(req.About);
             profile.SetSkills(req.Skills != null ? string.Join(",", req.Skills) : null);
             profile.SetPreferredLocation(req.PreferredLocation);
             profile.SetPreferredJobType(req.PreferredJobType);
             profile.SetWorkHistory(workHistory);
             profile.SetEducation(education);
             profile.SetCertifications(certifications);
+            profile.SetProjects(projects);
         }
         else
         {
@@ -72,12 +75,14 @@ public class UpsertUserProfileCommandHandler(
                 Phone = req.Phone,
                 LinkedIn = req.LinkedIn,
                 Portfolio = req.Portfolio,
+                About = req.About,
                 Skills = req.Skills,
                 PreferredLocation = req.PreferredLocation,
                 PreferredJobType = req.PreferredJobType,
                 WorkHistory = workHistory,
                 Education = education,
                 Certifications = certifications,
+                Projects = projects,
                 InternalId = id,
                 UId = uid,
                 CreatedAt = DateTime.UtcNow,
@@ -131,5 +136,13 @@ public class UpsertUserProfileCommandHandler(
         IssueDate = dto.IssueDate,
         ExpirationDate = dto.ExpirationDate,
         CredentialId = dto.CredentialId
+    };
+
+    private static ProjectEntry MapProject(ProjectDto dto) => new()
+    {
+        Name = dto.Name,
+        Description = dto.Description,
+        Technologies = dto.Technologies ?? [],
+        Url = dto.Url
     };
 }
