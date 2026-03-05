@@ -1,6 +1,7 @@
-import { Component, ElementRef, input, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, inject, input, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatchingJob } from '../../../core/types/job.type';
+import { ApplicationsListStore } from '../../../core/stores/applications-list.store';
 
 @Component({
   selector: 'app-matching-jobs',
@@ -8,6 +9,7 @@ import { MatchingJob } from '../../../core/types/job.type';
   templateUrl: './matching-jobs.html',
 })
 export class MatchingJobs {
+  private readonly appStore = inject(ApplicationsListStore);
   jobs = input.required<MatchingJob[]>();
   loading = input(false);
   error = input<string | null>(null);
@@ -17,14 +19,19 @@ export class MatchingJobs {
   readonly canScrollLeft = signal(false);
   readonly canScrollRight = signal(true);
 
-  matchColor(similarity: number): string {
-    if (similarity >= 0.8) return 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400';
-    if (similarity >= 0.6) return 'bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400';
-    return 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400';
+  isApplied(jobId: string): boolean {
+    return this.appStore.appliedJobIds().has(jobId);
   }
 
   matchPercent(similarity: number): string {
     return Math.round(similarity * 100) + '%';
+  }
+
+  matchLevel(similarity: number): string {
+    const pct = Math.round(similarity * 100);
+    if (pct >= 80) return 'high';
+    if (pct >= 60) return 'medium';
+    return 'low';
   }
 
   scroll(direction: 'left' | 'right'): void {

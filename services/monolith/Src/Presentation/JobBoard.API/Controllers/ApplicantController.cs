@@ -1,3 +1,4 @@
+using JobBoard.Application.Actions.Applications.List;
 using JobBoard.Application.Actions.Applications.Submit;
 using JobBoard.Application.Actions.Profiles.Get;
 using JobBoard.Application.Actions.Profiles.Upsert;
@@ -27,6 +28,15 @@ public class ApplicantController : BaseApiController
     public async Task<IActionResult> UpsertProfile([FromBody] UserProfileRequest request)
     {
         return await ExecuteCommandAsync(new UpsertUserProfileCommand(request), Ok);
+    }
+
+    /// <summary>
+    /// Lists all applications submitted by the authenticated user.
+    /// </summary>
+    [HttpGet("applications")]
+    public async Task<IActionResult> GetApplications()
+    {
+        return await ExecuteQueryAsync(new ListUserApplicationsQuery(), Ok);
     }
 
     /// <summary>

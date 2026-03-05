@@ -11,6 +11,7 @@ public class SubmitApplicationRequest
     public List<EducationDto>? Education { get; set; }
     public List<CertificationDto>? Certifications { get; set; }
     public List<string>? Skills { get; set; }
+    public List<ProjectDto>? Projects { get; set; }
 }
 
 public class PersonalInfoDto

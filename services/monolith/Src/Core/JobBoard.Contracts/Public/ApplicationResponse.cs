@@ -14,4 +14,5 @@ public class ApplicationResponse
     public List<EducationDto>? Education { get; set; }
     public List<CertificationDto>? Certifications { get; set; }
     public List<string>? Skills { get; set; }
+    public List<ProjectDto>? Projects { get; set; }
 }

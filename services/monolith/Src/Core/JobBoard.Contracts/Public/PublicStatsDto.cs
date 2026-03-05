@@ -4,4 +4,5 @@ public class PublicStatsDto
 {
     public int JobCount { get; set; }
     public int CompanyCount { get; set; }
+    public int ApplicationCount { get; set; }
 }
