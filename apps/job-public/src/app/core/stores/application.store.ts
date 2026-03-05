@@ -142,6 +142,7 @@ export class ApplicationStore {
       education?: EducationDto[];
       certifications?: CertificationDto[];
       skills?: string[];
+      projects?: { name: string; description?: string; technologies: string[]; url?: string }[];
     },
   ): void {
     this.applicationStatus.set('submitting');
@@ -156,6 +157,7 @@ export class ApplicationStore {
       education: applicationData?.education,
       certifications: applicationData?.certifications,
       skills: applicationData?.skills,
+      projects: applicationData?.projects,
     };
 
     // Sequential: save profile first, then submit application

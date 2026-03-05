@@ -3,6 +3,7 @@ using System;
 using JobBoard.AI.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pgvector;
@@ -12,9 +13,11 @@ using Pgvector;
 namespace JobBoard.AI.Infrastructure.Persistence.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AiDbContext))]
-    partial class AiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260305032633_SectionLevelEmbeddings")]
+    partial class SectionLevelEmbeddings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -105,8 +108,16 @@ namespace JobBoard.AI.Infrastructure.Persistence.Infrastructure.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Vector>("CertificationsVectorData")
+                        .HasColumnType("vector(1536)")
+                        .HasColumnName("certifications_vector");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<Vector>("EducationVectorData")
+                        .HasColumnType("vector(1536)")
+                        .HasColumnName("education_vector");
 
                     b.Property<Vector>("ExperienceVectorData")
                         .HasColumnType("vector(1536)")
@@ -115,6 +126,10 @@ namespace JobBoard.AI.Infrastructure.Persistence.Infrastructure.Data.Migrations
                     b.Property<string>("Model")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<Vector>("ProjectsVectorData")
+                        .HasColumnType("vector(1536)")
+                        .HasColumnName("projects_vector");
 
                     b.Property<string>("Provider")
                         .IsRequired()
@@ -126,6 +141,10 @@ namespace JobBoard.AI.Infrastructure.Persistence.Infrastructure.Data.Migrations
                     b.Property<Vector>("SkillsVectorData")
                         .HasColumnType("vector(1536)")
                         .HasColumnName("skills_vector");
+
+                    b.Property<Vector>("SummaryVectorData")
+                        .HasColumnType("vector(1536)")
+                        .HasColumnName("summary_vector");
 
                     b.Property<Vector>("VectorData")
                         .IsRequired()

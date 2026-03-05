@@ -18,6 +18,7 @@ public class UserProfile : BaseAuditableEntity
     public string? Phone { get; private set; }
     public string? LinkedIn { get; private set; }
     public string? Portfolio { get; private set; }
+    public string? About { get; private set; }
     public string? Skills { get; private set; }
     public string? PreferredLocation { get; private set; }
     public JobType? PreferredJobType { get; private set; }
@@ -25,18 +26,21 @@ public class UserProfile : BaseAuditableEntity
     public List<WorkHistoryEntry> WorkHistory { get; private set; } = [];
     public List<EducationEntry> Education { get; private set; } = [];
     public List<CertificationEntry> Certifications { get; private set; } = [];
+    public List<ProjectEntry> Projects { get; private set; } = [];
 
     internal void SetUser(int userId) => UserId = userId;
 
     public void SetPhone(string? phone) => Phone = phone?.Trim();
     public void SetLinkedIn(string? linkedIn) => LinkedIn = linkedIn?.Trim();
     public void SetPortfolio(string? portfolio) => Portfolio = portfolio?.Trim();
+    public void SetAbout(string? about) => About = about?.Trim();
     public void SetSkills(string? skills) => Skills = skills?.Trim();
     public void SetPreferredLocation(string? location) => PreferredLocation = location?.Trim();
     public void SetPreferredJobType(JobType? jobType) => PreferredJobType = jobType;
     public void SetWorkHistory(List<WorkHistoryEntry>? workHistory) => WorkHistory = workHistory ?? [];
     public void SetEducation(List<EducationEntry>? education) => Education = education ?? [];
     public void SetCertifications(List<CertificationEntry>? certifications) => Certifications = certifications ?? [];
+    public void SetProjects(List<ProjectEntry>? projects) => Projects = projects ?? [];
 
     public static UserProfile Create(UserProfileInput input)
     {
@@ -52,12 +56,14 @@ public class UserProfile : BaseAuditableEntity
             Phone = input.Phone?.Trim(),
             LinkedIn = input.LinkedIn?.Trim(),
             Portfolio = input.Portfolio?.Trim(),
+            About = input.About?.Trim(),
             Skills = input.Skills != null ? string.Join(",", input.Skills) : null,
             PreferredLocation = input.PreferredLocation?.Trim(),
             PreferredJobType = input.PreferredJobType,
             WorkHistory = input.WorkHistory ?? [],
             Education = input.Education ?? [],
-            Certifications = input.Certifications ?? []
+            Certifications = input.Certifications ?? [],
+            Projects = input.Projects ?? []
         };
 
         profile.SetUser(input.UserId);

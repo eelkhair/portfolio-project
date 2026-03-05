@@ -44,6 +44,15 @@ public class ParseResumePrompt : IAiPrompt<ResumeParseRequest>
                                            "expirationDate": "YYYY-MM-DD or null",
                                            "credentialId": "string or null"
                                          }
+                                       ],
+                                       "summary": "string — 2-3 sentence professional summary capturing key strengths, experience level, and primary domain",
+                                       "projects": [
+                                         {
+                                           "name": "string",
+                                           "description": "string or null",
+                                           "technologies": ["string"],
+                                           "url": "string or null"
+                                         }
                                        ]
                                      }
                                      """;
@@ -63,6 +72,8 @@ public class ParseResumePrompt : IAiPrompt<ResumeParseRequest>
                - Skills: extract individual skills as short tokens (e.g. "Python", "AWS", "React"), not full sentences.
                - LinkedIn/portfolio: include full URL if present. If only a username/handle, prefix with the appropriate domain.
                - Phone: normalize to a consistent format if possible, otherwise keep as-is.
+               - Projects: extract portfolio projects, side projects, or open-source contributions. Include technologies used if listed.
+               - Summary: generate a concise 2-3 sentence professional summary capturing the candidate's key strengths, experience level, and primary domain. This is the ONLY field you generate — all other fields are extracted verbatim.
                - Output JSON ONLY. No markdown fences, no commentary, no extra keys.
                - Prompt version: 0.1. Scope: resume parsing only.
                """.Trim();

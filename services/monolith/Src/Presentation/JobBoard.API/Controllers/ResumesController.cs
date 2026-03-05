@@ -172,14 +172,24 @@ public class ResumesController(IUserAccessor accessor, IResumeParseNotifier resu
     }
     
     /// <summary>
+    /// Callback from AI service after resume embedding completes successfully.
+    /// </summary>
+    [HttpPost("embedded")]
+    [Authorize(Policy = "DaprInternal")]
+    public async Task<IActionResult> ResumeEmbedded([FromBody] ResumeEmbeddedModel request,
+        CancellationToken cancellationToken)
+    {
+        await resumeParseNotifier.NotifyEmbeddedAsync(
+            request.ResumeUId, request.UserId, cancellationToken);
+
+        return Ok();
+    }
+
+    /// <summary>
     /// Retrieves a list of jobs that match the user's resume.
     /// </summary>
     /// <returns>A task that represents the asynchronous operation. The task result contains the matching jobs.</returns>
     [HttpGet("jobs/matching")]
     public async Task<IActionResult> GetMatchingJobs(int limit = 10)
-    {
-        var jobs = await ExecuteQueryAsync(new ListMatchingJobsQuery(limit), Ok);
-       
-        return Ok(jobs);
-    }
+        => await ExecuteQueryAsync(new ListMatchingJobsQuery(limit), Ok);
 }

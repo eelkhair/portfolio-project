@@ -59,6 +59,26 @@
   </div>
 </section>
 
+<!-- Jobs For You (authenticated users only) -->
+@if (account.isAuthenticated()) {
+  <section class="bg-slate-50 dark:bg-slate-900/50">
+    <div class="mx-auto max-w-7xl px-6 py-16">
+      <div>
+        <h2 class="section-heading text-3xl">Jobs For You</h2>
+        <p class="mt-2 section-subheading">AI-matched positions based on your resume.</p>
+      </div>
+      <div class="mt-8">
+        <app-matching-jobs
+          [jobs]="profileStore.matchingJobs()"
+          [loading]="profileStore.matchingJobsLoading()"
+          [error]="profileStore.matchingJobsError()"
+          [hasResumes]="profileStore.resumes().length > 0"
+        />
+      </div>
+    </div>
+  </section>
+}
+
 <!-- Latest Jobs -->
 <section class="mx-auto max-w-7xl px-6 py-16">
   <div class="flex items-center justify-between">

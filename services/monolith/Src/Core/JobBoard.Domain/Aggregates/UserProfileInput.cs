@@ -9,12 +9,14 @@ public class UserProfileInput
     public string? Phone { get; set; }
     public string? LinkedIn { get; set; }
     public string? Portfolio { get; set; }
+    public string? About { get; set; }
     public List<string>? Skills { get; set; }
     public string? PreferredLocation { get; set; }
     public JobType? PreferredJobType { get; set; }
     public List<WorkHistoryEntry>? WorkHistory { get; set; }
     public List<EducationEntry>? Education { get; set; }
     public List<CertificationEntry>? Certifications { get; set; }
+    public List<ProjectEntry>? Projects { get; set; }
 
     public DateTime? CreatedAt { get; set; }
     public string? CreatedBy { get; set; }

@@ -267,6 +267,10 @@ public sealed class AiServiceClient(
         CancellationToken cancellationToken)
     {
         using var activity = activityFactory.StartActivity("ai-service-v2.get-matching-jobs", ActivityKind.Internal);
+        EnrichActivity(null, "get-matching-jobs", AiServiceV2);
+        activity?.SetTag("resume.id", resumeId);
+        activity?.SetTag("matching.limit", requestLimit);
+
         var request = CreateRequest(
             HttpMethod.Get,
             $"resumes/{resumeId}/matching?limit={requestLimit}",

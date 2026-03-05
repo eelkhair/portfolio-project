@@ -6,14 +6,15 @@ import { LoadingSpinner } from '../../../shared/components/loading-spinner';
 import { ConfirmDialog } from '../../../shared/components/confirm-dialog';
 import { ProfileStore } from '../../../core/stores/profile.store';
 import { AccountService } from '../../../core/services/account.service';
+import { MatchingJobs } from '../../../shared/components/matching-jobs/matching-jobs';
 import { ResumePreviewModal } from '../resume-preview-modal/resume-preview-modal';
-import { ResumeResponse } from '../../../core/types/resume-data.type';
+import { ResumeResponse, ProjectDto } from '../../../core/types/resume-data.type';
 import { WorkHistoryDto, EducationDto, CertificationDto } from '../../../core/types/application.type';
 import { Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-profile',
-  imports: [ReactiveFormsModule, RouterLink, LoadingSpinner, DatePipe, ResumePreviewModal, ConfirmDialog],
+  imports: [ReactiveFormsModule, RouterLink, LoadingSpinner, DatePipe, MatchingJobs, ResumePreviewModal, ConfirmDialog],
   templateUrl: './profile.html',
 })
 export class Profile implements OnInit {
@@ -24,23 +25,28 @@ export class Profile implements OnInit {
   protected readonly activeSection = signal(0);
 
   protected readonly sections = [
-    'Contact & Links',
+    'Personal Info',
     'Work History',
     'Education',
     'Certifications',
     'Skills & Preferences',
+    'Projects',
   ];
+
+  protected readonly skillsList = signal<string[]>([]);
+  protected readonly newSkill = signal('');
 
   protected readonly form = this.fb.group({
     phone: [''],
     linkedin: [''],
     portfolio: [''],
-    skills: [''],
+    about: [''],
     preferredLocation: [''],
     preferredJobType: [''],
     workHistory: this.fb.array<FormGroup>([]),
     education: this.fb.array<FormGroup>([]),
     certifications: this.fb.array<FormGroup>([]),
+    projects: this.fb.array<FormGroup>([]),
   });
 
   get parsedFields() {
@@ -65,6 +71,10 @@ export class Profile implements OnInit {
     return this.form.controls.certifications;
   }
 
+  get projectsArray(): FormArray {
+    return this.form.controls.projects;
+  }
+
   constructor() {
     // Pre-fill form when profile loads
     effect(() => {
@@ -74,10 +84,11 @@ export class Profile implements OnInit {
           phone: profile.phone ?? '',
           linkedin: profile.linkedin ?? '',
           portfolio: profile.portfolio ?? '',
-          skills: profile.skills.join(', '),
+          about: profile.about ?? '',
           preferredLocation: profile.preferredLocation ?? '',
           preferredJobType: profile.preferredJobType ?? '',
         });
+        this.skillsList.set(profile.skills ?? []);
 
         if (profile.workHistory?.length) {
           this.workHistoryArray.clear();
@@ -90,6 +101,10 @@ export class Profile implements OnInit {
         if (profile.certifications?.length) {
           this.certificationsArray.clear();
           profile.certifications.forEach(cert => this.addCertification(cert));
+        }
+        if (profile.projects?.length) {
+          this.projectsArray.clear();
+          profile.projects.forEach(proj => this.addProject(proj));
         }
       }
     });
@@ -104,8 +119,11 @@ export class Profile implements OnInit {
             phone: data.phone || this.form.value.phone,
             linkedin: data.linkedin || this.form.value.linkedin,
             portfolio: data.portfolio || this.form.value.portfolio,
-            skills: data.skills.length > 0 ? data.skills.join(', ') : this.form.value.skills,
+            about: data.summary || this.form.value.about,
           });
+          if (data.skills?.length) {
+            this.skillsList.set(data.skills);
+          }
 
           if (data.workHistory?.length) {
             this.workHistoryArray.clear();
@@ -119,6 +137,10 @@ export class Profile implements OnInit {
             this.certificationsArray.clear();
             data.certifications.forEach(cert => this.addCertification(cert));
           }
+          if (data.projects?.length) {
+            this.projectsArray.clear();
+            data.projects.forEach(proj => this.addProject(proj));
+          }
           // Clear pending data after applying
           this.store.pendingParsedContent.set(null);
         }
@@ -128,7 +150,7 @@ export class Profile implements OnInit {
 
   ngOnInit(): void {
     this.store.loadProfile();
-    this.store.loadResumes();
+    this.store.loadResumes(true);
   }
 
   // --- Work History ---
@@ -175,6 +197,65 @@ export class Profile implements OnInit {
 
   removeCertification(i: number): void {
     this.certificationsArray.removeAt(i);
+  }
+
+  // --- Projects ---
+  addProject(initial?: ProjectDto): void {
+    this.projectsArray.push(this.fb.group({
+      name: [initial?.name ?? '', Validators.required],
+      description: [initial?.description ?? ''],
+      technologies: [initial?.technologies?.join(', ') ?? ''],
+      url: [initial?.url ?? ''],
+    }));
+  }
+
+  removeProject(i: number): void {
+    this.projectsArray.removeAt(i);
+  }
+
+  getProjectTechnologies(i: number): string[] {
+    const val = (this.projectsArray.at(i) as FormGroup).controls['technologies'].value ?? '';
+    return val.split(',').map((t: string) => t.trim()).filter(Boolean);
+  }
+
+  addProjectTechnology(i: number, event: KeyboardEvent | null, inputEl?: HTMLInputElement): void {
+    if (event && event.key !== 'Enter') return;
+    event?.preventDefault();
+    const el = inputEl ?? (event?.target as HTMLInputElement);
+    const tech = el.value.trim();
+    if (!tech) return;
+    const current = this.getProjectTechnologies(i);
+    if (!current.includes(tech)) {
+      current.push(tech);
+      (this.projectsArray.at(i) as FormGroup).controls['technologies'].setValue(current.join(', '));
+    }
+    el.value = '';
+  }
+
+  removeProjectTechnology(i: number, techIndex: number): void {
+    const current = this.getProjectTechnologies(i);
+    current.splice(techIndex, 1);
+    (this.projectsArray.at(i) as FormGroup).controls['technologies'].setValue(current.join(', '));
+  }
+
+  // --- Skills ---
+  addSkill(): void {
+    const skill = this.newSkill().trim();
+    if (skill && !this.skillsList().includes(skill)) {
+      this.skillsList.update(list => [...list, skill]);
+      this.newSkill.set('');
+    }
+  }
+
+  removeSkill(index: number): void {
+    this.skillsList.update(list => list.filter((_, i) => i !== index));
+  }
+
+  onSkillKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.addSkill();
+    }
   }
 
   // --- Section nav ---
@@ -248,16 +329,25 @@ export class Profile implements OnInit {
       expirationDate: cert.expirationDate || undefined,
     })) as CertificationDto[];
 
+    const projects = (val.projects ?? []).map((proj: any) => ({
+      name: proj.name,
+      description: proj.description || undefined,
+      technologies: (proj.technologies ?? '').split(',').map((t: string) => t.trim()).filter(Boolean),
+      url: proj.url || undefined,
+    })) as ProjectDto[];
+
     this.store.saveProfile({
       phone: val.phone || undefined,
       linkedin: val.linkedin || undefined,
       portfolio: val.portfolio || undefined,
-      skills: (val.skills ?? '').split(',').map((s: string) => s.trim()).filter(Boolean),
+      about: val.about || undefined,
+      skills: this.skillsList(),
       preferredLocation: val.preferredLocation || undefined,
       preferredJobType: val.preferredJobType || undefined,
       workHistory,
       education,
       certifications,
+      projects,
     });
   }
 }

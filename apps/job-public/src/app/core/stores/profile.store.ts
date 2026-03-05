@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import mammoth from 'mammoth';
 import { propagation, ROOT_CONTEXT, SpanKind, trace } from '@opentelemetry/api';
 import { ApiService } from '../services/api.service';
+import { MatchingJob } from '../types/job.type';
 import { ResumeData, ResumeResponse, UserProfile, UserProfileRequest } from '../types/resume-data.type';
 
 @Injectable({ providedIn: 'root' })
@@ -28,6 +29,14 @@ export class ProfileStore {
   readonly pendingParsedContent = signal<ResumeData | null>(null);
   readonly lastUploadedResumeId = signal<string | null>(null);
   readonly lastUploadedFileName = signal('');
+
+  // Default resume parsed content (for summary display)
+  readonly defaultResumeParsedContent = signal<ResumeData | null>(null);
+
+  // Matching jobs state
+  readonly matchingJobs = signal<MatchingJob[]>([]);
+  readonly matchingJobsLoading = signal(false);
+  readonly matchingJobsError = signal<string | null>(null);
 
   // Preview state
   readonly previewResume = signal<ResumeResponse | null>(null);
@@ -71,10 +80,51 @@ export class ProfileStore {
     });
   }
 
-  loadResumes(): void {
+  loadResumes(andMatchJobs = false): void {
     this.api.getResumes().subscribe({
-      next: (resumes) => this.resumes.set(resumes),
+      next: (resumes) => {
+        this.resumes.set(resumes);
+        const defaultResume = resumes.find((r) => r.isDefault && r.hasParsedContent);
+        if (defaultResume) {
+          this.loadDefaultResumeParsedContent(defaultResume.id);
+        }
+        if (andMatchJobs && resumes.some((r) => r.isDefault)) {
+          this.loadMatchingJobs();
+        }
+      },
       error: () => {}, // Silently fail — resumes may not exist yet
+    });
+  }
+
+  private loadDefaultResumeParsedContent(resumeId: string): void {
+    this.api.getResumeParsedContent(resumeId).subscribe({
+      next: (data) => this.defaultResumeParsedContent.set(data),
+      error: () => {}, // Non-critical
+    });
+  }
+
+  loadMatchingJobs(traceParent?: string): void {
+    this.matchingJobsLoading.set(true);
+    this.matchingJobsError.set(null);
+
+    this.api.getMatchingJobs(10, traceParent).subscribe({
+      next: (jobs) => {
+        this.matchingJobs.set(jobs);
+        this.matchingJobsLoading.set(false);
+      },
+      error: (err) => {
+        // 404 = no default resume / no embeddings yet
+        // 401 = token not ready (race with auth interceptor)
+        // Both are expected — silently show empty state
+        if (err?.status === 404 || err?.status === 401) {
+          this.matchingJobs.set([]);
+        } else {
+          this.matchingJobsError.set(
+            err?.error?.exceptions?.message ?? 'Failed to load matching jobs.'
+          );
+        }
+        this.matchingJobsLoading.set(false);
+      },
     });
   }
 
@@ -118,6 +168,13 @@ export class ProfileStore {
     });
   }
 
+  /** Called by ResumeRealtimeService when SignalR "ResumeEmbedded" arrives */
+  onResumeEmbedded(_resumeId: string, traceParent?: string): void {
+    // Always refresh — the API uses the default resume regardless,
+    // so a redundant call after a non-default embed is harmless.
+    this.loadMatchingJobs(traceParent);
+  }
+
   /** Called by ResumeRealtimeService when SignalR "ResumeParseFailed" arrives */
   onResumeParseFailed(retrying: boolean): void {
     if (!this.lastUploadedResumeId()) return;
@@ -145,6 +202,11 @@ export class ProfileStore {
   /** User confirms they want AI-parsed data applied to the profile form */
   applyParsedContent(): void {
     this.emitUserDecisionSpan('applied');
+    // Update default resume summary from the parsed content
+    const pending = this.pendingParsedContent();
+    if (pending) {
+      this.defaultResumeParsedContent.set(pending);
+    }
     this.profileParseStatus.set('applied');
     // pendingParsedContent stays available for the component effect to read
   }
@@ -162,6 +224,7 @@ export class ProfileStore {
         this.resumes.update((list) =>
           list.map((r) => ({ ...r, isDefault: r.id === id }))
         );
+        this.loadMatchingJobs();
       },
       error: (err) => {
         this.uploadError.set(err?.error?.exceptions?.message ?? 'Failed to set default resume.');
@@ -170,9 +233,13 @@ export class ProfileStore {
   }
 
   deleteResume(id: string): void {
+    const wasDefault = this.resumes().find((r) => r.id === id)?.isDefault;
     this.api.deleteResume(id).subscribe({
       next: () => {
         this.resumes.update((list) => list.filter((r) => r.id !== id));
+        if (wasDefault) {
+          this.matchingJobs.set([]);
+        }
       },
       error: (err) => {
         this.uploadError.set(err?.error?.exceptions?.message ?? 'Failed to delete resume.');

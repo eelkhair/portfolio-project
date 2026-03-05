@@ -14,3 +14,11 @@ export interface Job {
   createdAt: string;
   updatedAt: string | null;
 }
+
+export interface MatchingJob {
+  jobId: string;
+  title: string;
+  aboutRole: string | null;
+  salaryRange: string | null;
+  similarity: number;
+}

@@ -1,7 +1,7 @@
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ApplicationStore } from '../../../core/stores/application.store';
-import { ResumeData } from '../../../core/types/resume-data.type';
+import { ResumeData, ProjectDto } from '../../../core/types/resume-data.type';
 import { WorkHistoryDto, EducationDto, CertificationDto } from '../../../core/types/application.type';
 
 @Component({
@@ -18,6 +18,8 @@ export class ApplicationForm {
   resumeId = input<string>('');
 
   protected readonly activeSection = signal(0);
+  protected readonly skillsList = signal<string[]>([]);
+  protected readonly newSkill = signal('');
 
   protected readonly form = this.fb.group({
     // Personal Information
@@ -27,6 +29,7 @@ export class ApplicationForm {
     phone: [''],
     linkedin: [''],
     portfolio: [''],
+    about: [''],
 
     // Work History
     workHistory: this.fb.array<FormGroup>([]),
@@ -37,8 +40,8 @@ export class ApplicationForm {
     // Certifications
     certifications: this.fb.array<FormGroup>([]),
 
-    // Skills
-    skills: [''],
+    // Projects
+    projects: this.fb.array<FormGroup>([]),
 
     // Cover Letter
     coverLetter: [''],
@@ -49,7 +52,7 @@ export class ApplicationForm {
     'Work History',
     'Education',
     'Certifications',
-    'Skills',
+    'Skills & Projects',
   ];
 
   protected readonly aiFields = computed(() => {
@@ -63,9 +66,11 @@ export class ApplicationForm {
       if (data.linkedin) fields.add('linkedin');
       if (data.portfolio) fields.add('portfolio');
       if (data.skills.length > 0) fields.add('skills');
+      if (data.summary) fields.add('about');
       if (data.workHistory?.length) fields.add('workHistory');
       if (data.education?.length) fields.add('education');
       if (data.certifications?.length) fields.add('certifications');
+      if (data.projects?.length) fields.add('projects');
     }
     return fields;
   });
@@ -82,6 +87,10 @@ export class ApplicationForm {
     return this.form.controls.certifications;
   }
 
+  get projectsArray(): FormArray {
+    return this.form.controls.projects;
+  }
+
   constructor() {
     // Auto-fill from resume parsing — clears form when switching resumes
     effect(() => {
@@ -94,8 +103,9 @@ export class ApplicationForm {
           phone: data.phone,
           linkedin: data.linkedin,
           portfolio: data.portfolio,
-          skills: data.skills.join(', '),
+          about: data.summary ?? '',
         });
+        this.skillsList.set(data.skills ?? []);
 
         this.workHistoryArray.clear();
         if (data.workHistory?.length) {
@@ -111,12 +121,19 @@ export class ApplicationForm {
         if (data.certifications?.length) {
           data.certifications.forEach(cert => this.addCertification(cert));
         }
+
+        this.projectsArray.clear();
+        if (data.projects?.length) {
+          data.projects.forEach(proj => this.addProject(proj));
+        }
       } else {
         // Resume switched or cleared — reset all form fields
         this.form.reset();
         this.workHistoryArray.clear();
         this.educationArray.clear();
         this.certificationsArray.clear();
+        this.projectsArray.clear();
+        this.skillsList.set([]);
       }
     });
 
@@ -132,8 +149,27 @@ export class ApplicationForm {
           phone: profile.phone ?? '',
           linkedin: profile.linkedin ?? '',
           portfolio: profile.portfolio ?? '',
-          skills: profile.skills.join(', '),
+          about: profile.about ?? '',
         });
+        this.skillsList.set(profile.skills ?? []);
+
+        if (profile.workHistory?.length) {
+          this.workHistoryArray.clear();
+          profile.workHistory.forEach(wh => this.addWorkHistory(wh));
+        }
+        if (profile.education?.length) {
+          this.educationArray.clear();
+          profile.education.forEach(ed => this.addEducation(ed));
+        }
+        if (profile.certifications?.length) {
+          this.certificationsArray.clear();
+          profile.certifications.forEach(cert => this.addCertification(cert));
+        }
+        if (profile.projects?.length) {
+          this.projectsArray.clear();
+          profile.projects.forEach(proj => this.addProject(proj));
+        }
+
         this.store.profileLoaded.set(false);
       }
     });
@@ -182,6 +218,65 @@ export class ApplicationForm {
     this.certificationsArray.removeAt(i);
   }
 
+  // --- Projects ---
+  addProject(initial?: ProjectDto): void {
+    this.projectsArray.push(this.fb.group({
+      name: [initial?.name ?? '', Validators.required],
+      description: [initial?.description ?? ''],
+      technologies: [initial?.technologies?.join(', ') ?? ''],
+      url: [initial?.url ?? ''],
+    }));
+  }
+
+  removeProject(i: number): void {
+    this.projectsArray.removeAt(i);
+  }
+
+  getProjectTechnologies(i: number): string[] {
+    const val = (this.projectsArray.at(i) as FormGroup).controls['technologies'].value ?? '';
+    return val.split(',').map((t: string) => t.trim()).filter(Boolean);
+  }
+
+  addProjectTechnology(i: number, event: KeyboardEvent | null, inputEl?: HTMLInputElement): void {
+    if (event && event.key !== 'Enter') return;
+    event?.preventDefault();
+    const el = inputEl ?? (event?.target as HTMLInputElement);
+    const tech = el.value.trim();
+    if (!tech) return;
+    const current = this.getProjectTechnologies(i);
+    if (!current.includes(tech)) {
+      current.push(tech);
+      (this.projectsArray.at(i) as FormGroup).controls['technologies'].setValue(current.join(', '));
+    }
+    el.value = '';
+  }
+
+  removeProjectTechnology(i: number, techIndex: number): void {
+    const current = this.getProjectTechnologies(i);
+    current.splice(techIndex, 1);
+    (this.projectsArray.at(i) as FormGroup).controls['technologies'].setValue(current.join(', '));
+  }
+
+  // --- Skills ---
+  addSkill(): void {
+    const skill = this.newSkill().trim();
+    if (skill && !this.skillsList().includes(skill)) {
+      this.skillsList.update(list => [...list, skill]);
+      this.newSkill.set('');
+    }
+  }
+
+  removeSkill(index: number): void {
+    this.skillsList.update(list => list.filter((_, i) => i !== index));
+  }
+
+  onSkillKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.addSkill();
+    }
+  }
+
   goToSection(index: number): void {
     this.activeSection.set(index);
   }
@@ -202,6 +297,13 @@ export class ApplicationForm {
     if (this.form.valid) {
       const val = this.form.value;
 
+      const projects = (val.projects ?? []).map((proj: any) => ({
+        name: proj.name,
+        description: proj.description || undefined,
+        technologies: (proj.technologies ?? '').split(',').map((t: string) => t.trim()).filter(Boolean),
+        url: proj.url || undefined,
+      }));
+
       this.store.submitApplication(
         this.jobId(),
         val.coverLetter ?? '',
@@ -209,7 +311,9 @@ export class ApplicationForm {
           phone: val.phone || undefined,
           linkedin: val.linkedin || undefined,
           portfolio: val.portfolio || undefined,
-          skills: (val.skills ?? '').split(',').map((s: string) => s.trim()).filter(Boolean),
+          about: val.about || undefined,
+          skills: this.skillsList(),
+          projects,
         },
         this.resumeId() || undefined,
         {
@@ -224,7 +328,8 @@ export class ApplicationForm {
           workHistory: (val.workHistory ?? []) as WorkHistoryDto[],
           education: (val.education ?? []) as EducationDto[],
           certifications: (val.certifications ?? []) as CertificationDto[],
-          skills: (val.skills ?? '').split(',').map((s: string) => s.trim()).filter(Boolean),
+          skills: this.skillsList(),
+          projects,
         },
       );
     }

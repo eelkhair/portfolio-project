@@ -12,6 +12,8 @@ public class ResumeParsedContentResponse
     public List<WorkHistoryDto> WorkHistory { get; set; } = [];
     public List<EducationDto> Education { get; set; } = [];
     public List<CertificationDto> Certifications { get; set; } = [];
+    public string? Summary { get; set; }
+    public List<ProjectDto> Projects { get; set; } = [];
 }
 
 public class WorkHistoryDto
@@ -40,4 +42,12 @@ public class CertificationDto
     public DateTime? IssueDate { get; set; }
     public DateTime? ExpirationDate { get; set; }
     public string? CredentialId { get; set; }
+}
+
+public class ProjectDto
+{
+    public string Name { get; set; } = string.Empty;
+    public string? Description { get; set; }
+    public List<string> Technologies { get; set; } = [];
+    public string? Url { get; set; }
 }
