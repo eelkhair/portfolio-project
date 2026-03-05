@@ -143,6 +143,8 @@ public class ProcessResumeUploadedCommandHandler(
         return Unit.Value;
     }
 
+    private const int MaxSectionRetries = 2;
+
     private async Task ParseSectionAsync<T>(
         string sectionName,
         ResumeParseRequest parseRequest,
@@ -154,58 +156,70 @@ public class ProcessResumeUploadedCommandHandler(
         Action<T>? postProcess,
         CancellationToken cancellationToken)
     {
-        try
+        Exception? lastException = null;
+
+        for (var attempt = 1; attempt <= MaxSectionRetries; attempt++)
         {
-            Logger.LogInformation("Parsing section {Section} for resume {ResumeUId}",
-                sectionName, eventData.ResumeUId);
-
-            var userPrompt = userPromptTemplate.Replace("{RESUME_TEXT}", resumeText);
-
-            var result = await chatService.GetResponseAsync<T>(
-                systemPrompt, userPrompt, false, cancellationToken);
-
-            postProcess?.Invoke(result);
-
-            await monolithClient.NotifySectionParsedAsync(new ResumeSectionParsedRequest
-            {
-                ResumeUId = eventData.ResumeUId,
-                Section = sectionName,
-                SectionContent = result!,
-                UserId = userId,
-                CurrentPage = eventData.CurrentPage
-            }, cancellationToken);
-
-            Logger.LogInformation("Section {Section} parsed for resume {ResumeUId}",
-                sectionName, eventData.ResumeUId);
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Failed to parse section {Section} for resume {ResumeUId}",
-                sectionName, eventData.ResumeUId);
-
             try
             {
-                await monolithClient.NotifySectionFailedAsync(new ResumeSectionFailedRequest
+                Logger.LogInformation("Parsing section {Section} for resume {ResumeUId} (attempt {Attempt}/{Max})",
+                    sectionName, eventData.ResumeUId, attempt, MaxSectionRetries);
+
+                var userPrompt = userPromptTemplate.Replace("{RESUME_TEXT}", resumeText);
+
+                var result = await chatService.GetResponseAsync<T>(
+                    systemPrompt, userPrompt, false, cancellationToken);
+
+                postProcess?.Invoke(result);
+
+                await monolithClient.NotifySectionParsedAsync(new ResumeSectionParsedRequest
                 {
                     ResumeUId = eventData.ResumeUId,
                     Section = sectionName,
-                    Reason = ex.Message,
+                    SectionContent = result!,
                     UserId = userId,
                     CurrentPage = eventData.CurrentPage
                 }, cancellationToken);
-            }
-            catch (Exception callbackEx)
-            {
-                Logger.LogError(callbackEx,
-                    "Failed to notify monolith of section {Section} failure for resume {ResumeUId}",
+
+                Logger.LogInformation("Section {Section} parsed for resume {ResumeUId}",
                     sectionName, eventData.ResumeUId);
+
+                return; // Success — exit retry loop
             }
+            catch (Exception ex)
+            {
+                lastException = ex;
+                Logger.LogWarning(ex,
+                    "Section {Section} attempt {Attempt}/{Max} failed for resume {ResumeUId}",
+                    sectionName, attempt, MaxSectionRetries, eventData.ResumeUId);
 
-            // Re-throw for quick section (Phase 1 failure is fatal)
-            if (sectionName == "quick")
-                throw;
+                // Re-throw immediately for quick section (Phase 1 failure is fatal)
+                if (sectionName == "quick")
+                    throw;
+            }
+        }
 
-            // Phase 2 section failures are non-fatal — continue to next section
+        // All retries exhausted — notify failure
+        Logger.LogError(lastException,
+            "Section {Section} failed after {Max} attempts for resume {ResumeUId}",
+            sectionName, MaxSectionRetries, eventData.ResumeUId);
+
+        try
+        {
+            await monolithClient.NotifySectionFailedAsync(new ResumeSectionFailedRequest
+            {
+                ResumeUId = eventData.ResumeUId,
+                Section = sectionName,
+                Reason = lastException?.Message ?? "Unknown error",
+                UserId = userId,
+                CurrentPage = eventData.CurrentPage
+            }, cancellationToken);
+        }
+        catch (Exception callbackEx)
+        {
+            Logger.LogError(callbackEx,
+                "Failed to notify monolith of section {Section} failure for resume {ResumeUId}",
+                sectionName, eventData.ResumeUId);
         }
     }
 }

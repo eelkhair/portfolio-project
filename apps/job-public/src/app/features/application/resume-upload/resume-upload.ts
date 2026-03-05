@@ -19,23 +19,25 @@ export class ResumeUpload implements OnInit {
   protected readonly mode = signal<ResumeMode>('upload');
   protected readonly selectedResumeId = signal('');
   private resumesCountBeforeUpload = 0;
+  private waitingForUpload = false;
 
   readonly resumeIdChange = output<string>();
 
   constructor() {
-    // Auto-select newly uploaded resume and transition to parsing state
+    // Detect newly uploaded resume and ask user before auto-filling
     effect(() => {
       const resumes = this.profileStore.resumes();
       if (
         this.mode() === 'upload' &&
-        resumes.length > this.resumesCountBeforeUpload &&
-        this.resumesCountBeforeUpload > 0
+        this.waitingForUpload &&
+        resumes.length > this.resumesCountBeforeUpload
       ) {
-        // New resume was prepended — auto-select it and start progressive tracking
+        this.waitingForUpload = false;
         const newResume = resumes[0];
         this.selectedResumeId.set(newResume.id);
         this.resumeIdChange.emit(newResume.id);
-        this.store.initProgressiveParse(newResume.id);
+        this.store.resumeId.set(newResume.id);
+        this.store.parseStatus.set('ready');
         this.resumesCountBeforeUpload = resumes.length;
       }
     });
@@ -131,6 +133,17 @@ export class ResumeUpload implements OnInit {
     }
   }
 
+  acceptAutoFill(): void {
+    const id = this.selectedResumeId();
+    if (id) {
+      this.store.initProgressiveParse(id);
+    }
+  }
+
+  skipAutoFill(): void {
+    this.store.parseStatus.set('parsed');
+  }
+
   // --- Section tracking helpers for template ---
   readonly parseSections = ALL_RESUME_SECTIONS;
   readonly parseSectionLabels = SECTION_LABELS;
@@ -143,6 +156,7 @@ export class ResumeUpload implements OnInit {
     // Single upload via ProfileStore — bridge effects in constructor
     // push parsed content to ApplicationStore automatically
     this.resumesCountBeforeUpload = this.profileStore.resumes().length;
+    this.waitingForUpload = true;
     this.store.fileName.set(file.name);
     this.store.parseStatus.set('uploading');
     this.profileStore.uploadResume(file);
