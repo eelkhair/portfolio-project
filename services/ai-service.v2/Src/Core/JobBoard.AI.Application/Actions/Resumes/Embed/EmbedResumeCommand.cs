@@ -6,7 +6,6 @@ using JobBoard.AI.Application.Interfaces.Clients;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Application.Interfaces.Persistence;
-using JobBoard.AI.Application.Interfaces.Resumes;
 using JobBoard.AI.Domain.AI;
 using JobBoard.AI.Domain.Drafts;
 using JobBoard.IntegrationEvents.Resume;

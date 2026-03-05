@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, input, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatchingJob } from '../../../core/types/job.type';
 import { ApplicationsListStore } from '../../../core/stores/applications-list.store';
@@ -14,6 +14,7 @@ export class MatchingJobs {
   loading = input(false);
   error = input<string | null>(null);
   hasResumes = input(false);
+  readonly reEmbedClick = output<void>();
 
   private readonly scrollContainer = viewChild<ElementRef<HTMLElement>>('carousel');
   readonly canScrollLeft = signal(false);

@@ -1,3 +1,5 @@
+using JobBoard.IntegrationEvents.Resume;
+
 namespace JobBoard.Monolith.Contracts.Public;
 
 public class ResumeResponse

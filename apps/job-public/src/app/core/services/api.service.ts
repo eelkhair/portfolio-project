@@ -139,6 +139,10 @@ export class ApiService {
     return this.http.delete<void>(`${this.resumesUrl}/${id}`);
   }
 
+  reEmbedResume(id: string): Observable<void> {
+    return this.http.post<void>(`${this.resumesUrl}/${id}/re-embed`, null);
+  }
+
   getMatchingJobs(limit = 10, traceParent?: string): Observable<MatchingJob[]> {
     const params = new HttpParams().set('limit', limit);
     const headers = traceParent ? new HttpHeaders({ traceparent: traceParent }) : undefined;

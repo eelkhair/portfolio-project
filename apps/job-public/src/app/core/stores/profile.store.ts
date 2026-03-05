@@ -70,6 +70,13 @@ export class ProfileStore {
   readonly matchingJobsLoading = signal(false);
   readonly matchingJobsError = signal<string | null>(null);
 
+  // Populate from resume state
+  readonly populatingFromResume = signal(false);
+
+  readonly hasDefaultParsedResume = computed(() =>
+    this.resumes().some((r) => r.isDefault && r.hasParsedContent)
+  );
+
   // Preview state
   readonly previewResume = signal<ResumeResponse | null>(null);
   readonly previewUrl = signal<string | null>(null);
@@ -346,6 +353,41 @@ export class ProfileStore {
       },
       error: (err) => {
         this.uploadError.set(err?.error?.exceptions?.message ?? 'Failed to delete resume.');
+      },
+    });
+  }
+
+  populateFromDefaultResume(): void {
+    const defaultResume = this.resumes().find((r) => r.isDefault && r.hasParsedContent);
+    if (!defaultResume) return;
+
+    this.populatingFromResume.set(true);
+    this.api.getResumeParsedContent(defaultResume.id).subscribe({
+      next: (data) => {
+        if (data) {
+          this.progressiveParsedContent.set(data);
+          this.defaultResumeParsedContent.set(data);
+        }
+        this.populatingFromResume.set(false);
+      },
+      error: () => this.populatingFromResume.set(false),
+    });
+  }
+
+  reEmbedDefaultResume(): void {
+    const defaultResume = this.resumes().find((r) => r.isDefault);
+    if (!defaultResume) return;
+
+    this.matchingJobsLoading.set(true);
+    this.matchingJobsError.set(null);
+
+    this.api.reEmbedResume(defaultResume.id).subscribe({
+      next: () => {
+        // Embedding will complete async — SignalR ResumeEmbedded handler will refresh matching jobs
+      },
+      error: (err) => {
+        this.matchingJobsLoading.set(false);
+        this.matchingJobsError.set(err?.error?.exceptions?.message ?? 'Failed to re-embed resume.');
       },
     });
   }

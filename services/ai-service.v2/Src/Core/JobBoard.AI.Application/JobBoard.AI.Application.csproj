@@ -12,7 +12,7 @@
         <PackageReference Include="Elkhair.Dev.Common" Version="1.0.19" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
         <PackageReference Include="JobBoard.AdminAPI.Contracts" Version="1.0.1" />
-        <PackageReference Include="JobBoard.IntegrationEvents" Version="1.0.8" />
+        <PackageReference Include="JobBoard.IntegrationEvents" Version="1.0.9" />
         <PackageReference Include="JobBoard.Monolith.Contracts" Version="1.0.3" />
         <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="10.3.0" />
         <PackageReference Include="PdfPig" Version="0.1.13" />

@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 using Elkhair.Dev.Common.Application;
-using JobBoard.AI.Application.Interfaces.Resumes;
+using JobBoard.IntegrationEvents.Resume;
 using JobBoard.Monolith.Contracts.Companies;
 using JobAPI.Contracts.Models.Jobs.Responses;
 

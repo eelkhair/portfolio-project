@@ -1,4 +1,4 @@
-namespace JobBoard.AI.Application.Interfaces.Resumes;
+namespace JobBoard.IntegrationEvents.Resume;
 
 public class ResumeParsedContentResponse
 {
@@ -9,42 +9,42 @@ public class ResumeParsedContentResponse
     public string Linkedin { get; set; } = string.Empty;
     public string Portfolio { get; set; } = string.Empty;
     public List<string> Skills { get; set; } = [];
-    public List<WorkHistoryDto> WorkHistory { get; set; } = [];
-    public List<EducationDto> Education { get; set; } = [];
-    public List<CertificationDto> Certifications { get; set; } = [];
+    public List<ResumeWorkHistoryDto> WorkHistory { get; set; } = [];
+    public List<ResumeEducationDto> Education { get; set; } = [];
+    public List<ResumeCertificationDto> Certifications { get; set; } = [];
     public string? Summary { get; set; }
-    public List<ProjectDto> Projects { get; set; } = [];
+    public List<ResumeProjectDto> Projects { get; set; } = [];
 }
 
-public class WorkHistoryDto
+public class ResumeWorkHistoryDto
 {
     public string Company { get; set; } = string.Empty;
     public string JobTitle { get; set; } = string.Empty;
-    public DateTime StartDate { get; set; }
-    public DateTime? EndDate { get; set; }
+    public string? StartDate { get; set; }
+    public string? EndDate { get; set; }
     public string? Description { get; set; }
     public bool IsCurrent { get; set; }
 }
 
-public class EducationDto
+public class ResumeEducationDto
 {
     public string Institution { get; set; } = string.Empty;
     public string Degree { get; set; } = string.Empty;
     public string? FieldOfStudy { get; set; }
-    public DateTime StartDate { get; set; }
-    public DateTime? EndDate { get; set; }
+    public string? StartDate { get; set; }
+    public string? EndDate { get; set; }
 }
 
-public class CertificationDto
+public class ResumeCertificationDto
 {
     public string Name { get; set; } = string.Empty;
     public string? IssuingOrganization { get; set; }
-    public DateTime? IssueDate { get; set; }
-    public DateTime? ExpirationDate { get; set; }
+    public string? IssueDate { get; set; }
+    public string? ExpirationDate { get; set; }
     public string? CredentialId { get; set; }
 }
 
-public class ProjectDto
+public class ResumeProjectDto
 {
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
