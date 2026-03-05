@@ -77,6 +77,13 @@ import { AccountService } from '../../core/services/account.service';
                   >
                     Profile
                   </a>
+                  <a
+                    routerLink="/applications"
+                    (click)="menuOpen.set(false)"
+                    class="block w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700"
+                  >
+                    My Applications
+                  </a>
                   <button
                     (click)="account.logout(); menuOpen.set(false)"
                     class="block w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700"

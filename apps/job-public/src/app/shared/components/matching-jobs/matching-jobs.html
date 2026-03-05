@@ -76,12 +76,17 @@
           class="card-hover group block w-70 shrink-0 p-5"
           style="scroll-snap-align: start;"
         >
-          <!-- Match badge -->
-          <span
-            class="inline-block rounded-full px-2.5 py-1 text-xs font-semibold {{matchColor(job.similarity)}}"
-          >
-            {{ matchPercent(job.similarity) }} match
-          </span>
+          <!-- Badges -->
+          <div class="flex items-center gap-2">
+            <span class="match-badge" [class.match-badge-high]="matchLevel(job.similarity) === 'high'" [class.match-badge-medium]="matchLevel(job.similarity) === 'medium'" [class.match-badge-low]="matchLevel(job.similarity) === 'low'">
+              {{ matchPercent(job.similarity) }} match
+            </span>
+            @if (isApplied(job.jobId)) {
+              <span class="match-badge match-badge-high">
+                Applied
+              </span>
+            }
+          </div>
 
           <!-- Title -->
           <h3

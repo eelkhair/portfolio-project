@@ -5,6 +5,8 @@ import { LoadingSpinner } from '../../../shared/components/loading-spinner';
 import { EmptyState } from '../../../shared/components/empty-state';
 import { JobStore } from '../../../core/stores/job.store';
 import { SearchStore } from '../../../core/stores/search.store';
+import { ApplicationsListStore } from '../../../core/stores/applications-list.store';
+import { AccountService } from '../../../core/services/account.service';
 
 @Component({
   selector: 'app-jobs',
@@ -14,6 +16,8 @@ import { SearchStore } from '../../../core/stores/search.store';
 export class Jobs implements OnInit {
   protected readonly jobStore = inject(JobStore);
   protected readonly searchStore = inject(SearchStore);
+  private readonly appStore = inject(ApplicationsListStore);
+  private readonly account = inject(AccountService);
 
   protected readonly loading = computed(() => this.jobStore.loading() || this.searchStore.loading());
 
@@ -45,6 +49,9 @@ export class Jobs implements OnInit {
 
   ngOnInit(): void {
     this.jobStore.loadJobs();
+    if (this.account.isAuthenticated()) {
+      this.appStore.ensureLoaded();
+    }
   }
 
   goToPage(page: number): void {

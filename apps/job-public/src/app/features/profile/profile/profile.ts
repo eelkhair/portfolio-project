@@ -6,6 +6,7 @@ import { LoadingSpinner } from '../../../shared/components/loading-spinner';
 import { ConfirmDialog } from '../../../shared/components/confirm-dialog';
 import { ProfileStore } from '../../../core/stores/profile.store';
 import { AccountService } from '../../../core/services/account.service';
+import { ApplicationsListStore } from '../../../core/stores/applications-list.store';
 import { MatchingJobs } from '../../../shared/components/matching-jobs/matching-jobs';
 import { ResumePreviewModal } from '../resume-preview-modal/resume-preview-modal';
 import { ResumeResponse, ProjectDto } from '../../../core/types/resume-data.type';
@@ -20,6 +21,7 @@ import { Validators } from '@angular/forms';
 export class Profile implements OnInit {
   protected readonly store = inject(ProfileStore);
   protected readonly account = inject(AccountService);
+  private readonly appStore = inject(ApplicationsListStore);
   private readonly fb = inject(FormBuilder);
 
   protected readonly activeSection = signal(0);
@@ -151,6 +153,7 @@ export class Profile implements OnInit {
   ngOnInit(): void {
     this.store.loadProfile();
     this.store.loadResumes(true);
+    this.appStore.ensureLoaded();
   }
 
   // --- Work History ---

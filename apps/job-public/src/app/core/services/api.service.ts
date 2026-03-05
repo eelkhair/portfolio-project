@@ -77,7 +77,7 @@ export class ApiService {
   getStats(): Observable<Stats> {
     return this.http
       .get<ApiResponse<Stats>>(`${this.baseUrl}/stats`)
-      .pipe(map((res) => res.data ?? { jobCount: 0, companyCount: 0 }));
+      .pipe(map((res) => res.data ?? { jobCount: 0, companyCount: 0, applicationCount: 0 }));
   }
 
   // --- Authenticated applicant endpoints ---
@@ -92,6 +92,12 @@ export class ApiService {
     return this.http
       .put<ApiResponse<UserProfile>>(`${this.applicantUrl}/profile`, profile)
       .pipe(map((res) => res.data!));
+  }
+
+  getApplications(): Observable<ApplicationResponse[]> {
+    return this.http
+      .get<ApiResponse<ApplicationResponse[]>>(`${this.applicantUrl}/applications`)
+      .pipe(map((res) => res.data ?? []));
   }
 
   submitApplication(request: SubmitApplicationRequest): Observable<ApplicationResponse> {

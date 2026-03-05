@@ -37,12 +37,21 @@
             </div>
           </div>
         </div>
-        <a
-          [routerLink]="['/apply', job.id]"
-          class="btn-primary hidden md:inline-flex"
-        >
-          Apply Now
-        </a>
+        @if (isApplied()) {
+          <span class="hidden items-center gap-2 rounded-lg bg-green-600/20 px-4 py-2 text-sm font-medium text-green-400 md:inline-flex">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            </svg>
+            Applied
+          </span>
+        } @else {
+          <a
+            [routerLink]="['/apply', job.id]"
+            class="btn-primary hidden md:inline-flex"
+          >
+            Apply Now
+          </a>
+        }
       </div>
     </div>
   </div>
@@ -50,9 +59,18 @@
   <!-- Content -->
   <div class="mx-auto max-w-7xl px-6 py-10">
     <!-- Mobile apply button -->
-    <a [routerLink]="['/apply', job.id]" class="btn-primary mb-8 w-full md:hidden">
-      Apply Now
-    </a>
+    @if (isApplied()) {
+      <div class="mb-8 flex w-full items-center justify-center gap-2 rounded-lg bg-green-100 px-4 py-2.5 text-sm font-medium text-green-700 dark:bg-green-900/20 dark:text-green-400 md:hidden">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+        </svg>
+        Applied
+      </div>
+    } @else {
+      <a [routerLink]="['/apply', job.id]" class="btn-primary mb-8 w-full md:hidden">
+        Apply Now
+      </a>
+    }
 
     <div class="grid grid-cols-1 gap-10 lg:grid-cols-3">
       <!-- Main content -->

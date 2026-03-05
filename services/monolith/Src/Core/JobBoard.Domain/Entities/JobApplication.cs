@@ -29,6 +29,7 @@ public class JobApplication : BaseAuditableEntity
     public List<EducationEntry> Education { get; private set; } = [];
     public List<CertificationEntry> Certifications { get; private set; } = [];
     public List<string> Skills { get; private set; } = [];
+    public List<ProjectEntry> Projects { get; private set; } = [];
 
     internal void SetJob(int jobId) => JobId = jobId;
     internal void SetUser(int userId) => UserId = userId;
@@ -53,7 +54,8 @@ public class JobApplication : BaseAuditableEntity
             WorkHistory = input.WorkHistory ?? [],
             Education = input.Education ?? [],
             Certifications = input.Certifications ?? [],
-            Skills = input.Skills ?? []
+            Skills = input.Skills ?? [],
+            Projects = input.Projects ?? []
         };
 
         application.SetJob(input.JobId);

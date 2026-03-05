@@ -20,12 +20,14 @@ export class Home implements OnInit {
 
   readonly jobCount = signal(0);
   readonly companyCount = signal(0);
+  readonly applicationCount = signal(0);
 
   ngOnInit(): void {
     this.store.loadLatestJobs();
     this.api.getStats().subscribe((stats) => {
       this.jobCount.set(stats.jobCount);
       this.companyCount.set(stats.companyCount);
+      this.applicationCount.set(stats.applicationCount);
     });
 
     if (this.account.isAuthenticated()) {

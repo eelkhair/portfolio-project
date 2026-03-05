@@ -14,6 +14,7 @@ public class JobApplicationInput
     public List<EducationEntry>? Education { get; set; }
     public List<CertificationEntry>? Certifications { get; set; }
     public List<string>? Skills { get; set; }
+    public List<ProjectEntry>? Projects { get; set; }
 
     public DateTime? CreatedAt { get; set; }
     public string? CreatedBy { get; set; }

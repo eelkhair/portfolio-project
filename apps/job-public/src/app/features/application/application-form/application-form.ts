@@ -297,6 +297,25 @@ export class ApplicationForm {
     if (this.form.valid) {
       const val = this.form.value;
 
+      // Sanitize dates: empty strings → undefined so the backend receives null instead of ""
+      const workHistory = (val.workHistory ?? []).map((wh: any) => ({
+        ...wh,
+        startDate: wh.startDate || undefined,
+        endDate: wh.endDate || undefined,
+      })) as WorkHistoryDto[];
+
+      const education = (val.education ?? []).map((ed: any) => ({
+        ...ed,
+        startDate: ed.startDate || undefined,
+        endDate: ed.endDate || undefined,
+      })) as EducationDto[];
+
+      const certifications = (val.certifications ?? []).map((cert: any) => ({
+        ...cert,
+        issueDate: cert.issueDate || undefined,
+        expirationDate: cert.expirationDate || undefined,
+      })) as CertificationDto[];
+
       const projects = (val.projects ?? []).map((proj: any) => ({
         name: proj.name,
         description: proj.description || undefined,
@@ -313,6 +332,9 @@ export class ApplicationForm {
           portfolio: val.portfolio || undefined,
           about: val.about || undefined,
           skills: this.skillsList(),
+          workHistory,
+          education,
+          certifications,
           projects,
         },
         this.resumeId() || undefined,
@@ -325,9 +347,9 @@ export class ApplicationForm {
             linkedin: val.linkedin || undefined,
             portfolio: val.portfolio || undefined,
           },
-          workHistory: (val.workHistory ?? []) as WorkHistoryDto[],
-          education: (val.education ?? []) as EducationDto[],
-          certifications: (val.certifications ?? []) as CertificationDto[],
+          workHistory,
+          education,
+          certifications,
           skills: this.skillsList(),
           projects,
         },

@@ -189,6 +189,46 @@
   }
 }
 
+/* Match score badges */
+.match-badge {
+  display: inline-block;
+  border-radius: 9999px;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 600;
+}
+
+.match-badge-high {
+  background-color: #dcfce7; /* green-100 */
+  color: #15803d; /* green-700 */
+}
+
+.match-badge-medium {
+  background-color: #fef3c7; /* amber-100 */
+  color: #b45309; /* amber-700 */
+}
+
+.match-badge-low {
+  background-color: #f1f5f9; /* slate-100 */
+  color: #475569; /* slate-600 */
+}
+
+:where(.dark, .dark *) .match-badge-high {
+  background-color: rgb(22 163 74 / 0.2); /* green-900/20 */
+  color: #4ade80; /* green-400 */
+}
+
+:where(.dark, .dark *) .match-badge-medium {
+  background-color: rgb(180 83 9 / 0.2); /* amber-900/20 */
+  color: #fbbf24; /* amber-400 */
+}
+
+:where(.dark, .dark *) .match-badge-low {
+  background-color: var(--color-slate-700);
+  color: var(--color-slate-400);
+}
+
 /* AI gradient utility */
 .ai-gradient {
   background: linear-gradient(135deg, #8b5cf6, #ec4899, #f59e0b);

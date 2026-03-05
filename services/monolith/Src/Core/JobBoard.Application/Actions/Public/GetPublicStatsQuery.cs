@@ -17,7 +17,8 @@ public class GetPublicStatsQueryHandler(IJobBoardQueryDbContext context, ILogger
         return new PublicStatsDto
         {
             JobCount = await Context.Jobs.CountAsync(cancellationToken),
-            CompanyCount = await Context.Companies.CountAsync(cancellationToken)
+            CompanyCount = await Context.Companies.CountAsync(cancellationToken),
+            ApplicationCount = await Context.JobApplications.CountAsync(cancellationToken)
         };
     }
 }

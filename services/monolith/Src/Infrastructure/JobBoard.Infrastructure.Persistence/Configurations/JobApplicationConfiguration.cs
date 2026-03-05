@@ -44,6 +44,11 @@ public class JobApplicationConfiguration : IEntityTypeConfiguration<JobApplicati
         builder.Property(a => a.Skills)
             .HasColumnType("nvarchar(max)");
 
+        builder.OwnsMany(a => a.Projects, p =>
+        {
+            p.ToJson();
+        });
+
         builder.HasOne(a => a.Job)
             .WithMany()
             .HasForeignKey(a => a.JobId)
