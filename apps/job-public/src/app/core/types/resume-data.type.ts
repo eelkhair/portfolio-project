@@ -61,14 +61,28 @@ export interface ResumeResponse {
   contentType?: string;
   fileSize?: number;
   hasParsedContent: boolean;
-  parseStatus: 'Pending' | 'Processing' | 'Parsed' | 'Failed';
+  parseStatus: 'Pending' | 'Processing' | 'PartiallyParsed' | 'Parsed' | 'Failed';
   parseRetryCount: number;
   isDefault: boolean;
   createdAt: string;
   parsedContent?: ResumeData;
 }
 
-export type ParseStatus = 'idle' | 'uploading' | 'parsing' | 'ready' | 'parsed' | 'error' | 'retrying';
+export type ParseStatus = 'idle' | 'uploading' | 'parsing' | 'partial' | 'complete' | 'ready' | 'parsed' | 'error' | 'retrying';
+
+export type ResumeSection = 'quick' | 'workHistory' | 'education' | 'certifications' | 'projects';
+
+export type SectionStatus = 'pending' | 'parsing' | 'done' | 'failed';
+
+export const ALL_RESUME_SECTIONS: ResumeSection[] = ['quick', 'workHistory', 'education', 'certifications', 'projects'];
+
+export const SECTION_LABELS: Record<ResumeSection, string> = {
+  quick: 'Contact & Skills',
+  workHistory: 'Work History',
+  education: 'Education',
+  certifications: 'Certifications',
+  projects: 'Projects',
+};
 
 export interface ResumeParsedMsg {
   resumeId: string;
@@ -89,6 +103,26 @@ export interface ResumeParseFailedMsg {
   status: 'retrying' | 'failed';
   attempt: number;
   maxAttempts: number;
+  traceParent?: string;
+  traceState?: string;
+}
+
+export interface ResumeSectionParsedMsg {
+  resumeId: string;
+  section: ResumeSection;
+  traceParent?: string;
+  traceState?: string;
+}
+
+export interface ResumeSectionFailedMsg {
+  resumeId: string;
+  section: ResumeSection;
+  traceParent?: string;
+  traceState?: string;
+}
+
+export interface ResumeAllSectionsCompletedMsg {
+  resumeId: string;
   traceParent?: string;
   traceState?: string;
 }

@@ -42,7 +42,8 @@
       "Bash(dotnet ef migrations add SimplifyEmbeddingVectors --project \"Src/Infrastructure/JobBoard.AI.Infrastructure.Persistence/JobBoard.AI.Infrastructure.Persistence.csproj\" --startup-project \"Src/Presentation/JobBoard.AI.API/JobBoard.AI.API.csproj\")",
       "Bash(dotnet ef database update --project \"Src/Infrastructure/JobBoard.AI.Infrastructure.Persistence/JobBoard.AI.Infrastructure.Persistence.csproj\" --startup-project \"Src/Presentation/JobBoard.AI.API/JobBoard.AI.API.csproj\")",
       "Bash(dotnet ef migrations add AddProfileAboutAndProjects --project Src/Infrastructure/JobBoard.Infrastructure.Persistence/ --startup-project Src/Presentation/JobBoard.API/)",
-      "Bash(dotnet ef database update --project Src/Infrastructure/JobBoard.Infrastructure.Persistence/ --startup-project Src/Presentation/JobBoard.API/)"
+      "Bash(dotnet ef database update --project Src/Infrastructure/JobBoard.Infrastructure.Persistence/ --startup-project Src/Presentation/JobBoard.API/)",
+      "Bash(dotnet ef migrations add AddParsedSectionsToResume --project \"services/monolith/Src/Infrastructure/JobBoard.Infrastructure.Persistence/JobBoard.Infrastructure.Persistence.csproj\" --startup-project \"services/monolith/Src/Presentation/JobBoard.API/JobBoard.API.csproj\")"
     ]
   }
 }

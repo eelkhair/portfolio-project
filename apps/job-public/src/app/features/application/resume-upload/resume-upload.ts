@@ -2,6 +2,7 @@ import { Component, effect, inject, OnInit, output, signal } from '@angular/core
 import { ApplicationStore } from '../../../core/stores/application.store';
 import { ProfileStore } from '../../../core/stores/profile.store';
 import { RouterLink } from '@angular/router';
+import { ALL_RESUME_SECTIONS, ResumeSection, SECTION_LABELS, SectionStatus } from '../../../core/types/resume-data.type';
 
 type ResumeMode = 'select' | 'upload';
 
@@ -30,12 +31,11 @@ export class ResumeUpload implements OnInit {
         resumes.length > this.resumesCountBeforeUpload &&
         this.resumesCountBeforeUpload > 0
       ) {
-        // New resume was prepended — auto-select it
+        // New resume was prepended — auto-select it and start progressive tracking
         const newResume = resumes[0];
         this.selectedResumeId.set(newResume.id);
         this.resumeIdChange.emit(newResume.id);
-        this.store.resumeId.set(newResume.id);
-        this.store.parseStatus.set('parsing'); // Async: wait for SignalR notification
+        this.store.initProgressiveParse(newResume.id);
         this.resumesCountBeforeUpload = resumes.length;
       }
     });
@@ -129,6 +129,14 @@ export class ResumeUpload implements OnInit {
     if (event.dataTransfer?.files[0]) {
       this.uploadFile(event.dataTransfer.files[0]);
     }
+  }
+
+  // --- Section tracking helpers for template ---
+  readonly parseSections = ALL_RESUME_SECTIONS;
+  readonly parseSectionLabels = SECTION_LABELS;
+
+  sectionStatus(section: ResumeSection): SectionStatus {
+    return this.store.sectionStatuses()[section];
   }
 
   private uploadFile(file: File): void {

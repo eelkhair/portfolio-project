@@ -6,7 +6,14 @@ import { propagation, ROOT_CONTEXT, SpanKind, SpanStatusCode, trace } from '@ope
 import { environment } from '../../../environments/environment';
 import { ApplicationStore } from '../stores/application.store';
 import { ProfileStore } from '../stores/profile.store';
-import { ResumeEmbeddedMsg, ResumeParsedMsg, ResumeParseFailedMsg } from '../types/resume-data.type';
+import {
+  ResumeAllSectionsCompletedMsg,
+  ResumeEmbeddedMsg,
+  ResumeParsedMsg,
+  ResumeParseFailedMsg,
+  ResumeSectionFailedMsg,
+  ResumeSectionParsedMsg,
+} from '../types/resume-data.type';
 
 @Injectable({ providedIn: 'root' })
 export class ResumeRealtimeService {
@@ -136,6 +143,122 @@ export class ResumeRealtimeService {
           } finally {
             span.end();
           }
+        },
+      );
+    });
+
+    this.hub.on('ResumeSectionParsed', (msg: ResumeSectionParsedMsg) => {
+      const parentCtx = this.extractTraceContext(msg);
+      this.tracer.startActiveSpan(
+        'signalr.message.received',
+        {
+          kind: SpanKind.CONSUMER,
+          attributes: {
+            'messaging.system': 'signalr',
+            'messaging.operation': 'process',
+            'messaging.destination.name': 'ResumeSectionParsed',
+            'resume.id': msg.resumeId,
+            'resume.section': msg.section,
+          },
+        },
+        parentCtx,
+        (span) => {
+          let hasError = false;
+          try {
+            this.profileStore.onSectionParsed(msg.resumeId, msg.section, msg.traceParent);
+          } catch (err: any) {
+            hasError = true;
+            span.recordException(err);
+          }
+          try {
+            this.store.onSectionParsed(msg.resumeId, msg.section, msg.traceParent);
+          } catch (err: any) {
+            hasError = true;
+            span.recordException(err);
+          }
+          span.setStatus(
+            hasError
+              ? { code: SpanStatusCode.ERROR, message: 'partial failure' }
+              : { code: SpanStatusCode.OK },
+          );
+          span.end();
+        },
+      );
+    });
+
+    this.hub.on('ResumeSectionFailed', (msg: ResumeSectionFailedMsg) => {
+      const parentCtx = this.extractTraceContext(msg);
+      this.tracer.startActiveSpan(
+        'signalr.message.received',
+        {
+          kind: SpanKind.CONSUMER,
+          attributes: {
+            'messaging.system': 'signalr',
+            'messaging.operation': 'process',
+            'messaging.destination.name': 'ResumeSectionFailed',
+            'resume.id': msg.resumeId,
+            'resume.section': msg.section,
+          },
+        },
+        parentCtx,
+        (span) => {
+          let hasError = false;
+          try {
+            this.profileStore.onSectionFailed(msg.resumeId, msg.section);
+          } catch (err: any) {
+            hasError = true;
+            span.recordException(err);
+          }
+          try {
+            this.store.onSectionFailed(msg.resumeId, msg.section);
+          } catch (err: any) {
+            hasError = true;
+            span.recordException(err);
+          }
+          span.setStatus(
+            hasError
+              ? { code: SpanStatusCode.ERROR, message: 'partial failure' }
+              : { code: SpanStatusCode.OK },
+          );
+          span.end();
+        },
+      );
+    });
+
+    this.hub.on('ResumeAllSectionsCompleted', (msg: ResumeAllSectionsCompletedMsg) => {
+      const parentCtx = this.extractTraceContext(msg);
+      this.tracer.startActiveSpan(
+        'signalr.message.received',
+        {
+          kind: SpanKind.CONSUMER,
+          attributes: {
+            'messaging.system': 'signalr',
+            'messaging.operation': 'process',
+            'messaging.destination.name': 'ResumeAllSectionsCompleted',
+            'resume.id': msg.resumeId,
+          },
+        },
+        parentCtx,
+        (span) => {
+          let hasError = false;
+          try {
+            this.profileStore.onAllSectionsCompleted(msg.resumeId, msg.traceParent);
+          } catch (err: any) {
+            hasError = true;
+            span.recordException(err);
+          }
+          try {
+            this.store.onAllSectionsCompleted(msg.resumeId, msg.traceParent);
+          } catch (err: any) {
+            hasError = true;
+            span.recordException(err);
+          }
+          span.setStatus(
+            hasError
+              ? { code: SpanStatusCode.ERROR, message: 'partial failure' }
+              : { code: SpanStatusCode.OK },
+          );
+          span.end();
         },
       );
     });

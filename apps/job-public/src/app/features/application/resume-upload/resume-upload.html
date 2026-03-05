@@ -1,5 +1,5 @@
 <!-- Mode tabs -->
-@if (profileStore.resumes().length > 0 || store.parseStatus() === 'parsed') {
+@if (profileStore.resumes().length > 0 || store.parseStatus() === 'parsed' || store.parseStatus() === 'partial') {
   <div class="mb-4 flex rounded-lg bg-slate-100 p-1 dark:bg-slate-800">
     <button
       type="button"
@@ -72,23 +72,10 @@
         <div class="h-4 w-4 rounded-full border-2 border-slate-300 border-t-primary-600 animate-spin dark:border-slate-600"></div>
         Extracting resume data...
       </div>
-    } @else if (store.parseStatus() === 'ready') {
-      <div class="mt-3 flex items-center gap-3 text-sm">
-        <span class="text-primary-600 dark:text-primary-400">Resume parsed — apply to form?</span>
-        <button
-          type="button"
-          class="rounded-md bg-primary-600 px-2.5 py-1 text-xs font-medium text-white hover:bg-primary-700"
-          (click)="store.applyResumeData()"
-        >
-          Apply
-        </button>
-        <button
-          type="button"
-          class="rounded-md px-2.5 py-1 text-xs font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
-          (click)="store.dismissResumeData()"
-        >
-          Skip
-        </button>
+    } @else if (store.parseStatus() === 'partial') {
+      <div class="mt-3 flex items-center gap-2 text-sm text-primary-600 dark:text-primary-400">
+        <div class="h-4 w-4 rounded-full border-2 border-primary-200 border-t-primary-600 animate-spin dark:border-primary-800"></div>
+        Auto-filling form — {{ store.sectionsComplete() }}/5 sections extracted
       </div>
     } @else if (store.parseStatus() === 'parsed' && store.resumeData()) {
       <div class="mt-3 flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
@@ -176,28 +163,118 @@
       </div>
     }
     @case ('parsing') {
-      <div class="card p-10 text-center">
-        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl ai-gradient animate-pulse-slow">
-          <svg
-            class="h-7 w-7 text-white"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"
-            />
-          </svg>
+      <div class="card p-8">
+        <div class="flex items-center gap-3">
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ai-gradient animate-pulse-slow">
+            <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+            </svg>
+          </div>
+          <div>
+            <p class="font-medium text-slate-900 dark:text-white">
+              AI is extracting your resume — {{ store.sectionsComplete() }}/5 sections
+            </p>
+            @if (store.currentParsingSectionLabel()) {
+              <p class="text-sm text-slate-500 dark:text-slate-400">
+                Extracting {{ store.currentParsingSectionLabel() }}...
+              </p>
+            }
+          </div>
         </div>
-        <p class="mt-4 font-medium text-slate-900 dark:text-white">AI is parsing your resume...</p>
-        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          Extracting skills, experience, and contact info
-        </p>
-        <div class="mx-auto mt-4 h-1.5 w-48 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
-          <div class="h-full animate-shimmer ai-gradient rounded-full"></div>
+        <!-- Progress bar -->
+        <div class="mt-4 h-1.5 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+          <div
+            class="h-full ai-gradient rounded-full transition-all duration-500"
+            [style.width.%]="(store.sectionsComplete() / 5) * 100"
+          ></div>
+        </div>
+        <!-- Section status pills -->
+        <div class="mt-3 flex flex-wrap gap-2">
+          @for (entry of parseSections; track entry) {
+            <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium"
+              [class]="sectionStatus(entry) === 'done'
+                ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400'
+                : sectionStatus(entry) === 'parsing'
+                  ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400'
+                  : sectionStatus(entry) === 'failed'
+                    ? 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400'
+                    : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'"
+            >
+              @if (sectionStatus(entry) === 'done') {
+                <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+              } @else if (sectionStatus(entry) === 'parsing') {
+                <div class="h-3 w-3 rounded-full border-2 border-primary-200 border-t-primary-600 animate-spin"></div>
+              } @else if (sectionStatus(entry) === 'failed') {
+                <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              }
+              {{ parseSectionLabels[entry] }}
+            </span>
+          }
+        </div>
+      </div>
+    }
+    @case ('partial') {
+      <div class="card p-8">
+        <div class="flex items-center gap-3">
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ai-gradient animate-pulse-slow">
+            <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+            </svg>
+          </div>
+          <div>
+            <p class="font-medium text-slate-900 dark:text-white">
+              AI is extracting your resume — {{ store.sectionsComplete() }}/5 sections
+            </p>
+            @if (store.currentParsingSectionLabel()) {
+              <p class="text-sm text-slate-500 dark:text-slate-400">
+                Extracting {{ store.currentParsingSectionLabel() }}...
+              </p>
+            } @else {
+              <p class="text-sm text-slate-500 dark:text-slate-400">
+                Form is being auto-filled as sections complete
+              </p>
+            }
+          </div>
+        </div>
+        <!-- Progress bar -->
+        <div class="mt-4 h-1.5 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+          <div
+            class="h-full ai-gradient rounded-full transition-all duration-500"
+            [style.width.%]="(store.sectionsComplete() / 5) * 100"
+          ></div>
+        </div>
+        <!-- Section status pills -->
+        <div class="mt-3 flex flex-wrap gap-2">
+          @for (entry of parseSections; track entry) {
+            <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium"
+              [class]="sectionStatus(entry) === 'done'
+                ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400'
+                : sectionStatus(entry) === 'parsing'
+                  ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400'
+                  : sectionStatus(entry) === 'failed'
+                    ? 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400'
+                    : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'"
+            >
+              @if (sectionStatus(entry) === 'done') {
+                <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+              } @else if (sectionStatus(entry) === 'parsing') {
+                <div class="h-3 w-3 rounded-full border-2 border-primary-200 border-t-primary-600 animate-spin"></div>
+              } @else if (sectionStatus(entry) === 'failed') {
+                <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              }
+              {{ parseSectionLabels[entry] }}
+            </span>
+          }
         </div>
       </div>
     }
@@ -226,77 +303,6 @@
           <div class="h-full animate-shimmer ai-gradient rounded-full"></div>
         </div>
       </div>
-    }
-    @case ('ready') {
-      @if (store.pendingResumeData(); as data) {
-        <div class="card border-primary-200 p-6 dark:border-primary-800">
-          <div class="flex items-center gap-3">
-            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900/30">
-              <svg
-                class="h-6 w-6 text-primary-600 dark:text-primary-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"
-                />
-              </svg>
-            </div>
-            <div>
-              <p class="font-semibold text-slate-900 dark:text-white">Resume parsed successfully</p>
-              <p class="text-sm text-slate-500 dark:text-slate-400">Apply AI-extracted data to the form?</p>
-            </div>
-          </div>
-          <div class="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
-            @for (field of parsedFields; track field.label) {
-              <div class="flex items-center gap-2">
-                <svg
-                  class="h-4 w-4 shrink-0 text-primary-500"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                </svg>
-                <span class="text-slate-600 dark:text-slate-400">{{ field.label }}: </span>
-                <span class="font-medium text-slate-900 dark:text-white">{{ field.value }}</span>
-              </div>
-            }
-          </div>
-          @if (data.skills.length > 0) {
-            <div class="mt-4 flex flex-wrap gap-1.5">
-              @for (skill of data.skills; track skill) {
-                <span
-                  class="rounded-md bg-primary-50 px-2 py-0.5 text-xs font-medium text-primary-700 dark:bg-primary-900/20 dark:text-primary-400"
-                >
-                  {{ skill }}
-                </span>
-              }
-            </div>
-          }
-          <div class="mt-5 flex gap-3">
-            <button
-              type="button"
-              class="btn-primary flex-1"
-              (click)="store.applyResumeData()"
-            >
-              Apply to form
-            </button>
-            <button
-              type="button"
-              class="flex-1 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
-              (click)="store.dismissResumeData()"
-            >
-              Keep my edits
-            </button>
-          </div>
-        </div>
-      }
     }
     @case ('parsed') {
       <div class="card p-6">

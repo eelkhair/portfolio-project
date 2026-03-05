@@ -196,4 +196,52 @@ public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<Mon
             throw;
         }
     }
+
+    public async Task NotifySectionParsedAsync(ResumeSectionParsedRequest model, CancellationToken ct)
+    {
+        try
+        {
+            var request = CreateRequest(HttpMethod.Post, "api/resumes/section-parsed", "monolith-api");
+            request.Content = JsonContent.Create(model);
+            await Client.InvokeMethodAsync(request, ct);
+        }
+        catch (InvocationException ex)
+        {
+            var body = await ex.Response.Content.ReadAsStringAsync(ct);
+            logger.LogError(ex, "Error notifying monolith of section parse for {Section}: {Body}", model.Section, body);
+            throw;
+        }
+    }
+
+    public async Task NotifySectionFailedAsync(ResumeSectionFailedRequest model, CancellationToken ct)
+    {
+        try
+        {
+            var request = CreateRequest(HttpMethod.Post, "api/resumes/section-failed", "monolith-api");
+            request.Content = JsonContent.Create(model);
+            await Client.InvokeMethodAsync(request, ct);
+        }
+        catch (InvocationException ex)
+        {
+            var body = await ex.Response.Content.ReadAsStringAsync(ct);
+            logger.LogError(ex, "Error notifying monolith of section failure for {Section}: {Body}", model.Section, body);
+            throw;
+        }
+    }
+
+    public async Task NotifyAllSectionsCompletedAsync(ResumeAllSectionsCompletedRequest model, CancellationToken ct)
+    {
+        try
+        {
+            var request = CreateRequest(HttpMethod.Post, "api/resumes/all-sections-completed", "monolith-api");
+            request.Content = JsonContent.Create(model);
+            await Client.InvokeMethodAsync(request, ct);
+        }
+        catch (InvocationException ex)
+        {
+            var body = await ex.Response.Content.ReadAsStringAsync(ct);
+            logger.LogError(ex, "Error notifying monolith of all sections completed: {Body}", body);
+            throw;
+        }
+    }
 }
