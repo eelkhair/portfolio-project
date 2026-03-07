@@ -1,0 +1,2515 @@
+[
+  {
+    "title": "Senior Backend Engineer",
+    "aboutRole": "Design and build scalable backend services powering our core platform. You will own critical API surfaces, optimize database performance, and drive architectural decisions for high-throughput systems.\n\nAs a senior member of the backend team, you will mentor engineers, lead design reviews, and shape the technical roadmap. You will collaborate cross-functionally with frontend, infrastructure, and product teams to deliver reliable, well-documented services that meet demanding SLAs.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Design and implement RESTful APIs and event-driven microservices",
+      "Optimize SQL and NoSQL database queries for sub-millisecond latency",
+      "Lead code reviews and establish backend engineering best practices",
+      "Collaborate with infrastructure teams on deployment and scaling strategies",
+      "Mentor junior engineers and contribute to technical documentation"
+    ],
+    "qualifications": [
+      "5+ years of experience with C#, Java, or Go in production environments",
+      "Strong understanding of distributed systems, message queues, and caching layers",
+      "Experience with SQL Server, PostgreSQL, or similar relational databases",
+      "Familiarity with containerization (Docker, Kubernetes) and CI/CD pipelines",
+      "Bachelor's degree in Computer Science or equivalent practical experience"
+    ]
+  },
+  {
+    "title": "Frontend Developer",
+    "aboutRole": "Build responsive, accessible web applications that delight users. You will work closely with designers and backend engineers to deliver pixel-perfect interfaces with smooth interactions.\n\nYou will champion frontend best practices including component reusability, performance budgets, and automated testing. Our ideal candidate thrives in a collaborative environment where design fidelity and user experience are treated as first-class engineering concerns.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop and maintain single-page applications using Angular or React",
+      "Implement responsive designs that work across browsers and devices",
+      "Write unit and integration tests to ensure UI reliability",
+      "Optimize frontend performance including bundle size and rendering speed",
+      "Participate in design reviews and provide technical feasibility feedback"
+    ],
+    "qualifications": [
+      "3+ years of professional experience with TypeScript and modern JavaScript frameworks",
+      "Strong knowledge of HTML5, CSS3, and responsive design principles",
+      "Experience with state management patterns (NgRx, Redux, or similar)",
+      "Familiarity with RESTful API integration and WebSocket communication",
+      "Understanding of accessibility standards (WCAG 2.1)"
+    ]
+  },
+  {
+    "title": "DevOps Engineer",
+    "aboutRole": "Build and maintain the infrastructure and CI/CD pipelines that enable rapid, reliable software delivery. You will champion automation, observability, and infrastructure-as-code across the organization.\n\nIn this role you will partner with development teams to optimize build times, improve deployment reliability, and establish monitoring best practices. You will be instrumental in shaping our cloud strategy and ensuring our infrastructure scales efficiently as the platform grows.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Design and maintain CI/CD pipelines using GitHub Actions, Azure DevOps, or Jenkins",
+      "Manage cloud infrastructure on Azure or AWS using Terraform or Bicep",
+      "Implement monitoring, alerting, and logging solutions with Grafana and Prometheus",
+      "Automate deployment processes and environment provisioning",
+      "Collaborate with development teams to improve build and release workflows"
+    ],
+    "qualifications": [
+      "4+ years of experience in DevOps, SRE, or platform engineering roles",
+      "Proficiency with Docker, Kubernetes, and container orchestration",
+      "Experience with infrastructure-as-code tools (Terraform, Pulumi, or ARM templates)",
+      "Strong scripting skills in Bash, PowerShell, or Python",
+      "Knowledge of networking, DNS, load balancing, and TLS certificate management"
+    ]
+  },
+  {
+    "title": "Full Stack Developer",
+    "aboutRole": "Work across the entire stack to deliver end-to-end features from database to UI. You will contribute to both frontend and backend codebases, bridging the gap between design and infrastructure.\n\nThis role is ideal for engineers who enjoy variety and want ownership of complete features. You will participate in architectural discussions, suggest improvements across layers, and help the team adopt new technologies that improve developer productivity and user experience.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Build features spanning Angular/React frontends and .NET/Node.js backends",
+      "Design database schemas and write efficient queries",
+      "Implement authentication and authorization flows",
+      "Write automated tests at unit, integration, and end-to-end levels",
+      "Participate in architecture discussions and technical planning"
+    ],
+    "qualifications": [
+      "3+ years of full-stack development experience",
+      "Proficiency in TypeScript/JavaScript and at least one backend language (C#, Python, or Node.js)",
+      "Experience with relational databases and ORM frameworks",
+      "Familiarity with cloud services (Azure, AWS, or GCP)",
+      "Strong problem-solving skills and attention to detail"
+    ]
+  },
+  {
+    "title": "QA Automation Engineer",
+    "aboutRole": "Ensure software quality through comprehensive automated testing strategies. You will design test frameworks, write automated test suites, and integrate quality gates into CI/CD pipelines.\n\nYou will work alongside developers to shift testing left, advocate for testability in system design, and build dashboards that give the team confidence in every release. Your work directly impacts deployment velocity and production stability.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Design and implement automated test frameworks for API and UI testing",
+      "Write and maintain end-to-end tests using Playwright, Selenium, or Cypress",
+      "Integrate automated tests into CI/CD pipelines for continuous quality feedback",
+      "Analyze test results and collaborate with developers to resolve defects",
+      "Define and track quality metrics and test coverage goals"
+    ],
+    "qualifications": [
+      "3+ years of experience in QA automation or software testing",
+      "Proficiency in at least one programming language (C#, Java, Python, or TypeScript)",
+      "Experience with test automation frameworks (xUnit, NUnit, Jest, or Pytest)",
+      "Understanding of API testing tools (Postman, REST Assured, or similar)",
+      "Knowledge of performance testing and load testing concepts"
+    ]
+  },
+  {
+    "title": "Data Engineer",
+    "aboutRole": "Build and optimize data pipelines that power analytics, reporting, and machine learning workloads. You will work with large datasets and ensure data quality, reliability, and accessibility across the organization.\n\nYou will partner with data scientists, analysts, and product teams to understand their data needs and deliver scalable solutions. This role combines strong software engineering fundamentals with deep knowledge of data processing frameworks and cloud data services.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Design and implement ETL/ELT pipelines for batch and streaming data",
+      "Build and maintain data warehouse schemas and data models",
+      "Optimize query performance and data storage costs",
+      "Implement data quality checks and monitoring",
+      "Collaborate with data scientists and analysts to deliver actionable datasets"
+    ],
+    "qualifications": [
+      "4+ years of experience in data engineering or backend development",
+      "Strong SQL skills and experience with data warehousing solutions",
+      "Experience with Apache Kafka, Spark, or similar streaming technologies",
+      "Proficiency in Python or Scala for data processing",
+      "Familiarity with cloud data services (Azure Data Factory, AWS Glue, or BigQuery)"
+    ]
+  },
+  {
+    "title": "Mobile Developer (iOS/Android)",
+    "aboutRole": "Develop and maintain mobile applications that provide seamless user experiences. You will work with cross-platform frameworks or native toolkits to ship features to millions of users.\n\nYour work will directly impact how users interact with our products on their most personal devices. You will stay current with platform updates, advocate for mobile-first design, and ensure our apps meet the quality bar expected by App Store and Play Store reviewers.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Build and maintain mobile applications using React Native, Flutter, or native SDKs",
+      "Implement offline-first architectures and local data persistence",
+      "Integrate with REST APIs and push notification services",
+      "Optimize app performance, memory usage, and battery consumption",
+      "Publish and manage app releases through App Store and Google Play"
+    ],
+    "qualifications": [
+      "3+ years of mobile development experience (iOS, Android, or cross-platform)",
+      "Proficiency in Swift, Kotlin, Dart, or React Native with TypeScript",
+      "Experience with mobile CI/CD pipelines and automated testing",
+      "Understanding of mobile UX patterns and platform design guidelines",
+      "Familiarity with analytics and crash reporting tools (Firebase, Sentry)"
+    ]
+  },
+  {
+    "title": "Platform Engineer",
+    "aboutRole": "Build internal developer platforms that accelerate engineering velocity. You will create self-service tooling, standardize infrastructure patterns, and reduce cognitive load for product teams.\n\nYour customers are internal engineering teams, and your success is measured by their productivity and satisfaction. You will gather developer feedback, iterate on platform capabilities, and ensure the platform remains reliable, secure, and easy to adopt as the organization scales.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Build and maintain internal developer platforms and self-service tooling",
+      "Create reusable infrastructure modules and deployment templates",
+      "Implement service mesh, API gateways, and traffic management solutions",
+      "Define and enforce platform standards for security, logging, and monitoring",
+      "Support product engineering teams in adopting platform capabilities"
+    ],
+    "qualifications": [
+      "5+ years of experience in platform engineering, DevOps, or infrastructure roles",
+      "Deep expertise with Kubernetes, Helm, and container orchestration",
+      "Experience building CLIs, SDKs, or internal tooling",
+      "Strong understanding of networking, service discovery, and observability",
+      "Familiarity with Backstage, Crossplane, or similar platform engineering tools"
+    ]
+  },
+  {
+    "title": "Machine Learning Engineer",
+    "aboutRole": "Bridge the gap between data science and production systems by deploying and operating ML models at scale. You will build inference pipelines, feature stores, and model monitoring infrastructure.\n\nYou will work at the intersection of research and production engineering, translating experimental notebooks into robust, observable services. This role requires strong software engineering discipline combined with an understanding of ML lifecycle management, from data preparation through model retirement.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Deploy and serve machine learning models in production environments",
+      "Build feature engineering pipelines and feature stores",
+      "Implement model monitoring, drift detection, and retraining workflows",
+      "Optimize model inference latency and throughput",
+      "Collaborate with data scientists to productionize research prototypes"
+    ],
+    "qualifications": [
+      "3+ years of experience in ML engineering or backend development with ML focus",
+      "Proficiency in Python and ML frameworks (PyTorch, TensorFlow, or scikit-learn)",
+      "Experience with ML serving platforms (MLflow, SageMaker, or Vertex AI)",
+      "Strong software engineering fundamentals including testing and version control",
+      "Familiarity with vector databases and embedding-based search systems"
+    ]
+  },
+  {
+    "title": "Engineering Manager",
+    "aboutRole": "Lead a team of engineers to deliver high-quality software while fostering a culture of growth and collaboration. You will balance technical leadership with people management to drive team and business outcomes.\n\nYou will create an environment where engineers do the best work of their careers. This means building psychological safety, setting clear expectations, providing timely feedback, and ensuring the team has the tools and processes needed to ship quality software consistently.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Manage and mentor a team of 5-8 software engineers",
+      "Drive sprint planning, backlog grooming, and delivery commitments",
+      "Conduct regular 1:1s, performance reviews, and career development conversations",
+      "Collaborate with product management to define technical roadmaps",
+      "Remove blockers and continuously improve team processes"
+    ],
+    "qualifications": [
+      "6+ years of software engineering experience with 2+ years in a leadership role",
+      "Track record of delivering complex software projects on time",
+      "Strong communication skills and ability to translate business needs to technical plans",
+      "Experience with agile methodologies (Scrum, Kanban)",
+      "Hands-on technical ability to review code and guide architectural decisions"
+    ]
+  },
+  {
+    "title": "Junior Software Developer",
+    "aboutRole": "Begin your engineering career by contributing to real-world projects under the guidance of senior engineers. You will write production code, fix bugs, and learn industry best practices.\n\nWe invest heavily in your growth through structured mentorship, regular pairing sessions, and a supportive code review culture. You will gain exposure to the full software development lifecycle and build a strong foundation in professional engineering practices.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Write clean, tested code for new features and bug fixes",
+      "Participate in code reviews and incorporate feedback",
+      "Assist in writing and maintaining automated tests",
+      "Document technical solutions and contribute to team knowledge base"
+    ],
+    "qualifications": [
+      "Bachelor's degree in Computer Science or equivalent bootcamp/self-taught experience",
+      "Familiarity with at least one programming language (C#, JavaScript, Python, or Java)",
+      "Basic understanding of version control with Git",
+      "Eagerness to learn and grow in a collaborative environment"
+    ]
+  },
+  {
+    "title": "Site Reliability Engineer",
+    "aboutRole": "Ensure production systems are reliable, performant, and scalable. You will define SLOs, build automation to reduce toil, and lead incident response for critical services.\n\nYou will embed reliability thinking into every stage of the development lifecycle, from design reviews through post-deployment monitoring. Your automation efforts will free engineering teams to focus on building features while maintaining the production stability our users depend on.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Define and monitor SLOs, SLIs, and error budgets for production services",
+      "Build automation to reduce operational toil and improve reliability",
+      "Lead incident response, conduct blameless post-mortems, and track action items",
+      "Design and implement disaster recovery and failover strategies",
+      "Collaborate with development teams to improve service reliability from design phase"
+    ],
+    "qualifications": [
+      "4+ years of experience in SRE, DevOps, or systems engineering",
+      "Strong Linux/Unix administration and troubleshooting skills",
+      "Experience with observability tools (Prometheus, Grafana, Jaeger, or Datadog)",
+      "Proficiency in at least one programming language for automation (Python, Go, or C#)",
+      "Understanding of distributed systems failure modes and mitigation strategies"
+    ]
+  },
+  {
+    "title": "Security Engineer",
+    "aboutRole": "Protect our applications and infrastructure from security threats. You will conduct security assessments, implement security controls, and champion secure development practices across engineering teams.\n\nYou will embed security into the development lifecycle rather than bolt it on after the fact. By building developer-friendly security tools and clear guidelines, you will make secure coding the path of least resistance for every engineer on the team.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Conduct security code reviews and application vulnerability assessments",
+      "Implement authentication, authorization, and secrets management solutions",
+      "Design and maintain security monitoring and alerting pipelines",
+      "Develop security guidelines and training materials for engineering teams",
+      "Respond to security incidents and coordinate remediation efforts"
+    ],
+    "qualifications": [
+      "4+ years of experience in application security or security engineering",
+      "Knowledge of OWASP Top 10 and common vulnerability patterns",
+      "Experience with identity platforms (Auth0, Azure AD, or Okta)",
+      "Familiarity with penetration testing tools and techniques",
+      "Understanding of compliance frameworks (SOC 2, GDPR, or ISO 27001)"
+    ]
+  },
+  {
+    "title": "Staff Software Engineer",
+    "aboutRole": "Drive technical excellence across multiple teams by setting architectural direction, solving the hardest engineering problems, and raising the bar for code quality and system design.\n\nYour impact extends beyond code — you shape engineering culture, influence hiring decisions, and ensure the organization builds systems that will serve the business for years. You lead through technical excellence and collaboration rather than positional authority.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Define and drive architectural vision for cross-team technical initiatives",
+      "Solve complex distributed systems problems spanning multiple services",
+      "Establish engineering standards, patterns, and best practices organization-wide",
+      "Mentor senior engineers and contribute to engineering career ladder development",
+      "Evaluate and introduce new technologies aligned with business strategy"
+    ],
+    "qualifications": [
+      "8+ years of software engineering experience with demonstrated technical leadership",
+      "Deep expertise in distributed systems, API design, and data modeling",
+      "Track record of leading large-scale technical migrations or system redesigns",
+      "Excellent written and verbal communication skills for technical audiences",
+      "Experience influencing engineering direction without direct authority"
+    ]
+  },
+  {
+    "title": "Software Architect",
+    "aboutRole": "Define the long-term technical strategy and system architecture for the engineering organization. You will create architecture blueprints, evaluate technology choices, and ensure systems scale with business growth.\n\nYou will balance long-term technical vision with pragmatic delivery constraints. By maintaining close relationships with engineering teams and staying hands-on with critical design decisions, you ensure architecture remains a living practice rather than an ivory-tower exercise.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Create and maintain architecture blueprints and technical roadmaps",
+      "Evaluate build-vs-buy decisions and technology stack selections",
+      "Design integration patterns between monolithic and microservice architectures",
+      "Conduct architecture reviews and ensure alignment with non-functional requirements",
+      "Guide teams through complex migrations such as strangler-fig patterns"
+    ],
+    "qualifications": [
+      "10+ years of software engineering experience with 3+ years in architecture roles",
+      "Expertise in microservices, event-driven architecture, and domain-driven design",
+      "Experience with cloud-native architecture on Azure, AWS, or GCP",
+      "Strong understanding of CQRS, event sourcing, and transactional outbox patterns",
+      "Ability to communicate technical concepts to both engineering and business stakeholders"
+    ]
+  },
+  {
+    "title": "Backend Developer (Node.js)",
+    "aboutRole": "Build performant APIs and backend services using Node.js and TypeScript. You will design event-driven systems and ensure our services handle scale efficiently.\n\nYou will thrive in a fast-paced environment where quick iteration and clean abstractions are equally valued. Our Node.js services handle high concurrency and real-time workloads, and you will play a key role in keeping them performant, maintainable, and well-tested.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop RESTful and GraphQL APIs using Node.js and Express or Fastify",
+      "Implement message-driven integrations with RabbitMQ or Kafka",
+      "Write comprehensive unit and integration tests with Jest or Vitest",
+      "Optimize application performance and memory usage in Node.js",
+      "Contribute to shared libraries and internal npm packages"
+    ],
+    "qualifications": [
+      "3+ years of backend development experience with Node.js and TypeScript",
+      "Experience with PostgreSQL, MongoDB, or Redis",
+      "Understanding of event-driven architecture and pub/sub patterns",
+      "Familiarity with Docker and container-based deployments",
+      "Knowledge of authentication protocols (OAuth 2.0, JWT)"
+    ]
+  },
+  {
+    "title": "React Developer",
+    "aboutRole": "Build modern, performant web applications using React and the broader React ecosystem. You will create reusable component libraries and deliver exceptional user experiences.\n\nYou will be part of a frontend guild that values craft, accessibility, and performance. Our applications serve diverse users across devices and network conditions, and you will help ensure every interaction is snappy, intuitive, and delightful.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop complex UI components using React, TypeScript, and modern hooks patterns",
+      "Build and maintain shared component libraries with Storybook",
+      "Implement client-side routing, state management, and data fetching",
+      "Write unit tests with React Testing Library and end-to-end tests with Playwright",
+      "Collaborate with UX designers to implement design systems"
+    ],
+    "qualifications": [
+      "3+ years of experience building production React applications",
+      "Strong TypeScript skills and understanding of React rendering lifecycle",
+      "Experience with state management (Redux Toolkit, Zustand, or React Query)",
+      "Knowledge of CSS-in-JS, Tailwind CSS, or styled-components",
+      "Familiarity with Next.js or Remix for server-side rendering"
+    ]
+  },
+  {
+    "title": "Angular Developer",
+    "aboutRole": "Develop enterprise-grade web applications using Angular and TypeScript. You will build scalable, maintainable frontends with RxJS-based reactive patterns and comprehensive testing.\n\nYou will join a team that values type safety, testability, and scalable architecture. Our Angular applications serve enterprise customers who demand reliability and performance, and you will help maintain and evolve a codebase that meets those expectations.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Build and maintain Angular applications using standalone components and signals",
+      "Implement reactive data flows with RxJS and NgRx or signal-based state",
+      "Create reusable Angular libraries and shared UI components",
+      "Integrate with backend APIs using HttpClient and interceptor patterns",
+      "Write unit tests with Jasmine/Karma and e2e tests with Cypress or Playwright"
+    ],
+    "qualifications": [
+      "3+ years of Angular development experience (Angular 14+)",
+      "Strong TypeScript and RxJS proficiency",
+      "Experience with Angular routing, lazy loading, and dependency injection",
+      "Knowledge of Angular Material, PrimeNG, or custom design system implementation",
+      "Understanding of PWA capabilities and service workers"
+    ]
+  },
+  {
+    "title": "Cloud Infrastructure Engineer",
+    "aboutRole": "Design and operate cloud infrastructure that is secure, cost-efficient, and highly available. You will automate provisioning, enforce governance policies, and optimize cloud spending.\n\nYou will serve as the bridge between engineering teams and cloud providers, translating business requirements into secure, cost-effective infrastructure designs. Your decisions directly impact system availability, operational costs, and the speed at which teams can deliver new capabilities.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Provision and manage cloud resources on Azure or AWS using infrastructure-as-code",
+      "Implement network architecture including VNets, subnets, NSGs, and private endpoints",
+      "Configure identity and access management policies and role-based access control",
+      "Monitor and optimize cloud costs through right-sizing and reserved capacity planning",
+      "Automate compliance checks and security policy enforcement"
+    ],
+    "qualifications": [
+      "4+ years of cloud infrastructure experience (Azure preferred, AWS acceptable)",
+      "Expertise with Terraform, Bicep, or CloudFormation",
+      "Strong understanding of networking (DNS, VPN, load balancing, CDN)",
+      "Experience with Azure Kubernetes Service, App Service, or equivalent AWS services",
+      "Azure or AWS certification preferred"
+    ]
+  },
+  {
+    "title": "API Developer",
+    "aboutRole": "Design and implement robust, well-documented APIs that external and internal consumers rely on. You will focus on API standards, versioning, and developer experience.\n\nYou will be the advocate for API consumers, both internal and external. By investing in documentation, consistency, and developer experience, you ensure that integrating with our platform is straightforward and predictable for every consumer.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Design RESTful APIs following OpenAPI specification standards",
+      "Implement API versioning, rate limiting, and pagination strategies",
+      "Build API documentation and developer portals",
+      "Create integration tests and contract tests for API consumers",
+      "Monitor API performance, error rates, and usage analytics"
+    ],
+    "qualifications": [
+      "3+ years of experience building production APIs",
+      "Strong understanding of REST principles, HTTP semantics, and API design patterns",
+      "Experience with ASP.NET Core, Express.js, or FastAPI",
+      "Knowledge of API gateway patterns (YARP, Kong, or Azure API Management)",
+      "Familiarity with OpenAPI/Swagger tooling and code generation"
+    ]
+  },
+  {
+    "title": "Database Administrator / Developer",
+    "aboutRole": "Manage and optimize database systems that underpin our applications. You will design schemas, tune queries, implement high-availability configurations, and ensure data integrity at scale.\n\nYou will be the go-to expert for database-related decisions across the organization. From advising on schema design during feature planning to optimizing critical queries in production, your expertise ensures data remains the reliable foundation of our applications.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Design and optimize database schemas for transactional and analytical workloads",
+      "Tune SQL queries and indexing strategies for optimal performance",
+      "Implement database high availability, replication, and disaster recovery",
+      "Manage database migrations and schema evolution processes",
+      "Monitor database health metrics and proactively resolve performance issues"
+    ],
+    "qualifications": [
+      "4+ years of experience with SQL Server, PostgreSQL, or MySQL",
+      "Strong T-SQL or PL/pgSQL skills including stored procedures and CTEs",
+      "Experience with database performance tuning and execution plan analysis",
+      "Knowledge of temporal tables, partitioning, and columnstore indexes",
+      "Familiarity with EF Core migrations and ORM-generated query optimization"
+    ]
+  },
+  {
+    "title": "Software Development Intern",
+    "aboutRole": "Gain hands-on experience building real software as part of an engineering team. You will contribute to production codebases, learn agile practices, and develop professional engineering skills.\n\nThis internship is designed to give you meaningful project ownership, not just busywork. You will work alongside experienced engineers who are invested in your learning, and you will leave with practical skills, professional connections, and a clearer picture of your career path.",
+    "jobType": "Internship",
+    "responsibilities": [
+      "Contribute to feature development under the guidance of a mentor",
+      "Write unit tests and participate in code reviews",
+      "Document your work and present learnings to the team",
+      "Participate in daily standups and sprint ceremonies"
+    ],
+    "qualifications": [
+      "Currently pursuing a degree in Computer Science, Software Engineering, or related field",
+      "Familiarity with at least one programming language (Python, JavaScript, C#, or Java)",
+      "Basic understanding of data structures and algorithms",
+      "Strong willingness to learn and accept constructive feedback"
+    ]
+  },
+  {
+    "title": "Contract DevOps Specialist",
+    "aboutRole": "Join on a contract basis to help us migrate CI/CD pipelines, containerize applications, and establish Kubernetes-based deployment workflows.\n\nThis is a focused engagement where your expertise will have an outsized impact. You will bring best practices from your experience across multiple organizations and leave behind well-documented, maintainable infrastructure that the team can confidently operate after your engagement ends.",
+    "jobType": "Contract",
+    "responsibilities": [
+      "Migrate existing CI/CD pipelines to GitHub Actions or Azure DevOps",
+      "Containerize .NET and Node.js applications with optimized Docker images",
+      "Set up Kubernetes clusters and Helm chart deployments",
+      "Document infrastructure architecture and runbooks"
+    ],
+    "qualifications": [
+      "5+ years of DevOps experience with a focus on containerization",
+      "Expert-level Docker and Kubernetes skills",
+      "Experience with .NET and Node.js build and deployment pipelines",
+      "Strong documentation and knowledge transfer abilities"
+    ]
+  },
+  {
+    "title": "Part-Time Frontend Engineer",
+    "aboutRole": "Contribute to frontend development on a flexible part-time schedule. You will focus on building accessible UI components and improving frontend test coverage.\n\nThis flexible arrangement lets you contribute meaningfully while maintaining work-life balance. You will have clear ownership of specific areas of the frontend codebase and the autonomy to prioritize your work within agreed-upon sprint commitments.",
+    "jobType": "PartTime",
+    "responsibilities": [
+      "Build and maintain UI components in Angular or React",
+      "Improve accessibility compliance across the application",
+      "Increase frontend test coverage with unit and integration tests",
+      "Review pull requests and provide constructive feedback"
+    ],
+    "qualifications": [
+      "2+ years of frontend development experience",
+      "Proficiency in TypeScript and at least one modern UI framework",
+      "Understanding of web accessibility standards (WCAG)",
+      "Ability to work independently with asynchronous communication"
+    ]
+  },
+  {
+    "title": "Lead Backend Engineer",
+    "aboutRole": "Lead backend engineering efforts by combining hands-on development with technical leadership. You will guide system design, coordinate cross-team integrations, and ensure backend services meet reliability targets.\n\nYou will be the technical anchor for your team, providing guidance on complex problems while remaining deeply hands-on. Your leadership style combines strong technical opinions with openness to different approaches, creating an environment where the best ideas win regardless of seniority.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Lead the design and implementation of core backend services",
+      "Coordinate technical work across multiple teams for cross-cutting initiatives",
+      "Establish and enforce coding standards, testing practices, and review guidelines",
+      "Own service-level objectives and drive reliability improvements",
+      "Mentor senior and mid-level engineers on system design and best practices"
+    ],
+    "qualifications": [
+      "7+ years of backend development experience with technical leadership responsibilities",
+      "Deep expertise in C#/.NET or Java with microservices architecture",
+      "Experience with CQRS, event sourcing, or transactional outbox patterns",
+      "Strong understanding of observability (distributed tracing, structured logging, metrics)",
+      "Proven ability to lead technical initiatives and drive consensus"
+    ]
+  },
+  {
+    "title": "Principal Engineer",
+    "aboutRole": "Serve as the top technical authority, setting the engineering vision and solving the most critical technical challenges. You will influence company-wide technical strategy and represent engineering in executive discussions.\n\nYour influence extends across the entire engineering organization and into business strategy. You will identify the most leveraged technical investments, build consensus around difficult tradeoffs, and ensure the organization's technical capabilities evolve in step with its ambitions.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Set technical vision and engineering strategy across the organization",
+      "Solve the most complex, ambiguous, and impactful engineering challenges",
+      "Drive technology evaluation and adoption decisions at the organizational level",
+      "Represent engineering in executive and cross-functional leadership forums",
+      "Build engineering culture through writing, speaking, and mentoring"
+    ],
+    "qualifications": [
+      "12+ years of software engineering experience with significant technical leadership",
+      "Deep expertise across multiple domains (backend, infrastructure, data, or frontend)",
+      "Track record of driving large-scale architectural transformations",
+      "Exceptional communication skills for technical and non-technical audiences",
+      "Experience influencing company-wide technical direction and engineering culture"
+    ]
+  },
+  {
+    "title": "Observability Engineer",
+    "aboutRole": "Build and maintain the observability stack that gives engineering teams visibility into system behavior. You will implement distributed tracing, structured logging, and metrics collection across all services.\n\nYour work makes the invisible visible — helping engineers understand system behavior, diagnose issues quickly, and make data-driven decisions about reliability investments. You will be a key partner to every team that runs production services.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Implement and maintain distributed tracing with OpenTelemetry and Jaeger",
+      "Build structured logging pipelines using Serilog, Elasticsearch, or Grafana Loki",
+      "Design and deploy metrics collection and dashboarding with Prometheus and Grafana",
+      "Create alerting rules and on-call runbooks for critical service health indicators",
+      "Instrument applications for end-to-end trace context propagation"
+    ],
+    "qualifications": [
+      "4+ years of experience in observability, monitoring, or SRE roles",
+      "Hands-on experience with OpenTelemetry, Jaeger, or Zipkin",
+      "Proficiency with Grafana, Prometheus, and log aggregation tools",
+      "Understanding of distributed systems and microservice communication patterns",
+      "Experience with .NET or Java instrumentation and trace context propagation"
+    ]
+  },
+  {
+    "title": "Integration Developer",
+    "aboutRole": "Build and maintain integrations between internal systems and third-party services. You will design reliable message-based integrations and ensure data consistency across system boundaries.\n\nYou will be responsible for the connective tissue between our systems, ensuring data flows reliably across boundaries. This role requires a deep understanding of failure modes in distributed systems and the patience to build robust solutions that handle edge cases gracefully.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Design and implement integrations using message queues (RabbitMQ, Azure Service Bus)",
+      "Build API connectors for third-party services and SaaS platforms",
+      "Implement retry logic, circuit breakers, and dead-letter queue handling",
+      "Maintain integration documentation and data flow diagrams",
+      "Monitor integration health and troubleshoot message delivery failures"
+    ],
+    "qualifications": [
+      "3+ years of experience building system integrations",
+      "Experience with message brokers (RabbitMQ, Kafka, or Azure Service Bus)",
+      "Understanding of integration patterns (pub/sub, saga, outbox, CDC)",
+      "Proficiency in C# or Java for enterprise integration development",
+      "Familiarity with Dapr, MassTransit, or NServiceBus"
+    ]
+  },
+  {
+    "title": "Technical Writer (Developer Documentation)",
+    "aboutRole": "Create clear, accurate technical documentation for APIs, SDKs, and internal developer tools. You will work closely with engineering teams to produce guides, tutorials, and reference materials.\n\nGreat documentation is a force multiplier for engineering teams. You will work embedded with engineers, attending design reviews and reading code to produce documentation that is accurate, current, and genuinely useful to its audience.",
+    "jobType": "Contract",
+    "responsibilities": [
+      "Write and maintain API reference documentation using OpenAPI specs",
+      "Create getting-started guides, tutorials, and code samples",
+      "Document architecture decisions and system design rationale (ADRs)",
+      "Review and edit existing documentation for clarity and accuracy",
+      "Build and maintain documentation site infrastructure (Docusaurus, MkDocs)"
+    ],
+    "qualifications": [
+      "3+ years of technical writing experience for software engineering audiences",
+      "Ability to read and understand code in at least one language (C#, TypeScript, Python)",
+      "Experience with docs-as-code workflows (Markdown, Git, CI/CD publishing)",
+      "Strong written communication skills and attention to detail",
+      "Familiarity with API documentation standards and developer portals"
+    ]
+  },
+  {
+    "title": "Performance Engineer",
+    "aboutRole": "Identify and resolve performance bottlenecks across our applications and infrastructure. You will conduct load testing, profile applications, and implement optimizations that ensure systems perform under scale.\n\nYour work ensures that performance is a feature, not an afterthought. By establishing baselines, automating regression detection, and partnering with teams to resolve bottlenecks, you help deliver applications that remain fast and responsive as they scale.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Design and execute load tests, stress tests, and soak tests using k6 or JMeter",
+      "Profile application performance and identify CPU, memory, and I/O bottlenecks",
+      "Optimize database queries, caching strategies, and API response times",
+      "Establish performance baselines and regression detection in CI/CD",
+      "Collaborate with development teams to implement performance improvements"
+    ],
+    "qualifications": [
+      "4+ years of experience in performance engineering or backend optimization",
+      "Proficiency with profiling and benchmarking tools (dotTrace, BenchmarkDotNet, or flame graphs)",
+      "Strong understanding of caching patterns (Redis, CDN, in-memory)",
+      "Experience with load testing frameworks (k6, Gatling, or Locust)",
+      "Knowledge of database query optimization and indexing strategies"
+    ]
+  },
+  {
+    "title": "AI/ML Platform Engineer",
+    "aboutRole": "Build the platform infrastructure that enables data scientists and ML engineers to train, deploy, and monitor machine learning models at scale. You will create self-service ML workflows and manage GPU-accelerated compute.\n\nYou will enable data scientists to move from experiment to production with confidence and speed. By abstracting away infrastructure complexity and providing self-service tooling, you multiply the impact of every ML practitioner in the organization.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Build and maintain ML training and inference infrastructure",
+      "Implement model registry, versioning, and experiment tracking systems",
+      "Manage GPU compute resources and optimize training costs",
+      "Create self-service ML deployment pipelines for data science teams",
+      "Integrate ML monitoring and observability into existing platform tools"
+    ],
+    "qualifications": [
+      "4+ years of platform or infrastructure engineering experience",
+      "Experience with ML platforms (Kubeflow, MLflow, or SageMaker)",
+      "Strong Kubernetes skills including custom operators and GPU scheduling",
+      "Proficiency in Python and familiarity with ML frameworks",
+      "Understanding of vector databases and embedding storage (pgvector, Pinecone)"
+    ]
+  },
+  {
+    "title": "Rust Systems Developer",
+    "aboutRole": "Develop high-performance, memory-safe systems software using Rust. You will build low-level services, performance-critical libraries, and tooling that demands zero-cost abstractions.\n\nYou will join a team that values correctness, performance, and safety in equal measure. Rust's ownership model and type system let you write fearless concurrent code, and you will leverage these guarantees to build systems that are both fast and reliable.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Build high-performance system services and CLI tools in Rust",
+      "Design memory-safe, concurrent data processing pipelines",
+      "Create FFI bindings for integration with .NET and Node.js services",
+      "Optimize hot paths for minimal latency and maximum throughput",
+      "Contribute to open-source Rust ecosystem libraries"
+    ],
+    "qualifications": [
+      "3+ years of systems programming experience with 1+ years in Rust",
+      "Strong understanding of memory management, ownership, and lifetimes",
+      "Experience with async Rust (Tokio or async-std)",
+      "Familiarity with profiling tools (perf, flamegraph, criterion)",
+      "Knowledge of networking protocols and binary serialization formats"
+    ]
+  },
+  {
+    "title": "Go Backend Developer",
+    "aboutRole": "Build lightweight, high-concurrency backend services using Go. You will develop microservices that handle thousands of concurrent requests with minimal resource consumption.\n\nYou will appreciate Go's simplicity and the productivity that comes from a small, well-designed language. Our Go services are deployed as lightweight containers and scale horizontally, and you will contribute to an ecosystem that values clarity and operational simplicity.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop microservices and APIs using Go's standard library and frameworks",
+      "Implement concurrent processing patterns using goroutines and channels",
+      "Build gRPC and REST API endpoints with protocol buffer definitions",
+      "Write table-driven tests and benchmark critical code paths",
+      "Deploy services to Kubernetes with health checks and graceful shutdown"
+    ],
+    "qualifications": [
+      "3+ years of Go development experience in production environments",
+      "Strong understanding of Go concurrency patterns and error handling idioms",
+      "Experience with gRPC, Protocol Buffers, and API design",
+      "Familiarity with PostgreSQL, Redis, and message queues",
+      "Knowledge of Docker, Kubernetes, and observability tools"
+    ]
+  },
+  {
+    "title": "Release Engineer",
+    "aboutRole": "Own the software release process from build to production deployment. You will ensure releases are predictable, auditable, and can be rolled back safely.\n\nYou will be the guardian of deployment quality and cadence. By making releases predictable, reversible, and well-communicated, you build confidence across the organization and enable teams to ship faster without sacrificing stability.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Manage and improve the end-to-end release pipeline",
+      "Implement blue-green and canary deployment strategies",
+      "Coordinate release schedules and change management processes",
+      "Build release automation tools and dashboard visibility",
+      "Ensure rollback procedures are tested and documented"
+    ],
+    "qualifications": [
+      "3+ years of experience in release engineering or DevOps",
+      "Experience with deployment orchestration tools (Argo CD, Flux, or Octopus Deploy)",
+      "Strong understanding of version control branching strategies (GitFlow, trunk-based)",
+      "Knowledge of feature flag management (LaunchDarkly, Unleash, or custom)",
+      "Familiarity with compliance and audit requirements for software releases"
+    ]
+  },
+  {
+    "title": "Embedded Systems Developer",
+    "aboutRole": "Develop firmware and software for embedded devices and IoT products. You will write efficient, resource-constrained code and interface with hardware peripherals.\n\nYou will work at the intersection of hardware and software, solving problems that require understanding both domains. This role demands creative problem-solving within tight constraints and the satisfaction of seeing your code control physical systems in the real world.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop firmware for microcontrollers using C/C++ or Rust",
+      "Interface with sensors, actuators, and communication modules (UART, SPI, I2C)",
+      "Implement OTA firmware update mechanisms",
+      "Optimize power consumption and memory usage for resource-constrained devices",
+      "Write hardware integration tests and simulation environments"
+    ],
+    "qualifications": [
+      "3+ years of embedded systems development experience",
+      "Proficiency in C or C++ for bare-metal and RTOS development",
+      "Experience with ARM Cortex-M or ESP32 platforms",
+      "Understanding of communication protocols (MQTT, BLE, LoRa)",
+      "Familiarity with oscilloscopes, logic analyzers, and hardware debugging tools"
+    ]
+  },
+  {
+    "title": "NLP Engineer",
+    "aboutRole": "Build natural language processing systems that extract meaning from text at scale. You will work on text classification, entity extraction, and semantic search capabilities.\n\nYou will tackle the challenge of understanding unstructured text at scale, building systems that extract actionable information from documents, conversations, and user-generated content. Your work powers features that make our platform smarter and more useful for every user.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop text classification, NER, and sentiment analysis pipelines",
+      "Build and fine-tune transformer-based models for domain-specific NLP tasks",
+      "Implement semantic search using embedding models and vector databases",
+      "Create data annotation workflows and quality assurance processes",
+      "Evaluate model performance and iterate on training data improvements"
+    ],
+    "qualifications": [
+      "3+ years of NLP or computational linguistics experience",
+      "Proficiency with Hugging Face Transformers, spaCy, or similar NLP libraries",
+      "Experience with embedding models (sentence-transformers, OpenAI embeddings)",
+      "Strong Python skills and experience with pandas and NumPy",
+      "Understanding of vector similarity search (FAISS, pgvector, or Pinecone)"
+    ]
+  },
+  {
+    "title": "Blockchain Developer",
+    "aboutRole": "Build decentralized applications and smart contracts for Web3 platforms. You will design on-chain logic, integrate with wallets, and ensure security of financial transactions.\n\nYou will work at the frontier of decentralized technology, building systems where trust is enforced by code rather than institutions. This role combines deep cryptographic understanding with practical software engineering to deliver secure, auditable financial applications.",
+    "jobType": "Contract",
+    "responsibilities": [
+      "Develop and deploy smart contracts using Solidity or Rust",
+      "Build decentralized application frontends with Web3 library integrations",
+      "Implement wallet connectivity and transaction signing flows",
+      "Conduct smart contract security audits and gas optimization",
+      "Design tokenomics and on-chain governance mechanisms"
+    ],
+    "qualifications": [
+      "2+ years of blockchain development experience",
+      "Proficiency in Solidity, Vyper, or Rust for smart contract development",
+      "Experience with Ethereum, Polygon, or Solana ecosystems",
+      "Understanding of DeFi protocols, NFT standards, and token standards (ERC-20, ERC-721)",
+      "Knowledge of smart contract security patterns and common vulnerabilities"
+    ]
+  },
+  {
+    "title": "Game Developer",
+    "aboutRole": "Develop engaging game experiences using modern game engines and programming patterns. You will implement gameplay systems, optimize rendering performance, and collaborate with artists and designers.\n\nYou will combine technical excellence with creative problem-solving to deliver experiences that captivate players. This role demands both strong engineering fundamentals and an appreciation for the art of game design, animation, and interactive storytelling.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Implement gameplay mechanics, physics, and AI systems",
+      "Optimize rendering performance and memory management",
+      "Build multiplayer networking and state synchronization systems",
+      "Integrate audio, animation, and visual effects pipelines",
+      "Write automated tests for game logic and regression detection"
+    ],
+    "qualifications": [
+      "3+ years of game development experience with Unity or Unreal Engine",
+      "Strong C# (Unity) or C++ (Unreal) programming skills",
+      "Understanding of game design patterns (ECS, state machines, behavior trees)",
+      "Experience with 3D math, physics engines, and rendering pipelines",
+      "Portfolio demonstrating shipped game projects"
+    ]
+  },
+  {
+    "title": "Solutions Engineer",
+    "aboutRole": "Bridge the gap between engineering and customer success by designing technical solutions, building proof-of-concepts, and enabling customers to integrate with our platform effectively.\n\nYou will be the technical face of the company, building trust with customers through deep product knowledge and engineering credibility. Your ability to understand customer pain points and translate them into working solutions directly drives revenue and customer satisfaction.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Design and deliver technical proof-of-concepts for prospective customers",
+      "Create API integration guides and sample implementations",
+      "Troubleshoot customer integration issues and provide technical support",
+      "Gather customer requirements and relay product feedback to engineering",
+      "Present technical architecture and product capabilities to stakeholders"
+    ],
+    "qualifications": [
+      "4+ years of software engineering experience with customer-facing roles",
+      "Strong API development and integration experience",
+      "Excellent presentation and communication skills",
+      "Proficiency in multiple programming languages for polyglot customer environments",
+      "Experience with CRM tools and technical sales processes"
+    ]
+  },
+  {
+    "title": "Test Automation Architect",
+    "aboutRole": "Define the test automation strategy and build scalable testing infrastructure across the organization. You will evaluate testing tools, design test architectures, and mentor QA teams on automation best practices.\n\nYour frameworks and tools will be used by every QA engineer in the organization. By investing in developer experience, clear documentation, and reliable infrastructure, you ensure that writing automated tests is fast, enjoyable, and consistently valuable.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Define organization-wide test automation strategy and tool selection",
+      "Design and build shared test automation frameworks and libraries",
+      "Implement test infrastructure including parallel execution and reporting",
+      "Establish test data management strategies and environment provisioning",
+      "Mentor QA engineers on automation patterns and anti-patterns"
+    ],
+    "qualifications": [
+      "6+ years of experience in QA with 3+ years focused on test architecture",
+      "Expertise in multiple testing frameworks across API, UI, and performance testing",
+      "Strong programming skills in C#, Java, or TypeScript",
+      "Experience with test infrastructure (Selenium Grid, Docker-based test environments)",
+      "Knowledge of shift-left testing practices and CI/CD integration"
+    ]
+  },
+  {
+    "title": "Developer Experience Engineer",
+    "aboutRole": "Improve the productivity and satisfaction of internal engineering teams by building better tooling, streamlining workflows, and reducing friction in the development lifecycle.\n\nYou will measure success by the smiles of engineers who can set up their environment in minutes rather than hours. By relentlessly eliminating friction in the development workflow, you create compounding productivity gains across the entire engineering organization.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Build and maintain internal CLI tools and developer utilities",
+      "Improve local development setup and environment bootstrapping",
+      "Optimize CI/CD pipeline performance and developer feedback loops",
+      "Create internal documentation portals and onboarding materials",
+      "Survey engineering teams and implement improvements based on feedback"
+    ],
+    "qualifications": [
+      "3+ years of software engineering experience with a passion for developer tooling",
+      "Experience building CLI applications (Go, Rust, or Node.js)",
+      "Familiarity with IDE extensions, linters, and code generation tools",
+      "Understanding of CI/CD systems and build optimization techniques",
+      "Strong empathy for developer workflows and pain points"
+    ]
+  },
+  {
+    "title": "GraphQL API Developer",
+    "aboutRole": "Design and implement a GraphQL API layer that provides flexible, efficient data access to frontend and mobile clients. You will build schema-first APIs with robust authorization and caching.\n\nYou will design APIs that give frontend teams exactly the data they need, nothing more and nothing less. By thinking carefully about schema design and performance, you create an API layer that is both powerful for consumers and efficient for backend systems.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Design and implement GraphQL schemas using schema-first or code-first approaches",
+      "Build resolvers with DataLoader patterns to prevent N+1 query problems",
+      "Implement field-level authorization and query complexity analysis",
+      "Set up GraphQL subscriptions for real-time data updates",
+      "Optimize query execution and implement response caching strategies"
+    ],
+    "qualifications": [
+      "3+ years of API development experience with 1+ years using GraphQL",
+      "Experience with Hot Chocolate (.NET), Apollo Server, or similar GraphQL frameworks",
+      "Strong understanding of GraphQL schema design and type system",
+      "Knowledge of query optimization, batching, and caching patterns",
+      "Familiarity with federation and schema stitching for distributed GraphQL"
+    ]
+  },
+  {
+    "title": "Accessibility Engineer",
+    "aboutRole": "Ensure our digital products are usable by everyone, including people with disabilities. You will audit applications for accessibility compliance, build accessible components, and champion inclusive design.\n\nYour work ensures that our products serve everyone, regardless of ability. By combining technical expertise with empathy for diverse users, you help the team build software that is not only compliant with standards but genuinely inclusive and usable.",
+    "jobType": "PartTime",
+    "responsibilities": [
+      "Conduct accessibility audits using automated tools and manual testing",
+      "Remediate WCAG 2.1 AA violations across web applications",
+      "Build and maintain an accessible component library",
+      "Train development teams on accessible coding practices",
+      "Test with assistive technologies (screen readers, keyboard navigation)"
+    ],
+    "qualifications": [
+      "3+ years of web development experience with accessibility focus",
+      "Deep knowledge of WCAG 2.1 guidelines and ARIA specification",
+      "Experience with accessibility testing tools (axe, Lighthouse, NVDA, VoiceOver)",
+      "Proficiency in HTML semantics, CSS, and JavaScript/TypeScript",
+      "IAAP or similar accessibility certification preferred"
+    ]
+  },
+  {
+    "title": "Mid-Level .NET Developer",
+    "aboutRole": "Build and maintain business-critical applications using the .NET ecosystem. You will develop features, fix bugs, and contribute to a growing codebase with clean architecture principles.\n\nYou will join a team that values clean code, thorough testing, and continuous improvement. This is an opportunity to deepen your .NET expertise while contributing to meaningful features that serve real users and working alongside engineers who are invested in your growth.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop features in ASP.NET Core Web APIs and background services",
+      "Write LINQ queries and manage EF Core data access layers",
+      "Participate in code reviews and pair programming sessions",
+      "Troubleshoot production issues using structured logging and tracing",
+      "Contribute to unit and integration test suites"
+    ],
+    "qualifications": [
+      "3+ years of professional C#/.NET development experience",
+      "Solid understanding of dependency injection and SOLID principles",
+      "Experience with Entity Framework Core and SQL Server",
+      "Familiarity with Git workflows and pull request processes",
+      "Knowledge of xUnit or NUnit testing frameworks"
+    ]
+  },
+  {
+    "title": "Senior Python Developer",
+    "aboutRole": "Design and build Python-based backend services, data pipelines, and automation tools. You will champion code quality, mentor team members, and drive adoption of modern Python practices.\n\nYou will bring discipline and craftsmanship to the Python codebase, demonstrating that dynamic languages can be used to build robust, well-tested systems. Your influence will extend beyond code to team practices, tooling choices, and architectural patterns.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop backend services using FastAPI, Django, or Flask",
+      "Design and implement data processing pipelines with pandas and Celery",
+      "Establish coding standards including type hints, linting, and formatting",
+      "Mentor junior developers through code reviews and pairing",
+      "Optimize application performance and resource utilization"
+    ],
+    "qualifications": [
+      "5+ years of professional Python development experience",
+      "Strong knowledge of async Python (asyncio, aiohttp)",
+      "Experience with PostgreSQL, Redis, and message queues",
+      "Familiarity with Docker, CI/CD, and cloud deployments",
+      "Understanding of Python packaging and dependency management (Poetry, pip)"
+    ]
+  },
+  {
+    "title": "Kubernetes Administrator",
+    "aboutRole": "Manage and optimize Kubernetes clusters that run our production workloads. You will ensure cluster reliability, security, and cost efficiency across multiple environments.\n\nYou will be the expert that teams turn to when they need to understand how their workloads behave in production. By maintaining healthy, secure clusters and providing clear guidance on Kubernetes best practices, you enable the entire organization to ship with confidence.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Provision and manage production Kubernetes clusters (AKS, EKS, or GKE)",
+      "Implement RBAC, network policies, and pod security standards",
+      "Configure auto-scaling, resource quotas, and node pool management",
+      "Troubleshoot pod scheduling, networking, and storage issues",
+      "Upgrade clusters and manage addon lifecycle (ingress controllers, cert-manager)"
+    ],
+    "qualifications": [
+      "4+ years of Kubernetes administration experience",
+      "CKA or CKAD certification preferred",
+      "Experience with Helm, Kustomize, and GitOps workflows (Argo CD or Flux)",
+      "Strong Linux administration and networking skills",
+      "Knowledge of service mesh technologies (Istio, Linkerd)"
+    ]
+  },
+  {
+    "title": "iOS Developer (Swift)",
+    "aboutRole": "Build native iOS applications that deliver polished, performant experiences on iPhone and iPad. You will work with SwiftUI and UIKit to ship features that users love.\n\nYou will join a mobile team that cares deeply about craft, from smooth 60fps animations to thoughtful error handling. Our users expect a premium experience, and you will help ensure every interaction with our iOS app feels native, polished, and reliable.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop and maintain native iOS applications using Swift and SwiftUI",
+      "Implement complex UI layouts, animations, and gesture interactions",
+      "Integrate with REST APIs and handle offline data synchronization",
+      "Write unit and UI tests using XCTest and snapshot testing",
+      "Submit app updates to the App Store and manage release cycles"
+    ],
+    "qualifications": [
+      "3+ years of native iOS development with Swift",
+      "Proficiency in SwiftUI and UIKit frameworks",
+      "Experience with Core Data, Combine, and async/await patterns",
+      "Understanding of iOS app lifecycle, memory management, and performance profiling",
+      "Portfolio of published apps on the App Store"
+    ]
+  },
+  {
+    "title": "Android Developer (Kotlin)",
+    "aboutRole": "Build native Android applications using Kotlin and Jetpack Compose. You will deliver high-quality mobile experiences with modern architecture patterns and robust testing.\n\nYou will help shape the Android experience for a growing user base that depends on our app daily. The team values modern Android development practices, and you will have the opportunity to influence architecture decisions and mentor less experienced developers.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop Android applications using Kotlin and Jetpack Compose",
+      "Implement MVVM architecture with Hilt dependency injection",
+      "Handle background processing with WorkManager and Coroutines",
+      "Write unit tests with JUnit and UI tests with Espresso or Compose Testing",
+      "Optimize app size, startup time, and battery usage"
+    ],
+    "qualifications": [
+      "3+ years of Android development experience with Kotlin",
+      "Proficiency with Jetpack libraries (Compose, Navigation, Room, DataStore)",
+      "Experience with Retrofit, OkHttp, and Kotlin Coroutines/Flow",
+      "Understanding of Material Design guidelines and adaptive layouts",
+      "Familiarity with Firebase services and Google Play Console"
+    ]
+  },
+  {
+    "title": "Technical Lead",
+    "aboutRole": "Provide technical direction for a product engineering team while remaining hands-on. You will make architectural decisions, unblock team members, and ensure timely delivery of high-quality software.\n\nYour success is measured not just by your own output but by the productivity and growth of your team. You will create technical clarity out of ambiguous requirements, shield the team from unnecessary complexity, and ensure that technical decisions serve both current and future needs.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Lead technical design and architecture for team projects",
+      "Make technology decisions and communicate tradeoffs to stakeholders",
+      "Conduct thorough code reviews and maintain code quality standards",
+      "Unblock team members by providing guidance on complex problems",
+      "Balance technical debt reduction with feature delivery priorities"
+    ],
+    "qualifications": [
+      "6+ years of software engineering experience with 2+ years as tech lead",
+      "Strong system design skills across backend, frontend, and infrastructure",
+      "Experience leading teams of 4-8 engineers in agile environments",
+      "Ability to translate product requirements into technical specifications",
+      "Excellent communication skills for both technical and non-technical audiences"
+    ]
+  },
+  {
+    "title": "ETL Developer",
+    "aboutRole": "Design and implement data extraction, transformation, and loading processes that feed analytics and reporting systems. You will ensure data quality and timeliness across business-critical pipelines.\n\nYour pipelines are the backbone of business intelligence and decision-making. By delivering reliable, timely data to downstream consumers, you empower analysts and stakeholders to make informed decisions that drive the business forward.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Build ETL pipelines using SSIS, Azure Data Factory, or Apache Airflow",
+      "Transform and cleanse data from multiple heterogeneous sources",
+      "Implement incremental load patterns and change data capture",
+      "Monitor pipeline health and implement alerting for data quality issues",
+      "Optimize data processing performance for large-scale datasets"
+    ],
+    "qualifications": [
+      "3+ years of ETL development experience",
+      "Strong SQL skills including complex joins, window functions, and CTEs",
+      "Experience with at least one orchestration tool (Airflow, ADF, or SSIS)",
+      "Knowledge of data warehousing concepts (star schema, slowly changing dimensions)",
+      "Familiarity with Python or Scala for custom data transformations"
+    ]
+  },
+  {
+    "title": "Scrum Master / Agile Coach",
+    "aboutRole": "Facilitate agile practices for engineering teams and help them continuously improve their processes. You will coach teams on Scrum, Kanban, and lean principles to maximize delivery effectiveness.\n\nYou will create the conditions for high-performing teams by fostering transparency, encouraging experimentation, and helping teams learn from both successes and failures. Your facilitation skills turn meetings into productive sessions that teams actually look forward to.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Facilitate sprint ceremonies including planning, standups, reviews, and retrospectives",
+      "Remove impediments and shield the team from external distractions",
+      "Coach team members and stakeholders on agile principles and practices",
+      "Track and visualize team metrics (velocity, cycle time, throughput)",
+      "Drive continuous improvement initiatives based on retrospective outcomes"
+    ],
+    "qualifications": [
+      "3+ years of Scrum Master or agile coaching experience with software teams",
+      "CSM, PSM, or SAFe certification required",
+      "Understanding of software development lifecycle and engineering practices",
+      "Excellent facilitation and conflict resolution skills",
+      "Experience with Jira, Azure DevOps, or similar project management tools"
+    ]
+  },
+  {
+    "title": "Computer Vision Engineer",
+    "aboutRole": "Develop computer vision systems that analyze images and video feeds for object detection, classification, and tracking applications.\n\nYou will push the boundaries of what machines can see and understand. By combining deep learning expertise with practical engineering, you deliver vision systems that work reliably in real-world conditions with varying lighting, angles, and occlusions.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Build and train deep learning models for object detection and image segmentation",
+      "Deploy computer vision models for real-time inference on edge devices",
+      "Create data labeling workflows and manage training datasets",
+      "Optimize model architectures for latency and accuracy tradeoffs",
+      "Integrate vision models with application backends via REST APIs"
+    ],
+    "qualifications": [
+      "3+ years of computer vision experience in production environments",
+      "Proficiency with PyTorch or TensorFlow and CNN architectures (YOLO, ResNet, EfficientNet)",
+      "Experience with OpenCV and image preprocessing techniques",
+      "Knowledge of model optimization (quantization, pruning, ONNX Runtime)",
+      "Familiarity with edge deployment platforms (NVIDIA Jetson, Intel OpenVINO)"
+    ]
+  },
+  {
+    "title": "VP of Engineering",
+    "aboutRole": "Lead the engineering organization by setting strategy, building high-performing teams, and ensuring technical execution aligns with business objectives. You will own engineering outcomes at the department level.\n\nYou will shape the engineering department into an organization that attracts top talent, delivers reliably, and adapts to changing business needs. Your leadership sets the tone for engineering culture, and your decisions have lasting impact on the company's technical trajectory.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Set engineering strategy and roadmap aligned with company objectives",
+      "Build, develop, and retain high-performing engineering teams",
+      "Establish engineering culture, values, and hiring standards",
+      "Manage engineering budget, vendor relationships, and technology investments",
+      "Partner with product, design, and business leadership on company strategy"
+    ],
+    "qualifications": [
+      "12+ years of software engineering experience with 5+ years in senior leadership",
+      "Track record of scaling engineering organizations (50+ engineers)",
+      "Experience with organizational design, hiring, and talent development",
+      "Strong business acumen and ability to communicate with C-suite executives",
+      "Deep technical background with ability to evaluate architectural decisions"
+    ]
+  },
+  {
+    "title": "Edge Computing Developer",
+    "aboutRole": "Build software that runs at the network edge, close to data sources and end users. You will develop lightweight services optimized for constrained environments with intermittent connectivity.\n\nYou will solve unique challenges that arise when software runs far from the data center, including unreliable networks, limited resources, and the need for autonomous operation. This role rewards creative problem-solving and a deep understanding of distributed systems at the edge.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop edge computing applications with minimal resource footprint",
+      "Implement data synchronization between edge and cloud environments",
+      "Build local-first architectures that handle intermittent connectivity",
+      "Optimize container images for ARM and x86 edge hardware",
+      "Monitor edge fleet health and implement remote update mechanisms"
+    ],
+    "qualifications": [
+      "3+ years of software development with edge or IoT focus",
+      "Experience with lightweight container runtimes (K3s, MicroK8s)",
+      "Proficiency in Go, Rust, or C++ for resource-constrained environments",
+      "Understanding of MQTT, AMQP, and edge messaging patterns",
+      "Familiarity with Azure IoT Edge, AWS Greengrass, or similar platforms"
+    ]
+  },
+  {
+    "title": "Chaos Engineer",
+    "aboutRole": "Proactively discover system weaknesses by designing and running controlled failure experiments. You will build resilience testing into the development lifecycle and improve system robustness.\n\nYour controlled experiments reveal the hidden weaknesses that only emerge under stress. By building a culture of proactive resilience testing, you help the organization move from reactive firefighting to confident, well-understood failure handling.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Design and execute chaos experiments to test system resilience",
+      "Build chaos engineering tooling and integrate with CI/CD pipelines",
+      "Analyze experiment results and recommend architectural improvements",
+      "Develop game days and failure injection scenarios for production systems",
+      "Document resilience patterns and failure mode catalogs"
+    ],
+    "qualifications": [
+      "4+ years of SRE, infrastructure, or backend engineering experience",
+      "Experience with chaos engineering tools (Chaos Monkey, Litmus, or Gremlin)",
+      "Strong understanding of distributed systems failure modes",
+      "Proficiency in scripting and automation (Python, Go, or Bash)",
+      "Knowledge of observability and incident management practices"
+    ]
+  },
+  {
+    "title": "Microservices Developer",
+    "aboutRole": "Design and build independently deployable microservices that communicate through well-defined APIs and message contracts. You will focus on service boundaries, data ownership, and inter-service communication.\n\nYou will think deeply about service boundaries, data ownership, and the tradeoffs inherent in distributed architectures. By building services that are independently deployable, observable, and resilient, you contribute to a system that scales with both traffic and team growth.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop microservices following domain-driven design bounded context principles",
+      "Implement event-driven communication using message brokers",
+      "Design service contracts and maintain backward compatibility",
+      "Build health checks, circuit breakers, and retry policies",
+      "Manage per-service databases and data consistency patterns"
+    ],
+    "qualifications": [
+      "4+ years of backend development with microservices experience",
+      "Strong understanding of DDD, bounded contexts, and aggregate patterns",
+      "Experience with message brokers (RabbitMQ, Kafka, or Azure Service Bus)",
+      "Knowledge of API versioning and contract testing",
+      "Familiarity with service mesh and API gateway patterns"
+    ]
+  },
+  {
+    "title": "Salesforce Developer",
+    "aboutRole": "Customize and extend the Salesforce platform to meet business requirements. You will build custom applications using Apex and Lightning Web Components, and integrate Salesforce with internal systems.\n\nYou will be the technical expert who unlocks the full potential of the Salesforce platform for business stakeholders. By combining deep platform knowledge with strong integration skills, you deliver solutions that streamline operations and improve data quality across the organization.",
+    "jobType": "Contract",
+    "responsibilities": [
+      "Develop custom Salesforce applications using Apex and LWC",
+      "Build Salesforce integrations with external systems via REST and SOAP APIs",
+      "Configure Salesforce workflows, process builder, and flow automation",
+      "Write Apex unit tests and maintain code coverage above 80%",
+      "Support data migrations and manage Salesforce deployments"
+    ],
+    "qualifications": [
+      "3+ years of Salesforce development experience",
+      "Salesforce Platform Developer I or II certification",
+      "Proficiency in Apex, SOQL, and Lightning Web Components",
+      "Experience with Salesforce DX and CI/CD for Salesforce deployments",
+      "Understanding of Salesforce data model and governor limits"
+    ]
+  },
+  {
+    "title": "UI/UX Developer",
+    "aboutRole": "Bridge design and engineering by implementing pixel-perfect interfaces with attention to usability and interaction design. You will translate Figma designs into production code with smooth animations.\n\nYou will bring designs to life with meticulous attention to detail, ensuring that every hover state, transition, and loading pattern feels intentional and polished. Your work sits at the intersection of engineering and design, and you take pride in both code quality and visual excellence.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Translate design mockups from Figma into production-ready UI components",
+      "Implement micro-interactions, transitions, and animation effects",
+      "Build and maintain a design system with reusable components",
+      "Collaborate with UX researchers to implement usability improvements",
+      "Ensure consistency between design specifications and implemented interfaces"
+    ],
+    "qualifications": [
+      "3+ years of frontend development with strong design sensibility",
+      "Proficiency in CSS animations, transitions, and modern layout techniques",
+      "Experience with design tools (Figma, Sketch) and design-to-code workflows",
+      "Knowledge of design system principles and component documentation",
+      "Understanding of user-centered design principles and usability heuristics"
+    ]
+  },
+  {
+    "title": "Search Engineer",
+    "aboutRole": "Build and optimize search infrastructure that delivers fast, relevant results to users. You will implement full-text search, faceted navigation, and ranking algorithms.\n\nFast, relevant search is one of the most impactful features in any application. You will combine information retrieval expertise with solid engineering to deliver search experiences that help users find exactly what they need, even when they struggle to articulate their query.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Design and implement search solutions using Elasticsearch or Azure Cognitive Search",
+      "Build text analysis pipelines including tokenizers, analyzers, and synonyms",
+      "Implement search relevance tuning and ranking algorithms",
+      "Develop faceted search, autocomplete, and search-as-you-type features",
+      "Monitor search performance, query latency, and relevance metrics"
+    ],
+    "qualifications": [
+      "3+ years of experience building search systems",
+      "Proficiency with Elasticsearch, Solr, or Azure Cognitive Search",
+      "Understanding of information retrieval, TF-IDF, and BM25 scoring",
+      "Experience with natural language processing for query understanding",
+      "Knowledge of vector search and hybrid search combining keyword and semantic approaches"
+    ]
+  },
+  {
+    "title": "Senior React Native Developer",
+    "aboutRole": "Build cross-platform mobile applications using React Native that share code between iOS and Android while delivering near-native performance and user experience.\n\nYou will own the mobile development experience across platforms, making strategic decisions about when to share code and when native solutions are necessary. Your expertise in React Native performance optimization ensures our apps feel native despite their cross-platform foundation.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop cross-platform mobile apps with React Native and TypeScript",
+      "Implement native modules when platform-specific functionality is needed",
+      "Optimize app performance using Hermes, lazy loading, and memoization",
+      "Set up mobile CI/CD with Fastlane, EAS Build, or App Center",
+      "Manage app store submissions and over-the-air update strategies"
+    ],
+    "qualifications": [
+      "4+ years of React Native development experience",
+      "Strong TypeScript and React fundamentals",
+      "Experience with native iOS (Swift) or Android (Kotlin) for bridging",
+      "Knowledge of mobile state management (Redux, MobX, or Zustand)",
+      "Familiarity with React Navigation, Reanimated, and Expo ecosystem"
+    ]
+  },
+  {
+    "title": "Data Platform Engineer",
+    "aboutRole": "Build and maintain the foundational data infrastructure that supports analytics, ML, and business intelligence workloads across the organization.\n\nYou will build the foundation that every data consumer in the organization depends on. By investing in data quality, discoverability, and governance, you ensure that the platform earns the trust of analysts, scientists, and engineers who rely on it daily.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Build and maintain data lake and lakehouse architectures",
+      "Implement data governance, cataloging, and lineage tracking",
+      "Design real-time and batch data ingestion pipelines",
+      "Manage data platform infrastructure (Databricks, Snowflake, or BigQuery)",
+      "Create self-service data access tools for analysts and data scientists"
+    ],
+    "qualifications": [
+      "4+ years of data platform or data engineering experience",
+      "Experience with modern data stack (dbt, Airflow, Spark)",
+      "Strong SQL skills and knowledge of data modeling patterns",
+      "Proficiency in Python or Scala for data processing",
+      "Understanding of data governance, privacy regulations, and access control"
+    ]
+  },
+  {
+    "title": "Prompt Engineer",
+    "aboutRole": "Design, test, and optimize prompts for large language model integrations across our products. You will develop prompt engineering best practices and build evaluation frameworks for LLM outputs.\n\nYou will bring a scientific approach to prompt design, systematically testing hypotheses and measuring outcomes. As LLM capabilities evolve rapidly, your ability to stay current with new techniques and translate them into product improvements makes this role both challenging and high-impact.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Design and iterate on prompts for various LLM-powered features",
+      "Build evaluation frameworks to measure prompt quality and consistency",
+      "Implement prompt versioning, A/B testing, and performance monitoring",
+      "Create prompt templates and guidelines for engineering teams",
+      "Research new prompting techniques and LLM capabilities"
+    ],
+    "qualifications": [
+      "2+ years of experience working with LLMs (OpenAI, Anthropic, or open-source models)",
+      "Strong analytical skills and systematic approach to prompt optimization",
+      "Programming experience in Python or TypeScript for tooling and automation",
+      "Understanding of token economics, context windows, and model limitations",
+      "Excellent written communication skills"
+    ]
+  },
+  {
+    "title": "Compiler Engineer",
+    "aboutRole": "Work on programming language tools including compilers, interpreters, and static analysis tooling. You will optimize code generation and build developer-facing language features.\n\nYou will work on one of the most intellectually rewarding areas of computer science. Every optimization you implement and every error message you improve has a multiplied effect across every developer who uses the language, making this a uniquely high-leverage role.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop and maintain compiler frontend (parsing, type checking, semantic analysis)",
+      "Implement optimization passes and code generation for target platforms",
+      "Build language server protocol (LSP) implementations for IDE support",
+      "Design and implement type system features and error diagnostics",
+      "Write comprehensive test suites for language correctness"
+    ],
+    "qualifications": [
+      "4+ years of experience in compiler development or programming language tools",
+      "Strong knowledge of parsing theory, type systems, and optimization techniques",
+      "Proficiency in C++, Rust, or OCaml",
+      "Understanding of LLVM, WebAssembly, or JVM bytecode",
+      "Bachelor's or Master's degree in Computer Science with PL focus"
+    ]
+  },
+  {
+    "title": "Event Streaming Developer",
+    "aboutRole": "Build real-time event streaming platforms that process millions of events per second. You will design event schemas, implement stream processing, and ensure exactly-once delivery semantics.\n\nYou will architect the real-time nervous system that connects our services and enables instant data flow across the platform. Your expertise in exactly-once semantics, schema evolution, and consumer group management ensures that events are the reliable backbone of our distributed architecture.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Design and implement event streaming architectures using Apache Kafka",
+      "Build stream processing applications with Kafka Streams or Apache Flink",
+      "Define event schemas and maintain schema registry compatibility",
+      "Implement event sourcing and CQRS patterns for downstream consumers",
+      "Monitor cluster health, partition balancing, and consumer lag"
+    ],
+    "qualifications": [
+      "4+ years of experience with event streaming platforms",
+      "Deep expertise with Apache Kafka including cluster operations",
+      "Experience with stream processing frameworks (Kafka Streams, Flink, or Spark Streaming)",
+      "Understanding of exactly-once semantics and idempotent processing",
+      "Knowledge of Avro, Protobuf, or JSON Schema for event contracts"
+    ]
+  },
+  {
+    "title": "Low-Code Platform Developer",
+    "aboutRole": "Build and extend low-code/no-code platform capabilities that enable citizen developers to create business applications without writing traditional code.\n\nYou will democratize software development by building tools that empower non-technical users to solve their own problems. This role combines platform engineering with product thinking, as you balance power and simplicity to create an experience that scales across the organization.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop custom connectors and components for the low-code platform",
+      "Build visual workflow designers and form builders",
+      "Implement plugin architectures that allow third-party extensions",
+      "Create governance controls and approval workflows for citizen developers",
+      "Maintain platform performance and security as usage scales"
+    ],
+    "qualifications": [
+      "3+ years of platform development experience",
+      "Experience with Power Platform, Mendix, OutSystems, or custom low-code solutions",
+      "Strong frontend skills for building drag-and-drop interfaces",
+      "Understanding of multi-tenancy and platform security patterns",
+      "Knowledge of workflow engines and business rules engines"
+    ]
+  },
+  {
+    "title": "Identity and Access Management Engineer",
+    "aboutRole": "Design and implement identity solutions that secure access to applications and resources. You will manage authentication flows, authorization policies, and identity lifecycle across the platform.\n\nYour work is the foundation of trust in every application interaction. By building robust, user-friendly identity solutions, you ensure that the right people have the right access at the right time while keeping unauthorized actors out.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Implement OAuth 2.0, OIDC, and SAML authentication flows",
+      "Manage identity providers (Auth0, Azure AD, Okta) and federation",
+      "Design role-based and attribute-based access control policies",
+      "Build user provisioning, deprovisioning, and access review workflows",
+      "Integrate MFA, passwordless authentication, and single sign-on"
+    ],
+    "qualifications": [
+      "4+ years of experience in identity and access management",
+      "Deep knowledge of OAuth 2.0, OpenID Connect, and SAML protocols",
+      "Experience with identity platforms (Auth0, Azure AD B2C, or Keycloak)",
+      "Understanding of zero-trust architecture principles",
+      "Familiarity with SCIM provisioning and directory services (LDAP, Active Directory)"
+    ]
+  },
+  {
+    "title": "Automation Engineer",
+    "aboutRole": "Build automation solutions that streamline business processes, reduce manual effort, and improve operational efficiency across the organization.\n\nYour impact is measured in hours saved and errors prevented. By systematically identifying repetitive manual work and replacing it with reliable automation, you free teams to focus on creative, high-value work that drives the business forward.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Identify and automate repetitive manual processes",
+      "Build RPA workflows using UiPath, Power Automate, or custom scripts",
+      "Create API integrations between business systems",
+      "Implement automated reporting and notification systems",
+      "Measure automation ROI and maintain process documentation"
+    ],
+    "qualifications": [
+      "3+ years of experience in process automation or software development",
+      "Experience with RPA platforms or scripting languages (Python, PowerShell)",
+      "Understanding of business process modeling and workflow design",
+      "Knowledge of API integration patterns and webhook architectures",
+      "Strong analytical skills for identifying automation opportunities"
+    ]
+  },
+  {
+    "title": "Senior TypeScript Developer",
+    "aboutRole": "Build type-safe applications across the stack using TypeScript. You will establish TypeScript best practices, create shared type definitions, and ensure type safety across frontend and backend codebases.\n\nYou will be the resident TypeScript expert, helping teams leverage the type system to catch bugs at compile time rather than in production. Your influence on coding standards and tooling configuration will improve developer experience and code quality across every project.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop full-stack applications using TypeScript for both frontend and backend",
+      "Design shared type definitions and API contracts between services",
+      "Configure and optimize TypeScript compiler settings for different targets",
+      "Implement advanced type patterns (generics, mapped types, conditional types)",
+      "Establish linting rules and code quality standards for TypeScript projects"
+    ],
+    "qualifications": [
+      "5+ years of TypeScript development experience across frontend and backend",
+      "Advanced knowledge of TypeScript type system and compiler API",
+      "Experience with monorepo tooling (Nx, Turborepo, or Lerna)",
+      "Proficiency with Node.js runtime and at least one frontend framework",
+      "Understanding of module resolution, declaration files, and type publishing"
+    ]
+  },
+  {
+    "title": "Distributed Systems Engineer",
+    "aboutRole": "Design and build distributed systems that are fault-tolerant, consistent, and performant at scale. You will tackle challenges around consensus, replication, and partition tolerance.\n\nYou will tackle some of the hardest problems in computer science, from maintaining consistency across network partitions to designing systems that degrade gracefully under failure. This role is ideal for engineers who enjoy reasoning about complex system behavior and proving correctness.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Design distributed systems with appropriate consistency and availability tradeoffs",
+      "Implement consensus protocols and leader election mechanisms",
+      "Build replication, sharding, and partitioning strategies for data stores",
+      "Develop fault-tolerant communication patterns between services",
+      "Analyze and resolve distributed system failures and performance bottlenecks"
+    ],
+    "qualifications": [
+      "5+ years of experience building distributed systems in production",
+      "Deep understanding of CAP theorem, eventual consistency, and consensus algorithms",
+      "Experience with distributed databases (CockroachDB, Cassandra, or DynamoDB)",
+      "Proficiency in Go, Java, or Rust for systems programming",
+      "Knowledge of network protocols, serialization formats, and RPC frameworks"
+    ]
+  },
+  {
+    "title": "Junior Data Analyst Developer",
+    "aboutRole": "Support data teams by building dashboards, writing analytical queries, and automating data reports. You will learn data engineering practices while contributing to business intelligence efforts.\n\nThis role is your launchpad into the data world. You will develop practical skills in SQL, data visualization, and analytical thinking while working with real business data that drives actual decisions, all within a supportive team that invests in your professional development.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Write SQL queries to extract insights from production databases",
+      "Build interactive dashboards using Power BI, Tableau, or Grafana",
+      "Automate recurring data reports and email distributions",
+      "Clean and transform raw data for analysis",
+      "Document data sources, definitions, and metric calculations"
+    ],
+    "qualifications": [
+      "1+ years of experience with SQL and data analysis",
+      "Familiarity with at least one BI tool (Power BI, Tableau, or Looker)",
+      "Basic programming skills in Python or R for data manipulation",
+      "Understanding of basic statistics and data visualization principles",
+      "Bachelor's degree in Computer Science, Statistics, or related field"
+    ]
+  },
+  {
+    "title": "Firmware Engineer",
+    "aboutRole": "Develop low-level firmware for hardware products including bootloaders, device drivers, and real-time control systems. You will work at the intersection of hardware and software.\n\nYou will write the code that runs closest to the metal, where every byte and clock cycle matters. This role offers the unique satisfaction of seeing your software control physical systems, and demands the precision and discipline that only comes from working in constrained environments.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Write bare-metal and RTOS firmware in C and assembly",
+      "Develop device drivers for custom hardware peripherals",
+      "Implement secure boot, firmware signing, and OTA update protocols",
+      "Debug firmware issues using JTAG, logic analyzers, and oscilloscopes",
+      "Optimize firmware for power consumption and real-time performance"
+    ],
+    "qualifications": [
+      "4+ years of firmware development experience",
+      "Expert-level C programming for embedded targets",
+      "Experience with ARM Cortex-M/A processors and development toolchains",
+      "Knowledge of communication protocols (SPI, I2C, UART, CAN)",
+      "Understanding of RTOS concepts (FreeRTOS, Zephyr, or ThreadX)"
+    ]
+  },
+  {
+    "title": "WebAssembly Developer",
+    "aboutRole": "Build high-performance web applications using WebAssembly to run computationally intensive workloads in the browser at near-native speeds.\n\nYou will bring desktop-class performance to web applications, enabling capabilities that were previously impossible in the browser. This role sits at the intersection of systems programming and web development, requiring fluency in both worlds.",
+    "jobType": "Contract",
+    "responsibilities": [
+      "Port performance-critical algorithms to WebAssembly from C++, Rust, or Go",
+      "Integrate Wasm modules with JavaScript/TypeScript frontend applications",
+      "Optimize Wasm binary size and initialization time",
+      "Build WebAssembly-based tools for image processing, compression, or computation",
+      "Evaluate Wasm component model and WASI for server-side applications"
+    ],
+    "qualifications": [
+      "3+ years of systems programming experience (C++, Rust, or Go)",
+      "Experience compiling to WebAssembly using Emscripten or wasm-pack",
+      "Strong JavaScript/TypeScript skills for Wasm-JS interop",
+      "Understanding of browser APIs, Web Workers, and SharedArrayBuffer",
+      "Knowledge of Wasm runtime environments (Wasmtime, Wasmer)"
+    ]
+  },
+  {
+    "title": "Network Engineer (Software-Defined)",
+    "aboutRole": "Design and implement software-defined networking solutions that automate network provisioning, configuration, and monitoring across cloud and on-premises environments.\n\nYour work ensures that data flows securely and efficiently across a complex, multi-cloud environment. By applying software engineering practices to networking, you bring automation, version control, and testing rigor to a domain traditionally managed through manual configuration.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Implement software-defined networking using NSX, Calico, or Cilium",
+      "Automate network provisioning and configuration management",
+      "Design network segmentation, micro-segmentation, and zero-trust architectures",
+      "Build network monitoring and anomaly detection systems",
+      "Troubleshoot complex multi-layer networking issues in cloud environments"
+    ],
+    "qualifications": [
+      "4+ years of networking experience with software-defined networking focus",
+      "Strong understanding of TCP/IP, DNS, BGP, and overlay networks (VXLAN)",
+      "Experience with Kubernetes networking (CNI plugins, ingress controllers)",
+      "Proficiency in Python or Go for network automation",
+      "CCNA/CCNP or equivalent cloud networking certifications"
+    ]
+  },
+  {
+    "title": "Conversational AI Developer",
+    "aboutRole": "Build intelligent chatbots and voice assistants that understand natural language and provide helpful, contextual responses across multiple channels.\n\nYou will create AI assistants that understand context, handle ambiguity gracefully, and provide genuinely helpful responses. This role combines NLP expertise with UX sensibility, as the quality of a conversation is measured not just by accuracy but by how natural and helpful it feels.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Design and implement conversational flows for chatbots and voice assistants",
+      "Integrate LLMs with retrieval-augmented generation (RAG) pipelines",
+      "Build intent recognition and entity extraction systems",
+      "Implement multi-turn conversation management and context handling",
+      "Evaluate conversation quality and iterate on user experience"
+    ],
+    "qualifications": [
+      "3+ years of experience building conversational AI systems",
+      "Experience with LLM APIs (OpenAI, Anthropic) and prompt engineering",
+      "Knowledge of RAG architectures and vector similarity search",
+      "Proficiency in Python or TypeScript for backend development",
+      "Understanding of speech-to-text and text-to-speech integration"
+    ]
+  },
+  {
+    "title": "Product Engineer",
+    "aboutRole": "Own features end-to-end from ideation through shipping, combining product thinking with engineering execution. You will make product decisions, write code, and measure impact.\n\nYou will combine the technical skills of a software engineer with the strategic thinking of a product manager. This hybrid role gives you the autonomy to identify high-impact opportunities, build solutions quickly, and measure whether your work actually moves the needle for users.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Own features from concept to production including design, implementation, and metrics",
+      "Make product decisions based on user research, data, and business context",
+      "Build rapid prototypes to validate product hypotheses",
+      "Instrument features for analytics and measure impact on key metrics",
+      "Collaborate directly with users to understand needs and gather feedback"
+    ],
+    "qualifications": [
+      "4+ years of software engineering experience with product ownership",
+      "Full-stack development skills (frontend framework + backend language)",
+      "Experience with product analytics tools (Amplitude, Mixpanel, or PostHog)",
+      "Strong communication skills and comfort with ambiguous requirements",
+      "Data-driven mindset with ability to define and track success metrics"
+    ]
+  },
+  {
+    "title": "Senior Java Developer",
+    "aboutRole": "Build enterprise-grade Java applications using Spring Boot and cloud-native patterns. You will design resilient services, optimize JVM performance, and mentor team members on Java best practices.\n\nYou will bring deep JVM expertise to a team building high-throughput enterprise services. Your knowledge of Java's concurrency model, memory management, and ecosystem tooling will help the team build services that are both robust in production and maintainable over time.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop microservices using Spring Boot, Spring Cloud, and Spring Data",
+      "Design database schemas and optimize JPA/Hibernate queries",
+      "Implement resilience patterns (circuit breaker, bulkhead, retry) with Resilience4j",
+      "Configure JVM garbage collection and performance tuning",
+      "Mentor developers and conduct thorough code reviews"
+    ],
+    "qualifications": [
+      "5+ years of professional Java development (Java 17+)",
+      "Strong knowledge of Spring Boot ecosystem and reactive programming with WebFlux",
+      "Experience with PostgreSQL, MongoDB, and Redis",
+      "Understanding of JVM internals, garbage collection, and profiling tools",
+      "Familiarity with Gradle/Maven, Docker, and Kubernetes deployments"
+    ]
+  },
+  {
+    "title": "Robotics Software Engineer",
+    "aboutRole": "Develop software for autonomous robots including motion planning, perception, and control systems. You will work with ROS and real-time systems to make robots operate safely and effectively.\n\nYou will bring software to the physical world, creating autonomous systems that navigate, manipulate, and interact with their environment. This role combines the rigor of real-time systems engineering with the creativity of solving open-ended perception and planning problems.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop robot control software using ROS/ROS2 framework",
+      "Implement motion planning, path finding, and obstacle avoidance algorithms",
+      "Integrate sensor data from LiDAR, cameras, and IMUs for perception",
+      "Build simulation environments for testing robot behaviors",
+      "Optimize real-time control loops for deterministic performance"
+    ],
+    "qualifications": [
+      "3+ years of robotics software development experience",
+      "Proficiency in C++ and Python with ROS/ROS2 experience",
+      "Knowledge of kinematics, dynamics, and control theory",
+      "Experience with sensor fusion and SLAM algorithms",
+      "Understanding of real-time operating systems and deterministic scheduling"
+    ]
+  },
+  {
+    "title": "FinTech Developer",
+    "aboutRole": "Build financial technology applications that handle payments, transactions, and financial data with the highest standards of accuracy, security, and regulatory compliance.\n\nFinancial software demands the highest standards of correctness, security, and auditability. You will build systems where every transaction is traceable, every calculation is precise, and every user interaction meets regulatory requirements without compromising the user experience.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop payment processing and transaction management systems",
+      "Implement financial calculations with precise decimal arithmetic",
+      "Build audit trails, reconciliation tools, and regulatory reporting",
+      "Integrate with banking APIs, payment gateways, and financial data providers",
+      "Ensure PCI DSS compliance and financial data security"
+    ],
+    "qualifications": [
+      "4+ years of software development with financial systems experience",
+      "Understanding of payment processing, ACH, wire transfers, and card networks",
+      "Experience with financial regulations (PCI DSS, SOX, or AML/KYC)",
+      "Strong attention to accuracy and experience with decimal/money types",
+      "Knowledge of event sourcing for financial audit trails"
+    ]
+  },
+  {
+    "title": "Documentation Engineer",
+    "aboutRole": "Build and maintain documentation infrastructure including doc sites, API references, and automated documentation generation. You will treat docs as code and ensure documentation stays current.\n\nYou will treat documentation as a product, applying the same rigor to information architecture and content quality that engineers apply to code. Your infrastructure ensures documentation stays current automatically and provides a delightful reading experience for developers.",
+    "jobType": "PartTime",
+    "responsibilities": [
+      "Build and maintain documentation site infrastructure (Docusaurus, VitePress)",
+      "Create automated documentation generation from code annotations and OpenAPI specs",
+      "Implement documentation CI/CD including link checking and freshness monitoring",
+      "Design information architecture for developer documentation",
+      "Build interactive code examples and playground environments"
+    ],
+    "qualifications": [
+      "3+ years of experience in documentation engineering or technical writing",
+      "Proficiency with static site generators and Markdown/MDX",
+      "Experience with docs-as-code workflows (Git, CI/CD, automated testing)",
+      "Knowledge of OpenAPI, AsyncAPI, or similar specification formats",
+      "Frontend development skills for building interactive documentation features"
+    ]
+  },
+  {
+    "title": "Senior Vue.js Developer",
+    "aboutRole": "Build sophisticated web applications using Vue.js and its ecosystem. You will design component architectures, manage application state, and deliver performant user interfaces.\n\nYou will champion Vue.js best practices and help the team take full advantage of the framework's reactivity system and composition patterns. Your component designs will serve as examples for the team, and your mentorship will elevate the frontend skills of everyone around you.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop single-page applications using Vue 3 Composition API and TypeScript",
+      "Design component architectures with Pinia state management",
+      "Build shared component libraries with proper documentation and testing",
+      "Implement server-side rendering with Nuxt.js for SEO and performance",
+      "Optimize bundle size, lazy loading, and runtime performance"
+    ],
+    "qualifications": [
+      "4+ years of Vue.js development experience (Vue 3 preferred)",
+      "Strong TypeScript and Composition API proficiency",
+      "Experience with Pinia, Vue Router, and Vite build tooling",
+      "Knowledge of testing with Vitest and Vue Test Utils",
+      "Familiarity with Nuxt.js and server-side rendering patterns"
+    ]
+  },
+  {
+    "title": "Pen Test Engineer",
+    "aboutRole": "Conduct authorized penetration testing against web applications, APIs, and infrastructure to identify vulnerabilities before attackers do. You will provide actionable remediation guidance to engineering teams.\n\nYou will think like an attacker so that defenders can stay one step ahead. Your detailed findings reports translate complex vulnerabilities into actionable guidance that engineering teams can understand and prioritize, making you a trusted advisor for security across the organization.",
+    "jobType": "Contract",
+    "responsibilities": [
+      "Perform web application and API penetration testing",
+      "Conduct network and infrastructure vulnerability assessments",
+      "Write detailed findings reports with reproduction steps and remediation guidance",
+      "Validate fixes and perform regression testing after remediation",
+      "Stay current with emerging attack techniques and vulnerability disclosures"
+    ],
+    "qualifications": [
+      "3+ years of penetration testing experience",
+      "OSCP, CEH, or equivalent security certification",
+      "Proficiency with penetration testing tools (Burp Suite, Metasploit, Nmap)",
+      "Understanding of web application security (OWASP Top 10, API security)",
+      "Experience with scripting for custom exploit development (Python, Bash)"
+    ]
+  },
+  {
+    "title": "Technical Product Manager (Engineering Background)",
+    "aboutRole": "Drive product strategy for developer-facing products by combining technical depth with product management skills. You will define product roadmaps, write technical specifications, and measure outcomes.\n\nYour technical background gives you credibility with engineering teams and the ability to make informed tradeoff decisions. You will serve as the translation layer between business objectives and technical execution, ensuring that every feature delivers measurable value to users.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Define product vision and roadmap for developer platform features",
+      "Write detailed product requirements and technical specifications",
+      "Prioritize backlog based on user research, data analysis, and business impact",
+      "Collaborate with engineering teams on technical feasibility and tradeoffs",
+      "Define success metrics and measure feature adoption and impact"
+    ],
+    "qualifications": [
+      "5+ years combined experience in software engineering and product management",
+      "Technical background with ability to read code and understand system architecture",
+      "Experience managing developer tools, APIs, or platform products",
+      "Strong analytical skills and data-driven decision making",
+      "Excellent stakeholder management and communication skills"
+    ]
+  },
+  {
+    "title": "AR/VR Developer",
+    "aboutRole": "Build augmented and virtual reality applications that create immersive experiences. You will develop 3D interactions, spatial computing features, and cross-platform XR applications.\n\nYou will create experiences that blur the line between digital and physical worlds. This emerging field rewards engineers who combine strong 3D programming skills with a willingness to experiment, iterate, and push the boundaries of what immersive technology can do.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop AR/VR applications using Unity, Unreal Engine, or WebXR",
+      "Implement 3D interactions, hand tracking, and spatial audio",
+      "Optimize rendering performance for XR headsets (Quest, Vision Pro, HoloLens)",
+      "Build cross-platform XR experiences with platform-specific optimizations",
+      "Create interactive 3D UI elements and spatial navigation systems"
+    ],
+    "qualifications": [
+      "3+ years of AR/VR development experience",
+      "Proficiency with Unity (C#) or Unreal Engine (C++/Blueprints)",
+      "Experience with XR SDKs (OpenXR, ARKit, ARCore, or Meta SDK)",
+      "Understanding of 3D math, spatial computing, and rendering optimization",
+      "Portfolio demonstrating shipped XR applications"
+    ]
+  },
+  {
+    "title": "Backend Developer (Elixir)",
+    "aboutRole": "Build fault-tolerant, highly concurrent backend services using Elixir and the BEAM virtual machine. You will leverage OTP patterns to create systems that are resilient by design.\n\nYou will leverage the BEAM VM's unique strengths — lightweight processes, preemptive scheduling, and hot code reloading — to build systems that stay up and responsive even under extreme load. This role is ideal for engineers who appreciate elegance in concurrent system design.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop web applications and APIs using Phoenix Framework",
+      "Design fault-tolerant systems using OTP supervisors and GenServers",
+      "Build real-time features with Phoenix Channels and LiveView",
+      "Implement distributed systems using Erlang distribution and clustering",
+      "Write comprehensive ExUnit tests and property-based tests"
+    ],
+    "qualifications": [
+      "3+ years of Elixir/Erlang development experience",
+      "Strong understanding of OTP patterns, supervisors, and fault tolerance",
+      "Experience with Phoenix Framework and Ecto for database interactions",
+      "Knowledge of BEAM VM characteristics (lightweight processes, preemptive scheduling)",
+      "Familiarity with message queues and event-driven architectures"
+    ]
+  },
+  {
+    "title": "Data Visualization Developer",
+    "aboutRole": "Create interactive data visualizations and dashboards that make complex data accessible and actionable. You will combine data engineering with frontend skills to tell stories with data.\n\nYou will transform raw data into stories that inform decisions. By combining programming skills with visual design sensibility, you create interactive experiences that make complex data accessible and actionable for audiences ranging from executives to domain experts.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Build interactive data visualizations using D3.js, Plotly, or Observable",
+      "Develop custom dashboards with real-time data streaming",
+      "Design data visualization components that are responsive and accessible",
+      "Implement data transformations and aggregations for visualization pipelines",
+      "Collaborate with data analysts to translate insights into visual narratives"
+    ],
+    "qualifications": [
+      "3+ years of data visualization development experience",
+      "Proficiency with D3.js, Canvas API, or WebGL for custom visualizations",
+      "Strong JavaScript/TypeScript and CSS skills",
+      "Experience with data processing libraries (pandas, Observable Plot, or Vega-Lite)",
+      "Understanding of visual perception principles and chart design best practices"
+    ]
+  },
+  {
+    "title": "Open Source Maintainer / Developer Advocate",
+    "aboutRole": "Maintain open-source projects and build developer community around our platform. You will write code, documentation, tutorials, and engage with the developer community.\n\nYou will represent the company in the broader developer community, building trust through transparency, helpfulness, and genuine engagement. Your open-source contributions and technical content establish the company as a thought leader and attract talented engineers to join the team.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Maintain open-source libraries including issue triage and pull request reviews",
+      "Create technical content including blog posts, tutorials, and video demonstrations",
+      "Speak at conferences and meetups to represent engineering capabilities",
+      "Gather developer feedback and relay product insights to engineering teams",
+      "Build sample applications and starter templates for the developer community"
+    ],
+    "qualifications": [
+      "4+ years of software development with open-source contribution history",
+      "Experience maintaining public repositories and managing community contributions",
+      "Strong written and verbal communication skills",
+      "Ability to create clear, engaging technical content",
+      "Active presence in developer communities (GitHub, Twitter, Discord, or Stack Overflow)"
+    ]
+  },
+  {
+    "title": "GIS / Geospatial Developer",
+    "aboutRole": "Build location-aware applications and geospatial data processing systems. You will work with mapping libraries, spatial databases, and geographic data to deliver location-based features.\n\nLocation is a fundamental dimension of data, and you will help our applications leverage it fully. By combining geospatial expertise with strong software engineering, you deliver features that help users understand and interact with the world through maps, spatial queries, and geographic analysis.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop mapping features using Mapbox, Leaflet, or Google Maps APIs",
+      "Build geospatial data pipelines for processing geographic datasets",
+      "Implement spatial queries and indexing with PostGIS or MongoDB geospatial",
+      "Create geocoding, routing, and proximity search functionality",
+      "Visualize geographic data with custom tile layers and heatmaps"
+    ],
+    "qualifications": [
+      "3+ years of geospatial software development experience",
+      "Experience with mapping libraries (Mapbox GL JS, Leaflet, or deck.gl)",
+      "Knowledge of spatial databases (PostGIS) and GeoJSON/WKT formats",
+      "Understanding of coordinate systems, projections, and spatial indexing",
+      "Proficiency in JavaScript/TypeScript or Python for geospatial processing"
+    ]
+  },
+  {
+    "title": "Supply Chain Software Developer",
+    "aboutRole": "Build software systems that optimize supply chain operations including inventory management, logistics, and demand forecasting.\n\nYou will build software that moves goods through complex global networks efficiently and reliably. This domain rewards engineers who can model real-world logistics constraints in code and deliver systems that adapt to disruptions, demand fluctuations, and regulatory changes.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop inventory management and warehouse management systems",
+      "Build order processing and fulfillment workflow engines",
+      "Implement demand forecasting models and optimization algorithms",
+      "Create real-time tracking and visibility dashboards for logistics",
+      "Integrate with ERP systems, shipping carriers, and supplier portals"
+    ],
+    "qualifications": [
+      "3+ years of software development experience in supply chain or logistics",
+      "Understanding of supply chain concepts (inventory, WMS, TMS, demand planning)",
+      "Experience with workflow engines and business process automation",
+      "Proficiency in C#, Java, or Python for enterprise application development",
+      "Knowledge of EDI, AS2, and supply chain integration standards"
+    ]
+  },
+  {
+    "title": "API Gateway Engineer",
+    "aboutRole": "Design and operate API gateway infrastructure that handles authentication, rate limiting, routing, and observability for all API traffic across the organization.\n\nYou will sit at the critical junction where all API traffic enters the system. Your gateway configuration decisions affect every API consumer, making reliability, security, and performance paramount. You will build the observability needed to understand traffic patterns and detect anomalies in real time.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Configure and operate API gateways (YARP, Kong, or Azure API Management)",
+      "Implement rate limiting, throttling, and quota management policies",
+      "Design request routing, load balancing, and traffic splitting strategies",
+      "Build API analytics dashboards tracking usage, latency, and error rates",
+      "Manage API keys, OAuth scopes, and consumer authentication"
+    ],
+    "qualifications": [
+      "3+ years of experience with API gateway or reverse proxy technologies",
+      "Strong understanding of HTTP, TLS, and API security patterns",
+      "Experience with YARP, Kong, Envoy, or cloud-native API management",
+      "Knowledge of rate limiting algorithms and traffic shaping techniques",
+      "Proficiency in YAML/JSON configuration and infrastructure-as-code"
+    ]
+  },
+  {
+    "title": "Healthcare Software Developer",
+    "aboutRole": "Build software for healthcare systems that meets strict regulatory requirements. You will develop applications handling patient data with HIPAA compliance, HL7 integration, and clinical workflow support.\n\nPatient safety and data privacy are non-negotiable in healthcare software. You will build systems where regulatory compliance is built into the architecture rather than bolted on, and where clinical workflows are streamlined without compromising the accuracy that healthcare professionals depend on.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop clinical applications with HIPAA-compliant data handling",
+      "Implement HL7 FHIR integrations for healthcare data exchange",
+      "Build patient portal and electronic health record (EHR) interfaces",
+      "Design audit logging and access control for protected health information",
+      "Ensure compliance with healthcare regulations (HIPAA, HITECH, 21 CFR Part 11)"
+    ],
+    "qualifications": [
+      "3+ years of healthcare software development experience",
+      "Knowledge of HL7 FHIR, DICOM, or IHE integration profiles",
+      "Understanding of HIPAA privacy and security requirements",
+      "Experience with healthcare-specific databases and terminology systems (ICD, SNOMED)",
+      "Proficiency in C#, Java, or Python for enterprise healthcare applications"
+    ]
+  },
+  {
+    "title": "MLOps Engineer",
+    "aboutRole": "Build and maintain the infrastructure and processes that enable reliable, reproducible machine learning workflows from experimentation through production deployment.\n\nYou will bring DevOps discipline to the machine learning lifecycle, ensuring that models are reproducible, deployable, and monitorable. Your infrastructure enables data scientists to iterate faster while maintaining the production reliability that business-critical ML applications demand.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Build ML pipelines for training, evaluation, and deployment automation",
+      "Implement experiment tracking, model versioning, and artifact management",
+      "Create CI/CD pipelines specifically for ML model validation and deployment",
+      "Set up model monitoring for data drift, prediction quality, and performance",
+      "Manage GPU infrastructure and optimize training compute costs"
+    ],
+    "qualifications": [
+      "3+ years of MLOps or DevOps experience with ML workloads",
+      "Experience with MLflow, Kubeflow, or Weights & Biases",
+      "Proficiency in Python and containerized ML workflows",
+      "Knowledge of model serving (TorchServe, Triton, or TensorFlow Serving)",
+      "Understanding of data versioning (DVC) and feature store concepts"
+    ]
+  },
+  {
+    "title": "Real-Time Systems Developer",
+    "aboutRole": "Build low-latency, real-time software systems for applications where timing guarantees are critical. You will develop deterministic systems for trading, gaming, or industrial control.\n\nYou will work in a domain where microseconds matter and correctness is non-negotiable. This role attracts engineers who enjoy optimizing at the hardware level, reasoning about worst-case execution times, and building systems where latency spikes are measured and eliminated.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop low-latency applications with sub-millisecond response requirements",
+      "Implement lock-free data structures and wait-free algorithms",
+      "Optimize memory allocation patterns to avoid garbage collection pauses",
+      "Build real-time communication systems using UDP, WebSockets, or custom protocols",
+      "Profile and benchmark system performance under various load conditions"
+    ],
+    "qualifications": [
+      "4+ years of experience building performance-critical systems",
+      "Deep knowledge of C++ or Rust including memory layout and cache optimization",
+      "Understanding of CPU architecture, cache hierarchies, and NUMA topology",
+      "Experience with profiling tools (perf, VTune, or flamegraphs)",
+      "Knowledge of network programming and kernel bypass techniques (DPDK, io_uring)"
+    ]
+  },
+  {
+    "title": "Digital Twin Developer",
+    "aboutRole": "Build digital twin software that creates virtual representations of physical assets and systems for simulation, monitoring, and predictive analytics.\n\nYou will create virtual mirrors of physical systems that enable simulation, monitoring, and prediction. This role combines software engineering with domain modeling, and your work helps operators make better decisions by providing a real-time, interactive view of complex physical assets.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop digital twin models that mirror physical asset behavior",
+      "Build real-time data ingestion from IoT sensors and control systems",
+      "Create 3D visualization interfaces for digital twin monitoring",
+      "Implement simulation engines for scenario analysis and what-if modeling",
+      "Integrate predictive analytics for maintenance and performance optimization"
+    ],
+    "qualifications": [
+      "3+ years of software development with digital twin or simulation experience",
+      "Experience with 3D visualization (Three.js, Cesium, or Unity)",
+      "Knowledge of IoT protocols and time-series databases (InfluxDB, TimescaleDB)",
+      "Proficiency in Python or C# for simulation and modeling",
+      "Understanding of physics engines and mathematical modeling"
+    ]
+  },
+  {
+    "title": "Contract Security Analyst Developer",
+    "aboutRole": "Build security analysis tools and integrate security scanning into the software development lifecycle on a contract basis. You will automate vulnerability detection and triage workflows.\n\nYour tooling and automation will become the security backbone of the development lifecycle. By making vulnerability detection fast, accurate, and integrated into existing workflows, you enable teams to fix security issues before they ever reach production.",
+    "jobType": "Contract",
+    "responsibilities": [
+      "Integrate SAST, DAST, and SCA tools into CI/CD pipelines",
+      "Build vulnerability triage and tracking dashboards",
+      "Develop custom security scanning rules for domain-specific patterns",
+      "Automate security compliance checks for deployment gates",
+      "Create security findings reports and remediation tracking"
+    ],
+    "qualifications": [
+      "3+ years of experience in application security or security tooling",
+      "Experience with security scanning tools (SonarQube, Snyk, Checkmarx, or Semgrep)",
+      "Proficiency in Python or Go for security tooling development",
+      "Understanding of vulnerability scoring (CVSS) and risk assessment",
+      "Knowledge of secure SDLC practices and DevSecOps principles"
+    ]
+  },
+  {
+    "title": "Quantum Computing Developer",
+    "aboutRole": "Explore quantum computing applications and develop quantum algorithms for optimization, simulation, and machine learning problems using quantum development frameworks.\n\nYou will explore the frontier of computation, working on problems where quantum approaches may offer exponential speedups over classical algorithms. This role combines deep theoretical knowledge with practical engineering, as you bridge the gap between quantum theory and real-world applications.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop quantum algorithms using Qiskit, Cirq, or Q# frameworks",
+      "Implement hybrid quantum-classical algorithms for optimization problems",
+      "Benchmark quantum circuits on simulators and real quantum hardware",
+      "Research quantum machine learning approaches and feasibility",
+      "Build tools for quantum circuit visualization and debugging"
+    ],
+    "qualifications": [
+      "2+ years of quantum computing research or development experience",
+      "Strong foundation in linear algebra, quantum mechanics, and information theory",
+      "Experience with quantum computing SDKs (Qiskit, Cirq, PennyLane, or Q#)",
+      "Proficiency in Python for scientific computing",
+      "Master's or PhD in Physics, Computer Science, or related field preferred"
+    ]
+  },
+  {
+    "title": "Content Management System Developer",
+    "aboutRole": "Build and customize content management systems that enable marketing and content teams to publish and manage digital content efficiently.\n\nYou will empower content teams to publish and manage digital experiences without depending on engineering for every change. By building flexible, extensible content infrastructure, you accelerate time-to-market for campaigns, product launches, and editorial content.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop custom CMS features and plugins for content authoring workflows",
+      "Build headless CMS architectures with API-first content delivery",
+      "Implement content versioning, workflow approval, and scheduling",
+      "Create content preview and live editing experiences",
+      "Integrate CMS with CDN, search, and analytics platforms"
+    ],
+    "qualifications": [
+      "3+ years of CMS development experience",
+      "Experience with headless CMS platforms (Contentful, Strapi, or Sanity)",
+      "Proficiency in JavaScript/TypeScript and React or Vue.js",
+      "Understanding of content modeling, taxonomy design, and structured content",
+      "Knowledge of SEO technical requirements and structured data (JSON-LD, Schema.org)"
+    ]
+  },
+  {
+    "title": "Senior Scala Developer",
+    "aboutRole": "Build high-performance, type-safe applications using Scala and functional programming patterns. You will develop data-intensive services and streaming applications on the JVM.\n\nYou will bring functional programming rigor to production systems, building software that is both expressive and maintainable. Your expertise in Scala's type system and effect management ensures that complexity is managed through types rather than runtime checks.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop backend services using Scala with Akka, ZIO, or Cats Effect",
+      "Build data processing pipelines with Apache Spark or Flink",
+      "Design type-safe APIs using algebraic data types and tagless final patterns",
+      "Implement streaming applications with Akka Streams or fs2",
+      "Mentor team members on functional programming principles"
+    ],
+    "qualifications": [
+      "4+ years of Scala development experience in production systems",
+      "Strong understanding of functional programming (monads, functors, type classes)",
+      "Experience with Akka toolkit or ZIO ecosystem",
+      "Knowledge of JVM performance tuning and concurrent programming",
+      "Familiarity with Apache Spark for large-scale data processing"
+    ]
+  },
+  {
+    "title": "E-Commerce Developer",
+    "aboutRole": "Build and maintain e-commerce platforms that handle product catalogs, shopping carts, checkout flows, and payment processing with high availability and performance.\n\nYou will build the digital storefront where customer experience translates directly to revenue. Every millisecond of page load time, every friction point in checkout, and every search result ranking directly impacts conversion, making performance and UX optimization a continuous priority.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop product catalog, search, and recommendation features",
+      "Build shopping cart and checkout flow with payment gateway integration",
+      "Implement inventory management and order processing systems",
+      "Optimize page load times and conversion funnel performance",
+      "Handle seasonal traffic spikes with scalable architecture"
+    ],
+    "qualifications": [
+      "3+ years of e-commerce development experience",
+      "Experience with payment processing (Stripe, Braintree, or Adyen)",
+      "Understanding of PCI DSS compliance requirements",
+      "Proficiency in a backend language and at least one frontend framework",
+      "Knowledge of caching strategies, CDN configuration, and performance optimization"
+    ]
+  },
+  {
+    "title": "Compliance Automation Developer",
+    "aboutRole": "Build automated compliance checking and reporting systems that ensure software and infrastructure meet regulatory and organizational policy requirements.\n\nYou will make compliance a continuous, automated process rather than a periodic, manual burden. Your policy-as-code approach ensures that compliance is verifiable, auditable, and integrated into the same workflows that engineers already use to ship software.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop policy-as-code frameworks using OPA, Sentinel, or custom engines",
+      "Build automated compliance scanning for infrastructure and application code",
+      "Create compliance dashboards and audit reporting tools",
+      "Implement continuous compliance monitoring across cloud environments",
+      "Integrate compliance gates into CI/CD deployment pipelines"
+    ],
+    "qualifications": [
+      "3+ years of software development with compliance or governance focus",
+      "Experience with policy-as-code tools (Open Policy Agent, Checkov, or AWS Config)",
+      "Knowledge of compliance frameworks (SOC 2, ISO 27001, FedRAMP, or GDPR)",
+      "Proficiency in Python, Go, or Rego for policy implementation",
+      "Understanding of cloud security posture management (CSPM)"
+    ]
+  },
+  {
+    "title": "Technical Support Engineer (Tier 3)",
+    "aboutRole": "Resolve the most complex technical issues escalated from support teams by debugging application code, analyzing logs, and implementing hotfixes when necessary.\n\nYou will be the last line of defense for the most complex customer issues. Your ability to read code, trace distributed transactions, and identify root causes in unfamiliar systems makes you invaluable to both customers and the engineering teams who learn from your investigations.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Debug and resolve complex customer-reported issues at the code level",
+      "Analyze application logs, traces, and database queries to identify root causes",
+      "Develop hotfixes and patches for critical production issues",
+      "Create internal troubleshooting guides and knowledge base articles",
+      "Collaborate with engineering teams to prioritize and fix systemic issues"
+    ],
+    "qualifications": [
+      "3+ years of software development or advanced technical support experience",
+      "Strong debugging skills across multiple technology stacks",
+      "Experience with log analysis tools (Splunk, ELK, or Grafana Loki)",
+      "Ability to read and understand code in C#, Java, Python, or JavaScript",
+      "Excellent customer communication and issue documentation skills"
+    ]
+  },
+  {
+    "title": "Streaming Media Developer",
+    "aboutRole": "Build video and audio streaming infrastructure that delivers low-latency, high-quality media experiences at scale.\n\nYou will ensure that video and audio reach users with minimal latency and maximum quality, regardless of their network conditions or device capabilities. This domain combines low-level media processing with large-scale distributed systems engineering.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop video streaming pipelines using HLS, DASH, or WebRTC protocols",
+      "Build transcoding and adaptive bitrate streaming infrastructure",
+      "Implement DRM and content protection systems",
+      "Optimize streaming latency and quality for live and on-demand content",
+      "Monitor CDN performance and video quality metrics"
+    ],
+    "qualifications": [
+      "3+ years of media streaming development experience",
+      "Knowledge of video codecs (H.264, H.265, AV1) and container formats",
+      "Experience with FFmpeg, GStreamer, or similar media processing tools",
+      "Understanding of CDN architecture and edge computing for media",
+      "Proficiency in C++, Go, or Python for media pipeline development"
+    ]
+  },
+  {
+    "title": "Developer Relations Engineer",
+    "aboutRole": "Enable external developers to succeed with our platform through technical content, SDK development, and community engagement. You will be the voice of developers inside the company.\n\nYou will serve as the bridge between the company and the broader developer community. Your authentic engagement, technical credibility, and passion for helping others succeed build lasting relationships that benefit both developers and the business.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Build and maintain SDKs, code samples, and quickstart guides",
+      "Create technical blog posts, video tutorials, and conference presentations",
+      "Manage developer community forums and support channels",
+      "Provide technical feedback to product teams based on developer needs",
+      "Organize and participate in hackathons, workshops, and developer events"
+    ],
+    "qualifications": [
+      "4+ years of software engineering experience with community engagement",
+      "Strong public speaking and technical writing skills",
+      "Experience building and maintaining client libraries or SDKs",
+      "Active open-source contributions or developer community involvement",
+      "Polyglot programming ability across multiple languages and frameworks"
+    ]
+  },
+  {
+    "title": "Privacy Engineer",
+    "aboutRole": "Implement privacy-by-design principles across software systems to ensure compliance with data protection regulations and protect user privacy at a technical level.\n\nYou will make privacy a feature rather than a constraint. By building privacy-preserving architectures and automated compliance tooling, you enable product teams to innovate with user data while maintaining the trust and regulatory compliance that users and regulators expect.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Implement data anonymization, pseudonymization, and encryption at rest and in transit",
+      "Build data subject access request (DSAR) and deletion workflows",
+      "Design consent management systems and purpose-of-use tracking",
+      "Conduct privacy impact assessments for new features and data flows",
+      "Implement data retention policies and automated data lifecycle management"
+    ],
+    "qualifications": [
+      "3+ years of software engineering with privacy or data protection focus",
+      "Understanding of GDPR, CCPA, and other data protection regulations",
+      "Experience with encryption, tokenization, and data masking techniques",
+      "Knowledge of privacy-enhancing technologies (differential privacy, homomorphic encryption)",
+      "Familiarity with data lineage tracking and classification tools"
+    ]
+  },
+  {
+    "title": "Infrastructure Automation Developer",
+    "aboutRole": "Build automation tools and frameworks that manage infrastructure lifecycle from provisioning through decommissioning with minimal manual intervention.\n\nYour automation replaces manual toil with reliable, repeatable processes. By treating infrastructure as code and applying software engineering practices, you create systems that are auditable, testable, and self-documenting — reducing risk while increasing velocity.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop infrastructure automation using Terraform, Pulumi, or CDK",
+      "Build self-service infrastructure provisioning portals for developers",
+      "Create automated compliance and security scanning for infrastructure changes",
+      "Implement infrastructure testing frameworks (Terratest, kitchen-terraform)",
+      "Design GitOps workflows for infrastructure change management"
+    ],
+    "qualifications": [
+      "4+ years of infrastructure automation experience",
+      "Expertise with Terraform, Pulumi, or AWS CDK",
+      "Strong programming skills in Python, Go, or TypeScript for custom tooling",
+      "Experience with GitOps tools (Argo CD, Flux) and infrastructure testing",
+      "Knowledge of multi-cloud and hybrid cloud infrastructure patterns"
+    ]
+  },
+  {
+    "title": "Mid-Level React Developer",
+    "aboutRole": "Build and maintain React applications as part of a collaborative frontend team. You will implement features, write tests, and contribute to the shared component library.\n\nYou will grow your React expertise in a supportive team environment where code reviews are learning opportunities and pair programming is encouraged. This role offers a clear path to senior engineering through increasing ownership, mentorship, and technical challenges.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop features in React applications using hooks and functional components",
+      "Write unit tests with React Testing Library and integration tests",
+      "Contribute to the shared component library with documented components",
+      "Implement responsive layouts and cross-browser compatibility fixes",
+      "Participate in code reviews and pair programming sessions"
+    ],
+    "qualifications": [
+      "2+ years of React development experience",
+      "Solid TypeScript skills and understanding of React rendering behavior",
+      "Experience with CSS modules, Tailwind CSS, or styled-components",
+      "Familiarity with React Query or SWR for data fetching",
+      "Basic understanding of web performance optimization"
+    ]
+  },
+  {
+    "title": "Contract Cloud Migration Specialist",
+    "aboutRole": "Lead cloud migration projects to move on-premises applications and infrastructure to Azure or AWS. You will assess, plan, and execute migration strategies with minimal downtime.\n\nYour migration expertise will de-risk a critical business transformation. You will bring proven patterns and hard-won lessons from previous migrations, accelerating the journey to cloud while avoiding the common pitfalls that derail migration projects.",
+    "jobType": "Contract",
+    "responsibilities": [
+      "Assess existing on-premises applications for cloud migration readiness",
+      "Design migration strategies (rehost, refactor, rearchitect, or replace)",
+      "Execute database migrations with minimal downtime using DMS or similar tools",
+      "Implement hybrid connectivity (VPN, ExpressRoute, or Direct Connect)",
+      "Document cloud architecture and create operational runbooks"
+    ],
+    "qualifications": [
+      "5+ years of cloud infrastructure experience with migration project leadership",
+      "Deep expertise with Azure or AWS migration services and tooling",
+      "Experience with database migration strategies and data synchronization",
+      "Knowledge of network architecture for hybrid cloud environments",
+      "Azure or AWS Solutions Architect certification preferred"
+    ]
+  },
+  {
+    "title": "Functional Test Engineer",
+    "aboutRole": "Ensure software quality through systematic functional testing including test case design, manual exploratory testing, and defect analysis. You will be the quality advocate on your team.\n\nYou will be the quality advocate who ensures that software works correctly from the user's perspective. Your exploratory testing skills uncover issues that automated tests miss, and your clear bug reports help developers resolve problems quickly and effectively.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Design test cases and test plans based on user stories and requirements",
+      "Perform exploratory testing to discover edge cases and usability issues",
+      "Execute manual test scenarios for complex business workflows",
+      "Document and track defects with clear reproduction steps and severity",
+      "Collaborate with developers to define acceptance criteria and testability"
+    ],
+    "qualifications": [
+      "2+ years of software testing experience",
+      "Strong analytical skills and attention to detail",
+      "Experience with test management tools (TestRail, Zephyr, or Azure Test Plans)",
+      "Understanding of software development lifecycle and agile testing practices",
+      "Basic SQL skills for data validation and backend testing"
+    ]
+  },
+  {
+    "title": "Incident Response Developer",
+    "aboutRole": "Build tools and automate processes for detecting, responding to, and recovering from production incidents. You will reduce mean time to recovery and improve incident management workflows.\n\nYou will build the tools and processes that turn chaos into coordinated response. By reducing mean time to detection and recovery, your work directly impacts customer experience and system availability during the moments that matter most.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Build automated incident detection and alerting systems",
+      "Develop incident management tooling (ChatOps bots, status pages, war room automation)",
+      "Create runbooks and automated remediation scripts for common failure modes",
+      "Implement post-incident review workflows and action item tracking",
+      "Analyze incident trends and drive systemic reliability improvements"
+    ],
+    "qualifications": [
+      "3+ years of SRE, DevOps, or incident management experience",
+      "Experience with incident management platforms (PagerDuty, Opsgenie, or Incident.io)",
+      "Proficiency in Python, Go, or TypeScript for automation tooling",
+      "Knowledge of observability tools and log analysis techniques",
+      "Understanding of incident command structures and communication protocols"
+    ]
+  },
+  {
+    "title": "Intern - Machine Learning",
+    "aboutRole": "Gain practical experience in machine learning engineering by working on data preprocessing, model training, and evaluation tasks under the mentorship of senior ML engineers.\n\nThis internship offers hands-on experience with real ML systems under the guidance of experienced practitioners. You will develop practical skills in data preparation, model training, and evaluation while gaining exposure to the challenges of deploying ML in production environments.",
+    "jobType": "Internship",
+    "responsibilities": [
+      "Prepare and preprocess datasets for model training experiments",
+      "Train and evaluate ML models using established frameworks",
+      "Create visualizations and reports on model performance metrics",
+      "Contribute to data labeling and annotation quality workflows",
+      "Present research findings and experiment results to the team"
+    ],
+    "qualifications": [
+      "Currently pursuing a degree in Computer Science, Data Science, or related field",
+      "Coursework in machine learning, statistics, or linear algebra",
+      "Basic proficiency in Python and familiarity with pandas and NumPy",
+      "Exposure to ML frameworks (scikit-learn, PyTorch, or TensorFlow)",
+      "Curiosity and strong analytical problem-solving skills"
+    ]
+  },
+  {
+    "title": "Part-Time Backend Developer",
+    "aboutRole": "Contribute to backend services on a flexible part-time schedule. You will focus on API development, bug fixes, and incremental feature work.\n\nThis flexible role lets you contribute meaningful backend work while maintaining other commitments. You will have clear ownership of specific features and the autonomy to manage your time effectively within the team's sprint cadence.",
+    "jobType": "PartTime",
+    "responsibilities": [
+      "Develop and maintain REST API endpoints",
+      "Fix bugs and resolve production issues in backend services",
+      "Write and maintain unit and integration tests",
+      "Review pull requests and provide code quality feedback"
+    ],
+    "qualifications": [
+      "2+ years of backend development experience",
+      "Proficiency in C#, Python, or Node.js",
+      "Experience with relational databases and SQL",
+      "Ability to work independently with minimal supervision"
+    ]
+  },
+  {
+    "title": "Intern - Frontend Development",
+    "aboutRole": "Learn modern frontend development by building real UI features under the guidance of experienced frontend engineers. You will work with component-based frameworks and modern tooling.\n\nThis internship gives you the opportunity to build real features that ship to production. You will learn professional frontend development practices including component architecture, testing, and code review, all while contributing to a codebase used by real customers.",
+    "jobType": "Internship",
+    "responsibilities": [
+      "Build UI components using React or Angular with TypeScript",
+      "Implement responsive designs from Figma mockups",
+      "Write unit tests for UI components",
+      "Participate in code reviews and learn from feedback"
+    ],
+    "qualifications": [
+      "Currently pursuing a degree in Computer Science or related field",
+      "Basic knowledge of HTML, CSS, and JavaScript",
+      "Familiarity with at least one frontend framework (React, Angular, or Vue)",
+      "Eagerness to learn modern web development practices"
+    ]
+  },
+  {
+    "title": "Intern - DevOps Engineering",
+    "aboutRole": "Learn DevOps practices by working on CI/CD pipelines, container orchestration, and infrastructure automation alongside experienced platform engineers.\n\nThis internship introduces you to the world of infrastructure and operations engineering. You will gain hands-on experience with the tools and practices that keep modern software systems running, building a foundation for a career in platform engineering, SRE, or DevOps.",
+    "jobType": "Internship",
+    "responsibilities": [
+      "Assist in maintaining CI/CD pipeline configurations",
+      "Learn container basics by building and optimizing Docker images",
+      "Help automate repetitive operational tasks with scripts",
+      "Document infrastructure setup and deployment procedures"
+    ],
+    "qualifications": [
+      "Currently pursuing a degree in Computer Science or Information Technology",
+      "Basic Linux command line skills",
+      "Familiarity with Git version control",
+      "Interest in cloud computing, containers, and automation"
+    ]
+  },
+  {
+    "title": "Generative AI Engineer",
+    "aboutRole": "Build applications powered by generative AI including text generation, image synthesis, and code generation. You will integrate foundation models into products and optimize for quality and cost.\n\nYou will be at the forefront of the most transformative technology shift in a generation. By combining practical engineering with a deep understanding of LLM capabilities and limitations, you will deliver AI-powered features that genuinely improve our users' workflows and decision-making.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Integrate generative AI models (GPT, Claude, Stable Diffusion) into product features",
+      "Build RAG pipelines combining vector search with LLM generation",
+      "Implement guardrails, content filtering, and output validation",
+      "Optimize token usage, latency, and cost for AI-powered features",
+      "Design evaluation frameworks for generative output quality"
+    ],
+    "qualifications": [
+      "3+ years of software development with 1+ years working with generative AI",
+      "Experience with LLM APIs and embedding models",
+      "Knowledge of vector databases (pgvector, Pinecone, Weaviate)",
+      "Proficiency in Python or TypeScript for AI application development",
+      "Understanding of prompt engineering, fine-tuning, and model evaluation"
+    ]
+  },
+  {
+    "title": "Site Architect (Frontend Platform)",
+    "aboutRole": "Define the frontend architecture strategy including build tooling, component libraries, and rendering patterns. You will ensure frontend systems scale with team and application growth.\n\nYour architectural decisions will shape how dozens of engineers build and ship frontend code. By investing in build performance, developer experience, and scalable patterns, you create leverage that multiplies the output of every frontend team in the organization.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Define frontend architecture standards for monorepo structure and build pipelines",
+      "Evaluate and select frontend frameworks, bundlers, and tooling",
+      "Design micro-frontend architectures for independently deployable UI modules",
+      "Establish performance budgets and automated performance monitoring",
+      "Guide teams on rendering strategies (SSR, SSG, ISR, client-side)"
+    ],
+    "qualifications": [
+      "7+ years of frontend development with architectural leadership experience",
+      "Deep expertise with modern build tools (Vite, esbuild, webpack, Turbopack)",
+      "Experience with micro-frontend patterns and module federation",
+      "Strong understanding of web performance, Core Web Vitals, and rendering optimization",
+      "Knowledge of monorepo tools (Nx, Turborepo) and CI/CD for frontend"
+    ]
+  },
+  {
+    "title": "Mainframe Modernization Developer",
+    "aboutRole": "Modernize legacy mainframe applications by migrating business logic to cloud-native platforms. You will reverse-engineer COBOL systems and rebuild them with modern technologies.\n\nYou will rescue business-critical logic from aging platforms and give it new life in modern, maintainable systems. This rare combination of legacy expertise and modern engineering skills makes you uniquely valuable for one of the most impactful types of technical transformation.",
+    "jobType": "Contract",
+    "responsibilities": [
+      "Analyze and reverse-engineer legacy COBOL/JCL applications",
+      "Design migration strategies from mainframe to cloud-native services",
+      "Rebuild batch processing jobs as modern event-driven pipelines",
+      "Implement data migration from VSAM/DB2 to modern databases",
+      "Validate functional equivalence between legacy and modernized systems"
+    ],
+    "qualifications": [
+      "5+ years of experience with mainframe systems and at least one modern platform",
+      "Knowledge of COBOL, JCL, and mainframe data structures",
+      "Experience with cloud-native development (C#, Java, or Python)",
+      "Understanding of batch processing modernization patterns",
+      "Familiarity with mainframe migration tools and methodologies"
+    ]
+  },
+  {
+    "title": "API Security Engineer",
+    "aboutRole": "Secure API endpoints and authentication flows across all services. You will design API security policies, implement threat detection, and ensure APIs are resilient against common attack vectors.\n\nYou will be the guardian of the most exposed attack surface in any modern application. Your security controls and monitoring systems protect not just our infrastructure but the data and trust of every customer and partner who integrates with our APIs.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Design and implement API authentication and authorization security controls",
+      "Conduct API-specific security assessments and threat modeling",
+      "Implement API rate limiting, abuse detection, and bot mitigation",
+      "Build API security monitoring and anomaly detection pipelines",
+      "Define and enforce API security standards across engineering teams"
+    ],
+    "qualifications": [
+      "4+ years of security engineering with API security focus",
+      "Deep knowledge of OAuth 2.0 security best practices and token management",
+      "Experience with API security tools (42Crunch, Salt Security, or custom WAF rules)",
+      "Understanding of OWASP API Security Top 10",
+      "Proficiency in at least one backend language for security tooling"
+    ]
+  },
+  {
+    "title": "Graph Database Developer",
+    "aboutRole": "Build applications powered by graph databases that model complex relationships between entities. You will design graph schemas and implement traversal algorithms for recommendation and analytics.\n\nYou will unlock insights that are invisible in traditional relational databases. By modeling data as interconnected nodes and relationships, you enable sophisticated queries that reveal patterns, connections, and recommendations that drive real business value.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Design graph data models for complex relationship domains",
+      "Implement graph queries and traversal algorithms using Cypher or Gremlin",
+      "Build recommendation engines and fraud detection systems using graph analytics",
+      "Optimize graph query performance and indexing strategies",
+      "Integrate graph database with existing relational and document data stores"
+    ],
+    "qualifications": [
+      "3+ years of database development with graph database experience",
+      "Proficiency with Neo4j (Cypher) or Amazon Neptune (Gremlin)",
+      "Understanding of graph theory and traversal algorithms",
+      "Experience with data modeling for knowledge graphs or social networks",
+      "Knowledge of graph visualization libraries and tools"
+    ]
+  },
+  {
+    "title": "Contract Flutter Developer",
+    "aboutRole": "Build cross-platform mobile applications using Flutter and Dart on a contract basis. You will deliver a polished app that runs on both iOS and Android from a single codebase.\n\nYour Flutter expertise will accelerate our mobile roadmap by delivering a polished cross-platform app from a single codebase. You will bring best practices for widget composition, state management, and platform-specific adaptations that ensure the app feels native on both iOS and Android.",
+    "jobType": "Contract",
+    "responsibilities": [
+      "Develop cross-platform mobile apps using Flutter and Dart",
+      "Implement custom widgets and smooth animations",
+      "Integrate with REST APIs and local storage (SQLite, Hive)",
+      "Set up automated testing and CI/CD for Flutter apps",
+      "Optimize app performance and reduce build times"
+    ],
+    "qualifications": [
+      "3+ years of Flutter development experience",
+      "Strong Dart programming and Flutter widget tree understanding",
+      "Experience with state management (Riverpod, Bloc, or Provider)",
+      "Knowledge of platform channels for native integrations",
+      "Published Flutter apps on App Store and Google Play"
+    ]
+  },
+  {
+    "title": "Configuration Management Engineer",
+    "aboutRole": "Manage and automate server and application configuration across environments. You will ensure configuration consistency, drift detection, and secure secrets management.\n\nYour work ensures that every environment is consistent, reproducible, and secure. By automating configuration management and secrets distribution, you eliminate the configuration drift and manual errors that are among the most common causes of production incidents.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Implement configuration management using Ansible, Chef, or Puppet",
+      "Build secrets management workflows with HashiCorp Vault or Azure Key Vault",
+      "Design environment-specific configuration hierarchies and overrides",
+      "Implement configuration drift detection and automated remediation",
+      "Create self-service configuration management interfaces for developers"
+    ],
+    "qualifications": [
+      "3+ years of configuration management or systems administration experience",
+      "Experience with Ansible, Chef, Puppet, or SaltStack",
+      "Knowledge of secrets management (Vault, Key Vault, or AWS Secrets Manager)",
+      "Proficiency in YAML, Python, or Ruby for automation scripting",
+      "Understanding of immutable infrastructure and configuration-as-code principles"
+    ]
+  },
+  {
+    "title": "Junior Backend Developer (C#)",
+    "aboutRole": "Start your backend career by building APIs and services with C# and .NET. You will learn clean architecture patterns, database design, and professional development practices under senior mentorship.\n\nThis is your opportunity to build a career on one of the most versatile and in-demand technology stacks. You will learn clean architecture principles, SOLID design patterns, and professional development practices from senior engineers who are invested in your long-term growth.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop API endpoints and background services using ASP.NET Core",
+      "Write SQL queries and learn Entity Framework Core patterns",
+      "Create unit tests using xUnit and mocking frameworks",
+      "Fix bugs and implement small features with guidance",
+      "Participate in code reviews and learn from senior feedback"
+    ],
+    "qualifications": [
+      "0-2 years of professional development experience",
+      "Basic C# and .NET knowledge from coursework or personal projects",
+      "Understanding of HTTP, REST APIs, and JSON",
+      "Familiarity with SQL and relational database concepts",
+      "Bachelor's degree in Computer Science or equivalent self-taught experience"
+    ]
+  },
+  {
+    "title": "Service Mesh Engineer",
+    "aboutRole": "Implement and operate service mesh infrastructure that manages inter-service communication, security, and observability for microservice architectures.\n\nYour service mesh infrastructure is the invisible backbone that makes microservice communication secure, observable, and resilient. By providing these capabilities as infrastructure rather than application code, you free development teams to focus on business logic instead of cross-cutting concerns.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Deploy and manage service mesh infrastructure (Istio, Linkerd, or Consul Connect)",
+      "Configure mutual TLS, traffic policies, and service-to-service authorization",
+      "Implement traffic management (canary deployments, traffic splitting, fault injection)",
+      "Build service mesh observability dashboards and distributed tracing",
+      "Troubleshoot service mesh networking issues and latency overhead"
+    ],
+    "qualifications": [
+      "4+ years of infrastructure or platform engineering experience",
+      "Hands-on experience with Istio, Linkerd, or Consul Connect",
+      "Deep understanding of Kubernetes networking and DNS",
+      "Knowledge of mTLS, certificate management, and network security",
+      "Experience with Envoy proxy configuration and debugging"
+    ]
+  },
+  {
+    "title": "Workflow Engine Developer",
+    "aboutRole": "Build and maintain workflow orchestration systems that coordinate long-running business processes, approvals, and multi-step operations across distributed services.\n\nYou will build the orchestration layer that coordinates complex, long-running business processes across distributed services. Your workflow engine must handle failures gracefully, support human-in-the-loop steps, and provide visibility into process state for both operators and business stakeholders.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Design and implement workflow orchestration engines",
+      "Build visual workflow designers for business process modeling",
+      "Implement saga patterns for distributed transaction coordination",
+      "Create workflow monitoring, retry, and compensation mechanisms",
+      "Integrate workflow engines with existing services and data stores"
+    ],
+    "qualifications": [
+      "3+ years of backend development with workflow or orchestration experience",
+      "Experience with workflow engines (Temporal, Camunda, or Elsa Workflows)",
+      "Understanding of saga pattern and distributed transaction patterns",
+      "Proficiency in C#, Java, or Go for engine development",
+      "Knowledge of state machine design and event-driven architectures"
+    ]
+  },
+  {
+    "title": "Monitoring and Alerting Engineer",
+    "aboutRole": "Build comprehensive monitoring and alerting systems that detect issues before they impact users. You will define alert quality standards and reduce alert fatigue across engineering teams.\n\nYour alerting rules are the first line of defense against production issues. By investing in signal quality, appropriate thresholds, and actionable alert messages, you ensure that on-call engineers are notified when intervention is needed rather than overwhelmed with false positives.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Design and implement monitoring strategies for applications and infrastructure",
+      "Build alerting rules with appropriate severity, routing, and escalation",
+      "Create operational dashboards for real-time system visibility",
+      "Reduce alert fatigue by tuning thresholds and implementing alert correlation",
+      "Evaluate and integrate monitoring tools for comprehensive coverage"
+    ],
+    "qualifications": [
+      "3+ years of experience in monitoring, observability, or SRE roles",
+      "Proficiency with Prometheus, Grafana, and Alertmanager",
+      "Experience with log aggregation (Loki, Elasticsearch, or Splunk)",
+      "Understanding of SLO-based alerting and error budget policies",
+      "Knowledge of on-call best practices and incident notification systems"
+    ]
+  },
+  {
+    "title": "Capacity Planning Engineer",
+    "aboutRole": "Forecast infrastructure and resource needs based on growth projections and usage patterns. You will ensure systems have adequate capacity while optimizing costs.\n\nYour forecasts and models directly influence infrastructure spending and system reliability. By combining historical analysis with growth projections, you ensure the platform has headroom for unexpected traffic spikes while avoiding the waste of over-provisioned resources.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Analyze system resource utilization and forecast future capacity needs",
+      "Build capacity models and growth projections for planning cycles",
+      "Implement auto-scaling policies for cloud workloads",
+      "Conduct load testing to validate capacity limits and identify bottlenecks",
+      "Optimize resource allocation to balance performance and cost"
+    ],
+    "qualifications": [
+      "4+ years of experience in capacity planning, SRE, or infrastructure engineering",
+      "Strong analytical skills and experience with statistical forecasting",
+      "Proficiency with monitoring tools and metric analysis (Prometheus, Grafana)",
+      "Experience with cloud cost optimization and reserved capacity planning",
+      "Knowledge of auto-scaling mechanisms on Azure, AWS, or GCP"
+    ]
+  },
+  {
+    "title": "Domain-Driven Design Consultant",
+    "aboutRole": "Guide engineering teams in applying domain-driven design principles to model complex business domains. You will facilitate event storming sessions and define bounded context boundaries.\n\nYou will help teams escape the complexity trap that arises when software models diverge from business reality. By facilitating collaborative modeling sessions and guiding tactical implementation, you ensure that code reflects the domain language and rules that business experts already understand.",
+    "jobType": "Contract",
+    "responsibilities": [
+      "Facilitate event storming and domain modeling workshops",
+      "Define bounded context boundaries and context mapping strategies",
+      "Design aggregate roots, entities, and value objects for complex domains",
+      "Guide teams on implementing DDD tactical patterns in code",
+      "Create ubiquitous language glossaries and domain documentation"
+    ],
+    "qualifications": [
+      "7+ years of software engineering with DDD practice experience",
+      "Deep knowledge of DDD strategic patterns (bounded contexts, context maps, anti-corruption layers)",
+      "Experience with event storming facilitation and collaborative modeling",
+      "Proficiency in C#, Java, or Kotlin for DDD implementation examples",
+      "Strong facilitation and communication skills for workshop leadership"
+    ]
+  },
+  {
+    "title": "Technical Debt Reduction Engineer",
+    "aboutRole": "Systematically identify, quantify, and reduce technical debt across the codebase. You will refactor legacy code, improve test coverage, and modernize outdated dependencies.\n\nYou will make the codebase healthier one focused improvement at a time. By quantifying technical debt, prioritizing high-impact refactoring, and demonstrating measurable improvements, you build organizational support for the ongoing investment in code health that sustains long-term velocity.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Audit codebases to identify and categorize technical debt",
+      "Develop metrics and dashboards to track technical debt reduction progress",
+      "Refactor legacy code while maintaining backward compatibility",
+      "Upgrade outdated dependencies and migrate deprecated APIs",
+      "Improve test coverage and code quality in high-risk areas"
+    ],
+    "qualifications": [
+      "5+ years of software engineering experience across multiple tech stacks",
+      "Strong refactoring skills and knowledge of design patterns",
+      "Experience with static analysis tools (SonarQube, NDepend, or CodeClimate)",
+      "Understanding of safe refactoring techniques and feature flag strategies",
+      "Ability to balance technical improvements with business delivery"
+    ]
+  },
+  {
+    "title": "Payments Integration Developer",
+    "aboutRole": "Build and maintain payment integrations that enable secure, reliable financial transactions across multiple payment methods and geographies.\n\nMoney in motion demands flawless engineering. You will build payment systems where every transaction is traceable, every failure is handled gracefully, and every integration meets the security and compliance standards that financial institutions and regulators require.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Integrate payment gateways (Stripe, Adyen, PayPal) for multiple payment methods",
+      "Build recurring billing, subscription management, and invoicing systems",
+      "Implement payment reconciliation and settlement reporting",
+      "Handle multi-currency support and cross-border payment routing",
+      "Ensure PCI DSS compliance and secure card data handling"
+    ],
+    "qualifications": [
+      "3+ years of payment integration development experience",
+      "Experience with Stripe API, Adyen, or similar payment platforms",
+      "Understanding of PCI DSS requirements and tokenization",
+      "Knowledge of payment industry concepts (authorization, capture, settlement, chargebacks)",
+      "Proficiency in C#, Python, or Node.js for backend payment services"
+    ]
+  },
+  {
+    "title": "Mid-Level DevOps Engineer",
+    "aboutRole": "Maintain and improve CI/CD pipelines, cloud infrastructure, and deployment processes. You will automate operational tasks and support development teams with infrastructure needs.\n\nYou will develop your infrastructure skills in a supportive environment alongside senior platform engineers. This role offers hands-on experience with production systems and a clear growth path toward senior DevOps or SRE positions as you deepen your expertise.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Maintain and improve CI/CD pipelines for multiple application teams",
+      "Manage cloud resources and implement cost optimization recommendations",
+      "Automate environment provisioning and configuration management",
+      "Monitor infrastructure health and respond to alerts",
+      "Support development teams with deployment and infrastructure questions"
+    ],
+    "qualifications": [
+      "2-4 years of DevOps or platform engineering experience",
+      "Experience with Docker, Kubernetes basics, and CI/CD tools",
+      "Familiarity with cloud services (Azure or AWS) and infrastructure-as-code",
+      "Scripting skills in Bash, Python, or PowerShell",
+      "Understanding of networking fundamentals and Linux administration"
+    ]
+  },
+  {
+    "title": "Cost Optimization Engineer",
+    "aboutRole": "Reduce cloud and infrastructure spending by analyzing usage patterns, right-sizing resources, and implementing cost-aware architecture patterns.\n\nYour work directly impacts the bottom line by ensuring that every cloud dollar delivers maximum value. By combining technical expertise with financial analysis, you help engineering teams make informed decisions about resource allocation and architectural tradeoffs.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Analyze cloud spending and identify cost optimization opportunities",
+      "Implement resource right-sizing and spot/preemptible instance strategies",
+      "Design cost-aware architecture patterns and provide guidance to teams",
+      "Build cost monitoring dashboards and budget alerting systems",
+      "Negotiate reserved capacity and savings plans based on usage analysis"
+    ],
+    "qualifications": [
+      "3+ years of cloud infrastructure experience with cost optimization focus",
+      "Experience with cloud cost management tools (Azure Cost Management, AWS Cost Explorer)",
+      "Understanding of cloud pricing models (on-demand, reserved, spot)",
+      "Knowledge of resource tagging, showback, and chargeback models",
+      "Analytical skills for forecasting and trend analysis"
+    ]
+  },
+  {
+    "title": "Semantic Web Developer",
+    "aboutRole": "Build knowledge graph and linked data applications using semantic web technologies. You will design ontologies, implement SPARQL endpoints, and create intelligent data integration solutions.\n\nYou will build systems that understand the meaning of data, not just its structure. By creating machine-readable knowledge representations, you enable applications to reason about information, discover connections, and answer questions that traditional databases cannot easily support.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Design and implement ontologies using OWL and RDFS",
+      "Build SPARQL endpoints and knowledge graph query interfaces",
+      "Implement data integration pipelines using RDF and linked data principles",
+      "Create entity resolution and knowledge extraction workflows",
+      "Build visualization interfaces for knowledge graph exploration"
+    ],
+    "qualifications": [
+      "3+ years of experience with semantic web technologies",
+      "Knowledge of RDF, OWL, SPARQL, and linked data principles",
+      "Experience with graph databases (Neo4j, Apache Jena, or Stardog)",
+      "Proficiency in Python or Java for knowledge graph development",
+      "Understanding of entity resolution and natural language understanding for data extraction"
+    ]
+  },
+  {
+    "title": "Audio Software Developer",
+    "aboutRole": "Build real-time audio processing applications including DSP algorithms, audio plugins, and streaming audio infrastructure.\n\nYou will work in a domain where engineering meets artistry, building tools and systems that musicians, producers, and listeners depend on. Real-time audio demands zero-tolerance for glitches and a deep understanding of signal processing, making this one of the most technically demanding areas of software engineering.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Develop real-time audio processing algorithms and DSP pipelines",
+      "Build audio plugins using JUCE, VST, or AudioUnit frameworks",
+      "Implement low-latency audio streaming and synchronization",
+      "Optimize audio processing for minimal CPU usage and zero-glitch playback",
+      "Integrate audio engine with application backends and cloud services"
+    ],
+    "qualifications": [
+      "3+ years of audio software development experience",
+      "Strong C++ skills with real-time audio programming experience",
+      "Knowledge of DSP fundamentals (filters, FFT, convolution, synthesis)",
+      "Experience with audio APIs (CoreAudio, WASAPI, ASIO, or Web Audio)",
+      "Understanding of audio codecs, formats, and streaming protocols"
+    ]
+  },
+  {
+    "title": "Feature Flag Platform Developer",
+    "aboutRole": "Build and maintain feature flag infrastructure that enables safe progressive rollouts, A/B testing, and runtime configuration changes without deployments.\n\nYour platform enables teams to decouple deployment from release, giving them the confidence to ship code frequently and roll out features gradually. By building robust targeting and evaluation infrastructure, you empower product and engineering teams to experiment safely at scale.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Build feature flag management APIs and admin dashboards",
+      "Implement targeting rules, percentage rollouts, and user segmentation",
+      "Create SDKs for server-side and client-side feature flag evaluation",
+      "Design feature flag lifecycle management and cleanup workflows",
+      "Integrate feature flags with observability to measure feature impact"
+    ],
+    "qualifications": [
+      "3+ years of backend development experience",
+      "Experience with feature flag platforms (LaunchDarkly, Unleash, or Flagsmith)",
+      "Understanding of progressive delivery and canary release patterns",
+      "Proficiency in at least two of: C#, Go, TypeScript, or Python",
+      "Knowledge of caching strategies for high-performance flag evaluation"
+    ]
+  },
+  {
+    "title": "Disaster Recovery Engineer",
+    "aboutRole": "Design and implement disaster recovery strategies that ensure business continuity. You will build automated failover systems, conduct DR drills, and maintain recovery runbooks.\n\nYour work is insurance against the worst-case scenarios that every system will eventually face. By building automated recovery procedures, conducting realistic drills, and maintaining clear documentation, you ensure the organization can recover quickly when disaster strikes.",
+    "jobType": "FullTime",
+    "responsibilities": [
+      "Design disaster recovery architectures with defined RPO and RTO targets",
+      "Implement automated failover and failback procedures across regions",
+      "Conduct regular DR drills and document results and improvements",
+      "Build backup verification and data integrity validation systems",
+      "Maintain recovery runbooks and train teams on DR procedures"
+    ],
+    "qualifications": [
+      "4+ years of infrastructure or SRE experience with DR focus",
+      "Experience with multi-region cloud architectures (Azure or AWS)",
+      "Knowledge of database replication, geo-redundancy, and backup strategies",
+      "Understanding of business continuity planning and risk assessment",
+      "Proficiency in automation scripting for failover orchestration"
+    ]
+  }
+]

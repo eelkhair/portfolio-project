@@ -42,7 +42,7 @@ public class SettingsEndpointTests : IAsyncLifetime
     [Fact]
     public async Task GetProvider_Returns200WithProviderSettings()
     {
-        var response = await _client.GetAsync("/settings/provider");
+        var response = await _client.GetAsync("/api/settings/provider");
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
@@ -57,7 +57,7 @@ public class SettingsEndpointTests : IAsyncLifetime
     [Fact]
     public async Task GetApplicationMode_Returns200WithModeDto()
     {
-        var response = await _client.GetAsync("/settings/mode");
+        var response = await _client.GetAsync("/api/settings/mode");
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
 

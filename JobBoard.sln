@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.10.35021.124
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11520.95 d18.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobAPI.Contracts", "services\micro-services\job-api\JobAPI.Contracts\JobAPI.Contracts.csproj", "{FEB5E1E6-3211-489F-B08E-64BD4B6C3825}"
 EndProject
@@ -16,8 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "services", "services", "{6A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "job-api", "job-api", "{34F29689-4830-4406-B6E6-A36922FFAA5B}"
 	ProjectSection(SolutionItems) = preProject
-		services\job-api\Dockerfile = services\job-api\Dockerfile
 		services\job-api\.dockerignore = services\job-api\.dockerignore
+		services\job-api\Dockerfile = services\job-api\Dockerfile
 		services\job-api\Nuget.Config = services\job-api\Nuget.Config
 	EndProjectSection
 EndProject
@@ -27,8 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompanyApi.Service", "servi
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "company-api", "company-api", "{45755CDE-8322-42B4-ADC0-A0126A3997A4}"
 	ProjectSection(SolutionItems) = preProject
-		services\company-api\Dockerfile = services\company-api\Dockerfile
 		services\company-api\.dockerignore = services\company-api\.dockerignore
+		services\company-api\Dockerfile = services\company-api\Dockerfile
 		services\company-api\Nuget.Config = services\company-api\Nuget.Config
 	EndProjectSection
 EndProject
@@ -36,8 +36,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{97DB
 	ProjectSection(SolutionItems) = preProject
 		scripts\docker-compose.registry.yml = scripts\docker-compose.registry.yml
 		scripts\docker-publsh.sh = scripts\docker-publsh.sh
-		scripts\nuget-push.ps1 = scripts\nuget-push.ps1
 		scripts\migration.sh = scripts\migration.sh
+		scripts\nuget-push.ps1 = scripts\nuget-push.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "user-api", "user-api", "{D27A4457-B09A-4389-B56C-7A1E180B5F89}"
@@ -52,8 +52,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserAPI.Contracts", "servic
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "admin-api", "admin-api", "{D12A1538-3710-454B-91F8-FA92024D5A9E}"
 	ProjectSection(SolutionItems) = preProject
-		services\admin-api\Dockerfile = services\admin-api\Dockerfile
 		services\admin-api\.dockerignore = services\admin-api\.dockerignore
+		services\admin-api\Dockerfile = services\admin-api\Dockerfile
 		services\admin-api\Nuget.Config = services\admin-api\Nuget.Config
 	EndProjectSection
 EndProject
@@ -63,17 +63,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminApi.Service", "service
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ai-service", "ai-service", "{E946D98E-8216-438D-BD42-407A4B4E8201}"
 	ProjectSection(SolutionItems) = preProject
-		services\ai-service\src\index.ts = services\ai-service\src\index.ts
-		services\ai-service\Dockerfile = services\ai-service\Dockerfile
 		services\ai-service\.dockerignore = services\ai-service\.dockerignore
-		services\ai-service\package.json = services\ai-service\package.json
-		services\ai-service\settings\swagger.js = services\ai-service\settings\swagger.js
-		services\ai-service\tsconfig.json = services\ai-service\tsconfig.json
-		services\ai-service\package-lock.json = services\ai-service\package-lock.json
-		services\ai-service\run.sh = services\ai-service\run.sh
+		services\ai-service\Dockerfile = services\ai-service\Dockerfile
+		services\ai-service\src\index.ts = services\ai-service\src\index.ts
 		services\ai-service\Dapr\Components\Events\job-published-subscription.yaml = services\ai-service\Dapr\Components\Events\job-published-subscription.yaml
+		services\ai-service\package-lock.json = services\ai-service\package-lock.json
+		services\ai-service\package.json = services\ai-service\package.json
+		services\ai-service\run.sh = services\ai-service\run.sh
 		services\ai-service\Dapr\Components\Secrets\secret.yaml = services\ai-service\Dapr\Components\Secrets\secret.yaml
 		services\ai-service\Dapr\secrets.json = services\ai-service\Dapr\secrets.json
+		services\ai-service\settings\swagger.js = services\ai-service\settings\swagger.js
+		services\ai-service\tsconfig.json = services\ai-service\tsconfig.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BA3D8C05-0820-48F3-A42F-0CF4FB40BD4D}"
@@ -92,10 +92,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elkhair.Dev.Common", "servi
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Components", "Components", "{7FCF5303-CB4C-4D08-98CF-E14F771C77C1}"
 	ProjectSection(SolutionItems) = preProject
+		Components\config.redis.yaml = Components\config.redis.yaml
 		Components\jaeger.yaml = Components\jaeger.yaml
 		Components\rabbitmq.yaml = Components\rabbitmq.yaml
 		Components\statestore.yaml = Components\statestore.yaml
-		Components\config.redis.yaml = Components\config.redis.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{3CE6F25C-5B37-4BA7-AFF8-8952DBA0A575}"
@@ -105,16 +105,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{3CE6F2
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{8F216E64-AB1B-4402-A602-B20D7B4C470F}"
 	ProjectSection(SolutionItems) = preProject
-		docs\README.md = docs\README.md
 		docs\create-company.puml = docs\create-company.puml
 		docs\create-job.puml = docs\create-job.puml
-		docs\sync.puml = docs\sync.puml
+		docs\health-checks.md = docs\health-checks.md
 		docs\local-environment.md = docs\local-environment.md
 		docs\observability.md = docs\observability.md
-		docs\strangler-fig.md = docs\strangler-fig.md
-		docs\screenshots.md = docs\screenshots.md
-		docs\health-checks.md = docs\health-checks.md
+		docs\README.md = docs\README.md
 		docs\resumeparse.puml = docs\resumeparse.puml
+		docs\screenshots.md = docs\screenshots.md
+		docs\strangler-fig.md = docs\strangler-fig.md
+		docs\sync.puml = docs\sync.puml
+		docs\seedjobs.json = docs\seedjobs.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HealthChecks", "HealthChecks", "{6E111D1A-9F3E-4486-960C-57AF7DA4D809}"
@@ -190,10 +191,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "monolith-sync", "services\m
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ADRs", "ADRs", "{97769D49-12AC-486F-88DC-4E25F78EB71B}"
 	ProjectSection(SolutionItems) = preProject
-		docs\ADRs\ADR-004-Observability-First.md = docs\ADRs\ADR-004-Observability-First.md
-		docs\ADRs\ADR-003-Transactional-Outbox.md = docs\ADRs\ADR-003-Transactional-Outbox.md
-		docs\ADRs\ADR-002-Dapr-Usage-Boundaries.md = docs\ADRs\ADR-002-Dapr-Usage-Boundaries.md
 		docs\ADRs\ADR-001-Architecture-Showcase-Scope.md = docs\ADRs\ADR-001-Architecture-Showcase-Scope.md
+		docs\ADRs\ADR-002-Dapr-Usage-Boundaries.md = docs\ADRs\ADR-002-Dapr-Usage-Boundaries.md
+		docs\ADRs\ADR-003-Transactional-Outbox.md = docs\ADRs\ADR-003-Transactional-Outbox.md
+		docs\ADRs\ADR-004-Observability-First.md = docs\ADRs\ADR-004-Observability-First.md
 		docs\ADRs\ADR-005-CQRS-and-Decorator-Pipeline.md = docs\ADRs\ADR-005-CQRS-and-Decorator-Pipeline.md
 		docs\ADRs\ADR-006-RabbitMQ-vs-Azure-Service-Bus.md = docs\ADRs\ADR-006-RabbitMQ-vs-Azure-Service-Bus.md
 		docs\ADRs\ADR-007-Trace-Context-Propagation.md = docs\ADRs\ADR-007-Trace-Context-Propagation.md
@@ -217,12 +218,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Strangler Fig", "Strangler 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Observability", "Observability", "{85437C52-90D1-46A3-B1F8-13B01E100B24}"
 	ProjectSection(SolutionItems) = preProject
-		docs\Images\Observability\distributed-trace-end-to-end-jaeger.png = docs\Images\Observability\distributed-trace-end-to-end-jaeger.png
-		docs\Images\Observability\logs-trace-correlation-grafana.png = docs\Images\Observability\logs-trace-correlation-grafana.png
-		docs\Images\Observability\trace-id-propagation-browser-to-backend.png = docs\Images\Observability\trace-id-propagation-browser-to-backend.png
 		docs\Images\Observability\async-saga-and-pubsub-visibility.png = docs\Images\Observability\async-saga-and-pubsub-visibility.png
+		docs\Images\Observability\distributed-trace-end-to-end-jaeger.png = docs\Images\Observability\distributed-trace-end-to-end-jaeger.png
 		docs\Images\Observability\grafana-find-by-trace-id.png = docs\Images\Observability\grafana-find-by-trace-id.png
 		docs\Images\Observability\jaeger-end-to-end-trace.png = docs\Images\Observability\jaeger-end-to-end-trace.png
+		docs\Images\Observability\logs-trace-correlation-grafana.png = docs\Images\Observability\logs-trace-correlation-grafana.png
+		docs\Images\Observability\trace-id-propagation-browser-to-backend.png = docs\Images\Observability\trace-id-propagation-browser-to-backend.png
 		docs\Images\Observability\ui-browser-trace-id-header.png = docs\Images\Observability\ui-browser-trace-id-header.png
 	EndProjectSection
 EndProject
@@ -234,11 +235,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Healthchecks", "Healthchecks", "{6D1DF1C6-414E-4FA1-8A43-96E1AC67B1AC}"
 	ProjectSection(SolutionItems) = preProject
 		docs\Images\healthchecks\dapr-application-runtime-summary.png = docs\Images\healthchecks\dapr-application-runtime-summary.png
+		docs\Images\healthchecks\dapr-applications-overview.png = docs\Images\healthchecks\dapr-applications-overview.png
 		docs\Images\healthchecks\dapr-components-status.png = docs\Images\healthchecks\dapr-components-status.png
 		docs\Images\healthchecks\dapr-pubsub-subscriptions.png = docs\Images\healthchecks\dapr-pubsub-subscriptions.png
 		docs\Images\healthchecks\healthchecks-monolith-dependencies.png = docs\Images\healthchecks\healthchecks-monolith-dependencies.png
 		docs\Images\healthchecks\rabbitmq-queues-and-dlq.png = docs\Images\healthchecks\rabbitmq-queues-and-dlq.png
-		docs\Images\healthchecks\dapr-applications-overview.png = docs\Images\healthchecks\dapr-applications-overview.png
 		docs\Images\healthchecks\redis-config-and-feature-flags.png = docs\Images\healthchecks\redis-config-and-feature-flags.png
 	EndProjectSection
 EndProject
@@ -819,5 +820,8 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A1C2D3E4-F5A6-47B8-9C0D-E1F2A3B4C5D6}
+	EndGlobalSection
+	GlobalSection(NDepend) = preSolution
+		Project = "..\..\OneDrive\Documents\Portfolio.ndproj"
 	EndGlobalSection
 EndGlobal

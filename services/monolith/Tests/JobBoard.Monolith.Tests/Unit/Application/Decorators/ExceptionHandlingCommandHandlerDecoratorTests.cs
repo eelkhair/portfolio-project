@@ -2,8 +2,6 @@ using FluentValidation;
 using JobBoard.Application.Infrastructure.Decorators;
 using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Domain.Exceptions;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using Shouldly;
