@@ -53,7 +53,7 @@ done
 echo "🚀 Deploying + cleaning up on remote host..."
 
 # NOTE: no quotes around EOF so variables expand and we pass $PASSWORD through.
-ssh -tt eelkhair@192.168.1.112 <<EOF
+ssh -tt eelkhair@192.168.1.114 <<EOF
 set -euo pipefail
 
 PASSWORD='${PASSWORD}'

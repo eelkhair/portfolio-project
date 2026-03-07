@@ -78,7 +78,7 @@ public class CompaniesEndpointTests : IAsyncLifetime
             AdminEmail = $"admin-{suffix}@test.com"
         };
 
-        var response = await _client.PostAsJsonAsync("/companies", command);
+        var response = await _client.PostAsJsonAsync("/api/companies", command);
 
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
 
@@ -111,7 +111,7 @@ public class CompaniesEndpointTests : IAsyncLifetime
             AdminEmail = "john@test.com"
         };
 
-        var response = await _client.PostAsJsonAsync("/companies", command);
+        var response = await _client.PostAsJsonAsync("/api/companies", command);
 
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
     }
@@ -131,7 +131,7 @@ public class CompaniesEndpointTests : IAsyncLifetime
         };
 
         // Send request with anonymous header to trigger no-auth
-        var request = new HttpRequestMessage(HttpMethod.Post, "/companies")
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/companies")
         {
             Content = JsonContent.Create(command)
         };
@@ -159,7 +159,7 @@ public class CompaniesEndpointTests : IAsyncLifetime
             AdminLastName = "Admin",
             AdminEmail = $"admin1-{suffix}@test.com"
         };
-        var response1 = await _client.PostAsJsonAsync("/companies", command1);
+        var response1 = await _client.PostAsJsonAsync("/api/companies", command1);
         response1.StatusCode.ShouldBe(HttpStatusCode.Created);
 
         // Attempt to create a second company with the same name
@@ -172,7 +172,7 @@ public class CompaniesEndpointTests : IAsyncLifetime
             AdminLastName = "Admin",
             AdminEmail = $"admin2-{suffix}@test.com"
         };
-        var response2 = await _client.PostAsJsonAsync("/companies", command2);
+        var response2 = await _client.PostAsJsonAsync("/api/companies", command2);
 
         response2.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
     }
@@ -194,7 +194,7 @@ public class CompaniesEndpointTests : IAsyncLifetime
             AdminLastName = "Admin",
             AdminEmail = $"admin1-{suffix}@test.com"
         };
-        var response1 = await _client.PostAsJsonAsync("/companies", command1);
+        var response1 = await _client.PostAsJsonAsync("/api/companies", command1);
         response1.StatusCode.ShouldBe(HttpStatusCode.Created);
 
         // Attempt to create a second company with the same email
@@ -207,7 +207,7 @@ public class CompaniesEndpointTests : IAsyncLifetime
             AdminLastName = "Admin",
             AdminEmail = $"admin2-{suffix}@test.com"
         };
-        var response2 = await _client.PostAsJsonAsync("/companies", command2);
+        var response2 = await _client.PostAsJsonAsync("/api/companies", command2);
 
         response2.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
     }

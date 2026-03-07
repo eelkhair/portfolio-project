@@ -53,7 +53,7 @@ public class JobsEndpointTests : IAsyncLifetime
             MaxBullets = 5
         };
 
-        var response = await _client.PostAsJsonAsync($"/jobs/{companyId}/generate", request);
+        var response = await _client.PostAsJsonAsync($"/api/jobs/{companyId}/generate", request);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
@@ -70,7 +70,7 @@ public class JobsEndpointTests : IAsyncLifetime
     {
         var companyId = Guid.NewGuid();
 
-        var response = await _client.GetAsync($"/jobs/{companyId}/list-drafts");
+        var response = await _client.GetAsync($"/api/jobs/{companyId}/list-drafts");
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
@@ -93,7 +93,7 @@ public class JobsEndpointTests : IAsyncLifetime
             Style = new Dictionary<string, object> { ["tone"] = "professional" }
         };
 
-        var response = await _client.PutAsJsonAsync("/jobs/drafts/rewrite", request);
+        var response = await _client.PutAsJsonAsync("/api/jobs/drafts/rewrite", request);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
@@ -109,7 +109,7 @@ public class JobsEndpointTests : IAsyncLifetime
     public async Task GenerateDraft_WithoutAuth_Returns401()
     {
         var companyId = Guid.NewGuid();
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/jobs/{companyId}/generate")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/api/jobs/{companyId}/generate")
         {
             Content = JsonContent.Create(new DraftGenRequest { Brief = "Test" })
         };
@@ -124,7 +124,7 @@ public class JobsEndpointTests : IAsyncLifetime
     public async Task ListDrafts_WithoutAuth_Returns401()
     {
         var companyId = Guid.NewGuid();
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/jobs/{companyId}/list-drafts");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/api/jobs/{companyId}/list-drafts");
         request.Headers.Add("X-Anonymous", "true");
 
         var response = await _client.SendAsync(request);
