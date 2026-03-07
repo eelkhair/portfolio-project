@@ -16,9 +16,9 @@ export class CompanySelectionStore {
         if(companies.data.length == 1){
           this.selectedCompany.set(companies.data[0])
         }else{
-          const org =this.accountService.user()?.["https://eelkhair.net/org"]
+          const org = this.accountService.user()?.['organization'] as Record<string, any> | undefined
           if(org){
-            const company = companies.data.find(company => company.uId === org.name)
+            const company = companies.data.find(company => company.uId === org['name'])
             if(company){
               this.selectedCompany.set(company)
             }

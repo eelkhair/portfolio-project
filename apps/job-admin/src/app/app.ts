@@ -1,4 +1,4 @@
-import {Component, DestroyRef, inject, OnInit} from '@angular/core';
+import {Component, DestroyRef, effect, inject} from '@angular/core';
 import {Header} from './layout/header/header';
 import {Footer} from './layout/footer/footer';
 import {RouterOutlet} from '@angular/router';
@@ -22,22 +22,28 @@ import {AiChat} from './shared/ai-chat/ai-chat';
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App implements OnInit {
+export class App {
   accountService = inject(AccountService);
   destroyRef = inject(DestroyRef);
   protected rt = inject(RealtimeNotificationsService);
   protected aiRt = inject(AiRealtimeService);
-  ngOnInit() {
-    const sub =this.accountService.auth.getAccessTokenSilently().subscribe(()=> {
-      this.rt.start();
-      this.aiRt.start();
+
+  private signalRStarted = false;
+
+  constructor() {
+    // Auth callback is handled by APP_INITIALIZER in app.config.ts
+    // Start SignalR hubs when authentication state becomes true
+    effect(() => {
+      if (this.accountService.isAuthenticated() && !this.signalRStarted) {
+        this.signalRStarted = true;
+        this.rt.start();
+        this.aiRt.start();
+      }
     });
-    this.destroyRef.onDestroy(()=>{
+
+    this.destroyRef.onDestroy(() => {
       void this.rt.stop();
       void this.aiRt.stop();
-      sub.unsubscribe();
-    })
-
+    });
   }
-
 }

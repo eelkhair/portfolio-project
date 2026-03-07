@@ -116,6 +116,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{8F216E64-A
 		docs\strangler-fig.md = docs\strangler-fig.md
 		docs\sync.puml = docs\sync.puml
 		docs\seedjobs.json = docs\seedjobs.json
+		docs\ssh-key-auth.md = docs\ssh-key-auth.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HealthChecks", "HealthChecks", "{6E111D1A-9F3E-4486-960C-57AF7DA4D809}"

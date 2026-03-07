@@ -7,7 +7,7 @@ export class NavItems{
 
   getNavItems(){
     const roles = this.accountService.roles();
-    const isAdmin = roles.includes('admin');
+    const isAdmin = roles.includes('platform-admin');
     const NAV_ITEMS: MenuItem[] = [
       {
         label: 'Dashboard', icon: 'pi pi-chart-bar', routerLink: '/dashboard'
