@@ -1,22 +1,38 @@
 import {computed, inject, Injectable} from '@angular/core';
-import {AuthService} from '@auth0/auth0-angular';
+import {OidcSecurityService, LoginResponse} from 'angular-auth-oidc-client';
 import {toSignal} from '@angular/core/rxjs-interop';
+import {Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AccountService {
-  auth = inject(AuthService);
-  isAuthenticated = toSignal(this.auth.isAuthenticated$, { initialValue: false });
-  user = toSignal(this.auth.user$);
+  private oidc = inject(OidcSecurityService);
 
-  roles = computed(()=>{
-    return this.user()?.['https://eelkhair.net/roles'] as string[];
-  })
-  logout() {
-    this.auth.logout({
-      logoutParams: { returnTo: window.location.origin }
-    });
+  isAuthenticated = toSignal(
+    this.oidc.isAuthenticated$.pipe(map(result => result.isAuthenticated)),
+    { initialValue: false }
+  );
+
+  user = toSignal(
+    this.oidc.userData$.pipe(map(result => result.userData as Record<string, any> | undefined)),
+  );
+
+  roles = computed(() => {
+    const userData = this.user();
+    return (userData?.['realm_access']?.['roles'] as string[]) ?? [];
+  });
+
+  checkAuth(): Observable<LoginResponse> {
+    return this.oidc.checkAuth();
   }
 
+  getAccessToken(): Observable<string> {
+    return this.oidc.getAccessToken();
+  }
+
+  logout() {
+    this.oidc.logoff().subscribe();
+  }
 }
