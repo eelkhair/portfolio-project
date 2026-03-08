@@ -34,12 +34,12 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
 
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, userId),
-            new("https://eelkhair.net/email", DefaultEmail),
-            new("https://eelkhair.net/first_name", DefaultFirstName),
-            new("https://eelkhair.net/last_name", DefaultLastName),
-            new("https://eelkhair.net/roles", "LabAdmin"),
-            new("https://eelkhair.net/roles", "LabMember"),
+            new("sub", userId),
+            new("email", DefaultEmail),
+            new("given_name", DefaultFirstName),
+            new("family_name", DefaultLastName),
+            new("groups", "Admins"),
+            new("groups", "Recruiters"),
         };
 
         var identity = new ClaimsIdentity(claims, SchemeName);

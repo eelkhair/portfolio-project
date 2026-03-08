@@ -3,6 +3,6 @@
 public class CreateCompanyRequest
 {
     public string Name { get; set; } = string.Empty;
-    public string Auth0OrganizationId { get; set; }
+    public string KeycloakGroupId { get; set; } = string.Empty;
     public required Guid UId { get; set; }
 }

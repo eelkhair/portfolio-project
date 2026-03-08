@@ -39,8 +39,8 @@ public class ProvisionUserSuccessTopic(ICompanyCommandService service, IMessageS
                         CompanyName = request.Data?.CompanyName ?? string.Empty,
                         CompanyUId = request.Data?.CompanyUId ?? Guid.Empty,
                         UserUId = request.Data?.UId ?? Guid.Empty,
-                        Auth0CompanyId = request.Data?.Auth0OrganizationId ?? string.Empty,
-                        Auth0UserId = request.Data?.Auth0UserId ?? string.Empty
+                        KeycloakGroupId = request.Data?.KeycloakGroupId ?? string.Empty,
+                        KeycloakUserId = request.Data?.KeycloakUserId ?? string.Empty
                     }, ct);
             }
             else

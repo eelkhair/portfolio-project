@@ -13,7 +13,7 @@ public class UserApiClient(DaprClient client, ActivitySource activitySource, ILo
     {
         using var activity = activitySource.StartActivity("user-api.SendCompanyCreatedAsync");
         logger.LogInformation("Sending company created event to user-api");
-        var message = client.CreateInvokeMethodRequest(HttpMethod.Post, "user-api", "companies");
+        var message = client.CreateInvokeMethodRequest(HttpMethod.Post, "user-api", "api/companies");
         message.Content= JsonContent.Create(payload);
         return client.InvokeMethodAsync<CompanyCreatedUserApiPayload>(message, cancellationToken);
     }

@@ -11,6 +11,9 @@ namespace CompanyApi.Application.Commands;
 
 public class CompanyCommandService(ICompanyDbContext context): ICompanyCommandService
 {
+    private static readonly TypeAdapterConfig IgnoreIndustryConfig = TypeAdapterConfig.GlobalSettings.Fork(c =>
+        c.NewConfig<Company, CompanyResponse>().Ignore(dest => dest.IndustryUId));
+
     public async Task<CompanyResponse> CreateAsync(CreateCompanyRequest request, ClaimsPrincipal user, CancellationToken ct)
     {
         var company = request.Adapt<Company>();
@@ -21,7 +24,7 @@ public class CompanyCommandService(ICompanyDbContext context): ICompanyCommandSe
         {
             company.UId = request.CompanyId.Value;
         }
-        
+
         if (!string.IsNullOrWhiteSpace(request.UserId))
         {
             company.CreatedBy = request.UserId;
@@ -31,7 +34,7 @@ public class CompanyCommandService(ICompanyDbContext context): ICompanyCommandSe
 
         await context.SaveChangesAsync(user, ct);
 
-        var response = company.Adapt<CompanyResponse>();
+        var response = company.Adapt<CompanyResponse>(IgnoreIndustryConfig);
         response.IndustryUId = request.IndustryUId;
         return response;
 

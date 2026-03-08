@@ -47,7 +47,7 @@ public static class DependencyInjection
         });
 
         // ---------------------------------------------------------------------
-        // JWT Bearer Auth (Auth0)
+        // JWT Bearer Auth (Keycloak)
         // ---------------------------------------------------------------------
         services
             .AddAuthentication(options =>
@@ -57,14 +57,14 @@ public static class DependencyInjection
             })
             .AddJwtBearer(options =>
             {
-                options.Authority = $"https://{configuration["Auth0:Domain"]}/";
-                options.Audience = configuration["Auth0:Audience"];
+                options.RequireHttpsMetadata = false;
+                options.MapInboundClaims = false;
+                options.Authority = configuration["Keycloak:Authority"];
+                options.Audience = configuration["Keycloak:Audience"];
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
-                    ValidIssuer = $"https://{configuration["Auth0:Domain"]}/",
                     ValidateAudience = true,
-                    ValidAudience = configuration["Auth0:Audience"],
                     ValidateLifetime = true
                 };
                 options.Events = new JwtBearerEvents
@@ -78,6 +78,24 @@ public static class DependencyInjection
                             path.StartsWithSegments("/hubs/notifications"))
                         {
                             context.Token = token;
+                        }
+                        return Task.CompletedTask;
+                    },
+                    OnTokenValidated = context =>
+                    {
+                        // Keycloak "Full group path" emits /Admins, /Companies/... — strip leading /
+                        var identity = context.Principal?.Identity as System.Security.Claims.ClaimsIdentity;
+                        if (identity is not null)
+                        {
+                            var groupClaims = identity.FindAll("groups").ToList();
+                            foreach (var claim in groupClaims)
+                            {
+                                if (claim.Value.StartsWith('/'))
+                                {
+                                    identity.RemoveClaim(claim);
+                                    identity.AddClaim(new System.Security.Claims.Claim("groups", claim.Value.TrimStart('/')));
+                                }
+                            }
                         }
                         return Task.CompletedTask;
                     }
@@ -98,15 +116,15 @@ public static class DependencyInjection
         services
             .AddAuthorizationBuilder()
 
-            // Role-based policies
+            // Group-based policies (Keycloak groups)
             .AddPolicy(AuthorizationPolicies.Admin, policy =>
-                policy.RequireRole(UserRoles.LabAdmin))
+                policy.RequireClaim("groups", UserRoles.Admin))
 
-            .AddPolicy(AuthorizationPolicies.Member, policy =>
-                policy.RequireRole(UserRoles.LabMember))
+            .AddPolicy(AuthorizationPolicies.Recruiter, policy =>
+                policy.RequireClaim("groups", UserRoles.Recruiter))
 
             .AddPolicy(AuthorizationPolicies.AllUsers, policy =>
-                policy.RequireRole(UserRoles.LabAdmin, UserRoles.LabMember))
+                policy.RequireClaim("groups", UserRoles.Admin, UserRoles.Recruiter))
 
             // -----------------------------------------------------------------
             // Dapr Internal Policy (Dapr → App calls)

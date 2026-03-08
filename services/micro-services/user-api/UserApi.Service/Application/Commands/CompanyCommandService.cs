@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using UserApi.Application.Commands.Interfaces;
 using UserAPI.Contracts.Models.Requests;
 using UserApi.Infrastructure.Data;
@@ -22,7 +21,7 @@ public class CompanyCommandService(IUserDbContext context): ICompanyCommandServi
             FirstName = request.FirstName,
             LastName = request.LastName,
             Email = request.Email,
-            Auth0UserId = request.Auth0Id
+            KeycloakUserId = request.KeycloakId
         };
 
         if (request.UId != null)
@@ -39,7 +38,7 @@ public class CompanyCommandService(IUserDbContext context): ICompanyCommandServi
         var company = new Company
         {
             Name = request.Name,
-            Auth0OrganizationId = request.Auth0OrganizationId,
+            KeycloakGroupId = request.KeycloakGroupId,
             UId = request.UId
         };
         context.Companies.Add(company);

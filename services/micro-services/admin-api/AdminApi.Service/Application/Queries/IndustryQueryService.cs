@@ -11,7 +11,7 @@ public class IndustryQueryService(DaprClient daprClient, UserContextService acce
     { 
         var authHeader= accessor.GetHeader("Authorization");
 
-        var message = daprClient.CreateInvokeMethodRequest(HttpMethod.Get, "company-api", "industries");
+        var message = daprClient.CreateInvokeMethodRequest(HttpMethod.Get, "company-api", "api/industries");
         message.Headers.Add("Authorization", authHeader?.Trim());
         return await DaprExtensions.Process(()=> daprClient.InvokeMethodAsync<List<IndustryResponse>>(message, ct));
     }

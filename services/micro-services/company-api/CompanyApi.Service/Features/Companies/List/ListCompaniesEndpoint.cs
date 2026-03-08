@@ -9,7 +9,7 @@ public class ListCompaniesEndpoint(ICompanyQueryService service) : EndpointWitho
     public override void Configure()
     {
         Get("/companies");
-        Permissions("read:companies");
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

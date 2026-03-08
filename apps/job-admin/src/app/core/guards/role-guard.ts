@@ -4,7 +4,7 @@ import {AccountService} from '../services/account.service';
 
 export const roleGuard: CanActivateFn = (route) => {
   const accountService = inject(AccountService);
-  const allowedRoles = route.data["roles"];
-  const userRoles = accountService.roles() ?? [];
-  return userRoles.some((role) => allowedRoles.includes(role));
+  const allowedGroups = route.data["groups"];
+  const userGroups = (accountService.groups() ?? []).map(g => g.replace(/^\//, ''));
+  return userGroups.some((group) => allowedGroups.includes(group));
 };

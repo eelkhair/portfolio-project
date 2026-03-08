@@ -5,13 +5,13 @@ export const COMPANY_ROUTES: Routes = [
   {
     path:'',
     canActivate: [roleGuard],
-    data: {roles: ['platform-admin']},
+    data: {groups: ['Admins']},
     loadComponent: () => import('./company-list/companies').then(c=>c.Companies)
   },
   {
     path:':id',
     canActivate: [roleGuard],
-    data: {roles: ['platform-admin']},
+    data: {groups: ['Admins']},
     loadComponent: () => import('./company-details/company-details').then(c=>c.CompanyDetails)
   },
 ]

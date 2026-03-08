@@ -29,10 +29,10 @@ public class ActivateCompanyCommandHandler(IHandlerContext handlerContext,
         Logger.LogInformation("Activating company; Name: {CompanyName}; Id: {CompanyUId}", request.Model.CompanyName, request.Model.CompanyUId);
         var company = await companyRepository.GetCompanyById(request.Model.CompanyUId, cancellationToken);
         company.SetStatus("Active");
-        company.SetExternalId(request.Model.Auth0CompanyId);
-        
+        company.SetExternalId(request.Model.KeycloakGroupId);
+
         var user = await userRepository.FindUserByUIdAsync(request.Model.UserUId, cancellationToken);
-        user.SetExternalId(request.Model.Auth0UserId);
+        user.SetExternalId(request.Model.KeycloakUserId);
         
         await Context.SaveChangesAsync(request.UserId, cancellationToken);
         

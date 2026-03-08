@@ -6,8 +6,8 @@ export class NavItems{
   accountService = inject(AccountService);
 
   getNavItems(){
-    const roles = this.accountService.roles();
-    const isAdmin = roles.includes('platform-admin');
+    const groups = this.accountService.groups();
+    const isAdmin = groups.some(g => g.replace(/^\//, '') === 'Admins');
     const NAV_ITEMS: MenuItem[] = [
       {
         label: 'Dashboard', icon: 'pi pi-chart-bar', routerLink: '/dashboard'

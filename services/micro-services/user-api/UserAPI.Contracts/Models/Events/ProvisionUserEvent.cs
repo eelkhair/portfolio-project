@@ -1,4 +1,4 @@
-﻿namespace UserAPI.Contracts.Models.Events;
+namespace UserAPI.Contracts.Models.Events;
 
 public class ProvisionUserEvent
 {
@@ -11,7 +11,7 @@ public class ProvisionUserEvent
     public string CompanyEmail { get; set; } = string.Empty;
     public Guid? UserCompanyUId { get; set; }
     public Guid? UId { get; set; }
-    public string Auth0UserId { get; set; } = string.Empty;
-    public string Auth0OrganizationId { get; set; } = string.Empty;
+    public string KeycloakUserId { get; set; } = string.Empty;
+    public string KeycloakGroupId { get; set; } = string.Empty;
     public string SourceSystem { get; set; } = "AdminApi";
 }

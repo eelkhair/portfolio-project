@@ -13,7 +13,7 @@ public class CompanyQueryService(DaprClient client, UserContextService accessor)
     {
         var authHeader= accessor.GetHeader("Authorization");
 
-        var message = client.CreateInvokeMethodRequest(HttpMethod.Get, "company-api", "companies");
+        var message = client.CreateInvokeMethodRequest(HttpMethod.Get, "company-api", "api/companies");
         message.Headers.Add("Authorization", authHeader?.Trim());
         return  await DaprExtensions.Process(()=> client.InvokeMethodAsync<List<CompanyResponse>>(message, ct));
     }

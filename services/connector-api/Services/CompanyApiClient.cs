@@ -13,7 +13,7 @@ public class CompanyApiClient(DaprClient client, ActivitySource activitySource, 
     {
         using var activity = activitySource.StartActivity("company-api.SendCompanyCreatedAsync");
         logger.LogInformation("Sending company created event to company-api");
-        var message = client.CreateInvokeMethodRequest(HttpMethod.Post, "company-api", "companies");
+        var message = client.CreateInvokeMethodRequest(HttpMethod.Post, "company-api", "api/companies");
         message.Content= JsonContent.Create(companyApiPayload);
         return client.InvokeMethodAsync(message, cancellationToken);
     }
@@ -22,7 +22,7 @@ public class CompanyApiClient(DaprClient client, ActivitySource activitySource, 
     {
         using var activity = activitySource.StartActivity("company-api.SendCompanyUpdatedAsync");
         logger.LogInformation("Sending company updated event to company-api for {CompanyUId}", companyUId);
-        var message = client.CreateInvokeMethodRequest(HttpMethod.Put, "company-api", $"companies/{companyUId}");
+        var message = client.CreateInvokeMethodRequest(HttpMethod.Put, "company-api", $"api/companies/{companyUId}");
         message.Content = JsonContent.Create(payload);
         return client.InvokeMethodAsync(message, cancellationToken);
     }

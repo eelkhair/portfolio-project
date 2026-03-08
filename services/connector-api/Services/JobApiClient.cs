@@ -16,7 +16,7 @@ public class JobApiClient(DaprClient client, ActivitySource activitySource, ILog
     {
         using var activity = activitySource.StartActivity("job-api.SendCompanyCreatedAsync");
         logger.LogInformation("Sending company created event to job-api");
-        var message = client.CreateInvokeMethodRequest(HttpMethod.Post, "job-api", "companies");
+        var message = client.CreateInvokeMethodRequest(HttpMethod.Post, "job-api", "api/companies");
         message.Content = JsonContent.Create(payload);
         return client.InvokeMethodAsync(message, cancellationToken);
     }
@@ -25,7 +25,7 @@ public class JobApiClient(DaprClient client, ActivitySource activitySource, ILog
     {
         using var activity = activitySource.StartActivity("job-api.SendJobCreatedAsync");
         logger.LogInformation("Sending job created event to job-api");
-        var message = client.CreateInvokeMethodRequest(HttpMethod.Post, "job-api", "jobs");
+        var message = client.CreateInvokeMethodRequest(HttpMethod.Post, "job-api", "api/jobs");
         message.Content = JsonContent.Create(payload);
         return await client.InvokeMethodAsync<JobApiResponse>(message, cancellationToken);
     }
@@ -34,7 +34,7 @@ public class JobApiClient(DaprClient client, ActivitySource activitySource, ILog
     {
         using var activity = activitySource.StartActivity("job-api.SendCompanyUpdatedAsync");
         logger.LogInformation("Sending company updated event to job-api for {CompanyUId}", companyUId);
-        var message = client.CreateInvokeMethodRequest(HttpMethod.Put, "job-api", $"companies/{companyUId}");
+        var message = client.CreateInvokeMethodRequest(HttpMethod.Put, "job-api", $"api/companies/{companyUId}");
         message.Content = JsonContent.Create(payload);
         return client.InvokeMethodAsync(message, cancellationToken);
     }
