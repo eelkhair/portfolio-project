@@ -1,7 +1,7 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformServer } from '@angular/common';
-import { AuthService } from '@auth0/auth0-angular';
+import { OidcSecurityService } from 'angular-auth-oidc-client';
 import { switchMap, first, catchError, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
@@ -9,7 +9,7 @@ import { environment } from '../../../environments/environment';
 const PUBLIC_PATHS = ['/api/public'];
 
 /**
- * SSR-safe HTTP interceptor that attaches Auth0 Bearer tokens
+ * SSR-safe HTTP interceptor that attaches Keycloak Bearer tokens
  * to requests targeting the backend API.
  */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
@@ -29,14 +29,17 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req);
   }
 
-  const auth = inject(AuthService, { optional: true });
-  if (!auth) {
+  const oidc = inject(OidcSecurityService, { optional: true });
+  if (!oidc) {
     return next(req);
   }
 
-  return auth.getAccessTokenSilently().pipe(
+  return oidc.getAccessToken().pipe(
     first(),
     switchMap((token) => {
+      if (!token) {
+        return next(req);
+      }
       const authReq = req.clone({
         setHeaders: { Authorization: `Bearer ${token}` },
       });

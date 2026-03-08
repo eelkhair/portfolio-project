@@ -1,4 +1,5 @@
 import {
+  APP_INITIALIZER,
   ApplicationConfig,
   ErrorHandler,
   provideBrowserGlobalErrorListeners,
@@ -6,13 +7,15 @@ import {
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
-import { provideAuth0 } from '@auth0/auth0-angular';
+import { provideAuth, LogLevel, OidcSecurityService } from 'angular-auth-oidc-client';
+import { firstValueFrom } from 'rxjs';
 
 import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { tracingInterceptor } from './core/interceptors/tracing.interceptor';
 import { TracingErrorHandler } from './core/error-handler/tracing-error-handler';
+import { environment } from '../environments/environment';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -24,17 +27,26 @@ export const appConfig: ApplicationConfig = {
     provideClientHydration(withEventReplay()),
     ...(typeof window !== 'undefined'
       ? [
-          provideAuth0({
-            domain: 'elkhair-dev.us.auth0.com',
-            clientId: '32VHi7fNpZeUvHcYhM85fvVBRq9U38xV',
-            authorizationParams: {
-              audience: 'https://job-board.eelkhair.net',
-              redirect_uri: window.location.origin,
-              scope: 'openid profile email',
+          provideAuth({
+            config: {
+              authority: environment.oidc.authority,
+              redirectUrl: environment.oidc.redirectUrl,
+              postLogoutRedirectUri: environment.oidc.redirectUrl,
+              clientId: environment.oidc.clientId,
+              scope: 'openid profile email offline_access',
+              responseType: 'code',
+              silentRenew: true,
+              useRefreshToken: true,
+              logLevel: environment.production ? LogLevel.None : LogLevel.Debug,
+              secureRoutes: [environment.apiUrl, environment.aiUrl, environment.monolithUrl],
             },
-            cacheLocation: 'localstorage',
-            useRefreshTokens: true,
           }),
+          {
+            provide: APP_INITIALIZER,
+            useFactory: (oidc: OidcSecurityService) => () => firstValueFrom(oidc.checkAuth()),
+            deps: [OidcSecurityService],
+            multi: true,
+          },
         ]
       : []),
   ],

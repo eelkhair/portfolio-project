@@ -1,7 +1,8 @@
 import { Component, DestroyRef, inject, Injector, OnInit, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { AuthService } from '@auth0/auth0-angular';
+import { OidcSecurityService } from 'angular-auth-oidc-client';
+import { filter, map } from 'rxjs';
 import { Header } from './layout/header/header';
 import { Footer } from './layout/footer/footer';
 import { Chat } from './shared/chat/chat';
@@ -22,10 +23,14 @@ export class App implements OnInit {
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
 
-    const auth = this.injector.get(AuthService, null);
-    if (!auth) return;
+    const oidc = this.injector.get(OidcSecurityService, null);
+    if (!oidc) return;
 
-    const sub = auth.getAccessTokenSilently().subscribe(() => {
+    // Only start SignalR after the user has authenticated
+    const sub = oidc.isAuthenticated$.pipe(
+      map(r => r.isAuthenticated),
+      filter(Boolean),
+    ).subscribe(() => {
       this.resumeRt.start();
     });
 
