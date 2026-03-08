@@ -1,6 +1,6 @@
 import { inject, Injectable, Injector, PLATFORM_ID, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { AuthService } from '@auth0/auth0-angular';
+import { OidcSecurityService } from 'angular-auth-oidc-client';
 import { firstValueFrom } from 'rxjs';
 import { propagation, ROOT_CONTEXT, SpanKind, SpanStatusCode, trace } from '@opentelemetry/api';
 import { environment } from '../../../environments/environment';
@@ -34,14 +34,14 @@ export class ResumeRealtimeService {
 
     const signalR = await import('@microsoft/signalr');
 
-    const auth = this.injector.get(AuthService, null);
+    const oidc = this.injector.get(OidcSecurityService, null);
 
     const hubUrl = `${environment.monolithUrl}hubs/notifications`;
     this.hub = new signalR.HubConnectionBuilder()
       .withUrl(hubUrl, {
         accessTokenFactory: async () => {
-          if (!auth) return '';
-          return await firstValueFrom(auth.getAccessTokenSilently());
+          if (!oidc) return '';
+          return await firstValueFrom(oidc.getAccessToken());
         },
       })
       .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
