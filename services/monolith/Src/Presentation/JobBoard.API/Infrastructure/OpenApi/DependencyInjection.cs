@@ -96,43 +96,44 @@ public static class DependencyInjection
                     _ => false
                 };
             });
-            var domain = configuration["Auth0:Domain"]?? string.Empty;
-            var audience = configuration["Auth0:Audience"] ?? string.Empty;
-            
-            var scopes = new Dictionary<string, string>
+            var authority = configuration["Keycloak:Authority"] ?? string.Empty;
+
+            if (!string.IsNullOrEmpty(authority))
             {
-                { "read:jobs", "Read Jobs" },
-                { "read:companies", "Read Companies" }
-            };
-            c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
-            {
-                //Name = "Authorization",
-                //In = ParameterLocation.Header,
-                Type = SecuritySchemeType.OAuth2,
-                Flows = new OpenApiOAuthFlows
+                var scopes = new Dictionary<string, string>
                 {
-                    AuthorizationCode = new OpenApiOAuthFlow
-                    {
-                        Scopes = scopes,
-                        AuthorizationUrl = new Uri($"https://{domain}/authorize?audience={audience}"),
-                        TokenUrl = new Uri($"https://{domain}/oauth/token")
-                    }
-                }
-            });
-            c.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
+                    { "openid", "OpenID" },
+                    { "profile", "Profile" },
+                    { "email", "Email" }
+                };
+                c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
                 {
-                    new OpenApiSecurityScheme
+                    Type = SecuritySchemeType.OAuth2,
+                    Flows = new OpenApiOAuthFlows
                     {
-                        Reference = new OpenApiReference
+                        AuthorizationCode = new OpenApiOAuthFlow
                         {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "oauth2"
+                            Scopes = scopes,
+                            AuthorizationUrl = new Uri($"{authority}/protocol/openid-connect/auth"),
+                            TokenUrl = new Uri($"{authority}/protocol/openid-connect/token")
                         }
-                    },
-                    []
-                }
-            });
+                    }
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "oauth2"
+                            }
+                        },
+                        []
+                    }
+                });
+            }
 
             c.OperationFilter<ODataQueryOperationFilter>();
             c.OperationFilter<StandardResponsesOperationFilter>();
@@ -175,13 +176,12 @@ public static class DependencyInjection
             options.SwaggerEndpoint("/swagger/v1/swagger.json", "JobBoard API v1");
             options.SwaggerEndpoint("/swagger/odata-v1/swagger.json", "JobBoard OData v1");
             options.RoutePrefix = "swagger";
-            options.OAuthClientId(configuration["Auth0:SwaggerClientId"]);
-            options.OAuthClientSecret(configuration["Auth0:SwaggerClientSecret"]);
+            options.OAuthClientId(configuration["Keycloak:SwaggerClientId"]);
             options.OAuthAppName("JobBoard API - Swagger UI");
             options.OAuthUsePkce();
         });
-        var clientId = configuration["Auth0:SwaggerClientId"];
-        var apiScopes = new[] { "read:jobs", "read:companies" };
+        var clientId = configuration["Keycloak:SwaggerClientId"];
+        var apiScopes = new[] { "openid", "profile", "email" };
         app.MapScalarApiReference("/scalar", options =>
         {
             options.WithOpenApiRoutePattern("/swagger/v1/swagger.json");
@@ -190,7 +190,7 @@ public static class DependencyInjection
                 o =>
                 {
                     o.ClientId = clientId;
-                    o.ClientSecret = configuration["Auth0:SwaggerClientSecret"];
+                    o.ClientSecret = string.Empty;
                     o.SelectedScopes = apiScopes;
                     o.Pkce = Pkce.Sha256;
                 }
@@ -205,7 +205,7 @@ public static class DependencyInjection
                 o =>
                 {
                     o.ClientId = clientId;
-                    o.ClientSecret = configuration["Auth0:SwaggerClientSecret"];
+                    o.ClientSecret = string.Empty;
                     o.SelectedScopes = apiScopes;
                     o.Pkce = Pkce.Sha256;
                 }

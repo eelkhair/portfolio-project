@@ -55,8 +55,8 @@ public class ActivateCompanyCommandHandlerTests
         CompanyName = "Acme Corp",
         CompanyUId = Guid.NewGuid(),
         CompanyEmail = "info@acme.com",
-        Auth0CompanyId = "auth0|company-123",
-        Auth0UserId = "auth0|user-456",
+        KeycloakGroupId = "keycloak-group-123",
+        KeycloakUserId = "keycloak-user-456",
         UserUId = Guid.NewGuid(),
         CreatedBy = "system"
     };
@@ -110,7 +110,7 @@ public class ActivateCompanyCommandHandlerTests
         var command = new ActivateCompanyCommand(model) { UserId = "user-123" };
         await _sut.HandleAsync(command, CancellationToken.None);
 
-        company.ExternalId.ShouldBe("auth0|company-123");
+        company.ExternalId.ShouldBe("keycloak-group-123");
     }
 
     [Fact]
@@ -128,7 +128,7 @@ public class ActivateCompanyCommandHandlerTests
         var command = new ActivateCompanyCommand(model) { UserId = "user-123" };
         await _sut.HandleAsync(command, CancellationToken.None);
 
-        user.ExternalId.ShouldBe("auth0|user-456");
+        user.ExternalId.ShouldBe("keycloak-user-456");
     }
 
     [Fact]

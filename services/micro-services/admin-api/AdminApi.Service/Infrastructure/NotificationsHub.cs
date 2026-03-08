@@ -8,7 +8,7 @@ public class NotificationsHub(ActivitySource activitySource): Hub
     public override async Task OnConnectedAsync()
     {
         using var act = activitySource.StartActivity("signalr.connected");
-        var userId = Context.User?.FindFirst("sub")?.Value      // Auth0 sub
+        var userId = Context.User?.FindFirst("sub")?.Value      // Keycloak sub
                      ?? Context.User?.Identity?.Name
                      ?? Context.UserIdentifier;
         act?.SetTag("signalr.connection_id", Context.ConnectionId);

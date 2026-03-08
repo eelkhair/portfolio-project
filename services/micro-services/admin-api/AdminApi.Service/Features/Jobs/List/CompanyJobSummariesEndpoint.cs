@@ -9,7 +9,7 @@ public class CompanyJobSummariesEndpoint(IJobQueryService service) : EndpointWit
     public override void Configure()
     {
         Get("/companies/job-summaries");
-        Permissions("read:jobs");
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

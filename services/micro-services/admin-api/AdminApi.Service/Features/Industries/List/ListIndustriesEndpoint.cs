@@ -11,7 +11,7 @@ public class ListIndustriesEndpoint(IIndustryQueryService service) : EndpointWit
     public override void Configure()
     {
         Get("/industries");
-        Permissions("read:companies");
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

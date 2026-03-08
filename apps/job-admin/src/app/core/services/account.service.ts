@@ -15,14 +15,33 @@ export class AccountService {
     { initialValue: false }
   );
 
+  /** Stays true once the user has authenticated at least once — prevents layout flicker during token refresh */
+  hasInitialized = computed(() => {
+    if (this.isAuthenticated()) this._everAuthenticated = true;
+    return this._everAuthenticated;
+  });
+  private _everAuthenticated = false;
+
   user = toSignal(
     this.oidc.userData$.pipe(map(result => result.userData as Record<string, any> | undefined)),
   );
 
-  roles = computed(() => {
+  groups = computed(() => {
     const userData = this.user();
-    return (userData?.['realm_access']?.['roles'] as string[]) ?? [];
+    return (userData?.['groups'] as string[]) ?? [];
   });
+
+  isAdmin = computed(() => this.groups().some(g => g.replace(/^\//, '') === 'Admins'));
+
+  /** Extract company UIDs from group paths like /Companies/{uid}/... or Companies/{uid}/... */
+  companyUIds = computed(() =>
+    this.groups()
+      .map(g => g.replace(/^\//, ''))
+      .filter(g => g.startsWith('Companies/'))
+      .map(g => g.split('/')[1])
+      .filter((uid): uid is string => !!uid)
+      .filter((uid, i, arr) => arr.indexOf(uid) === i)
+  );
 
   checkAuth(): Observable<LoginResponse> {
     return this.oidc.checkAuth();

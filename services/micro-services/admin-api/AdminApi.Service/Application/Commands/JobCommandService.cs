@@ -111,7 +111,7 @@ public class JobCommandService(DaprClient client, UserContextService accessor, I
     {
         try
         {
-            var req = client.CreateInvokeMethodRequest(HttpMethod.Post, "job-api", "jobs");
+            var req = client.CreateInvokeMethodRequest(HttpMethod.Post, "job-api", "api/jobs");
 
             if (accessor.GetHeader("Authorization") is { } auth && !string.IsNullOrWhiteSpace(auth))
                 req.Headers.TryAddWithoutValidation("Authorization", auth);

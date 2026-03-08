@@ -14,7 +14,7 @@ public class HttpUserAccessorTests
     {
         var accessor = CreateAccessor(
             authenticated: true,
-            claims: [new Claim(ClaimTypes.NameIdentifier, "user-123")]);
+            claims: [new Claim("sub", "user-123")]);
 
         accessor.UserId.ShouldBe("user-123");
     }
@@ -24,7 +24,7 @@ public class HttpUserAccessorTests
     {
         var accessor = CreateAccessor(
             authenticated: true,
-            claims: [new Claim(ClaimTypes.NameIdentifier, "claim-id")],
+            claims: [new Claim("sub", "claim-id")],
             headers: new Dictionary<string, string> { ["x-user-id"] = "header-id" });
 
         accessor.UserId.ShouldBe("header-id");
@@ -35,12 +35,12 @@ public class HttpUserAccessorTests
     {
         var claims = new[]
         {
-            new Claim(ClaimTypes.NameIdentifier, "user-456"),
-            new Claim("https://eelkhair.net/first_name", "Jane"),
-            new Claim("https://eelkhair.net/last_name", "Smith"),
-            new Claim("https://eelkhair.net/email", "jane@test.com"),
-            new Claim("https://eelkhair.net/roles", "Admin"),
-            new Claim("https://eelkhair.net/roles", "User"),
+            new Claim("sub", "user-456"),
+            new Claim("given_name", "Jane"),
+            new Claim("family_name", "Smith"),
+            new Claim("email", "jane@test.com"),
+            new Claim("groups", "Admins"),
+            new Claim("groups", "Recruiters"),
         };
 
         var accessor = CreateAccessor(authenticated: true, claims: claims);
@@ -48,7 +48,7 @@ public class HttpUserAccessorTests
         accessor.FirstName.ShouldBe("Jane");
         accessor.LastName.ShouldBe("Smith");
         accessor.Email.ShouldBe("jane@test.com");
-        accessor.Roles.ShouldBe(new List<string> { "Admin", "User" });
+        accessor.Roles.ShouldBe(new List<string> { "Admins", "Recruiters" });
     }
 
     [Fact]
@@ -80,7 +80,7 @@ public class HttpUserAccessorTests
     {
         var accessor = CreateAccessor(
             authenticated: true,
-            claims: [new Claim(ClaimTypes.NameIdentifier, "user-789")]);
+            claims: [new Claim("sub", "user-789")]);
 
         accessor.FirstName.ShouldBe(string.Empty);
         accessor.LastName.ShouldBe(string.Empty);
@@ -93,7 +93,7 @@ public class HttpUserAccessorTests
     {
         var accessor = CreateAccessor(
             authenticated: true,
-            claims: [new Claim(ClaimTypes.NameIdentifier, "user-1")],
+            claims: [new Claim("sub", "user-1")],
             headers: new Dictionary<string, string> { ["Authorization"] = "Bearer test-token" });
 
         accessor.Token.ShouldBe("Bearer test-token");

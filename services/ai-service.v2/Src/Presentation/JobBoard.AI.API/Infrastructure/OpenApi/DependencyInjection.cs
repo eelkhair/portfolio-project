@@ -44,36 +44,39 @@ public static class DependencyInjection
                 Description = "Standard RESTful endpoints."
             });
             c.UseInlineDefinitionsForEnums();
-            var domain = configuration["Auth0:Domain"] ?? string.Empty;
-            var audience = configuration["Auth0:Audience"] ?? string.Empty;
+            var authority = configuration["Keycloak:Authority"] ?? string.Empty;
 
-            var scopes = new Dictionary<string, string>
+            if (!string.IsNullOrEmpty(authority))
             {
-                { "read:jobs", "Read Jobs" },
-                { "read:companies", "Read Companies" }
-            };
-
-            var securityScheme = new OpenApiSecurityScheme
-            {
-                Type = SecuritySchemeType.OAuth2,
-                Flows = new OpenApiOAuthFlows
+                var scopes = new Dictionary<string, string>
                 {
-                    AuthorizationCode = new OpenApiOAuthFlow
+                    { "openid", "OpenID" },
+                    { "profile", "Profile" },
+                    { "email", "Email" }
+                };
+
+                var securityScheme = new OpenApiSecurityScheme
+                {
+                    Type = SecuritySchemeType.OAuth2,
+                    Flows = new OpenApiOAuthFlows
                     {
-                        AuthorizationUrl = new Uri($"https://{domain}/authorize?audience={audience}"),
-                        TokenUrl = new Uri($"https://{domain}/oauth/token"),
-                        Scopes = scopes
+                        AuthorizationCode = new OpenApiOAuthFlow
+                        {
+                            AuthorizationUrl = new Uri($"{authority}/protocol/openid-connect/auth"),
+                            TokenUrl = new Uri($"{authority}/protocol/openid-connect/token"),
+                            Scopes = scopes
+                        }
                     }
-                }
-            };
+                };
 
-            c.AddSecurityDefinition("oauth2", securityScheme);
+                c.AddSecurityDefinition("oauth2", securityScheme);
 
-            c.AddSecurityRequirement(doc =>
-                new OpenApiSecurityRequirement
-            {
-                [new OpenApiSecuritySchemeReference("oauth2", doc)] = new List<string>()
-            });
+                c.AddSecurityRequirement(doc =>
+                    new OpenApiSecurityRequirement
+                {
+                    [new OpenApiSecuritySchemeReference("oauth2", doc)] = new List<string>()
+                });
+            }
 
             // TraceId response header (observability)
             c.OperationFilter<TraceIdHeaderOperationFilter>();
@@ -119,14 +122,13 @@ public static class DependencyInjection
             options.SwaggerEndpoint("/swagger/v1/swagger.json", "JobBoard AI Service v2");
             options.RoutePrefix = "swagger";
 
-            options.OAuthClientId(configuration["Auth0:SwaggerClientId"]);
-            options.OAuthClientSecret(configuration["Auth0:SwaggerClientSecret"]);
+            options.OAuthClientId(configuration["Keycloak:SwaggerClientId"]);
             options.OAuthAppName("JobBoard API - Swagger UI");
             options.OAuthUsePkce();
         });
 
-        var clientId = configuration["Auth0:SwaggerClientId"];
-        var apiScopes = new[] { "read:jobs", "read:companies" };
+        var clientId = configuration["Keycloak:SwaggerClientId"];
+        var apiScopes = new[] { "openid", "profile", "email" };
 
         app.MapScalarApiReference("/scalar", options =>
         {
@@ -137,7 +139,7 @@ public static class DependencyInjection
                 o =>
                 {
                     o.ClientId = clientId;
-                    o.ClientSecret = configuration["Auth0:SwaggerClientSecret"];
+                    o.ClientSecret = string.Empty;
                     o.SelectedScopes = apiScopes;
                     o.Pkce = Pkce.Sha256;
                 });

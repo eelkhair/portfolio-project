@@ -12,8 +12,8 @@ public class CompanyConfiguration : IEntityTypeConfiguration<Company>
         builder.ConfigureBaseAuditableEntity();
         builder.ToTable("Companies");
         builder.Property(c => c.Name).HasMaxLength(50);
-        builder.Property(c => c.Auth0OrganizationId).HasMaxLength(50);
+        builder.Property(c => c.KeycloakGroupId).HasMaxLength(50);
         builder.HasMany(c => c.UserCompanies).WithOne(uc => uc.Company).HasForeignKey(uc => uc.CompanyId);
-        builder.HasIndex(c => c.Auth0OrganizationId).IsUnique(true);
+        builder.HasIndex(c => c.KeycloakGroupId).IsUnique(true);
     }
 }

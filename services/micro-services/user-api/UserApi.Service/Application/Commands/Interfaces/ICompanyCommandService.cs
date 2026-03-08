@@ -1,7 +1,4 @@
-﻿using System.Security.Claims;
-using Auth0.ManagementApi.Models;
-using UserAPI.Contracts.Models.Events;
-using UserAPI.Contracts.Models.Requests;
+﻿using UserAPI.Contracts.Models.Requests;
 
 namespace UserApi.Application.Commands.Interfaces;
 

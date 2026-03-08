@@ -1,4 +1,3 @@
-using System.Text.Json;
 using CompanyApi.Application.Queries.Interfaces;
 using CompanyAPI.Contracts.Models.Companies.Responses;
 using CompanyApi.Infrastructure.Data;
@@ -15,7 +14,7 @@ public class CompanyQueryService(ICompanyDbContext companyDbContext)
     {
         List<Company> companies;
         var companiesQuery = companyDbContext.Companies.AsNoTracking().Include(c => c.Industry).AsQueryable();
-        
+
         var uIds = FilteredUIds(context);
         if (uIds.Count > 0)
         {
@@ -25,21 +24,28 @@ public class CompanyQueryService(ICompanyDbContext companyDbContext)
         {
             companies = await companiesQuery.ToListAsync(ct);
         }
-        
+
         return companies.Adapt<List<CompanyResponse>>();
     }
-    
+
     private static List<Guid> FilteredUIds(HttpContext context)
     {
-        var claims = context.User.Claims.Where(c=> c.Type == "https://eelkhair.net/roles").ToList();
-        var roles = claims.Select(c => c.Value).Distinct().ToList();
-        if (roles.Contains("admin") && roles.Count==1 )
-        {
-            return new List<Guid>();
-        }
+        var groups = context.User.Claims
+            .Where(c => c.Type == "groups")
+            .Select(c => c.Value.TrimStart('/'))
+            .ToList();
 
-        var c = context.User.Claims.First(c => c.Type == "https://eelkhair.net/user_metadata");
-        var companyUIds = JsonSerializer.Deserialize<Dictionary<Guid, string>>(c.Value);
-        return companyUIds?.Keys?.ToList()?? [];
+        // Admins see all companies
+        if (groups.Any(g => g == "Admins"))
+            return [];
+
+        // Extract company UIDs from Companies/{uid}/... group paths
+        return groups
+            .Where(g => g.StartsWith("Companies/"))
+            .Select(g => g.Split('/'))
+            .Where(parts => parts.Length >= 2 && Guid.TryParse(parts[1], out _))
+            .Select(parts => Guid.Parse(parts[1]))
+            .Distinct()
+            .ToList();
     }
 }
