@@ -1,5 +1,4 @@
 using System.Net;
-using System.Net.Http.Json;
 using Elkhair.Dev.Common.Application;
 using UserApi.Infrastructure.Keycloak.Interfaces;
 using ApiError = Elkhair.Dev.Common.Application.ApiError;
@@ -148,6 +147,22 @@ public class KeycloakResource(HttpClient http, string adminApiBaseUrl) : IKeyclo
         var groups = await http.GetFromJsonAsync<List<KeycloakGroup>>(
             $"{_baseUrl}/groups?search={Uri.EscapeDataString(name)}&exact=true", ct);
         return groups?.FirstOrDefault(g => g.Name == name);
+    }
+
+    public async Task<ApiResponse<bool>> SendVerifyEmailAsync(string userId, CancellationToken ct)
+    {
+        try
+        {
+            using var response = await http.PutAsync(
+                $"{_baseUrl}/users/{userId}/send-verify-email",
+                new StringContent(""), ct);
+            response.EnsureSuccessStatusCode();
+            return OkResult(true);
+        }
+        catch (Exception e)
+        {
+            return FailedResult<bool>(e);
+        }
     }
 
     public async Task<KeycloakUser?> FindUserByEmailAsync(string email, CancellationToken ct)
