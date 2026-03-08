@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.Net;
+using Microsoft.Extensions.Logging;
 using UserApi.Application.Commands.Interfaces;
 using UserApi.Infrastructure.Keycloak;
 using UserApi.Infrastructure.Keycloak.Interfaces;
@@ -6,7 +8,7 @@ using UserAPI.Contracts.Models.Events;
 
 namespace UserApi.Application.Commands;
 
-public class KeycloakCommandService(ActivitySource activitySource, IKeycloakFactory factory) : IKeycloakCommandService
+public class KeycloakCommandService(ActivitySource activitySource, IKeycloakFactory factory, ILogger<KeycloakCommandService> logger) : IKeycloakCommandService
 {
     private IKeycloakResource? _resource;
 
@@ -58,6 +60,17 @@ public class KeycloakCommandService(ActivitySource activitySource, IKeycloakFact
         activity5?.SetTag("companyAdmins.group.id", companyAdminsResult.Data?.Id);
         activity5?.SetTag("user.id", userResult.Data?.Id);
 
+        // 6. Send verification email (only for newly created users, non-blocking)
+        if (userResult.StatusCode == HttpStatusCode.Created)
+        {
+            using var activity6 = activitySource.StartActivity("Sending Verification Email.");
+            var emailResult = await _resource.SendVerifyEmailAsync(userResult.Data!.Id!, ct);
+            if (!emailResult.Success)
+                logger.LogWarning("Failed to send verification email to {Email}: {Error}",
+                    user.Email, emailResult.Exceptions?.Message);
+            activity6?.SetTag("email.sent", emailResult.Success);
+        }
+
         return (userResult.Data!, groupResult.Data!);
     }
 
@@ -65,7 +78,11 @@ public class KeycloakCommandService(ActivitySource activitySource, IKeycloakFact
         ProvisionUserEvent user, CancellationToken ct)
     {
         _resource ??= await factory.GetKeycloakResourceAsync(ct);
-        return await _resource.CreateUserAsync(user.Email, user.FirstName, user.LastName, null, ct);
+        var attributes = new Dictionary<string, List<string>>
+        {
+            ["companyName"] = [user.CompanyName]
+        };
+        return await _resource.CreateUserAsync(user.Email, user.FirstName, user.LastName, attributes, ct);
     }
 
     private async Task<Elkhair.Dev.Common.Application.ApiResponse<KeycloakGroup>> CreateGroupAsync(
