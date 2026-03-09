@@ -8,12 +8,12 @@ spec:
   metadata:
     - name: clientId
       secretKeyRef:
-        name: shared
+        name: shared-local
         key: Keycloak:ServiceClientId
 
     - name: clientSecret
       secretKeyRef:
-        name: shared
+        name: shared-local
         key: Keycloak:ServiceClientSecret
 
     - name: scopes
@@ -21,7 +21,7 @@ spec:
 
     - name: tokenURL
       secretKeyRef:
-        name: shared
+        name: shared-local
         key: Keycloak:TokenUrl
 
     - name: headerName

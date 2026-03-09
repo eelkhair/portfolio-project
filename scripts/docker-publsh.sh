@@ -10,7 +10,7 @@ read -p "Enter choice [1/2]: " ENV_CHOICE
 case "$ENV_CHOICE" in
   1|dev)
     ENVIRONMENT="dev"
-    REMOTE_HOST="192.168.1.134"
+    REMOTE_HOST="192.168.1.200"
     ADMIN_BUILD_CONFIG="development"
     ;;
   2|prod)
@@ -108,7 +108,7 @@ printf '%s\n' "\$PASSWORD" | docker login registry.eelkhair.net --username eelkh
 
 echo "📦 Pulling + starting stack..."
 docker compose -p job-board pull
-docker compose -p job-board up -d
+docker compose -p job-board up -d --force-recreate --remove-orphans
 
 echo "🧹 Post-deploy cleanup..."
 

@@ -32,6 +32,13 @@ public static class DependencyInjection
                         "http://localhost:5280",
                         "https://localhost:5280",
                         "http://127.0.0.1:4200",
+                        
+                        "https://job-admin-dev.eelkhair.net",
+                        "https://jobs-dev.eelkhair.net",
+                        "https://job-dev.eelkhair.net",
+                        "http://192.168.1.200:9000",
+                        "https://swagger-dev.eelkhair.net",
+                        
                         "http://192.168.1.112:9000",
                         "https://swagger.eelkhair.net",
                         "https://job-admin.eelkhair.net",
@@ -153,7 +160,8 @@ public static class DependencyInjection
     public static WebApplication UseApplicationServices(this WebApplication app)
     { 
     
-        app.UseHttpsRedirection();
+        if (!app.Environment.IsProduction())
+            app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseStaticFiles();
         app.UseRouting();

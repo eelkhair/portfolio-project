@@ -21,6 +21,11 @@ public static class DependencyInjection
             options.AddPolicy(corsPolicy, p => p
                 .WithOrigins(
                     "http://localhost:4200",
+                    "https://job-admin-dev.eelkhair.net",
+                    "https://jobs-dev.eelkhair.net",
+                    "https://job-dev.eelkhair.net",
+                    "http://192.168.1.200:9000",
+                    "https://swagger-dev.eelkhair.net",
                     "https://job-admin.eelkhair.net",
                     "http://192.168.1.112:9000",
                     "https://swagger.eelkhair.net")    
