@@ -15,7 +15,7 @@ public class IndustriesController : BaseODataController
     /// <returns>An IActionResult containing the retrieved collection of industries in response to an OData query.</returns>
     [HttpGet]
     [EnableQuery]
-    [Route("industries")]
+    [Route("api/industries")]
     public async Task<IActionResult> Get()
     {
         var industries = await ExecuteODataQueryAsync(new GetIndustriesQuery());

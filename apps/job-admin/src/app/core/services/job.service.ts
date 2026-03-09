@@ -20,7 +20,7 @@ export class JobService {
   }
 
   list(companyUId: string) {
-    return this.http.get<any>(`${this.baseUrl}jobs/${companyUId}`).pipe(
+    return this.http.get<any>(`${this.baseUrl}api/jobs/${companyUId}`).pipe(
       map(res => this.normalize(res))
     );
   }

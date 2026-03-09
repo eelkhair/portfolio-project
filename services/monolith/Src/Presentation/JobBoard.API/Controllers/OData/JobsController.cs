@@ -16,7 +16,7 @@ public class JobsController: BaseODataController
     /// <returns></returns>
     [HttpGet]
     [EnableQuery]
-    [Route("jobs/{companyId:guid}")]
+    [Route("api/jobs/{companyId:guid}")]
     public async Task<IActionResult> Get(Guid companyId)
     {
         var jobs = await ExecuteODataQueryAsync(new ListJobsQuery(companyId));

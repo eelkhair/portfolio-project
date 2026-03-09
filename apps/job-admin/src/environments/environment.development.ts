@@ -5,8 +5,8 @@ export const environment = {
   monolithUrl: 'https://job-monolith-dev.eelkhair.net/',
   microserviceUrl: 'https://job-admin-api-dev.eelkhair.net/',
   aiServiceUrl: 'https://job-ai-v2-dev.eelkhair.net/',
-  otel: 'https://otel-dev.eelkhair.net/v1/traces',
-  otelZipkin: 'https://otel-dev.eelkhair.net/api/v2/spans',
+  otel: 'https://otel.eelkhair.net/v1/traces',
+  otelZipkin: 'https://otel.eelkhair.net/api/v2/spans',
   oidc: {
     authority: 'https://auth.eelkhair.net/realms/job-board-dev',
     redirectUrl: 'https://job-admin-dev.eelkhair.net',
