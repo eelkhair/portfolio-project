@@ -179,6 +179,10 @@ public static class DependencyInjection
             options.OAuthClientId(configuration["Keycloak:SwaggerClientId"]);
             options.OAuthAppName("JobBoard API - Swagger UI");
             options.OAuthUsePkce();
+            options.OAuthAdditionalQueryStringParams(new Dictionary<string, string>
+            {
+                { "prompt", "login" }
+            });
         });
         var clientId = configuration["Keycloak:SwaggerClientId"];
         var apiScopes = new[] { "openid", "profile", "email" };

@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
+import { AuthCallbackComponent } from './shared/auth-callback/auth-callback';
 
 export const routes: Routes = [
   { path: '', loadComponent: () => import('./features/home/home/home').then((m) => m.Home) },
@@ -10,7 +11,8 @@ export const routes: Routes = [
   },
   {
     path: 'companies',
-    loadComponent: () => import('./features/companies/companies/companies').then((m) => m.Companies),
+    loadComponent: () =>
+      import('./features/companies/companies/companies').then((m) => m.Companies),
   },
   {
     path: 'companies/:id',
@@ -31,8 +33,7 @@ export const routes: Routes = [
   {
     path: 'applications',
     canActivate: [authGuard],
-    loadComponent: () =>
-      import('./features/applications/applications').then((m) => m.Applications),
+    loadComponent: () => import('./features/applications/applications').then((m) => m.Applications),
   },
   { path: '**', redirectTo: '' },
 ];

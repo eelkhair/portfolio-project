@@ -121,7 +121,10 @@ public static class DependencyInjection
         {
             options.SwaggerEndpoint("/swagger/v1/swagger.json", "JobBoard AI Service v2");
             options.RoutePrefix = "swagger";
-
+            options.OAuthAdditionalQueryStringParams(new Dictionary<string, string>
+            {
+                { "prompt", "login" }
+            });
             options.OAuthClientId(configuration["Keycloak:SwaggerClientId"]);
             options.OAuthAppName("JobBoard API - Swagger UI");
             options.OAuthUsePkce();
