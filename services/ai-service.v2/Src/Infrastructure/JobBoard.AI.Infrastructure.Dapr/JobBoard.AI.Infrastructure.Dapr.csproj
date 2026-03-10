@@ -17,4 +17,9 @@
       <ProjectReference Include="..\..\Core\JobBoard.AI.Application\JobBoard.AI.Application.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="AITools\Admins\" />
+      <Folder Include="AITools\Public\Shared\" />
+    </ItemGroup>
+
 </Project>
