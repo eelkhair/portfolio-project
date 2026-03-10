@@ -1,4 +1,4 @@
-import {Component, DestroyRef, effect, inject} from '@angular/core';
+import {Component, DestroyRef, effect, inject, OnInit} from '@angular/core';
 import {Header} from './layout/header/header';
 import {Footer} from './layout/footer/footer';
 import {RouterOutlet} from '@angular/router';
@@ -8,6 +8,7 @@ import {ToastModule} from 'primeng/toast';
 import {RealtimeNotificationsService} from './core/services/realtime-notifications.service';
 import {AiRealtimeService} from './core/services/ai-realtime.service';
 import {AiChat} from './shared/ai-chat/ai-chat';
+import {OidcSecurityService} from 'angular-auth-oidc-client';
 
 @Component({
   selector: 'app-root',
@@ -29,7 +30,6 @@ export class App {
   protected aiRt = inject(AiRealtimeService);
 
   private signalRStarted = false;
-
   constructor() {
     // Auth callback is handled by APP_INITIALIZER in app.config.ts
     // Start SignalR hubs when authentication state becomes true

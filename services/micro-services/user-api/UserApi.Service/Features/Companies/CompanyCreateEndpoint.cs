@@ -18,6 +18,7 @@ public class CompanyCreateEndpoint(
     public override void Configure()
     {
         Post("companies");
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(EventDto<ProvisionUserEvent> request, CancellationToken ct)

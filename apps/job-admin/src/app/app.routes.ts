@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { AutoLoginPartialRoutesGuard } from 'angular-auth-oidc-client';
+import {AuthCallbackComponent} from './shared/auth-callback/auth-callback';
 export const routes: Routes = [
   {
     path: '',

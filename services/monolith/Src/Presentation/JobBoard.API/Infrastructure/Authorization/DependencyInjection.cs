@@ -59,8 +59,19 @@ public static class DependencyInjection
         services
             .AddAuthentication(options =>
             {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = "Auto";
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddPolicyScheme("Auto", "JWT or Dapr", options =>
+            {
+                options.ForwardDefaultSelector = context =>
+                {
+                    var authHeader = context.Request.Headers.Authorization.FirstOrDefault();
+                    if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
+                        return JwtBearerDefaults.AuthenticationScheme;
+
+                    return "DaprInternalScheme";
+                };
             })
             .AddJwtBearer(options =>
             {

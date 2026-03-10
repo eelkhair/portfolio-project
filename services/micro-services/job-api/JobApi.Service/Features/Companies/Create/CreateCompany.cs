@@ -11,6 +11,7 @@ public class CreateCompanyTopic(ICompanyCommandService service, ILogger<CreateCo
     public override void Configure()
     {
         Post("companies");
+        AllowAnonymous();
     }
     
     public override async  Task HandleAsync(EventDto<CreateCompanyRequest> request, CancellationToken ct)

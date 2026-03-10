@@ -21,14 +21,14 @@ public sealed class ChatCommand(
 
 public sealed class ChatCommandHandler(
     IHandlerContext context,
-    IChatSystemPrompt adminSystemPrompt,
     IChatService chatService,
     IActivityFactory activityFactory
 ) : BaseCommandHandler(context),
     IHandler<ChatCommand, ChatResponse>
 {
     private static readonly PublicChatSystemPrompt PublicPrompt = new();
-
+    private static readonly AdminSystemPrompt AdminSystemPrompt = new();
+    
     public async Task<ChatResponse> HandleAsync(
         ChatCommand request,
         CancellationToken cancellationToken)
@@ -45,7 +45,7 @@ public sealed class ChatCommandHandler(
 
         var prompt = request.Scope == ChatScope.Public
             ? PublicPrompt.Value
-            : adminSystemPrompt.Value;
+            : AdminSystemPrompt.Value;
 
         var effectiveUserMessage = request.CompanyId is not null
             ? $"Context:\n- companyId: {request.CompanyId}\n\nUser:\n{request.Message}"

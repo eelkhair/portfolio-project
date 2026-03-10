@@ -12,11 +12,13 @@ case "$ENV_CHOICE" in
     ENVIRONMENT="dev"
     REMOTE_HOST="192.168.1.200"
     ADMIN_BUILD_CONFIG="development"
+    PUBLIC_BUILD_CONFIG="development"
     ;;
   2|prod)
     ENVIRONMENT="prod"
     REMOTE_HOST="192.168.1.112"
     ADMIN_BUILD_CONFIG="production"
+    PUBLIC_BUILD_CONFIG="production"
     echo "⚠️  You are about to deploy to PRODUCTION ($REMOTE_HOST)."
     read -p "Are you sure? (y/N): " CONFIRM
     if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
@@ -73,6 +75,11 @@ elif [ "$name" = "monolith-api" ]; then
 elif [ "$name" = "job-admin" ]; then
   docker build \
     --build-arg BUILD_CONFIG="$ADMIN_BUILD_CONFIG" \
+    -t "$image" \
+    "$path"
+elif [ "$name" = "job-public" ]; then
+  docker build \
+    --build-arg BUILD_CONFIG="$PUBLIC_BUILD_CONFIG" \
     -t "$image" \
     "$path"
 else

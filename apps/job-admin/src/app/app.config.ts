@@ -18,7 +18,6 @@ import {authInterceptor, provideAuth, LogLevel, OidcSecurityService} from 'angul
 import {environment} from '../environments/environment';
 import {firstValueFrom} from 'rxjs';
 
-
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
@@ -41,23 +40,25 @@ export const appConfig: ApplicationConfig = {
       }
     }),
     MessageService,
-    {
-      provide: APP_INITIALIZER,
-      useFactory: (oidc: OidcSecurityService) => () => firstValueFrom(oidc.checkAuth()),
-      deps: [OidcSecurityService],
-      multi: true,
-    },
     provideAuth({
       config: {
         authority: environment.oidc.authority,
-        redirectUrl: environment.oidc.redirectUrl,
-        postLogoutRedirectUri: environment.oidc.redirectUrl,
+        redirectUrl: window.location.origin,
+        postLogoutRedirectUri: window.location.origin,
         clientId: environment.oidc.clientId,
+
         scope: 'openid profile email offline_access',
         responseType: 'code',
+
         silentRenew: true,
         useRefreshToken: true,
+
         logLevel: environment.production ? LogLevel.None : LogLevel.Debug,
+
+        ignoreNonceAfterRefresh: true,
+        disableRefreshIdTokenAuthTimeValidation: true,
+
+
         secureRoutes: [
           environment.gatewayUrl,
           environment.monolithUrl,
@@ -66,6 +67,12 @@ export const appConfig: ApplicationConfig = {
         ],
       },
     }),
-    DialogService
+    DialogService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (oidc: OidcSecurityService) => () => firstValueFrom(oidc.checkAuth()),
+      deps: [OidcSecurityService],
+      multi: true,
+    },
   ]
 };
