@@ -16,7 +16,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="9.0.0" />
+        <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="9.0.0" />
         <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
         <PackageReference Include="JobBoard.HealthChecks" Version="1.0.6" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
