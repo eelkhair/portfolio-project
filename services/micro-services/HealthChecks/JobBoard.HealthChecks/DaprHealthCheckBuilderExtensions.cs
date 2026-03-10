@@ -1,4 +1,4 @@
-﻿using JobBoard.HealthChecks.Dtos;
+using JobBoard.HealthChecks.Dtos;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
@@ -6,16 +6,22 @@ namespace JobBoard.HealthChecks;
 
 public static class DaprHealthCheckBuilderExtensions
 {
+    /// <summary>
+    /// Adds Dapr sidecar, state store, secret store, and pub/sub health checks.
+    /// </summary>
     public static IHealthChecksBuilder AddDapr(this IHealthChecksBuilder builder)
     {
-        builder.AddCheck<DaprHealthCheck>("dapr");
-        builder.AddCheck<DaprStateStoreHealthCheck>("dapr.state");
-        builder.AddCheck<DaprSecretStoreHealthCheck>("dapr.secret");
-        builder.AddCheck<DaprPubSubHealthCheck>("dapr.pubsub");
+        builder.AddCheck<DaprHealthCheck>("dapr", tags: ["dapr"]);
+        builder.AddCheck<DaprStateStoreHealthCheck>("dapr.state", tags: ["dapr"]);
+        builder.AddCheck<DaprSecretStoreHealthCheck>("dapr.secret", tags: ["dapr"]);
+        builder.AddCheck<DaprPubSubHealthCheck>("dapr.pubsub", tags: ["dapr"]);
 
         return builder;
     }
 
+    /// <summary>
+    /// Adds a Dapr configuration store health check with the specified name.
+    /// </summary>
     public static IHealthChecksBuilder AddDaprConfigurationStore(
         this IHealthChecksBuilder builder,
         string name,
@@ -43,8 +49,22 @@ public static class DaprHealthCheckBuilderExtensions
                     name);
             },
             failureStatus: HealthStatus.Unhealthy,
-            tags: new[] { "dapr", "config" }
+            tags: ["dapr", "config"]
         ));
+
+        return builder;
+    }
+
+    /// <summary>
+    /// Adds a Keycloak OIDC realm reachability health check.
+    /// Validates the discovery endpoint and reports configured client IDs.
+    /// </summary>
+    public static IHealthChecksBuilder AddKeycloak(
+        this IHealthChecksBuilder builder,
+        Action<KeycloakOptions> configure)
+    {
+        builder.Services.Configure(configure);
+        builder.AddCheck<KeycloakHealthCheck>("keycloak", tags: ["auth"]);
 
         return builder;
     }
