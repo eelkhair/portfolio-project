@@ -1,0 +1,23 @@
+﻿apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: appconfig-global
+spec:
+  type: configuration.redis
+  version: v1
+  metadata:
+    - name: redisHost
+      value: 192.168.1.160:6379
+    - name: redisDb
+      value: "12"
+scopes:
+  - admin-api
+  - connector-api
+  - job-api
+  - user-api
+  - ai-service
+  - monolith-api
+  - company-api
+  - ai-service-v2
+  - gateway
+

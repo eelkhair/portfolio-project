@@ -190,6 +190,7 @@ public class KeycloakResource(HttpClient http, string adminApiBaseUrl) : IKeyclo
     {
         var brokenRules = new ApiError
         {
+            Message = e.Message,
             Errors = new Dictionary<string, string[]>
             {
                 ["500"] = [e.Message]

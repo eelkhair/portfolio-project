@@ -19,7 +19,7 @@ Debugger.Launch();
 #endif
 (await builder.AddDaprServices("ai-service-v2")).ConfigureLogging("ai-service-v2").AddCustomHealthChecks().Services
     .AddApplicationServices()
-    .AddConfigurationServices()
+    .AddConfigurationServices(builder.Configuration)
     .AddAiServices(builder.Configuration)
     .AddPersistenceServices(builder.Configuration)
     .AddHttpContextAccessor()
