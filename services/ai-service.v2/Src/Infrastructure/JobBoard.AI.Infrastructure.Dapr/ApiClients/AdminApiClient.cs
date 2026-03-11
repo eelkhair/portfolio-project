@@ -17,7 +17,7 @@ public class AdminApiClient(DaprClient client, IUserAccessor accessor, ILogger<A
     {
         try
         {
-            var request = CreateRequest(HttpMethod.Get, "companies", "admin-api");
+            var request = CreateRequest(HttpMethod.Get, "api/companies", "admin-api");
             return await Client.InvokeMethodAsync<ApiResponse<List<CompanyResponse>>>(request, cancellationToken);
         }
         catch (InvocationException ex)
@@ -34,7 +34,7 @@ public class AdminApiClient(DaprClient client, IUserAccessor accessor, ILogger<A
     {
         try
         {
-            var request = CreateRequest(HttpMethod.Post, "companies", "admin-api");
+            var request = CreateRequest(HttpMethod.Post, "api/companies", "admin-api");
             request.Content = JsonContent.Create(cmd);
             var response = await Client.InvokeMethodAsync<ApiResponse<CompanyResponse>>(request, ct);
             return response;
@@ -52,7 +52,7 @@ public class AdminApiClient(DaprClient client, IUserAccessor accessor, ILogger<A
     {
         try
         {
-            var request = CreateRequest(HttpMethod.Put, $"companies/{companyId}", "admin-api");
+            var request = CreateRequest(HttpMethod.Put, $"api/companies/{companyId}", "admin-api");
             request.Content = JsonContent.Create(cmd);
             var response = await Client.InvokeMethodAsync<ApiResponse<CompanyResponse>>(request, ct);
             return response;
@@ -70,7 +70,7 @@ public class AdminApiClient(DaprClient client, IUserAccessor accessor, ILogger<A
     {
         try
         {
-            var request = CreateRequest(HttpMethod.Post, "jobs", "admin-api");
+            var request = CreateRequest(HttpMethod.Post, "api/jobs", "admin-api");
             request.Content = JsonContent.Create(cmd);
             return await Client.InvokeMethodAsync<ApiResponse<object>>(request, ct);
         }
@@ -87,7 +87,7 @@ public class AdminApiClient(DaprClient client, IUserAccessor accessor, ILogger<A
     {
         try
         {
-            var request = CreateRequest(HttpMethod.Get, $"jobs/{companyUId}", "admin-api");
+            var request = CreateRequest(HttpMethod.Get, $"api/jobs/{companyUId}", "admin-api");
             return await Client.InvokeMethodAsync<ApiResponse<List<JobResponse>>>(request, ct);
         }
         catch (InvocationException ex)
@@ -103,7 +103,7 @@ public class AdminApiClient(DaprClient client, IUserAccessor accessor, ILogger<A
     {
         try
         {
-            var request = CreateRequest(HttpMethod.Get, "companies/job-summaries", "admin-api");
+            var request = CreateRequest(HttpMethod.Get, "api/companies/job-summaries", "admin-api");
             return await Client.InvokeMethodAsync<ApiResponse<List<CompanyJobSummaryDto>>>(request, ct);
         }
         catch (InvocationException ex)
@@ -119,7 +119,7 @@ public class AdminApiClient(DaprClient client, IUserAccessor accessor, ILogger<A
     {
         try
         {
-            var request = CreateRequest(HttpMethod.Get, "industries", "admin-api");
+            var request = CreateRequest(HttpMethod.Get, "api/industries", "admin-api");
             return await Client.InvokeMethodAsync<ApiResponse<List<IndustryResponse>>>(request, ct);
         }
         catch (InvocationException ex)

@@ -88,7 +88,7 @@ public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<Mon
     {
         try
         {
-            var request = CreateRequest(HttpMethod.Get, $"jobs/{companyUId}", "monolith-api");
+            var request = CreateRequest(HttpMethod.Get, $"api/jobs/{companyUId}", "monolith-api");
             return await Client.InvokeMethodAsync<List<JobResponse>>(request, ct);
         }
         catch (InvocationException ex)
@@ -104,7 +104,7 @@ public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<Mon
     {
         try
         {
-            var request = CreateRequest(HttpMethod.Get, "companies/job-summaries", "monolith-api");
+            var request = CreateRequest(HttpMethod.Get, "api/companies/job-summaries", "monolith-api");
             return await Client.InvokeMethodAsync<List<CompanyJobSummaryDto>>(request, ct);
         }
         catch (InvocationException ex)
