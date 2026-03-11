@@ -7,7 +7,7 @@ export const environment = {
   otelZipkin: 'https://otel.eelkhair.net/api/v2/spans',
   oidc: {
     authority: 'https://auth.eelkhair.net/realms/job-board',
-    redirectUrl: 'https://job-board.eelkhair.net',
+    redirectUrl: 'https://jobs.eelkhair.net',
     clientId: 'angular-public',
   },
 };
