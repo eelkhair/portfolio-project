@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 namespace JobBoard.AI.Infrastructure.Dapr.ApiClients;
 
 public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<MonolithApiClient> logger)
-    : BaseApiClient(_, accessor), IMonolithApiClient
+    : BaseApiClient(_, accessor, logger), IMonolithApiClient
 {
     public async Task<ODataResponse<List<CompanyDto>>> ListCompaniesAsync(CancellationToken cancellationToken = default)
     {
