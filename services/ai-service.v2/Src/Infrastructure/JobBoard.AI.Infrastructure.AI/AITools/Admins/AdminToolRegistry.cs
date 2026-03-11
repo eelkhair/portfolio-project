@@ -3,6 +3,7 @@ using JobBoard.AI.Application.Interfaces.Notifications;
 using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Infrastructure.AI.AITools.Admins.Drafts;
 using JobBoard.AI.Infrastructure.AI.AITools.Admins.System;
+using JobBoard.AI.Infrastructure.AI.Services;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -18,7 +19,8 @@ public class AdminToolRegistry(
     ISettingsService settingsService,
     ILogger<AdminToolRegistry> logger,
     IAiNotificationHub notificationHub,
-    IConversationContext conversationContext
+    IConversationContext conversationContext,
+    IConversationStore conversationStore
 ) : IAiTools
 {
     private static readonly TimeSpan ToolTtl = TimeSpan.FromMinutes(5);
@@ -29,7 +31,7 @@ public class AdminToolRegistry(
         yield return SaveDraftTool.Get(activityFactory, toolResolver);
         yield return ListDraftsTool.Get(activityFactory, toolResolver, cache, conversationContext, ToolTtl);
         yield return ListDraftsByLocationTool.Get(activityFactory, toolResolver, cache, conversationContext, ToolTtl);
-        yield return TraceIdTool.Get(activityFactory, redisStore,userAccessor, conversationContext);
+        yield return TraceIdTool.Get(activityFactory, redisStore, userAccessor, conversationContext, conversationStore);
         yield return DraftsByCompanyTool.Get(activityFactory, toolResolver, cache, conversationContext, ToolTtl);
         yield return ConversationIdTool.Get(activityFactory, conversationContext);
         yield return ProviderRetrievalTool.Get(activityFactory, toolResolver, logger);

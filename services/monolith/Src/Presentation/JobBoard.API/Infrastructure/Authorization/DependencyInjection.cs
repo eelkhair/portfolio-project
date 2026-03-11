@@ -70,6 +70,12 @@ public static class DependencyInjection
                     if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
                         return JwtBearerDefaults.AuthenticationScheme;
 
+                    // SignalR WebSocket/SSE transports cannot send Authorization headers;
+                    // the token is passed as ?access_token= query param instead.
+                    if (!string.IsNullOrEmpty(context.Request.Query["access_token"]) &&
+                        context.Request.Path.StartsWithSegments("/hubs"))
+                        return JwtBearerDefaults.AuthenticationScheme;
+
                     return "DaprInternalScheme";
                 };
             })

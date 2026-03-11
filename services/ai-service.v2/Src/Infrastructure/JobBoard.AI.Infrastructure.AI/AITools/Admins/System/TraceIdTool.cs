@@ -4,6 +4,7 @@ using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Infrastructure.AI.Services;
 using Microsoft.Extensions.AI;
 
+
 namespace JobBoard.AI.Infrastructure.AI.AITools.Admins.System;
 
 public static class TraceIdTool
@@ -12,7 +13,8 @@ public static class TraceIdTool
         IActivityFactory activityFactory,
         IRedisStore store,
         IUserAccessor userAccessor,
-        IConversationContext conversationContext)
+        IConversationContext conversationContext,
+        IConversationStore conversationStore)
     {
         return AIFunctionFactory.Create(
             async () =>
@@ -30,7 +32,7 @@ public static class TraceIdTool
                 activity?.SetTag("user.id", userId);
 
                 var convo = await store.GetAsync<ConversationDto>(
-                    $"conversations:{userId}:{conversationId}", 2);
+                    $"conversations:{userId}:{conversationId}", conversationStore.AiDbId);
 
                 return new {convo?.LastTraceId, CurrentTraceId = Activity.Current?.TraceId.ToString()};
             },
