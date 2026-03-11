@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace JobBoard.AI.Infrastructure.Dapr.ApiClients;
 
-public class AdminApiClient(DaprClient client, IUserAccessor accessor, ILogger<AdminApiClient> logger) : BaseApiClient(client, accessor), IAdminApiClient
+public class AdminApiClient(DaprClient client, IUserAccessor accessor, ILogger<AdminApiClient> logger) : BaseApiClient(client, accessor, logger), IAdminApiClient
 {
     public async Task<ApiResponse<List<CompanyResponse>>> ListCompaniesAsync(CancellationToken cancellationToken = default)
     {

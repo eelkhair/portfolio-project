@@ -38,6 +38,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{97DB
 		scripts\docker-publsh.sh = scripts\docker-publsh.sh
 		scripts\migration.sh = scripts\migration.sh
 		scripts\nuget-push.ps1 = scripts\nuget-push.ps1
+		scripts\CopyMicroservicesToMonolith.linq = scripts\CopyMicroservicesToMonolith.linq
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "user-api", "user-api", "{D27A4457-B09A-4389-B56C-7A1E180B5F89}"
