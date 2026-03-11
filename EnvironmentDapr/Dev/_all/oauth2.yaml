@@ -1,0 +1,30 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: oauth2clientcredentials
+spec:
+  type: middleware.http.oauth2clientcredentials
+  version: v1
+  metadata:
+    - name: clientId
+      secretKeyRef:
+        name: shared-dev
+        key: Keycloak:ServiceClientId
+
+    - name: clientSecret
+      secretKeyRef:
+        name: shared-dev
+        key: Keycloak:ServiceClientSecret
+
+    - name: scopes
+      value: "openid"
+
+    - name: tokenURL
+      secretKeyRef:
+        name: shared-dev
+        key: Keycloak:TokenUrl
+
+    - name: headerName
+      value: "Authorization"
+auth:
+  secretStore: "vault"

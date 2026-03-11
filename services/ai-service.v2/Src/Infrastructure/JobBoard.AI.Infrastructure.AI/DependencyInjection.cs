@@ -8,6 +8,7 @@ using JobBoard.AI.Application.Interfaces.AI;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Infrastructure.AI.AITools;
+using JobBoard.AI.Infrastructure.AI.AITools.Admins;
 using JobBoard.AI.Infrastructure.AI.Infrastructure;
 using JobBoard.AI.Infrastructure.AI.Services;
 using Microsoft.Extensions.AI;
@@ -53,9 +54,9 @@ public static class DependencyInjection
             ).Messages);
 
         
-        services.AddKeyedScoped<IAiTools, AiToolRegistry>("ai");
-        services.AddKeyedScoped<IAiTools, PublicToolRegistry>("public");
-        services.AddKeyedScoped<IAiTools, CompanyAdminToolRegistry>("company-admin");
+        services.AddKeyedScoped<IAiTools, AdminToolRegistry>("admin-ai");
+        services.AddKeyedScoped<IAiTools, PublicToolRegistry>("public-ai");
+        services.AddKeyedScoped<IAiTools, CompanyAdminToolRegistry>("company.admin-ai");
         services.AddScoped<IChatOptionsFactory, ChatOptionsFactory>();
 
 

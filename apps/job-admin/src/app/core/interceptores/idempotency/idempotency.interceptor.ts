@@ -4,12 +4,26 @@ import { mergeMap } from 'rxjs/operators';
 import { IDEMPOTENCY_DISABLE, IDEMPOTENCY_FORCE_KEY } from './idempotency.context';
 import { stableStringify, sha256Hex } from './idempotency.util';
 import { IdempotencyCache } from './idempotency.cache';
+import { environment } from '../../../../environments/environment';
 
 const cache = new IdempotencyCache();
+
+// Only add idempotency headers to our own API endpoints, not third-party services (e.g. Keycloak)
+const API_BASES = [
+  environment.gatewayUrl,
+  environment.monolithUrl,
+  environment.microserviceUrl,
+  environment.aiServiceUrl,
+];
+
+function isOwnApi(url: string): boolean {
+  return API_BASES.some(base => url.startsWith(base));
+}
 
 export const idempotencyInterceptor: HttpInterceptorFn = (req, next) => {
   if (!['POST','PUT','PATCH','DELETE'].includes(req.method)) return next(req);
   if (req.context.get(IDEMPOTENCY_DISABLE)) return next(req);
+  if (!isOwnApi(req.url)) return next(req);
 
   const forced = req.context.get(IDEMPOTENCY_FORCE_KEY);
   if (forced && !req.headers.has('Idempotency-Key')) {

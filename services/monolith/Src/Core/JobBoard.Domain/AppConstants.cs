@@ -7,16 +7,17 @@ public static class AppConstants
 
 public static class UserRoles
 {
-    public const string LabAdmin = "LabAdmin";
-    public const string LabMember = "LabMember";
+    public const string Admin = "Admins";
+    public const string Recruiter = "Recruiters";
+    public const string CompanyAdmin = "CompanyAdmins";
+    public const string Applicant = "Applicants";
 }
 
 public static class AuthorizationPolicies
 {
     public const string AllUsers = "AllUsers";
     public const string Admin = "Admin";
-    public const string Member = "Member";
-
+    public const string Recruiter = "Recruiter";
 }
 
 public static class PubSubNames

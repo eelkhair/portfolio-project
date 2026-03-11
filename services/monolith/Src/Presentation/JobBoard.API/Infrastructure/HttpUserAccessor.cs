@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using JobBoard.Application.Interfaces.Users;
-using Microsoft.Identity.Web;
 
 namespace JobBoard.API.Infrastructure;
 
@@ -23,14 +22,14 @@ public class HttpUserAccessor : IUserAccessor
         }
         else
         {
-            UserId = user.FindFirstValue(ClaimConstants.NameIdentifierId);
+            UserId = user.FindFirstValue("sub");
         }
 
 
-        FirstName = user.FindFirstValue("https://eelkhair.net/first_name") ?? string.Empty;
-        LastName = user.FindFirstValue("https://eelkhair.net/last_name") ?? string.Empty;
-        Email = user.FindFirstValue("https://eelkhair.net/email") ?? string.Empty;
-        Roles = user.FindAll("https://eelkhair.net/roles").Select(c => c.Value).ToList();
+        FirstName = user.FindFirstValue("given_name") ?? string.Empty;
+        LastName = user.FindFirstValue("family_name") ?? string.Empty;
+        Email = user.FindFirstValue("email") ?? string.Empty;
+        Roles = user.FindAll("groups").Select(c => c.Value).ToList();
         Token = (httpContextAccessor.HttpContext?.Request.Headers["Authorization"] ?? string.Empty);
     }
 

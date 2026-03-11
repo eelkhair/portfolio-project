@@ -21,7 +21,7 @@ public class UsersController : BaseODataController
     /// </returns>
     [HttpGet]
     [EnableQuery]
-    [Route("users")]
+    [Route("api/users")]
     public async Task<IQueryable<UserDto>> Get()
     {
         return await ExecuteODataQueryAsync(new GetUsersQuery());

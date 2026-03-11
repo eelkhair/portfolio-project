@@ -44,12 +44,12 @@ public sealed class ChatOptionsFactory(
                 var isMonolith = configuration.GetValue<bool>("FeatureFlags:Monolith");
 
                 var topologyTools =
-                    sp.GetRequiredKeyedService<IAiTools>(isMonolith ? "monolith" : "micro")
+                    sp.GetRequiredKeyedService<IAiTools>(isMonolith ? "admin-monolith" : "admin-micro")
                         .GetTools()
                         .ToList();
 
                 var aiTools =
-                    sp.GetRequiredKeyedService<IAiTools>("ai")
+                    sp.GetRequiredKeyedService<IAiTools>("admin-ai")
                         .GetTools()
                         .ToList();
 
@@ -74,9 +74,33 @@ public sealed class ChatOptionsFactory(
                     .ToList();
 
             case ChatScope.Public:
-                return sp.GetRequiredKeyedService<IAiTools>("public")
-                    .GetTools()
+            {
+                var isMonolith = configuration.GetValue<bool>("FeatureFlags:Monolith");
+
+                var topologyTools =
+                    sp.GetRequiredKeyedService<IAiTools>(isMonolith ? "public-monolith" : "public-micro")
+                        .GetTools()
+                        .ToList();
+
+                var aiTools =
+                    sp.GetRequiredKeyedService<IAiTools>("public-ai")
+                        .GetTools()
+                        .ToList();
+
+                var allTools = topologyTools.Concat(aiTools).ToList();
+
+                var duplicates = allTools
+                    .GroupBy(t => t.Name)
+                    .Where(g => g.Count() > 1)
+                    .Select(g => g.Key)
                     .ToList();
+
+                if (duplicates.Any())
+                    throw new InvalidOperationException(
+                        $"Duplicate AI tools detected: {string.Join(", ", duplicates)}");
+
+                return allTools;
+            }
 
             default:
                 return [];

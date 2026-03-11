@@ -21,7 +21,7 @@ public class JobQueryService(DaprClient client, UserContextService accessor, ILo
     {
         try
         {
-            var req = client.CreateInvokeMethodRequest(HttpMethod.Get, "job-api", $"jobs/{companyUId}");
+            var req = client.CreateInvokeMethodRequest(HttpMethod.Get, "job-api", $"api/jobs/{companyUId}");
 
             if (accessor.GetHeader("Authorization") is { } auth && !string.IsNullOrWhiteSpace(auth))
                 req.Headers.TryAddWithoutValidation("Authorization", auth);
@@ -69,7 +69,7 @@ public class JobQueryService(DaprClient client, UserContextService accessor, ILo
     {
         try
         {
-            var req = client.CreateInvokeMethodRequest(HttpMethod.Get, "job-api", "companies/job-summaries");
+            var req = client.CreateInvokeMethodRequest(HttpMethod.Get, "job-api", "api/companies/job-summaries");
 
             if (accessor.GetHeader("Authorization") is { } auth && !string.IsNullOrWhiteSpace(auth))
                 req.Headers.TryAddWithoutValidation("Authorization", auth);

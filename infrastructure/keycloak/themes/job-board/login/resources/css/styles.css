@@ -1,0 +1,15 @@
+/* Replace realm name text with logo */
+#kc-header-wrapper {
+  font-size: 0 !important;
+  padding: 20px 0 !important;
+}
+
+#kc-header-wrapper::before {
+  content: "";
+  display: block;
+  width: 200px;
+  height: 60px;
+  margin: 0 auto;
+  background: url("../img/logo.svg") no-repeat center center;
+  background-size: contain;
+}

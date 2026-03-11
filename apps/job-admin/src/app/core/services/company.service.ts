@@ -14,13 +14,13 @@ export class CompanyService {
   private readonly http = inject(HttpClient);
 
   listCompanies(): Observable<ApiResponse<Company[]>> {
-    return this.http.get<any>(`${environment.gatewayUrl}companies`).pipe(
+    return this.http.get<any>(`${environment.gatewayUrl}api/companies`).pipe(
       map(res => this.normalize<Company>(res))
     );
   }
 
   listIndustries(): Observable<ApiResponse<Industry[]>> {
-    return this.http.get<any>(`${environment.gatewayUrl}industries`).pipe(
+    return this.http.get<any>(`${environment.gatewayUrl}api/industries`).pipe(
       map(res => this.normalize<Industry>(res))
     );
   }

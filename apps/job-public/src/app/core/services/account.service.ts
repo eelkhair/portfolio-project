@@ -1,31 +1,48 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { AuthService } from '@auth0/auth0-angular';
+import { OidcSecurityService } from 'angular-auth-oidc-client';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { map, Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AccountService {
-  private readonly auth = inject(AuthService, { optional: true });
+  private readonly oidc = inject(OidcSecurityService, { optional: true });
 
-  readonly isAuthenticated = this.auth
-    ? toSignal(this.auth.isAuthenticated$, { initialValue: false })
+  private _everAuthenticated = false;
+
+  readonly isAuthenticated = this.oidc
+    ? toSignal(this.oidc.isAuthenticated$.pipe(map(r => r.isAuthenticated)), { initialValue: false })
     : signal(false);
 
-  readonly user = this.auth ? toSignal(this.auth.user$) : signal(undefined);
+  readonly hasInitialized = computed(() => {
+    if (this.isAuthenticated()) this._everAuthenticated = true;
+    return this._everAuthenticated;
+  });
+
+  readonly user = this.oidc
+    ? toSignal(this.oidc.userData$.pipe(map(r => r.userData as Record<string, any> | undefined)))
+    : signal(undefined);
 
   readonly displayName = computed(() => {
     const u = this.user();
-    return u?.given_name ?? u?.name ?? u?.nickname ?? u?.email ?? 'User';
+    return u?.['given_name'] ?? u?.['name'] ?? u?.['preferred_username'] ?? u?.['email'] ?? 'User';
   });
 
+  readonly groups = computed(() => {
+    const userData = this.user();
+    return (userData?.['groups'] as string[]) ?? [];
+  });
+
+  getAccessToken(): Observable<string> {
+    return this.oidc?.getAccessToken() ?? of('');
+  }
+
   login(): void {
-    this.auth?.loginWithRedirect();
+    this.oidc?.authorize();
   }
 
   logout(): void {
-    this.auth?.logout({
-      logoutParams: { returnTo: window.location.origin },
-    });
+    this.oidc?.logoff().subscribe();
   }
 }

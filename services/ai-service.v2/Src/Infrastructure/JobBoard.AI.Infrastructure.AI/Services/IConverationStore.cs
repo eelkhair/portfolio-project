@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.Configuration;
 
 namespace JobBoard.AI.Infrastructure.AI.Services;
 
@@ -17,14 +18,17 @@ public interface IConversationStore
 {
     Task<List<ChatMessage>> GetChatMessages(Guid conversationId, string userId);
     Task SaveChatMessages(Guid conversationId, string userId, List<ChatMessage> messages);
+    int AiDbId { get; }
 }
 
-public class ConversationStore(IRedisStore store) : IConversationStore
+public class ConversationStore(IRedisStore store, IConfiguration configuration) : IConversationStore
 {
+    public int AiDbId { get; } = int.TryParse(configuration["Redis:AiDb"], out var db) ? db : 2;
+
     public async Task<List<ChatMessage>> GetChatMessages(Guid conversationId, string userId)
     {
         var key = $"conversations:{userId}:{conversationId}";
-        var result =  await store.GetAsync<ConversationDto>(key, 2);
+        var result =  await store.GetAsync<ConversationDto>(key, AiDbId);
 
         if (result == null) return [];
         foreach (var traceParent in result.TraceParents)
@@ -52,7 +56,7 @@ public class ConversationStore(IRedisStore store) : IConversationStore
     public async Task SaveChatMessages(Guid conversationId, string userId, List<ChatMessage> messages)
     {
         var key = $"conversations:{userId}:{conversationId}";
-        var result =  await store.GetAsync<ConversationDto>(key, 2);
+        var result =  await store.GetAsync<ConversationDto>(key, AiDbId);
         var traceParents = new List<string>();
  
         var traceParent = string.Empty;
@@ -79,6 +83,6 @@ public class ConversationStore(IRedisStore store) : IConversationStore
             TraceParents = traceParents,
             LastTraceId = Activity.Current?.TraceId.ToString() ?? string.Empty 
         };
-        await store.SetAsync(key, dto, 2, TimeSpan.FromDays(2));
+        await store.SetAsync(key, dto, AiDbId, TimeSpan.FromDays(2));
     }
 }

@@ -8,24 +8,23 @@ spec:
   metadata:
     - name: clientId
       secretKeyRef:
-        name: shared
-        key: Auth0:SwaggerClientId
+        name: shared-local
+        key: Keycloak:ServiceClientId
 
     - name: clientSecret
       secretKeyRef:
-        name: shared
-        key: Auth0:SwaggerClientSecret
+        name: shared-local
+        key: Keycloak:ServiceClientSecret
 
     - name: scopes
-      value: "read:users read:companies write:users write:companies read:jobs write:jobs"
+      value: "openid"
 
     - name: tokenURL
-      value: "https://elkhair-dev.us.auth0.com/oauth/token"
+      secretKeyRef:
+        name: shared-local
+        key: Keycloak:TokenUrl
 
     - name: headerName
       value: "Authorization"
-
-    - name: endpointParamsQuery
-      value: "audience=https://job-board.eelkhair.net"
 auth:
   secretStore: "vault"

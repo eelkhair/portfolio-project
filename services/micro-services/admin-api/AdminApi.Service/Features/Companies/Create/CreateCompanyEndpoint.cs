@@ -19,7 +19,7 @@ public class CreateCompanyEndpoint(ICompanyCommandService service,
     public override void Configure()
     {
         Post("/companies");
-        Permissions("write:companies");
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CreateCompanyRequest request, CancellationToken ct)

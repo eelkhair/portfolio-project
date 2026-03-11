@@ -12,7 +12,7 @@ public class UpdateCompanyEndpoint(ICompanyCommandService service, ILogger<Updat
     public override void Configure()
     {
         Put("/companies/{id}");
-        Permissions("write:companies");
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(UpdateCompanyRequest request, CancellationToken ct)

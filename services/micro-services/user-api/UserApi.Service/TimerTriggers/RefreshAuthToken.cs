@@ -1,18 +1,18 @@
-﻿using AH.Metadata.Domain.Constants;
+using AH.Metadata.Domain.Constants;
 using Dapr.Client;
 using FastEndpoints;
-using UserApi.Infrastructure.Auth0.Interfaces;
+using UserApi.Infrastructure.Keycloak.Interfaces;
 
 namespace UserApi.TimerTriggers;
 
 public class RefreshAuthToken(
     ILogger<RefreshAuthToken> logger,
-    IAuth0TokenService tokenService,
+    IKeycloakTokenService tokenService,
     DaprClient dapr
 ) : EndpointWithoutRequest<string>
 {
     private const string StateStoreName = StateStores.Redis;
-    private const string LockKey        = "auth0token:refresh-lock";
+    private const string LockKey        = "keycloaktoken:refresh-lock";
     private static readonly TimeSpan LockTtl = TimeSpan.FromSeconds(60);
 
     public override void Configure()
@@ -29,7 +29,7 @@ public class RefreshAuthToken(
         var entry = await dapr.GetStateEntryAsync<string>(StateStoreName, LockKey, cancellationToken: ct);
         if (!string.IsNullOrEmpty(entry.Value))
         {
-            logger.LogInformation("Auth0 refresh skipped: another instance holds the lock.");
+            logger.LogInformation("Keycloak refresh skipped: another instance holds the lock.");
             return "skipped_locked";
         }
 
@@ -44,21 +44,21 @@ public class RefreshAuthToken(
 
         if (!acquired)
         {
-            logger.LogInformation("Auth0 refresh skipped: lock race lost");
+            logger.LogInformation("Keycloak refresh skipped: lock race lost");
             return "skipped_locked";
         }
 
         // 2) Do the refresh; always best-effort release lock
         try
         {
-            logger.LogInformation("Refreshing Auth0 Management API token...");
+            logger.LogInformation("Refreshing Keycloak Admin API token...");
             var token = await tokenService.RefreshAccessTokenAsync(ct);
-            logger.LogInformation("Auth0 token refreshed (len={Len})", token?.Length ?? 0);
+            logger.LogInformation("Keycloak token refreshed (len={Len})", token?.Length ?? 0);
             return "ok";
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Auth0 token refresh failed");
+            logger.LogError(ex, "Keycloak token refresh failed");
             HttpContext.Response.StatusCode = 500;
             return "error";
         }

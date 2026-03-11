@@ -11,12 +11,13 @@ internal static class HealthCheckExtensions
 {
     public static WebApplicationBuilder AddCustomHealthChecks(this WebApplicationBuilder builder)
     {
+        // --- Dapr infrastructure singletons ---
         var stateStore = new StateStoreOptions()
         {
             StoreName = StateStores.Redis
         };
         builder.Services.AddSingleton(_ => new DaprStateStoreHealthCheck(new DaprClientBuilder().Build(), stateStore));
-       
+
         var secretStore = new SecretStoreOptions
         {
             StoreName = SecretStoreNames.Local
@@ -29,25 +30,42 @@ internal static class HealthCheckExtensions
             Postfix = string.Empty,
             PubSubName = PubSubNames.RabbitMq
         };
-          
-        builder.Services.AddSingleton(_ => new DaprPubSubHealthCheck(new DaprClientBuilder().Build(), pubSub));
-      builder.Services
-                        .AddHealthChecks()
-                        .AddCheck("self", () => HealthCheckResult.Healthy())
-                        .AddSqlServer(
-                              builder.Configuration.GetConnectionString("Monolith")
-                              ?? throw new InvalidOperationException("DB connection missing"),
-                              name: "Monolith Database Check",
-                              timeout: TimeSpan.FromSeconds(10),
-                              tags: new[] { "database", "critical" })
-                        .AddDapr()      .AddDaprConfigurationStore("global", o =>
-                            o.StoreName = "appconfig-global")
-                        .AddDaprConfigurationStore("monolith", o =>
-                            o.StoreName = "appconfig-monolith-api");
 
-   
-          
-    
+        builder.Services.AddSingleton(_ => new DaprPubSubHealthCheck(new DaprClientBuilder().Build(), pubSub));
+
+        builder.Services.AddHttpClient();
+
+        builder.Services
+            .AddHealthChecks()
+
+            // -- Liveness --
+            .AddCheck("self", () => HealthCheckResult.Healthy())
+
+            // -- Database --
+            .AddSqlServer(
+                builder.Configuration.GetConnectionString("Monolith")
+                ?? throw new InvalidOperationException("DB connection missing"),
+                name: "Monolith Database Check",
+                timeout: TimeSpan.FromSeconds(10),
+                tags: ["database", "critical"])
+
+            // -- Authentication --
+            .AddKeycloak(o =>
+            {
+                o.Authority = builder.Configuration["Keycloak:Authority"]
+                              ?? throw new InvalidOperationException("Keycloak:Authority is not configured.");
+                o.ClientIds = ["angular-admin", "angular-public", "dapr-service-client", "swagger-client"];
+            })
+
+            // -- Dapr sidecar, state store, secret store, pub/sub --
+            .AddDapr()
+
+            // -- Dapr configuration stores --
+            .AddDaprConfigurationStore("global", o =>
+                o.StoreName = "appconfig-global")
+            .AddDaprConfigurationStore("monolith", o =>
+                o.StoreName = "appconfig-monolith-api");
+
         return builder;
     }
 }

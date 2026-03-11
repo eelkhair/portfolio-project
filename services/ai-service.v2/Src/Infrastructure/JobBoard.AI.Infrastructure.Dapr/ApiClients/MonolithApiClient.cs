@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 namespace JobBoard.AI.Infrastructure.Dapr.ApiClients;
 
 public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<MonolithApiClient> logger)
-    : BaseApiClient(_, accessor), IMonolithApiClient
+    : BaseApiClient(_, accessor, logger), IMonolithApiClient
 {
     public async Task<ODataResponse<List<CompanyDto>>> ListCompaniesAsync(CancellationToken cancellationToken = default)
     {
@@ -88,7 +88,7 @@ public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<Mon
     {
         try
         {
-            var request = CreateRequest(HttpMethod.Get, $"jobs/{companyUId}", "monolith-api");
+            var request = CreateRequest(HttpMethod.Get, $"api/jobs/{companyUId}", "monolith-api");
             return await Client.InvokeMethodAsync<List<JobResponse>>(request, ct);
         }
         catch (InvocationException ex)
@@ -104,7 +104,7 @@ public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<Mon
     {
         try
         {
-            var request = CreateRequest(HttpMethod.Get, "companies/job-summaries", "monolith-api");
+            var request = CreateRequest(HttpMethod.Get, "api/companies/job-summaries", "monolith-api");
             return await Client.InvokeMethodAsync<List<CompanyJobSummaryDto>>(request, ct);
         }
         catch (InvocationException ex)

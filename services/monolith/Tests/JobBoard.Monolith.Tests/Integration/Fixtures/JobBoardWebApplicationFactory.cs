@@ -40,8 +40,9 @@ public class JobBoardWebApplicationFactory : WebApplicationFactory<Program>
             config.AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["ConnectionStrings:Monolith"] = _dbFixture.ConnectionString,
-                ["Auth0:Domain"] = "test.auth0.com",
-                ["Auth0:Audience"] = "https://test-api",
+                ["Keycloak:Authority"] = "https://auth.test.com/realms/test",
+                ["Keycloak:Audience"] = "jobboard-api",
+                ["Keycloak:SwaggerClientId"] = "swagger-test",
             });
         });
 

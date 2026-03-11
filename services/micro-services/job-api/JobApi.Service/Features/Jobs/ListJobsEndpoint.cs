@@ -9,7 +9,6 @@ public class ListJobsEndpoint(IJobQueryService service): Endpoint<ListJobsReques
     public override void Configure()
     {
         Get("/jobs/{companyUId}");
-        Permissions("read:jobs");
         AllowAnonymous();
     }
 

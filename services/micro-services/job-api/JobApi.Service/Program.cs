@@ -39,27 +39,30 @@ builder.Services.AddFastEndpoints()
             s.Title = "Job API";
             s.Version = "v1";
 
-            // OAuth2 (Auth Code + PKCE) for Swagger UI via Auth0
-            s.AddAuth("oauth2", new OpenApiSecurityScheme
+            // OAuth2 (Auth Code + PKCE) for Swagger UI via Keycloak
+            var authority = builder.Configuration["Keycloak:Authority"] ?? string.Empty;
+            if (!string.IsNullOrEmpty(authority))
             {
-                Type = OpenApiSecuritySchemeType.OAuth2,
-                Description = "Auth0 (Authorization Code + PKCE)",
-                Flows = new OpenApiOAuthFlows
+                s.AddAuth("oauth2", new OpenApiSecurityScheme
                 {
-                    AuthorizationCode = new OpenApiOAuthFlow
+                    Type = OpenApiSecuritySchemeType.OAuth2,
+                    Description = "Keycloak (Authorization Code + PKCE)",
+                    Flows = new OpenApiOAuthFlows
                     {
-                        AuthorizationUrl = $"https://{builder.Configuration["Auth0:Domain"]}/authorize",
-                        TokenUrl = $"https://{builder.Configuration["Auth0:Domain"]}/oauth/token",
-                        Scopes = new Dictionary<string, string>
+                        AuthorizationCode = new OpenApiOAuthFlow
                         {
-                            ["read:jobs"]  = "Read jobs",
-                            ["write:jobs"] = "Create/Update jobs",
-                            ["read:companies"]  = "Read companies",
-                            ["write:companies"] = "Create/Update companies"
+                            AuthorizationUrl = $"{authority}/protocol/openid-connect/auth",
+                            TokenUrl = $"{authority}/protocol/openid-connect/token",
+                            Scopes = new Dictionary<string, string>
+                            {
+                                ["openid"] = "OpenID",
+                                ["profile"] = "Profile",
+                                ["email"] = "Email"
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
         };
     });
 
@@ -70,6 +73,11 @@ builder.Services.AddCors(o =>
     o.AddPolicy(CorsPolicy, p => p
         .WithOrigins(
             "http://localhost:4200",
+            "https://job-admin-dev.eelkhair.net",
+            "https://jobs-dev.eelkhair.net",
+            "https://job-dev.eelkhair.net",
+            "http://192.168.1.200:9000",
+            "https://swagger-dev.eelkhair.net",
             "https://job-admin.eelkhair.net",
             "http://192.168.1.112:9000",
             "https://swagger.eelkhair.net")    
@@ -105,14 +113,14 @@ builder.Services.AddAuthentication(options =>
     })
     .AddJwtBearer(options =>
     {
-        options.Authority = $"https://{cfg["Auth0:Domain"]}/";
-        options.Audience = cfg["Auth0:Audience"];
+        options.RequireHttpsMetadata = false;
+        options.MapInboundClaims = false;
+        options.Authority = cfg["Keycloak:Authority"];
+        options.Audience = cfg["Keycloak:Audience"];
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = $"https://{cfg["Auth0:Domain"]}/",
             ValidateAudience = true,
-            ValidAudience = cfg["Auth0:Audience"],
             ValidateLifetime = true
         };
     });
@@ -130,6 +138,7 @@ app.UseCloudEvents();
 app.MapSubscribeHandler();
 app.UseFastEndpoints(c =>
     {
+        c.Endpoints.RoutePrefix = "api";
         c.Serializer.Options.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
     })
     .UseSwaggerGen(
@@ -138,14 +147,9 @@ app.UseFastEndpoints(c =>
             ui.DocumentTitle = "Job API Docs";
             ui.OAuth2Client = new()
             {
-                ClientId = cfg["Auth0:SwaggerClientId"],
-                ClientSecret = cfg["Auth0:SwaggerClientSecret"],
+                ClientId = cfg["Keycloak:SwaggerClientId"],
                 AppName = "Job API Swagger",
-                UsePkceWithAuthorizationCodeGrant = true,
-                AdditionalQueryStringParameters =
-                {
-                    ["audience"] = cfg["Auth0:Audience"]!
-                }
+                UsePkceWithAuthorizationCodeGrant = true
             };
             // optional if you need to force it:
             // ui.OAuth2RedirectUrl = "https://localhost:5001/swagger/oauth2-redirect.html";

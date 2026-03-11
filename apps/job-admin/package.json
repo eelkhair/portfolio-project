@@ -5,7 +5,9 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --proxy-config proxy.conf.json",
+    "start:dev": "ng serve --configuration development",
     "build": "ng build",
+    "build:dev": "ng build --configuration development",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -27,7 +29,6 @@
     "@angular/forms": "^20.2.3",
     "@angular/platform-browser": "^20.2.3",
     "@angular/router": "^20.2.3",
-    "@auth0/auth0-angular": "^2.2.3",
     "@microsoft/signalr": "^9.0.6",
     "@opentelemetry/api": "^1.7.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.52.0",
@@ -38,6 +39,7 @@
     "@primeuix/themes": "^1.2.3",
     "ag-grid-angular": "^34.1.2",
     "ag-grid-community": "^34.1.2",
+    "angular-auth-oidc-client": "^21.0.1",
     "marked": "^17.0.2",
     "primeicons": "^7.0.0",
     "primeng": "^20.0.1",
