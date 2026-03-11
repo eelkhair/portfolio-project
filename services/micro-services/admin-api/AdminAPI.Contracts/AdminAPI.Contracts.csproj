@@ -12,7 +12,7 @@
     <ItemGroup>
       <PackageReference Include="JobBoard.CompanyAPI.Contracts" Version="1.0.7" />
       <PackageReference Include="JobBoard.JobAPI.Contracts" Version="1.0.4" />
-      <PackageReference Include="JobBoard.UserAPI.Contracts" Version="1.0.9" />
+      <PackageReference Include="JobBoard.UserAPI.Contracts" Version="1.0.10" />
     </ItemGroup>
 
 </Project>

@@ -31,7 +31,7 @@ namespace UserApi.Infrastructure.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Auth0OrganizationId")
+                    b.Property<string>("KeycloakGroupId")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -81,7 +81,7 @@ namespace UserApi.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Auth0OrganizationId")
+                    b.HasIndex("KeycloakGroupId")
                         .IsUnique();
 
                     b.ToTable("Companies", "Users");
@@ -106,7 +106,7 @@ namespace UserApi.Infrastructure.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Auth0UserId")
+                    b.Property<string>("KeycloakUserId")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 

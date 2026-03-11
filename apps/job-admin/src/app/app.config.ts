@@ -1,30 +1,29 @@
-import { ApplicationConfig, ErrorHandler, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
+import { ApplicationConfig, ErrorHandler, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection, APP_INITIALIZER } from '@angular/core';
 import { TracingErrorHandler } from './core/error-handler/tracing-error-handler';
 import {provideRouter, withComponentInputBinding, withViewTransitions} from '@angular/router';
 import Aura from '@primeng/themes/aura';
 import { routes } from './app.routes';
 import {
-
   provideHttpClient,
   withFetch,
   withInterceptors,
 } from '@angular/common/http';
-import {provideAuth0} from '@auth0/auth0-angular';
 import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
 import {providePrimeNG} from 'primeng/config';
-import {authInterceptor} from './core/interceptores/auth.interceptor';
 import {tracingInterceptor} from './core/interceptores/tracing.interceptor';
 import {MessageService} from 'primeng/api';
 import {idempotencyInterceptor} from './core/interceptores/idempotency/idempotency.interceptor';
 import {DialogService} from 'primeng/dynamicdialog';
-
+import {authInterceptor, provideAuth, LogLevel, OidcSecurityService} from 'angular-auth-oidc-client';
+import {environment} from '../environments/environment';
+import {firstValueFrom} from 'rxjs';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     { provide: ErrorHandler, useClass: TracingErrorHandler },
-    provideHttpClient(withFetch(), withInterceptors([authInterceptor, tracingInterceptor, idempotencyInterceptor])),
+    provideHttpClient(withFetch(), withInterceptors([authInterceptor(), tracingInterceptor, idempotencyInterceptor])),
     provideRouter(routes, withComponentInputBinding(), withViewTransitions()),
     provideAnimationsAsync(),
     providePrimeNG({
@@ -41,17 +40,39 @@ export const appConfig: ApplicationConfig = {
       }
     }),
     MessageService,
-    provideAuth0({
-      domain: 'elkhair-dev.us.auth0.com',
-      clientId: 'YXnqj0gOfZJD8Ypje7mdZqdoenCHNzWA',
-      authorizationParams: {
-        audience: 'https://job-board.eelkhair.net',      // << crucial
-        redirect_uri: window.location.origin,
-        scope: 'openid profile email offline_access'
+    provideAuth({
+      config: {
+        authority: environment.oidc.authority,
+        redirectUrl: window.location.origin,
+        postLogoutRedirectUri: window.location.origin,
+        clientId: environment.oidc.clientId,
+
+        scope: 'openid profile email offline_access',
+        responseType: 'code',
+
+        silentRenew: true,
+        useRefreshToken: true,
+
+        logLevel: environment.production ? LogLevel.None : LogLevel.Debug,
+
+        ignoreNonceAfterRefresh: true,
+        disableRefreshIdTokenAuthTimeValidation: true,
+
+
+        secureRoutes: [
+          environment.gatewayUrl,
+          environment.monolithUrl,
+          environment.microserviceUrl,
+          environment.aiServiceUrl,
+        ],
       },
-      cacheLocation: 'localstorage',
-      useRefreshTokens: true
     }),
-    DialogService
+    DialogService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (oidc: OidcSecurityService) => () => firstValueFrom(oidc.checkAuth()),
+      deps: [OidcSecurityService],
+      multi: true,
+    },
   ]
 };

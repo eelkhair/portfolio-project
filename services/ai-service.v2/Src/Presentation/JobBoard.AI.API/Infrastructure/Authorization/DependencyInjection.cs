@@ -32,6 +32,13 @@ public static class DependencyInjection
                         "http://localhost:5280",
                         "https://localhost:5280",
                         "http://127.0.0.1:4200",
+                        
+                        "https://job-admin-dev.eelkhair.net",
+                        "https://jobs-dev.eelkhair.net",
+                        "https://job-dev.eelkhair.net",
+                        "http://192.168.1.200:9000",
+                        "https://swagger-dev.eelkhair.net",
+                        
                         "http://192.168.1.112:9000",
                         "https://swagger.eelkhair.net",
                         "https://job-admin.eelkhair.net",
@@ -47,7 +54,7 @@ public static class DependencyInjection
         });
 
         // ---------------------------------------------------------------------
-        // JWT Bearer Auth (Auth0)
+        // JWT Bearer Auth (Keycloak)
         // ---------------------------------------------------------------------
         services
             .AddAuthentication(options =>
@@ -57,14 +64,14 @@ public static class DependencyInjection
             })
             .AddJwtBearer(options =>
             {
-                options.Authority = $"https://{configuration["Auth0:Domain"]}/";
-                options.Audience = configuration["Auth0:Audience"];
+                options.RequireHttpsMetadata = false;
+                options.MapInboundClaims = false;
+                options.Authority = configuration["Keycloak:Authority"];
+                options.Audience = configuration["Keycloak:Audience"];
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
-                    ValidIssuer = $"https://{configuration["Auth0:Domain"]}/",
                     ValidateAudience = true,
-                    ValidAudience = configuration["Auth0:Audience"],
                     ValidateLifetime = true
                 };
                 options.Events = new JwtBearerEvents
@@ -78,6 +85,24 @@ public static class DependencyInjection
                             path.StartsWithSegments("/hubs/notifications"))
                         {
                             context.Token = token;
+                        }
+                        return Task.CompletedTask;
+                    },
+                    OnTokenValidated = context =>
+                    {
+                        // Keycloak "Full group path" emits /Admins, /Companies/... — strip leading /
+                        var identity = context.Principal?.Identity as System.Security.Claims.ClaimsIdentity;
+                        if (identity is not null)
+                        {
+                            var groupClaims = identity.FindAll("groups").ToList();
+                            foreach (var claim in groupClaims)
+                            {
+                                if (claim.Value.StartsWith('/'))
+                                {
+                                    identity.RemoveClaim(claim);
+                                    identity.AddClaim(new System.Security.Claims.Claim("groups", claim.Value.TrimStart('/')));
+                                }
+                            }
                         }
                         return Task.CompletedTask;
                     }
@@ -108,22 +133,22 @@ public static class DependencyInjection
             })
 
             // -----------------------------------------------------------------
-            // Role-based Chat Policies (Auth0 RBAC)
+            // Group-based Chat Policies (Keycloak groups)
             // -----------------------------------------------------------------
             .AddPolicy("AdminChat", policy =>
             {
                 policy.RequireAuthenticatedUser();
-                policy.RequireClaim("https://eelkhair.net/roles", "admin");
+                policy.RequireClaim("groups", "Admins");
             })
             .AddPolicy("CompanyAdminChat", policy =>
             {
                 policy.RequireAuthenticatedUser();
-                policy.RequireClaim("https://eelkhair.net/roles", "admin", "company-admin");
+                policy.RequireClaim("groups", "Admins", "CompanyAdmins");
             })
             .AddPolicy("PublicChat", policy =>
             {
                 policy.RequireAuthenticatedUser();
-                policy.RequireClaim("https://eelkhair.net/roles", "admin", "company-admin", "applicant");
+                policy.RequireClaim("groups", "Admins", "CompanyAdmins", "Applicants");
             });
 
         return services;
@@ -135,7 +160,8 @@ public static class DependencyInjection
     public static WebApplication UseApplicationServices(this WebApplication app)
     { 
     
-        app.UseHttpsRedirection();
+        if (!app.Environment.IsProduction())
+            app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseStaticFiles();
         app.UseRouting();

@@ -35,9 +35,7 @@ export class AiRealtimeService {
     this.hub = new signalR.HubConnectionBuilder()
       .withUrl(hubUrl, {
         accessTokenFactory: async () =>
-          await firstValueFrom(
-            this.account.auth.getAccessTokenSilently()
-          ),
+          await firstValueFrom(this.account.getAccessToken()),
       })
       .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
       .configureLogging(signalR.LogLevel.Warning)

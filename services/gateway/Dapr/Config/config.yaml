@@ -15,5 +15,5 @@ spec:
       scopes:
         - storeName: vault
           defaultAccess: deny
-          allowedSecrets: [ "gateway", "shared" ]
+          allowedSecrets: [ "gateway", "shared", "shared-local" ]
      

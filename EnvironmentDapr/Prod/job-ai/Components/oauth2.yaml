@@ -1,0 +1,20 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: oauth2clientcredentials
+spec:
+  type: middleware.http.oauth2clientcredentials
+  version: v1
+  metadata:
+    - name: clientId
+      value: "YdpDeJJKfoSI9Xz4n8TDYx0qAsF0NDZp"
+    - name: clientSecret
+      value: "Bzpw8l7CAaamcJcSxjgv2-L9poQPDS953tY3PthSPLG6Xq95b3iiDwpYR8IpI0jQ"
+    - name: scopes
+      value: "read:users read:companies write:users write:companies read:jobs write:jobs"
+    - name: tokenURL
+      value: "https://elkhair-dev.us.auth0.com/oauth/token"
+    - name: headerName
+      value: "Authorization"
+    - name: endpointParamsQuery
+      value: "audience=https://job-board.eelkhair.net"   # <-- key fix

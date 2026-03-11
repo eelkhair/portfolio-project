@@ -19,7 +19,7 @@ public class CompaniesController : BaseODataController
     /// <returns>A filtered <see cref="SingleResult"/> containing the company matching the specified UId.</returns>
     [HttpGet]
     [EnableQuery]
-    [Route("companies")]
+    [Route("api/companies")]
     public async Task<IActionResult> Get()
     {
         var companies = await ExecuteODataQueryAsync(new GetCompaniesQuery());
@@ -46,7 +46,7 @@ public class CompaniesController : BaseODataController
     /// </summary>
     [HttpGet]
     [EnableQuery]
-    [Route("companies/job-summaries")]
+    [Route("api/companies/job-summaries")]
     public async Task<IActionResult> GetJobSummaries()
     {
         var summaries = await ExecuteODataQueryAsync(new GetCompanyJobSummariesQuery());

@@ -1,8 +1,41 @@
-﻿#!/bin/bash
+#!/bin/bash
 set -euo pipefail
 
+# ===== ENVIRONMENT SELECTION =====
+echo "Select environment:"
+echo "  1) dev"
+echo "  2) prod"
+read -p "Enter choice [1/2]: " ENV_CHOICE
+
+case "$ENV_CHOICE" in
+  1|dev)
+    ENVIRONMENT="dev"
+    REMOTE_HOST="192.168.1.200"
+    ADMIN_BUILD_CONFIG="development"
+    PUBLIC_BUILD_CONFIG="development"
+    ;;
+  2|prod)
+    ENVIRONMENT="prod"
+    REMOTE_HOST="192.168.1.112"
+    ADMIN_BUILD_CONFIG="production"
+    PUBLIC_BUILD_CONFIG="production"
+    echo "⚠️  You are about to deploy to PRODUCTION ($REMOTE_HOST)."
+    read -p "Are you sure? (y/N): " CONFIRM
+    if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
+      echo "Aborted."
+      exit 0
+    fi
+    ;;
+  *)
+    echo "Invalid choice. Exiting."
+    exit 1
+    ;;
+esac
+
+echo "Deploying to $ENVIRONMENT ($REMOTE_HOST)..."
+
 # ===== ONE PASSWORD FOR EVERYTHING =====
-read -s -p "🔐 Enter password (used for Docker registry and remote sudo): " PASSWORD
+read -s -p "🔐 Enter password (used for Docker registry): " PASSWORD
 echo
 
 echo "🔐 Logging into registry.eelkhair.net..."
@@ -22,6 +55,7 @@ declare -A services=(
   ["connector-api"]="../services/connector-api"
   ["gateway"]="../services/gateway"
   ["health-check"]="../services/micro-services/HealthChecks"
+  ["keycloak"]="../infrastructure/keycloak"
 )
 
 for name in "${!services[@]}"; do
@@ -33,15 +67,23 @@ if [ "$name" = "ai-service-v2" ]; then
     -f "/c/Users/elkha/RiderProjects/portfolio project/services/ai-service.v2/Src/Presentation/JobBoard.AI.API/Dockerfile" \
     -t "$image" \
     "/c/Users/elkha/RiderProjects/portfolio project/services/ai-service.v2"
+elif [ "$name" = "monolith-api" ]; then
+  docker build \
+    -f "/c/Users/elkha/RiderProjects/portfolio project/services/monolith/Src/Presentation/JobBoard.API/Dockerfile" \
+    -t "$image" \
+    "/c/Users/elkha/RiderProjects/portfolio project/services/monolith"
+elif [ "$name" = "job-admin" ]; then
+  docker build \
+    --build-arg BUILD_CONFIG="$ADMIN_BUILD_CONFIG" \
+    -t "$image" \
+    "$path"
+elif [ "$name" = "job-public" ]; then
+  docker build \
+    --build-arg BUILD_CONFIG="$PUBLIC_BUILD_CONFIG" \
+    -t "$image" \
+    "$path"
 else
-  if [ "$name" = "monolith-api" ]; then
-    docker build \
-      -f "/c/Users/elkha/RiderProjects/portfolio project/services/monolith/Src/Presentation/JobBoard.API/Dockerfile" \
-      -t "$image" \
-      "/c/Users/elkha/RiderProjects/portfolio project/services/monolith"
-  else
-    docker build -t "$image" "$path"
-  fi
+  docker build -t "$image" "$path"
 fi
 
   echo "📤 Pushing $image to registry.eelkhair.net..."
@@ -50,10 +92,10 @@ fi
   echo "-----------------------------"
 done
 
-echo "🚀 Deploying + cleaning up on remote host..."
+echo "🚀 Deploying + cleaning up on remote host ($REMOTE_HOST)..."
 
 # NOTE: no quotes around EOF so variables expand and we pass $PASSWORD through.
-ssh -tt eelkhair@192.168.1.114 <<EOF
+ssh -tt eelkhair@${REMOTE_HOST}<<EOF
 set -euo pipefail
 
 PASSWORD='${PASSWORD}'
@@ -73,7 +115,7 @@ printf '%s\n' "\$PASSWORD" | docker login registry.eelkhair.net --username eelkh
 
 echo "📦 Pulling + starting stack..."
 docker compose -p job-board pull
-docker compose -p job-board up -d
+docker compose -p job-board up -d --force-recreate --remove-orphans
 
 echo "🧹 Post-deploy cleanup..."
 
@@ -108,5 +150,5 @@ logout
 
 # wipe locally too
 PASSWORD='' ; unset PASSWORD || true
-echo "🎉 All done!"
+echo "🎉 All done! Deployed to ${ENVIRONMENT}."
 EOF

@@ -2,7 +2,7 @@ using JobBoard.AI.Application.Actions.Base;
 
 namespace JobBoard.AI.Application.Actions.Chat;
 
-public sealed class ChatSystemPrompt : IChatSystemPrompt
+public sealed class AdminSystemPrompt : IChatSystemPrompt
 {
     public string Value => """
                                      You are an AI assistant integrated into a system with access to tools.

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Elkhair.Dev.Common.Dapr;
 using Elkhair.Dev.Common.Domain.Constants;
 using FastEndpoints;
@@ -9,7 +9,7 @@ namespace UserApi.Features.Companies;
 
 public class CompanyCreateEndpoint(
     ActivitySource activitySource,
-    IAuth0CommandService aut0Service,
+    IKeycloakCommandService keycloakService,
     ICompanyCommandService commandService,
     IMessageSender sender,
     ILogger<CompanyCreateEndpoint> logger)
@@ -17,7 +17,8 @@ public class CompanyCreateEndpoint(
 {
     public override void Configure()
     {
-        Post("companies"); 
+        Post("companies");
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(EventDto<ProvisionUserEvent> request, CancellationToken ct)
@@ -33,42 +34,42 @@ public class CompanyCreateEndpoint(
         logger.LogInformation("Starting user provisioning workflow for {Email}", request.Data.Email);
         try
         {
-            using var spanAuth0 =
-                activitySource.StartActivity("provision.user.auth0", ActivityKind.Client);
+            using var spanKeycloak =
+                activitySource.StartActivity("provision.user.keycloak", ActivityKind.Client);
 
-            logger.LogInformation("Provisioning user in Auth0…");
+            logger.LogInformation("Provisioning user in Keycloak…");
 
-            var (auth0User, auth0Company) = await aut0Service.ProvisionUserAsync(request.Data, ct);
+            var (keycloakUser, keycloakGroup) = await keycloakService.ProvisionUserAsync(request.Data, ct);
 
-            if (auth0User is null || auth0Company is null)
+            if (keycloakUser is null || keycloakGroup is null)
             {
-                throw new InvalidOperationException("Auth0 provisioning returned null values.");
+                throw new InvalidOperationException("Keycloak provisioning returned null values.");
             }
 
-            spanAuth0?.SetTag("auth0.user.id", auth0User.UserId);
-            spanAuth0?.SetTag("auth0.company.id", auth0Company.Id);
+            spanKeycloak?.SetTag("keycloak.user.id", keycloakUser.Id);
+            spanKeycloak?.SetTag("keycloak.group.id", keycloakGroup.Id);
 
-        
+
             using var spanDb =
                 activitySource.StartActivity("provision.user.persistence");
 
             logger.LogInformation("Persisting new user and company records…");
-            
+
 
             var userId = await commandService.CreateUser(new CreateUserRequest
             {
-                Auth0Id = auth0User.UserId,
-                FirstName = auth0User.FirstName,
-                LastName = auth0User.LastName,
-                Email = auth0User.Email,
+                KeycloakId = keycloakUser.Id!,
+                FirstName = keycloakUser.FirstName!,
+                LastName = keycloakUser.LastName!,
+                Email = keycloakUser.Email!,
                 UId = request.Data.UId
-                
+
             }, request.UserId, ct);
 
             var companyId = await commandService.CreateCompany(new CreateCompanyRequest
             {
-                Auth0OrganizationId = auth0Company.Id,
-                Name = auth0Company.DisplayName,
+                KeycloakGroupId = keycloakGroup.Id!,
+                Name = keycloakGroup.Name!,
                 UId = request.Data.CompanyUId,
             }, request.UserId, ct);
 
@@ -76,10 +77,10 @@ public class CompanyCreateEndpoint(
 
             spanDb?.SetTag("db.user.id", userId);
             spanDb?.SetTag("db.company.id", companyId);
-            
-            request.Data.Auth0OrganizationId = auth0Company.Id;
-            request.Data.Auth0UserId = auth0User.UserId;
-            
+
+            request.Data.KeycloakGroupId = keycloakGroup.Id!;
+            request.Data.KeycloakUserId = keycloakUser.Id!;
+
             logger.LogInformation("Emitting success event for user provisioning");
             request.Data.SourceSystem = "Monolith";
             await sender.SendEventAsync(
@@ -99,8 +100,8 @@ public class CompanyCreateEndpoint(
 
             logger.LogError(ex, "Unhandled error while provisioning user");
 
-           
-            throw; 
+
+            throw;
         }
         logger.LogInformation("User {Email} provisioned successfully", request.Data.Email);
 

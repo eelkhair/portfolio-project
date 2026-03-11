@@ -22,7 +22,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenTelemetryServices(builder.Configuration, "admin-api");
 
 var cfg = builder.Configuration;
-var domain = cfg["Auth0:Domain"];
 // Register FastEndpoints + Swagger
 
 builder.Services.AddMessageSender();
@@ -37,27 +36,30 @@ builder.Services.AddFastEndpoints()
             s.Title = "Admin API";
             s.Version = "v1";
 
-            // OAuth2 (Auth Code + PKCE) for Swagger UI via Auth0
-            s.AddAuth("oauth2", new OpenApiSecurityScheme
+            // OAuth2 (Auth Code + PKCE) for Swagger UI via Keycloak
+            var authority = cfg["Keycloak:Authority"] ?? string.Empty;
+            if (!string.IsNullOrEmpty(authority))
             {
-                Type = OpenApiSecuritySchemeType.OAuth2,
-                Description = "Auth0 (Authorization Code + PKCE)",
-                Flows = new OpenApiOAuthFlows
+                s.AddAuth("oauth2", new OpenApiSecurityScheme
                 {
-                    AuthorizationCode = new OpenApiOAuthFlow
+                    Type = OpenApiSecuritySchemeType.OAuth2,
+                    Description = "Keycloak (Authorization Code + PKCE)",
+                    Flows = new OpenApiOAuthFlows
                     {
-                        AuthorizationUrl = $"https://{domain}/authorize",
-                        TokenUrl = $"https://{domain}/oauth/token",
-                        Scopes = new Dictionary<string, string>
+                        AuthorizationCode = new OpenApiOAuthFlow
                         {
-                            ["read:jobs"]  = "Read jobs",
-                            ["write:jobs"] = "Create/Update jobs",
-                            ["read:companies"]  = "Read companies",
-                            ["write:companies"] = "Create/Update companies"
+                            AuthorizationUrl = $"{authority}/protocol/openid-connect/auth",
+                            TokenUrl = $"{authority}/protocol/openid-connect/token",
+                            Scopes = new Dictionary<string, string>
+                            {
+                                ["openid"] = "OpenID",
+                                ["profile"] = "Profile",
+                                ["email"] = "Email"
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
         };
     });
 const string CorsPolicy = "AllowJobAdmin";
@@ -67,6 +69,9 @@ builder.Services.AddCors(options =>
     options.AddPolicy(CorsPolicy, p => p
         .WithOrigins(
             "http://localhost:4200",
+            "https://job-admin-dev.eelkhair.net",
+            "http://192.168.1.200:9000",
+            "https://swagger-dev.eelkhair.net",
             "https://job-admin.eelkhair.net",
             "http://192.168.1.112:9000",
             "https://swagger.eelkhair.net")    
@@ -94,14 +99,14 @@ builder.Services.AddAuthentication(options =>
     })
     .AddJwtBearer(options =>
     {
-        options.Authority = $"https://{domain}/";
-        options.Audience = cfg["Auth0:Audience"];
+        options.RequireHttpsMetadata = false;
+        options.MapInboundClaims = false;
+        options.Authority = cfg["Keycloak:Authority"];
+        options.Audience = cfg["Keycloak:Audience"];
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = $"https://{domain}/",
             ValidateAudience = true,
-            ValidAudience = cfg["Auth0:Audience"],
             ValidateLifetime = true
         };
         options.Events = new JwtBearerEvents
@@ -134,21 +139,19 @@ app.UseAuthentication();
 app.UseAuthorization();  
 app.UseCloudEvents();
 app.MapSubscribeHandler();
-app.UseFastEndpoints()
+app.UseFastEndpoints(c =>
+    {
+        c.Endpoints.RoutePrefix = "api";
+    })
     .UseSwaggerGen(
         uiConfig: ui =>
         {
             ui.DocumentTitle = "Admin API Docs";
             ui.OAuth2Client = new()
             {
-                ClientId = cfg["Auth0:SwaggerClientId"],
-                ClientSecret = cfg["Auth0:SwaggerClientSecret"],
+                ClientId = cfg["Keycloak:SwaggerClientId"],
                 AppName = "Admin API Swagger",
-                UsePkceWithAuthorizationCodeGrant = true,
-                AdditionalQueryStringParameters =
-                {
-                    ["audience"] = cfg["Auth0:Audience"]!
-                }
+                UsePkceWithAuthorizationCodeGrant = true
             };
             // optional if you need to force it:
             // ui.OAuth2RedirectUrl = "https://localhost:5001/swagger/oauth2-redirect.html";

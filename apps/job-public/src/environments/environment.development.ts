@@ -1,8 +1,13 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:5280/api/',
-  aiUrl: 'http://localhost:5200/',
-  monolithUrl: 'http://localhost:5280/',
-  otel: '/v1/traces',
-  otelZipkin: 'api/v2/spans',
+  apiUrl: 'https://job-monolith-dev.eelkhair.net/api/',
+  aiUrl: 'https://job-ai-v2-dev.eelkhair.net/',
+  monolithUrl: 'https://job-monolith-dev.eelkhair.net/',
+  otel: 'https://otel.eelkhair.net/v1/traces',
+  otelZipkin: 'https://otel.eelkhair.net/api/v2/spans',
+  oidc: {
+    authority: 'https://auth.eelkhair.net/realms/job-board-dev',
+    redirectUrl: 'https://jobs-dev.eelkhair.net',
+    clientId: 'angular-public',
+  },
 };

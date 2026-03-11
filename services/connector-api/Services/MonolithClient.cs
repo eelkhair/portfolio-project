@@ -55,8 +55,8 @@ public class MonolithOClient(DaprClient daprClient, ILogger<MonolithOClient> log
     {
         var model = new ActivateCompanyRequest
         {
-            Auth0CompanyId = userApiResponse.Auth0OrganizationId,
-            Auth0UserId = userApiResponse.Auth0UserId,
+            KeycloakGroupId = userApiResponse.KeycloakGroupId,
+            KeycloakUserId = userApiResponse.KeycloakUserId,
             CompanyEmail = company.Email,
             CompanyName = company.Name,
             CompanyUId = eventData.CompanyUId,

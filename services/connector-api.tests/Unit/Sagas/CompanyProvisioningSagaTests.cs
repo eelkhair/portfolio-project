@@ -63,8 +63,8 @@ public class CompanyProvisioningSagaTests
 
         _userApiResponse = new CompanyCreatedUserApiPayload
         {
-            Auth0UserId = "auth0|org-user",
-            Auth0OrganizationId = "org_abc123",
+            KeycloakUserId = "keycloak-org-user",
+            KeycloakGroupId = "keycloak-group-abc123",
             CompanyName = "Test Company",
             FirstName = "John",
             LastName = "Smith",

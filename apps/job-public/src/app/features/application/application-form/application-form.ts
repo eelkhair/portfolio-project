@@ -55,6 +55,40 @@ export class ApplicationForm {
     'Skills & Projects',
   ];
 
+  protected readonly formErrors = computed(() => {
+    const errors: string[] = [];
+    const c = this.form.controls;
+    if (c.firstName.invalid) errors.push('First Name');
+    if (c.lastName.invalid) errors.push('Last Name');
+    if (c.email.invalid) errors.push('Email');
+
+    c.workHistory.controls.forEach((g, i) => {
+      const ctrl = (g as FormGroup).controls;
+      if (ctrl['company']?.invalid) errors.push(`Work #${i + 1}: Company`);
+      if (ctrl['jobTitle']?.invalid) errors.push(`Work #${i + 1}: Job Title`);
+      if (ctrl['startDate']?.invalid) errors.push(`Work #${i + 1}: Start Date`);
+    });
+
+    c.education.controls.forEach((g, i) => {
+      const ctrl = (g as FormGroup).controls;
+      if (ctrl['institution']?.invalid) errors.push(`Education #${i + 1}: Institution`);
+      if (ctrl['degree']?.invalid) errors.push(`Education #${i + 1}: Degree`);
+      if (ctrl['startDate']?.invalid) errors.push(`Education #${i + 1}: Start Date`);
+    });
+
+    c.certifications.controls.forEach((g, i) => {
+      const ctrl = (g as FormGroup).controls;
+      if (ctrl['name']?.invalid) errors.push(`Certification #${i + 1}: Name`);
+    });
+
+    c.projects.controls.forEach((g, i) => {
+      const ctrl = (g as FormGroup).controls;
+      if (ctrl['name']?.invalid) errors.push(`Project #${i + 1}: Name`);
+    });
+
+    return errors;
+  });
+
   protected readonly aiFields = computed(() => {
     const data = this.resumeData();
     const fields = new Set<string>();

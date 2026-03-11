@@ -27,26 +27,24 @@ export class Header implements OnInit {
   displayName = signal('')
 
   ngOnInit() {
-    this.accountService.auth.user$.subscribe(u => {
-      if (u) {
-        console.log('user logged in', u);
-        this.displayName.set((u.given_name??u.name) ||u.name || u.nickname || u.email || 'User');
-        this.menuItems.set([
-          {
-            label: 'Profile',
-            icon: 'pi pi-id-card',
-            command: () => this.router.navigateByUrl('/settings/profile')
-          },
-          {
-            separator: true
-          },
-          {
-            label: 'Logout',
-            icon: 'pi pi-sign-out',
-            command: () => this.accountService.logout()
-          }
-        ]);
+    const u = this.accountService.user();
+    if (u) {
+      this.displayName.set((u['given_name'] ?? u['name']) || u['name'] || u['preferred_username'] || u['email'] || 'User');
+    }
+    this.menuItems.set([
+      {
+        label: 'Profile',
+        icon: 'pi pi-id-card',
+        command: () => this.router.navigateByUrl('/settings/profile')
+      },
+      {
+        separator: true
+      },
+      {
+        label: 'Logout',
+        icon: 'pi pi-sign-out',
+        command: () => this.accountService.logout()
       }
-    })
+    ]);
   }
 }

@@ -44,7 +44,18 @@
       "Bash(dotnet ef migrations add AddProfileAboutAndProjects --project Src/Infrastructure/JobBoard.Infrastructure.Persistence/ --startup-project Src/Presentation/JobBoard.API/)",
       "Bash(dotnet ef database update --project Src/Infrastructure/JobBoard.Infrastructure.Persistence/ --startup-project Src/Presentation/JobBoard.API/)",
       "Bash(dotnet ef migrations add AddParsedSectionsToResume --project \"services/monolith/Src/Infrastructure/JobBoard.Infrastructure.Persistence/JobBoard.Infrastructure.Persistence.csproj\" --startup-project \"services/monolith/Src/Presentation/JobBoard.API/JobBoard.API.csproj\")",
-      "Bash(dotnet ef database update --project Src/Infrastructure/JobBoard.Infrastructure.Persistence --startup-project Src/Presentation/JobBoard.API)"
+      "Bash(dotnet ef database update --project Src/Infrastructure/JobBoard.Infrastructure.Persistence --startup-project Src/Presentation/JobBoard.API)",
+      "Bash(npm uninstall @auth0/auth0-angular)",
+      "Bash(dotnet restore \"services/micro-services/company-api/CompanyApi.Service/CompanyApi.Service.csproj\")",
+      "Bash(dotnet restore \"services/micro-services/user-api/UserApi.Service/UserApi.Service.csproj\")",
+      "Bash(dotnet restore \"services/micro-services/job-api/JobApi.Service/JobApi.Service.csproj\")",
+      "Bash(dotnet restore \"services/micro-services/admin-api/AdminApi.Service/AdminApi.Service.csproj\")",
+      "Bash(dotnet pack \"services/micro-services/HealthChecks/JobBoard.HealthChecks/JobBoard.HealthChecks.csproj\" -c Debug -o ./nupkgs)",
+      "Bash(dotnet nuget locals all --list)",
+      "Bash(dotnet nuget list source)",
+      "Bash(dotnet nuget push \"C:/Users/elkha/RiderProjects/portfolio project/nupkgs/JobBoard.HealthChecks.1.0.7.nupkg\" --source \"Home\")",
+      "Bash(dotnet restore services/ai-service.v2/Src/Presentation/JobBoard.AI.API/JobBoard.AI.API.csproj)",
+      "Bash(dotnet nuget push \"C:/Users/elkha/RiderProjects/portfolio project/nupkgs/JobBoard.HealthChecks.1.0.8.nupkg\" --source \"Home\")"
     ]
   }
 }

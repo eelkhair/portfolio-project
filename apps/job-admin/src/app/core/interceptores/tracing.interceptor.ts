@@ -6,6 +6,13 @@ import {
 } from '@angular/common/http';
 import { trace, SpanKind, SpanStatusCode, Span } from '@opentelemetry/api';
 import { tap, finalize } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
+
+// Extract host from OIDC authority to exclude from tracing (avoids CORS issues with Keycloak)
+const oidcHost = (() => {
+  try { return new URL(environment.oidc.authority).host; }
+  catch { return ''; }
+})();
 
 const EXCLUDE: RegExp[] = [
   /\/v1\/traces$/i,
@@ -13,6 +20,7 @@ const EXCLUDE: RegExp[] = [
   /^assets\//i,
   /\.woff2?$|\.png$|\.jpe?g$|\.svg$|\.css$|\.js$/i,
   /(^|\/)healthz(\?|$)/i,
+  ...(oidcHost ? [new RegExp(oidcHost.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i')] : []),
 ];
 
 export const tracingInterceptor: HttpInterceptorFn = (req, next) => {
