@@ -5,21 +5,27 @@ set -euo pipefail
 echo "Select environment:"
 echo "  1) dev"
 echo "  2) prod"
-read -p "Enter choice [1/2]: " ENV_CHOICE
+echo "  3) both (dev + prod)"
+read -p "Enter choice [1/2/3]: " ENV_CHOICE
+
+DEPLOY_TARGETS=()
 
 case "$ENV_CHOICE" in
   1|dev)
-    ENVIRONMENT="dev"
-    REMOTE_HOST="192.168.1.200"
-    ADMIN_BUILD_CONFIG="development"
-    PUBLIC_BUILD_CONFIG="development"
+    DEPLOY_TARGETS+=("dev")
     ;;
   2|prod)
-    ENVIRONMENT="prod"
-    REMOTE_HOST="192.168.1.112"
-    ADMIN_BUILD_CONFIG="production"
-    PUBLIC_BUILD_CONFIG="production"
-    echo "⚠️  You are about to deploy to PRODUCTION ($REMOTE_HOST)."
+    DEPLOY_TARGETS+=("prod")
+    echo "⚠️  You are about to deploy to PRODUCTION (192.168.1.112)."
+    read -p "Are you sure? (y/N): " CONFIRM
+    if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
+      echo "Aborted."
+      exit 0
+    fi
+    ;;
+  3|both)
+    DEPLOY_TARGETS+=("dev" "prod")
+    echo "⚠️  You are about to deploy to BOTH dev AND prod."
     read -p "Are you sure? (y/N): " CONFIRM
     if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
       echo "Aborted."
@@ -32,7 +38,7 @@ case "$ENV_CHOICE" in
     ;;
 esac
 
-echo "Deploying to $ENVIRONMENT ($REMOTE_HOST)..."
+echo "Will deploy to: ${DEPLOY_TARGETS[*]}"
 
 # ===== ONE PASSWORD FOR EVERYTHING =====
 read -s -p "🔐 Enter password (used for Docker registry): " PASSWORD
@@ -41,7 +47,7 @@ echo
 echo "🔐 Logging into registry.eelkhair.net..."
 printf '%s\n' "$PASSWORD" | docker login registry.eelkhair.net --username eelkhair --password-stdin
 
-# ===== BUILD & PUSH LOCALLY =====
+# ===== SERVICE DEFINITIONS =====
 declare -A services=(
   ["job-admin"]="../apps/job-admin"
   ["job-public"]="../apps/job-public"
@@ -58,44 +64,86 @@ declare -A services=(
   ["keycloak"]="../infrastructure/keycloak"
 )
 
-for name in "${!services[@]}"; do
-  path="${services[$name]}"
-  image="registry.eelkhair.net/${name}:latest"
+# ===== HELPER: resolve env-specific vars =====
+env_vars() {
+  local env="$1"
+  case "$env" in
+    dev)
+      REMOTE_HOST="192.168.1.200"
+      ADMIN_BUILD_CONFIG="development"
+      PUBLIC_BUILD_CONFIG="development"
+      ;;
+    prod)
+      REMOTE_HOST="192.168.1.112"
+      ADMIN_BUILD_CONFIG="production"
+      PUBLIC_BUILD_CONFIG="production"
+      ;;
+  esac
+}
 
-if [ "$name" = "ai-service-v2" ]; then
-  docker build \
-    -f "/c/Users/elkha/RiderProjects/portfolio project/services/ai-service.v2/Src/Presentation/JobBoard.AI.API/Dockerfile" \
-    -t "$image" \
-    "/c/Users/elkha/RiderProjects/portfolio project/services/ai-service.v2"
-elif [ "$name" = "monolith-api" ]; then
-  docker build \
-    -f "/c/Users/elkha/RiderProjects/portfolio project/services/monolith/Src/Presentation/JobBoard.API/Dockerfile" \
-    -t "$image" \
-    "/c/Users/elkha/RiderProjects/portfolio project/services/monolith"
-elif [ "$name" = "job-admin" ]; then
-  docker build \
-    --build-arg BUILD_CONFIG="$ADMIN_BUILD_CONFIG" \
-    -t "$image" \
-    "$path"
-elif [ "$name" = "job-public" ]; then
-  docker build \
-    --build-arg BUILD_CONFIG="$PUBLIC_BUILD_CONFIG" \
-    -t "$image" \
-    "$path"
-else
-  docker build -t "$image" "$path"
-fi
+# ===== HELPER: build & push backend services (env-independent, run once) =====
+build_and_push_backends() {
+  for name in "${!services[@]}"; do
+    # Skip Angular apps — they're built per-environment
+    if [ "$name" = "job-admin" ] || [ "$name" = "job-public" ]; then
+      continue
+    fi
 
-  echo "📤 Pushing $image to registry.eelkhair.net..."
-  docker push "$image"
-  echo "✅ $name done"
-  echo "-----------------------------"
-done
+    path="${services[$name]}"
+    image="registry.eelkhair.net/${name}:latest"
 
-echo "🚀 Deploying + cleaning up on remote host ($REMOTE_HOST)..."
+    if [ "$name" = "ai-service-v2" ]; then
+      docker build \
+        -f "/c/Users/elkha/RiderProjects/portfolio project/services/ai-service.v2/Src/Presentation/JobBoard.AI.API/Dockerfile" \
+        -t "$image" \
+        "/c/Users/elkha/RiderProjects/portfolio project/services/ai-service.v2"
+    elif [ "$name" = "monolith-api" ]; then
+      docker build \
+        -f "/c/Users/elkha/RiderProjects/portfolio project/services/monolith/Src/Presentation/JobBoard.API/Dockerfile" \
+        -t "$image" \
+        "/c/Users/elkha/RiderProjects/portfolio project/services/monolith"
+    else
+      docker build -t "$image" "$path"
+    fi
+
+    echo "📤 Pushing $image to registry.eelkhair.net..."
+    docker push "$image"
+    echo "✅ $name done"
+    echo "-----------------------------"
+  done
+}
+
+# ===== HELPER: build & push Angular apps (env-specific) =====
+build_and_push_frontends() {
+  local admin_config="$1"
+  local public_config="$2"
+
+  for name in "job-admin" "job-public"; do
+    path="${services[$name]}"
+    image="registry.eelkhair.net/${name}:latest"
+
+    if [ "$name" = "job-admin" ]; then
+      docker build --build-arg BUILD_CONFIG="$admin_config" -t "$image" "$path"
+    else
+      docker build --build-arg BUILD_CONFIG="$public_config" -t "$image" "$path"
+    fi
+
+    echo "📤 Pushing $image to registry.eelkhair.net..."
+    docker push "$image"
+    echo "✅ $name ($admin_config) done"
+    echo "-----------------------------"
+  done
+}
+
+# ===== HELPER: deploy to remote host =====
+deploy_remote() {
+  local host="$1"
+  local env="$2"
+
+  echo "🚀 Deploying + cleaning up on $env ($host)..."
 
 # NOTE: no quotes around EOF so variables expand and we pass $PASSWORD through.
-ssh -tt eelkhair@${REMOTE_HOST}<<EOF
+ssh -tt eelkhair@${host}<<EOF
 set -euo pipefail
 
 PASSWORD='${PASSWORD}'
@@ -143,12 +191,39 @@ df -h || true
 
 # wipe secret in remote shell
 PASSWORD='' ; unset PASSWORD || true
-echo "✅ Remote cleanup complete!"
+echo "✅ Remote cleanup complete for $env!"
 
-logout
-
-
-# wipe locally too
-PASSWORD='' ; unset PASSWORD || true
-echo "🎉 All done! Deployed to ${ENVIRONMENT}."
+exit 0
 EOF
+  # ssh -tt may return non-zero on clean exit; don't let set -e kill the loop
+  local ssh_exit=$?
+  if [ $ssh_exit -ne 0 ]; then
+    echo "⚠️  SSH session for $env exited with code $ssh_exit (usually harmless with -tt)"
+  fi
+}
+
+# ===== MAIN =====
+
+# 1. Build backend services once (identical across environments)
+echo ""
+echo "=========================================="
+echo "🔨 Building backend services (shared)..."
+echo "=========================================="
+build_and_push_backends
+
+# 2. Per-environment: build frontends, push, deploy
+for target in "${DEPLOY_TARGETS[@]}"; do
+  env_vars "$target"
+
+  echo ""
+  echo "=========================================="
+  echo "🔨 Building frontends for $target..."
+  echo "=========================================="
+
+  build_and_push_frontends "$ADMIN_BUILD_CONFIG" "$PUBLIC_BUILD_CONFIG"
+  deploy_remote "$REMOTE_HOST" "$target" || true
+done
+
+# wipe locally
+PASSWORD='' ; unset PASSWORD || true
+echo "🎉 All done! Deployed to: ${DEPLOY_TARGETS[*]}"

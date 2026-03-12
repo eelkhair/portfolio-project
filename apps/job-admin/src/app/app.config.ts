@@ -1,6 +1,7 @@
 import { ApplicationConfig, ErrorHandler, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection, APP_INITIALIZER } from '@angular/core';
 import { TracingErrorHandler } from './core/error-handler/tracing-error-handler';
-import {provideRouter, withComponentInputBinding, withViewTransitions} from '@angular/router';
+import {provideRouter, TitleStrategy, withComponentInputBinding, withViewTransitions} from '@angular/router';
+import {EnvTitleStrategy} from './core/services/env-title.strategy';
 import Aura from '@primeng/themes/aura';
 import { routes } from './app.routes';
 import {
@@ -25,6 +26,7 @@ export const appConfig: ApplicationConfig = {
     { provide: ErrorHandler, useClass: TracingErrorHandler },
     provideHttpClient(withFetch(), withInterceptors([authInterceptor(), tracingInterceptor, idempotencyInterceptor])),
     provideRouter(routes, withComponentInputBinding(), withViewTransitions()),
+    { provide: TitleStrategy, useClass: EnvTitleStrategy },
     provideAnimationsAsync(),
     providePrimeNG({
       ripple: true,
