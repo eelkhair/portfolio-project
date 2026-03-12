@@ -2,6 +2,12 @@
   <div class="flex items-center gap-3">
     <img src="logo-icon.svg?v=2" alt="JobBoard" class="h-14 w-14">
     <h1 class="text-2xl font-semibold">Job Board Admin</h1>
+    @if (envName !== 'PROD') {
+      <span class="text-xs font-bold px-2 py-1 rounded"
+            [class]="envName === 'DEV' ? 'bg-red-600 text-white' : 'bg-amber-500 text-black'">
+        {{ envName }}
+      </span>
+    }
   </div>
 
   <div class="flex items-center gap-3">

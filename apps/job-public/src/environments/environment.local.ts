@@ -1,5 +1,6 @@
 export const environment = {
   production: false,
+  envName: 'LOCAL',
   apiUrl: 'http://localhost:5280/api/',
   aiUrl: 'http://localhost:5200/',
   monolithUrl: 'http://localhost:5280/',

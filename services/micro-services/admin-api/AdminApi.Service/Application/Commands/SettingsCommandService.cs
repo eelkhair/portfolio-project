@@ -174,6 +174,59 @@ public class SettingsCommandService(DaprClient client, UserContextService access
         }
     }
     
+    public async Task<ApiResponse<ReEmbedJobsResponse>> ReEmbedJobsAsync(CancellationToken ct)
+    {
+        try
+        {
+            var req = client.CreateInvokeMethodRequest(
+                HttpMethod.Post,
+                appId: "ai-service-v2",
+                methodName: "settings/re-embed-jobs"
+            );
+
+            if (accessor.GetHeader("Authorization") is { } auth && !string.IsNullOrWhiteSpace(auth))
+                req.Headers.TryAddWithoutValidation("Authorization", auth);
+
+            using var resp = await client.InvokeMethodWithResponseAsync(req, ct);
+
+            var raw = await resp.Content.ReadAsStringAsync(ct);
+
+            if (!resp.IsSuccessStatusCode)
+            {
+                logger.LogError("ai-service-v2 returned {StatusCode}: {Body}", (int)resp.StatusCode, raw);
+                throw new HttpRequestException($"ai-service-v2 {resp.StatusCode}: {raw}", null, resp.StatusCode);
+            }
+
+            var result = JsonSerializer.Deserialize<ApiResponse<ReEmbedJobsResponse>>(raw, JsonOpts);
+
+            Activity.Current?.SetTag("jobs.processed", result?.Data?.JobsProcessed);
+
+            return new ApiResponse<ReEmbedJobsResponse>
+            {
+                Data = result?.Data,
+                Success = true,
+                StatusCode = HttpStatusCode.OK
+            };
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error re-embedding jobs");
+            return new ApiResponse<ReEmbedJobsResponse>
+            {
+                Success = false,
+                StatusCode = HttpStatusCode.InternalServerError,
+                Exceptions = new ApiError
+                {
+                    Message = e.Message,
+                    Errors = new Dictionary<string, string[]>
+                    {
+                        { "Error", [e.Message] }
+                    }
+                }
+            };
+        }
+    }
+
     public async Task<ApiResponse<ApplicationModeDto>> UpdateApplicationModeAsync(ApplicationModeDto request, CancellationToken ct)
     {
         Activity.Current?.SetTag("isMonolith", request.IsMonolith);

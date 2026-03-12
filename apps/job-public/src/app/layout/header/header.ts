@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { ThemeService } from '../../core/services/theme.service';
 import { AccountService } from '../../core/services/account.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-header',
@@ -12,6 +13,12 @@ import { AccountService } from '../../core/services/account.service';
         <a routerLink="/" class="flex items-center gap-2">
           <img src="logo-icon.svg" alt="JobBoard" class="h-8 w-8" />
           <span class="text-xl font-bold">JobBoard</span>
+          @if (envName !== 'PROD') {
+            <span class="text-xs font-bold px-2 py-1 rounded"
+                  [class]="envName === 'DEV' ? 'bg-red-600 text-white' : 'bg-amber-500 text-black'">
+              {{ envName }}
+            </span>
+          }
         </a>
 
         <div class="flex items-center gap-6">
@@ -110,4 +117,5 @@ export class Header {
   protected readonly theme = inject(ThemeService);
   protected readonly account = inject(AccountService);
   protected readonly menuOpen = signal(false);
+  protected readonly envName = environment.envName;
 }

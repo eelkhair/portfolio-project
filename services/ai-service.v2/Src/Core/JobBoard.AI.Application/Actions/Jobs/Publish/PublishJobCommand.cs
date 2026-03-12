@@ -37,13 +37,22 @@ public class PublishJobCommandHandler(IHandlerContext context,
             embeddingText,
             cancellationToken);
 
+        var existing = await dbContext.JobEmbeddings
+            .FirstOrDefaultAsync(e => e.JobId == job.UId, cancellationToken);
+
+        if (existing is not null)
+        {
+            dbContext.JobEmbeddings.Remove(existing);
+            activity?.SetTag("job.embedding.replaced", true);
+        }
+
         var jobEmbedding = new JobEmbedding(
             jobId: job.UId,
             vector: new EmbeddingVector(vector),
             provider: new ProviderName("openai.embedding"),
             model: new ModelName("text-embedding-3-small")
         );
-        
+
         await dbContext.JobEmbeddings.AddAsync(jobEmbedding, cancellationToken);
 
         if (!string.IsNullOrWhiteSpace(job.DraftId))

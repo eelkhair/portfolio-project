@@ -1,7 +1,8 @@
 using JobBoard.AI.API.Infrastructure.Authorization;
+using JobBoard.AI.Application.Actions.Jobs.ReEmbedAll;
 using JobBoard.AI.Application.Actions.Settings;
 using JobBoard.AI.Application.Actions.Settings.ApplicationMode;
-using JobBoard.AI.Application.Actions.Settings.Provider; 
+using JobBoard.AI.Application.Actions.Settings.Provider;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -50,4 +51,12 @@ public class SettingsController : BaseApiController
     [StandardApiResponses]
     public async Task<IActionResult> UpdateApplicationMode(ApplicationModeDto request)
         => await ExecuteCommandAsync(new UpdateApplicationModeCommand(request), Ok);
+
+    /// <summary>
+    /// Re-embed all jobs — fetches all jobs from monolith and regenerates embeddings
+    /// </summary>
+    [HttpPost("re-embed-jobs")]
+    [StandardApiResponses]
+    public async Task<IActionResult> ReEmbedAllJobs()
+        => await ExecuteCommandAsync(new ReEmbedAllJobsCommand(), Ok);
 }

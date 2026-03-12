@@ -351,6 +351,33 @@ public sealed class AiServiceClient(
             request.IsMonolith);
     }
 
+    public async Task<ReEmbedAllJobsResponse> ReEmbedAllJobs(CancellationToken cancellationToken)
+    {
+        EnrichActivity(null, "settings.re-embed-jobs", AiServiceV2);
+
+        var request = CreateRequest(
+            HttpMethod.Post,
+            "settings/re-embed-jobs",
+            AiServiceV2);
+
+        using var response =
+            await client.InvokeMethodWithResponseAsync(request, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+            await ThrowExternalServiceError(response, "settings.re-embed-jobs", cancellationToken, AiServiceV2);
+
+        var result = await response.Content
+                         .ReadFromJsonAsync<ApiResponse<ReEmbedAllJobsResponse>>(JsonOpts, cancellationToken)
+                     ?? throw new InvalidOperationException($"{AiServiceV2} returned empty JSON payload.");
+
+        logger.LogInformation(
+            "{ServiceName} re-embedded {Count} jobs",
+            AiServiceV2,
+            result.Data?.JobsProcessed);
+
+        return result.Data!;
+    }
+
     private HttpRequestMessage CreateRequest(HttpMethod method, string path, string serviceName)
     {
         var request = client.CreateInvokeMethodRequest(

@@ -9,4 +9,5 @@ public interface ISettingsCommandService
     Task<ApiResponse<UpdateProviderResponse>> UpdateProviderAsync(UpdateProviderRequest request, CancellationToken ct = default);
     Task<ApiResponse<ApplicationModeDto>> GetApplicationModeAsync(CancellationToken ct);
     Task<ApiResponse<ApplicationModeDto>> UpdateApplicationModeAsync(ApplicationModeDto request, CancellationToken ct);
+    Task<ApiResponse<ReEmbedJobsResponse>> ReEmbedJobsAsync(CancellationToken ct);
 }

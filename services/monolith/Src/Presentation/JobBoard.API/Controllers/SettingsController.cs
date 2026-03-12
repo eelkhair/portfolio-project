@@ -1,5 +1,6 @@
 using JobBoard.Application.Actions.Settings.ApplicationMode;
 using JobBoard.Application.Actions.Settings.Provider;
+using JobBoard.Application.Actions.Settings.ReEmbedJobs;
 using JobBoard.Monolith.Contracts.Settings;
 using Microsoft.AspNetCore.Mvc;
 
@@ -37,4 +38,11 @@ public class SettingsController : BaseApiController
     [HttpPut("mode")]
     public async Task<IActionResult> UpdateApplicationMode(ApplicationModeDto request)
         => await ExecuteCommandAsync(new UpdateApplicationModeCommand(request), Ok);
+
+    /// <summary>
+    /// Re-embed all jobs — triggers AI service to regenerate all job embeddings
+    /// </summary>
+    [HttpPost("re-embed-jobs")]
+    public async Task<IActionResult> ReEmbedAllJobs()
+        => await ExecuteCommandAsync(new ReEmbedAllJobsCommand(), Ok);
 }

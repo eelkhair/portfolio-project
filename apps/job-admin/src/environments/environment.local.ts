@@ -1,5 +1,6 @@
 export const environment = {
   production: false,
+  envName: 'LOCAL',
   gatewayUrl: 'http://localhost:5238/',
   // Direct URLs for SignalR WebSocket connections (can't proxy through Dapr invoke)
   monolithUrl: 'http://localhost:5280/',
