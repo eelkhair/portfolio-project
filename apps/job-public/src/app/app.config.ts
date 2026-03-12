@@ -5,7 +5,8 @@ import {
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection,
 } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, TitleStrategy } from '@angular/router';
+import { EnvTitleStrategy } from './core/services/env-title.strategy';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { provideAuth, LogLevel, OidcSecurityService } from 'angular-auth-oidc-client';
 import { firstValueFrom } from 'rxjs';
@@ -23,6 +24,7 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     { provide: ErrorHandler, useClass: TracingErrorHandler },
     provideRouter(routes),
+    { provide: TitleStrategy, useClass: EnvTitleStrategy },
     provideHttpClient(withFetch(), withInterceptors([authInterceptor, tracingInterceptor])),
     provideClientHydration(withEventReplay()),
     ...(typeof window !== 'undefined'

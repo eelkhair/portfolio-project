@@ -13,12 +13,10 @@ import { environment } from '../../../environments/environment';
         <a routerLink="/" class="flex items-center gap-2">
           <img src="logo-icon.svg" alt="JobBoard" class="h-8 w-8" />
           <span class="text-xl font-bold">JobBoard</span>
-          @if (envName !== 'PROD') {
-            <span class="text-xs font-bold px-2 py-1 rounded"
-                  [class]="envName === 'DEV' ? 'bg-red-600 text-white' : 'bg-amber-500 text-black'">
-              {{ envName }}
-            </span>
-          }
+          <span class="text-xs font-bold px-2 py-1 rounded"
+                [class]="envName === 'DEV' ? 'bg-red-600 text-white' : envName === 'PROD' ? 'bg-green-600 text-white' : 'bg-amber-500 text-black'">
+            {{ envName }}
+          </span>
         </a>
 
         <div class="flex items-center gap-6">
