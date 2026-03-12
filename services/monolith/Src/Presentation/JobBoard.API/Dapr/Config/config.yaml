@@ -19,4 +19,4 @@ spec:
     scopes:
       - storeName: vault
         defaultAccess: deny
-        allowedSecrets: [ "monolith", "shared", "shared-local" ]
+        allowedSecrets: [ "monolith", "shared", "shared-local", "monolith-local" ]

@@ -51,6 +51,7 @@ export class NavItems{
           { label: 'Profile', icon: 'pi pi-id-card', routerLink: '/settings/profile' },
           { label: 'AI Provider', icon: 'pi pi-microchip-ai', routerLink: '/settings/ai-provider', visible: isAdmin },
           { label: 'Application Mode', icon: 'pi pi-arrows-h', routerLink: '/settings/application-mode', visible: isAdmin },
+          { label: 'Embedding Management', icon: 'pi pi-database', routerLink: '/settings/embedding-management', visible: isAdmin },
         ]
       },
 

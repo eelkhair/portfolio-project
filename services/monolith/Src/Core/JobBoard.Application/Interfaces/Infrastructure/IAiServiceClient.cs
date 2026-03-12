@@ -18,4 +18,5 @@ public interface IAiServiceClient
     Task<List<JobCandidate>> GetSimilarJobs(Guid jobId, CancellationToken cancellationToken);
     Task<List<JobCandidate>> SearchJobs(string? query, string? location, string? jobType, int limit = 50, CancellationToken cancellationToken = default);
     Task<List<JobCandidate>> GetMatchingJobsForResumeAsync(Guid resumeId, int requestLimit, CancellationToken cancellationToken);
+    Task<ReEmbedAllJobsResponse> ReEmbedAllJobs(CancellationToken cancellationToken);
 }

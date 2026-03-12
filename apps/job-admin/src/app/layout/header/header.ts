@@ -7,6 +7,7 @@ import {TitleCasePipe} from '@angular/common';
 import {MenuItem} from 'primeng/api';
 import {Router} from '@angular/router';
 import {ThemeService} from '../../core/services/theme.service';
+import {environment} from '../../../environments/environment';
 
 @Component({
   selector: 'app-header',
@@ -24,7 +25,8 @@ export class Header implements OnInit {
   router = inject(Router);
   themeService = inject(ThemeService);
   menuItems = signal<MenuItem[]>([]);
-  displayName = signal('')
+  displayName = signal('');
+  envName = environment.envName;
 
   ngOnInit() {
     const u = this.accountService.user();

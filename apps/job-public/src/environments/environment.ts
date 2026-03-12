@@ -1,5 +1,6 @@
 export const environment = {
   production: true,
+  envName: 'PROD',
   apiUrl: 'https://job-monolith.eelkhair.net/api/',
   aiUrl: 'https://job-ai-v2.eelkhair.net/',
   monolithUrl: 'https://job-monolith.eelkhair.net/',

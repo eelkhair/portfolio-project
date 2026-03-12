@@ -1,6 +1,6 @@
 using System.Diagnostics;
-using JobAPI.Contracts.Models.Jobs.Responses;
 using JobBoard.AI.Application.Interfaces.Clients;
+using JobBoard.Monolith.Contracts.Jobs;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
 using Microsoft.Extensions.AI;

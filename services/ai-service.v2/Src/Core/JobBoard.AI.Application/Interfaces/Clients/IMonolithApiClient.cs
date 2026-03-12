@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 using Elkhair.Dev.Common.Application;
 using JobBoard.IntegrationEvents.Resume;
 using JobBoard.Monolith.Contracts.Companies;
-using JobAPI.Contracts.Models.Jobs.Responses;
+using JobBoard.Monolith.Contracts.Jobs;
 
 namespace JobBoard.AI.Application.Interfaces.Clients;
 

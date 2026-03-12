@@ -1,0 +1,26 @@
+<div class="flex w-full justify-between mb-5">
+  <h1 class="text-3xl pl-2">Embedding Management</h1>
+</div>
+
+<p-card>
+  <div class="flex flex-col gap-6">
+    <div class="flex items-center gap-3 p-4 border-round surface-ground">
+      <i class="pi pi-database text-2xl text-primary"></i>
+      <div>
+        <div class="font-semibold">Re-embed All Jobs</div>
+        <div class="text-sm text-color-secondary">
+          Regenerate vector embeddings for all jobs using the current AI provider.
+          Each job will be fetched and processed through the embedding pipeline.
+        </div>
+      </div>
+    </div>
+
+    <div class="flex gap-2">
+      <p-button
+        label="Re-embed All Jobs"
+        icon="pi pi-refresh"
+        (onClick)="reEmbedJobs()"
+        [loading]="loading()" />
+    </div>
+  </div>
+</p-card>

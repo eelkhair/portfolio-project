@@ -16,6 +16,10 @@ export interface ApplicationMode {
   isMonolith: boolean;
 }
 
+export interface ReEmbedJobsResponse {
+  jobsProcessed: number;
+}
+
 @Injectable({providedIn: 'root'})
 export class SettingsService {
   private http = inject(HttpClient);
@@ -43,6 +47,13 @@ export class SettingsService {
     return this.http.put<ApiResponse<ApplicationMode>>(
       `${environment.gatewayUrl}api/settings/mode`,
       request
+    );
+  }
+
+  reEmbedAllJobs() {
+    return this.http.post<ApiResponse<ReEmbedJobsResponse>>(
+      `${environment.gatewayUrl}api/settings/re-embed-jobs`,
+      {}
     );
   }
 }

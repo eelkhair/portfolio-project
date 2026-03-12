@@ -19,5 +19,11 @@ export const SETTINGS_ROUTES: Route[] = [
     canActivate: [roleGuard],
     data: {groups: ['Admins']},
     loadComponent: () => import('./application-mode/application-mode').then(c=>c.ApplicationMode)
+  },
+  {
+    path:'embedding-management',
+    canActivate: [roleGuard],
+    data: {groups: ['Admins']},
+    loadComponent: () => import('./embedding-management/embedding-management').then(c=>c.EmbeddingManagement)
   }
 ]

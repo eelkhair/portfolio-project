@@ -5,7 +5,7 @@ using JobBoard.AI.Application.Interfaces.Clients;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.IntegrationEvents.Resume;
 using JobBoard.Monolith.Contracts.Companies;
-using JobAPI.Contracts.Models.Jobs.Responses;
+using JobBoard.Monolith.Contracts.Jobs;
 using Microsoft.Extensions.Logging;
 
 namespace JobBoard.AI.Infrastructure.Dapr.ApiClients;
