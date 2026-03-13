@@ -1,4 +1,3 @@
-using JobBoard.Application.Interfaces.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +16,7 @@ public static class DependencyInjection
         TimeSpan pollInterval)
     {
         var redisConnection = builder.Configuration["Redis:ConnectionString"] ?? DefaultRedisConnection;
+        var configDb = int.TryParse(builder.Configuration["Redis:ConfigDb"], out var db) ? db : 1;
         var redis = await ConnectionMultiplexer.ConnectAsync(redisConnection);
 
         builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
@@ -24,7 +24,7 @@ public static class DependencyInjection
         var loggerFactory = LoggerFactory.Create(b => b.AddConsole());
         var logger = loggerFactory.CreateLogger("RedisConfig");
 
-        await RedisConfigurationLoader.LoadAsync(builder.Configuration, redis, serviceName, logger);
+        await RedisConfigurationLoader.LoadAsync(builder.Configuration, redis, serviceName, logger, configDb);
 
         builder.Services.AddHostedService(sp =>
             new RedisConfigurationWatcher(
@@ -33,6 +33,7 @@ public static class DependencyInjection
                 sp.GetRequiredService<ILogger<RedisConfigurationWatcher>>(),
                 serviceName,
                 pollInterval,
+                configDb,
                 sp.GetService<IFeatureFlagNotifier>()));
 
         return builder;

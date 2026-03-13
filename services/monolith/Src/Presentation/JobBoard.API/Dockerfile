@@ -14,15 +14,20 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Src/Presentation/JobBoard.API/Nuget.Config", "."]
 COPY ["Src/Presentation/JobBoard.API/JobBoard.API.csproj", "Src/Presentation/JobBoard.API/"]
-COPY ["Src/Infrastructure/JobBoard.Infrastructure.Configuration/JobBoard.Infrastructure.Configuration.csproj", "Src/Infrastructure/JobBoard.Infrastructure.Configuration/"]
 COPY ["Src/Core/JobBoard.Application/JobBoard.Application.csproj", "Src/Core/JobBoard.Application/"]
+COPY ["Src/Core/JobBoard.Contracts/JobBoard.Contracts.csproj", "Src/Core/JobBoard.Contracts/"]
 COPY ["Src/Core/JobBoard.Domain/JobBoard.Domain.csproj", "Src/Core/JobBoard.Domain/"]
 COPY ["Src/Core/JobBoard.IntegrationEvents/JobBoard.IntegrationEvents.csproj", "Src/Core/JobBoard.IntegrationEvents/"]
-COPY ["Src/Infrastructure/JobBoard.Infrastructure.Dapr/JobBoard.Infrastructure.Dapr.csproj", "Src/Infrastructure/JobBoard.Infrastructure.Dapr/"]
+COPY ["Src/Infrastructure/JobBoard.Infrastructure.BlobStorage/JobBoard.Infrastructure.BlobStorage.csproj", "Src/Infrastructure/JobBoard.Infrastructure.BlobStorage/"]
+COPY ["Src/Infrastructure/JobBoard.Infrastructure.Configuration/JobBoard.Infrastructure.Configuration.csproj", "Src/Infrastructure/JobBoard.Infrastructure.Configuration/"]
 COPY ["Src/Infrastructure/JobBoard.Infrastructure.Diagnostics/JobBoard.Infrastructure.Diagnostics.csproj", "Src/Infrastructure/JobBoard.Infrastructure.Diagnostics/"]
+COPY ["Src/Infrastructure/JobBoard.Infrastructure.HttpClients/JobBoard.Infrastructure.HttpClients.csproj", "Src/Infrastructure/JobBoard.Infrastructure.HttpClients/"]
+COPY ["Src/Infrastructure/JobBoard.Infrastructure.Messaging/JobBoard.Infrastructure.Messaging.csproj", "Src/Infrastructure/JobBoard.Infrastructure.Messaging/"]
 COPY ["Src/Infrastructure/JobBoard.Infrastructure.Outbox/JobBoard.Infrastructure.Outbox.csproj", "Src/Infrastructure/JobBoard.Infrastructure.Outbox/"]
 COPY ["Src/Infrastructure/JobBoard.Infrastructure.Persistence/JobBoard.Infrastructure.Persistence.csproj", "Src/Infrastructure/JobBoard.Infrastructure.Persistence/"]
+COPY ["Src/Infrastructure/JobBoard.Infrastructure.RedisConfig/JobBoard.Infrastructure.RedisConfig.csproj", "Src/Infrastructure/JobBoard.Infrastructure.RedisConfig/"]
 COPY ["Src/Infrastructure/JobBoard.Infrastructure.Smtp/JobBoard.Infrastructure.Smtp.csproj", "Src/Infrastructure/JobBoard.Infrastructure.Smtp/"]
+COPY ["Src/Infrastructure/JobBoard.Infrastructure.Vault/JobBoard.Infrastructure.Vault.csproj", "Src/Infrastructure/JobBoard.Infrastructure.Vault/"]
 RUN dotnet restore "./Src/Presentation/JobBoard.API/JobBoard.API.csproj" --configfile "Nuget.Config"
 COPY . .
 WORKDIR "/src/Src/Presentation/JobBoard.API"

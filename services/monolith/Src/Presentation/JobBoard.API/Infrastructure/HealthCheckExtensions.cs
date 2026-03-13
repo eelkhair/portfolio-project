@@ -1,4 +1,5 @@
 using JobBoard.HealthChecks;
+using JobBoard.Infrastructure.Vault;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using RabbitMQ.Client;
 
@@ -50,7 +51,10 @@ internal static class HealthCheckExtensions
                     return factory.CreateConnectionAsync().GetAwaiter().GetResult();
                 },
                 name: "RabbitMQ",
-                tags: ["infrastructure"]);
+                tags: ["infrastructure"])
+
+            // -- Vault (secrets) --
+            .AddVaultHealthCheck(tags: ["infrastructure"]);
 
         return builder;
     }

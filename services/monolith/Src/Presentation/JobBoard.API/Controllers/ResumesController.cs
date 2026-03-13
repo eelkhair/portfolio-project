@@ -16,6 +16,7 @@ using JobBoard.Application.Infrastructure.Exceptions;
 using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Application.Interfaces.Users;
 using JobBoard.Monolith.Contracts.Public;
+using JobBoard.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -66,10 +67,10 @@ public class ResumesController(IUserAccessor accessor, IResumeParseNotifier resu
 
     /// <summary>
     /// Internal endpoint for service-to-service retrieval of parsed resume content.
-    /// Does not enforce user ownership — intended for Dapr service invocation only.
+    /// Does not enforce user ownership — intended for internal service-to-service calls only.
     /// </summary>
     [HttpGet("{id:guid}/parsed-content/internal")]
-    [Authorize(Policy = "DaprInternal")]
+    [Authorize(Policy = AuthorizationPolicies.InternalOrJwt)]
     public async Task<IActionResult> GetResumeParsedContentInternal(Guid id)
     {
         return await ExecuteQueryAsync(new GetResumeParsedContentInternalQuery(id), Ok);
@@ -135,7 +136,7 @@ public class ResumesController(IUserAccessor accessor, IResumeParseNotifier resu
     /// Callback from AI service after resume parsing completes successfully.
     /// </summary>
     [HttpPost("parse-completed")]
-    [Authorize(Policy = "DaprInternal")]
+    [Authorize(Policy = AuthorizationPolicies.InternalOrJwt)]
     public async Task<IActionResult> ResumeParseCompleted([FromBody] ResumeParseCompletedModel request,
         CancellationToken cancellationToken)
     {
@@ -153,7 +154,7 @@ public class ResumesController(IUserAccessor accessor, IResumeParseNotifier resu
     /// Callback from AI service after resume parsing fails.
     /// </summary>
     [HttpPost("parse-failed")]
-    [Authorize(Policy = "DaprInternal")]
+    [Authorize(Policy = AuthorizationPolicies.InternalOrJwt)]
     public async Task<IActionResult> ResumeParseFailed([FromBody] ResumeParseFailedModel request,
         CancellationToken cancellationToken)
     {
@@ -177,7 +178,7 @@ public class ResumesController(IUserAccessor accessor, IResumeParseNotifier resu
     /// Callback from AI service after resume embedding completes successfully.
     /// </summary>
     [HttpPost("embedded")]
-    [Authorize(Policy = "DaprInternal")]
+    [Authorize(Policy = AuthorizationPolicies.InternalOrJwt)]
     public async Task<IActionResult> ResumeEmbedded([FromBody] ResumeEmbeddedModel request,
         CancellationToken cancellationToken)
     {
@@ -191,7 +192,7 @@ public class ResumesController(IUserAccessor accessor, IResumeParseNotifier resu
     /// Callback from AI service after a single section is parsed.
     /// </summary>
     [HttpPost("section-parsed")]
-    [Authorize(Policy = "DaprInternal")]
+    [Authorize(Policy = AuthorizationPolicies.InternalOrJwt)]
     public async Task<IActionResult> ResumeSectionParsed([FromBody] ResumeSectionParsedModel request,
         CancellationToken cancellationToken)
     {
@@ -210,7 +211,7 @@ public class ResumesController(IUserAccessor accessor, IResumeParseNotifier resu
     /// Callback from AI service when a section extraction fails.
     /// </summary>
     [HttpPost("section-failed")]
-    [Authorize(Policy = "DaprInternal")]
+    [Authorize(Policy = AuthorizationPolicies.InternalOrJwt)]
     public async Task<IActionResult> ResumeSectionFailed([FromBody] ResumeSectionFailedModel request,
         CancellationToken cancellationToken)
     {
@@ -229,7 +230,7 @@ public class ResumesController(IUserAccessor accessor, IResumeParseNotifier resu
     /// Callback from AI service after all sections have been processed.
     /// </summary>
     [HttpPost("all-sections-completed")]
-    [Authorize(Policy = "DaprInternal")]
+    [Authorize(Policy = AuthorizationPolicies.InternalOrJwt)]
     public async Task<IActionResult> AllSectionsCompleted([FromBody] ResumeAllSectionsCompletedModel request,
         CancellationToken cancellationToken)
     {

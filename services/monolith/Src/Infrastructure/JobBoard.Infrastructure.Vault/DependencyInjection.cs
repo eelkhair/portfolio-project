@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace JobBoard.Infrastructure.Vault;
@@ -11,8 +14,11 @@ public static class DependencyInjection
 
     public static WebApplicationBuilder AddVaultSecrets(
         this WebApplicationBuilder builder,
-        string[] secretPaths)
+        string serviceName)
     {
+        var envSuffix = GetEnvironmentSuffix(builder.Environment.EnvironmentName);
+        var secretPaths = new[] { $"{serviceName}-{envSuffix}", serviceName, $"shared-{envSuffix}", "shared" };
+
         var vaultAddress = Environment.GetEnvironmentVariable("VAULT_ADDR") ?? DefaultVaultAddress;
         var vaultToken = Environment.GetEnvironmentVariable("VAULT_TOKEN");
 
@@ -35,4 +41,28 @@ public static class DependencyInjection
 
         return builder;
     }
+
+    public static IHealthChecksBuilder AddVaultHealthCheck(
+        this IHealthChecksBuilder builder,
+        string? name = "Vault",
+        HealthStatus? failureStatus = null,
+        IEnumerable<string>? tags = null)
+    {
+        var vaultAddress = Environment.GetEnvironmentVariable("VAULT_ADDR") ?? DefaultVaultAddress;
+        var vaultToken = Environment.GetEnvironmentVariable("VAULT_TOKEN") ?? "";
+
+        return builder.AddCheck(
+            name ?? "Vault",
+            new VaultHealthCheck(vaultAddress, vaultToken),
+            failureStatus,
+            tags ?? ["infrastructure"]);
+    }
+
+    private static string GetEnvironmentSuffix(string environmentName) =>
+        environmentName switch
+        {
+            "Development" => "local",
+            "Production" => "prod",
+            _ => environmentName.ToLowerInvariant()
+        };
 }

@@ -26,7 +26,7 @@ public class MassTransitOutboxProcessor(
             EventType = message.EventType
         };
 
-        await publisher.PublishAsync(topic, eventDto, message.EventType, Source, cancellationToken);
+        await publisher.PublishAsync(topic, eventDto, message.EventType, Source, message.TraceParent, cancellationToken);
 
         logger.LogInformation(
             "Published outbox message {MessageId} to exchange '{Topic}' as CloudEvent",

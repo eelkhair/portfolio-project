@@ -4,9 +4,9 @@ using ConnectorAPI.Endpoints.Job;
 using ConnectorAPI.Infrastructure;
 using Elkhair.Common.Observability;
 
-#if DEBUG
-Debugger.Launch();
-#endif
+// #if DEBUG
+// Debugger.Launch();
+// #endif
 const string CorsPolicy = "AllowJobAdmin";
 var builder = WebApplication.CreateBuilder(args);
 (await builder.AddDaprServices("connector-api"))

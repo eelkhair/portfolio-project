@@ -39,12 +39,6 @@ public static class TracingFilters
             {
                 return false;
             }
-            if (path != null &&
-                path.Contains("dapr.proto.runtime.v1.Dapr", StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
-           
             return path == null 
                    || 
                    !path.Contains(".well-known")&&

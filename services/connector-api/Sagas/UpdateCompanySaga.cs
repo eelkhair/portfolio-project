@@ -60,7 +60,11 @@ public class UpdateCompanySaga
             {
                 await Task.WhenAll(
                     _companyApi.SendCompanyUpdatedAsync(@event.Data.CompanyUId, payloads.Company, ct),
-                    _jobApi.SendCompanyUpdatedAsync(@event.Data.CompanyUId, payloads.Job, ct));
+                    _jobApi.SendCompanyUpdatedAsync(@event.Data.CompanyUId,
+                        new EventDto<CompanyUpdatedJobApiPayload>(
+                            @event.UserId,
+                            Guid.CreateVersion7().ToString(),
+                            payloads.Job), ct));
             }
 
             _logger.LogInformation(

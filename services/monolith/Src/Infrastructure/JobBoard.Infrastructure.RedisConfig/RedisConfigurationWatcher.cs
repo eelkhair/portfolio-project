@@ -1,4 +1,3 @@
-using JobBoard.Application.Interfaces.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -14,6 +13,7 @@ public sealed class RedisConfigurationWatcher : BackgroundService
     private readonly ILogger<RedisConfigurationWatcher> _logger;
     private readonly string _serviceName;
     private readonly TimeSpan _pollInterval;
+    private readonly int _databaseId;
 
     public RedisConfigurationWatcher(
         IConnectionMultiplexer redis,
@@ -21,6 +21,7 @@ public sealed class RedisConfigurationWatcher : BackgroundService
         ILogger<RedisConfigurationWatcher> logger,
         string serviceName,
         TimeSpan pollInterval,
+        int databaseId = 1,
         IFeatureFlagNotifier? notifier = null)
     {
         _redis = redis;
@@ -29,6 +30,7 @@ public sealed class RedisConfigurationWatcher : BackgroundService
         _logger = logger;
         _serviceName = serviceName;
         _pollInterval = pollInterval;
+        _databaseId = databaseId;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -37,7 +39,7 @@ public sealed class RedisConfigurationWatcher : BackgroundService
         {
             try
             {
-                var db = _redis.GetDatabase(1);
+                var db = _redis.GetDatabase(_databaseId);
                 var server = _redis.GetServers().First();
 
                 var featureFlags = new Dictionary<string, bool>();
@@ -49,7 +51,7 @@ public sealed class RedisConfigurationWatcher : BackgroundService
 
                 foreach (var prefix in prefixes)
                 {
-                    await foreach (var key in server.KeysAsync(database: 1, pattern: $"{prefix}*").WithCancellation(stoppingToken))
+                    await foreach (var key in server.KeysAsync(database: _databaseId, pattern: $"{prefix}*").WithCancellation(stoppingToken))
                     {
                         var value = await db.StringGetAsync(key);
                         if (!value.HasValue) continue;

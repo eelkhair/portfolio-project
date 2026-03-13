@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Yarp.ReverseProxy.Configuration;
 
@@ -62,19 +63,18 @@ public static class YarpProvider
         }
     };
 
-    public static IReadOnlyList<ClusterConfig> GetClusters()
+    public static IReadOnlyList<ClusterConfig> GetClusters(IConfiguration config)
     {
         return new[]
         {
-            Cluster("ai-v2", "ai-service-v2"),
-            Cluster("admin", "admin-api"),
-            Cluster("monolith", "monolith-api"),
+            Cluster("ai-v2", config["AiServiceUrl"] ?? "http://ai-service-v2:8080"),
+            Cluster("admin", config["AdminApiUrl"] ?? "http://admin-api:8080"),
+            Cluster("monolith", config["MonolithUrl"] ?? "http://monolith-api:8080"),
         };
     }
 
-    private static ClusterConfig Cluster(string clusterId, string serviceName)
+    private static ClusterConfig Cluster(string clusterId, string address)
     {
-        var address = $"http://{serviceName}:8080/";
         Log.LogInformation("Cluster {ClusterId} -> {Address}", clusterId, address);
 
         return new()

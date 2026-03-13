@@ -1,17 +1,22 @@
-﻿using ConnectorAPI.Helpers;
-using ConnectorAPI.Interfaces;
+using System.Diagnostics;
+using System.Net.Http.Json;
+using System.Text.Json;
+using ConnectorAPI.Helpers;
 using ConnectorAPI.Interfaces.Clients;
 using ConnectorAPI.Models;
 using ConnectorAPI.Models.CompanyCreated;
 using ConnectorAPI.Models.CompanyUpdated;
-using Dapr.Client;
 using JobBoard.IntegrationEvents.Company;
 
 namespace ConnectorAPI.Services;
 
-public class MonolithOClient(DaprClient daprClient, ILogger<MonolithOClient> logger) : IMonolithClient
+public class MonolithOClient(HttpClient httpClient, ActivitySource activitySource, ILogger<MonolithOClient> logger) : IMonolithClient
 {
-    private const string MonolithAppId = "monolith-api";
+    private static readonly JsonSerializerOptions JsonOpts = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
 
     public async Task<(CompanyCreateCompanyResult Company, CompanyCreateUserResult Admin)>
         GetCompanyAndAdminForCreatedEventAsync(
@@ -20,6 +25,10 @@ public class MonolithOClient(DaprClient daprClient, ILogger<MonolithOClient> log
             string userId,
             CancellationToken cancellationToken)
     {
+        using var activity = activitySource.StartActivity("monolith.GetCompanyAndAdmin");
+        activity?.SetTag("company.id", companyId.ToString());
+        activity?.SetTag("admin.id", adminId.ToString());
+
         var companyRoute = ODataRouteBuilder.CompanyById(companyId, q =>
         {
             q["$select"] = "name,email,website,industryUId";
@@ -30,29 +39,23 @@ public class MonolithOClient(DaprClient daprClient, ILogger<MonolithOClient> log
             q["$select"] = "firstname,lastname,email,id";
         });
 
-        var companyRequest = CreateGetRequest(companyRoute, userId);
-        var adminRequest   = CreateGetRequest(adminRoute,   userId);
+        logger.LogInformation("Fetching company {CompanyId} and admin {AdminId} from monolith via HTTP",
+            companyId, adminId);
 
-        logger.LogDebug("Invoking monolith OData: {CompanyRoute} & {AdminRoute}",
-            companyRoute, adminRoute);
-
-        var companyTask = daprClient.InvokeMethodAsync<CompanyCreateCompanyResult>(
-            companyRequest, cancellationToken);
-
-        var adminTask = daprClient.InvokeMethodAsync<CompanyCreateUserResult>(
-            adminRequest, cancellationToken);
+        var companyTask = GetAsync<CompanyCreateCompanyResult>(companyRoute, userId, cancellationToken);
+        var adminTask = GetAsync<CompanyCreateUserResult>(adminRoute, userId, cancellationToken);
 
         await Task.WhenAll(companyTask, adminTask);
 
-        var company = await companyTask;
-        var admin   = await adminTask;
-
-        return (company, admin);
+        return (await companyTask, await adminTask);
     }
 
     public async Task ActivateCompanyAsync(CompanyCreatedV1Event eventData, CompanyCreateCompanyResult company,
         CompanyCreatedUserApiPayload userApiResponse, CancellationToken cancellationToken)
     {
+        using var activity = activitySource.StartActivity("monolith.ActivateCompany");
+        activity?.SetTag("company.uid", eventData.CompanyUId.ToString());
+
         var model = new ActivateCompanyRequest
         {
             KeycloakGroupId = userApiResponse.KeycloakGroupId,
@@ -63,10 +66,11 @@ public class MonolithOClient(DaprClient daprClient, ILogger<MonolithOClient> log
             CreatedBy = eventData.UserId,
             UserUId = eventData.AdminUId
         };
-        logger.LogInformation("Activating company in the monolith api");
-        var message = daprClient.CreateInvokeMethodRequest(HttpMethod.Post, MonolithAppId, "api/companies/company-created-success");
-        message.Content= JsonContent.Create(model);
-        await daprClient.InvokeMethodAsync(message, cancellationToken);
+
+        logger.LogInformation("Activating company {CompanyUId} in the monolith via HTTP", eventData.CompanyUId);
+
+        var response = await httpClient.PostAsJsonAsync("api/companies/company-created-success", model, JsonOpts, cancellationToken);
+        response.EnsureSuccessStatusCode();
     }
 
     public async Task<CompanyUpdateCompanyResult> GetCompanyForUpdatedEventAsync(
@@ -74,26 +78,28 @@ public class MonolithOClient(DaprClient daprClient, ILogger<MonolithOClient> log
         string userId,
         CancellationToken cancellationToken)
     {
+        using var activity = activitySource.StartActivity("monolith.GetCompanyForUpdate");
+        activity?.SetTag("company.id", companyId.ToString());
+
         var companyRoute = ODataRouteBuilder.CompanyById(companyId, q =>
         {
             q["$select"] = "name,email,website,phone,description,about,eeo,founded,size,logo,industryUId";
         });
 
-        var companyRequest = CreateGetRequest(companyRoute, userId);
+        logger.LogInformation("Fetching company {CompanyId} for update from monolith via HTTP", companyId);
 
-        logger.LogDebug("Invoking monolith OData for company update: {CompanyRoute}", companyRoute);
-
-        return await daprClient.InvokeMethodAsync<CompanyUpdateCompanyResult>(
-            companyRequest, cancellationToken);
+        return await GetAsync<CompanyUpdateCompanyResult>(companyRoute, userId, cancellationToken);
     }
 
-    private HttpRequestMessage CreateGetRequest(string route, string userId)
+    private async Task<T> GetAsync<T>(string route, string userId, CancellationToken cancellationToken)
     {
-        var req = daprClient.CreateInvokeMethodRequest(HttpMethod.Get, MonolithAppId, route);
-
+        using var request = new HttpRequestMessage(HttpMethod.Get, route);
         if (!string.IsNullOrWhiteSpace(userId))
-            req.Headers.TryAddWithoutValidation("x-user-id", userId);
+            request.Headers.TryAddWithoutValidation("x-user-id", userId);
 
-        return req;
+        var response = await httpClient.SendAsync(request, cancellationToken);
+        response.EnsureSuccessStatusCode();
+
+        return (await response.Content.ReadFromJsonAsync<T>(JsonOpts, cancellationToken))!;
     }
 }

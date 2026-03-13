@@ -14,7 +14,7 @@ public static class DependencyInjection
 
         services.AddHttpClient<IAiServiceClient, HttpAiServiceClient>(client =>
             {
-                var baseUrl = configuration["Services:AiServiceV2:BaseUrl"]
+                var baseUrl = configuration["AiServiceUrl"]
                               ?? "http://localhost:5200/";
                 client.BaseAddress = new Uri(baseUrl);
             })

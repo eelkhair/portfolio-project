@@ -1,4 +1,3 @@
-using Dapr.Client;
 using JobBoard.API.Infrastructure.SignalR.CompanyActivation;
 using JobBoard.Application.Interfaces.Infrastructure;
 using JobBoard.Application.Interfaces.Observability;
@@ -48,28 +47,11 @@ public class JobBoardWebApplicationFactory : WebApplicationFactory<Program>
 
         builder.ConfigureTestServices(services =>
         {
-            // Remove Dapr-related hosted services (FeatureFlagWatcher)
-            var hostedServices = services
-                .Where(d => d.ServiceType == typeof(IHostedService))
-                .ToList();
-            foreach (var svc in hostedServices)
-            {
-                if (svc.ImplementationType?.Name.Contains("FeatureFlagWatcher") == true
-                    || svc.ImplementationFactory?.Method.ReturnType.Name.Contains("FeatureFlagWatcher") == true)
-                {
-                    services.Remove(svc);
-                }
-            }
-
             // Replace DbContext with Testcontainers connection
             services.RemoveAll<DbContextOptions<JobBoardDbContext>>();
             services.RemoveAll<JobBoardDbContext>();
             services.AddDbContext<JobBoardDbContext>(options =>
                 options.UseSqlServer(_dbFixture.ConnectionString));
-
-            // Stub Dapr services
-            services.RemoveAll<DaprClient>();
-            services.AddSingleton(Substitute.For<DaprClient>());
 
             services.RemoveAll<IOutboxMessageProcessor>();
             services.AddTransient(_ => Substitute.For<IOutboxMessageProcessor>());

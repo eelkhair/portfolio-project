@@ -6,8 +6,8 @@ using JobBoard.API.Infrastructure.SignalR.CompanyActivation;
 using JobBoard.API.Infrastructure.SignalR.FeatureFlags;
 using JobBoard.API.Infrastructure.SignalR.ResumeParse;
 using JobBoard.Application;
-using JobBoard.Application.Interfaces.Infrastructure;
 using JobBoard.Application.Interfaces.Users;
+using JobBoard.Infrastructure.RedisConfig;
 using JobBoard.Infrastructure.Diagnostics;
 using JobBoard.Infrastructure.HttpClients;
 using JobBoard.Infrastructure.Messaging;
@@ -19,9 +19,9 @@ using JobBoard.Infrastructure.Smtp;
 using JobBoard.Infrastructure.Vault;
 
 var builder = WebApplication.CreateBuilder(args);
-#if DEBUG
- Debugger.Launch();
-#endif
+// #if DEBUG
+//  Debugger.Launch();
+// #endif
 
 var isTesting = builder.Environment.IsEnvironment("Testing");
 
@@ -35,7 +35,7 @@ if (isTesting)
 }
 else
 {
-    builder.AddVaultSecrets(["monolith-local", "monolith", "shared", "shared-local"]);
+    builder.AddVaultSecrets("monolith");
     (await builder.AddRedisConfiguration("monolith-api", TimeSpan.FromSeconds(5)))
         .ConfigureLogging("monolith-api")
         .AddCustomHealthChecks();

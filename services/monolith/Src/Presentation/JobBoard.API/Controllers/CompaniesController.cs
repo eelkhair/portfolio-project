@@ -5,6 +5,7 @@ using JobBoard.Application.Actions.Companies.Activate;
 using JobBoard.Application.Actions.Companies.Create;
 using JobBoard.Application.Actions.Companies.Update;
 using JobBoard.Application.Interfaces.Users;
+using JobBoard.Domain;
 using JobBoard.Monolith.Contracts.Companies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -48,7 +49,7 @@ public class CompaniesController(IUserAccessor accessor, ICompanyActivationNotif
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>An IActionResult indicating the result of the activation operation.</returns>
     [HttpPost("company-created-success")]
-    [Authorize(Policy = "DaprInternal")]
+    [Authorize(Policy = AuthorizationPolicies.InternalOrJwt)]
     public async Task<IActionResult> CompanyCreatedSuccess([FromBody] CompanyCreatedModel request, CancellationToken cancellationToken)
     {
         accessor.UserId = request.CreatedBy;

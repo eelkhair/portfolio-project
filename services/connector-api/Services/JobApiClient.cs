@@ -21,7 +21,7 @@ public class JobApiClient(DaprClient client, ActivitySource activitySource, ILog
         return client.InvokeMethodAsync(message, cancellationToken);
     }
 
-    public async Task<JobApiResponse> SendJobCreatedAsync(JobCreatedJobApiPayload payload, CancellationToken cancellationToken)
+    public async Task<JobApiResponse> SendJobCreatedAsync(EventDto<JobCreatedJobApiPayload> payload, CancellationToken cancellationToken)
     {
         using var activity = activitySource.StartActivity("job-api.SendJobCreatedAsync");
         logger.LogInformation("Sending job created event to job-api");
@@ -30,7 +30,7 @@ public class JobApiClient(DaprClient client, ActivitySource activitySource, ILog
         return await client.InvokeMethodAsync<JobApiResponse>(message, cancellationToken);
     }
 
-    public Task SendCompanyUpdatedAsync(Guid companyUId, CompanyUpdatedJobApiPayload payload, CancellationToken cancellationToken)
+    public Task SendCompanyUpdatedAsync(Guid companyUId, EventDto<CompanyUpdatedJobApiPayload> payload, CancellationToken cancellationToken)
     {
         using var activity = activitySource.StartActivity("job-api.SendCompanyUpdatedAsync");
         logger.LogInformation("Sending company updated event to job-api for {CompanyUId}", companyUId);

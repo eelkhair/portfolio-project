@@ -1,4 +1,4 @@
-namespace JobBoard.Application.Interfaces.Infrastructure;
+namespace JobBoard.Infrastructure.RedisConfig;
 
 public interface IFeatureFlagNotifier
 {

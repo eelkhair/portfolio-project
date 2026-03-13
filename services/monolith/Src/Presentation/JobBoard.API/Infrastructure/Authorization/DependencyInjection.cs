@@ -2,6 +2,7 @@ using HealthChecks.UI.Client;
 using JobBoard.API.Infrastructure.SignalR;
 using JobBoard.Domain;
 using JobBoard.HealthChecks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.OData;
 using Microsoft.IdentityModel.Tokens;
@@ -61,6 +62,8 @@ public static class DependencyInjection
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
+            .AddScheme<AuthenticationSchemeOptions, InternalApiKeyAuthenticationHandler>(
+                "InternalApiKey", _ => { })
             .AddJwtBearer(options =>
             {
                 options.RequireHttpsMetadata = false;
@@ -122,7 +125,11 @@ public static class DependencyInjection
                 policy.RequireClaim("groups", UserRoles.Recruiter))
 
             .AddPolicy(AuthorizationPolicies.AllUsers, policy =>
-                policy.RequireClaim("groups", UserRoles.Admin, UserRoles.Recruiter));
+                policy.RequireClaim("groups", UserRoles.Admin, UserRoles.Recruiter))
+
+            .AddPolicy(AuthorizationPolicies.InternalOrJwt, policy =>
+                policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme, "InternalApiKey")
+                    .RequireAuthenticatedUser());
 
         return services;
     }

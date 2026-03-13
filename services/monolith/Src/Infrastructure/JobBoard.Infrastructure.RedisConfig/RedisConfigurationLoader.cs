@@ -10,9 +10,10 @@ public static class RedisConfigurationLoader
         IConfiguration configuration,
         IConnectionMultiplexer redis,
         string serviceName,
-        ILogger logger)
+        ILogger logger,
+        int databaseId = 1)
     {
-        var db = redis.GetDatabase(1);
+        var db = redis.GetDatabase(databaseId);
         var server = redis.GetServers().First();
 
         var prefixes = new[]
@@ -24,7 +25,7 @@ public static class RedisConfigurationLoader
         foreach (var prefix in prefixes)
         {
             var count = 0;
-            await foreach (var key in server.KeysAsync(database: 1, pattern: $"{prefix}*"))
+            await foreach (var key in server.KeysAsync(database: databaseId, pattern: $"{prefix}*"))
             {
                 var value = await db.StringGetAsync(key);
                 if (value.HasValue)
