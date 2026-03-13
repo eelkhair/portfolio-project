@@ -62,23 +62,19 @@ public static class YarpProvider
         }
     };
 
-    public static IReadOnlyList<ClusterConfig> GetClusters(bool useDapr)
+    public static IReadOnlyList<ClusterConfig> GetClusters()
     {
-        Log.LogInformation("Building YARP clusters — UseDapr: {UseDapr}", useDapr);
         return new[]
         {
-            Cluster("ai-v2", "ai-service-v2", useDapr),
-            Cluster("admin", "admin-api", useDapr),
-            Cluster("monolith", "monolith-api", useDapr),
+            Cluster("ai-v2", "ai-service-v2"),
+            Cluster("admin", "admin-api"),
+            Cluster("monolith", "monolith-api"),
         };
     }
 
-    private static ClusterConfig Cluster(string clusterId, string serviceName, bool useDapr)
+    private static ClusterConfig Cluster(string clusterId, string serviceName)
     {
-        var address = useDapr
-            ? $"http://localhost:3500/v1.0/invoke/{serviceName}/method/"
-            : $"http://{serviceName}:8080/";
-
+        var address = $"http://{serviceName}:8080/";
         Log.LogInformation("Cluster {ClusterId} -> {Address}", clusterId, address);
 
         return new()

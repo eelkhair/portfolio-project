@@ -9,9 +9,8 @@
 
     <ItemGroup>
         <PackageReference Include="Yarp.ReverseProxy" Version="2.3.0" />
-        <PackageReference Include="Dapr.AspNetCore" Version="1.16.1" />
-        <PackageReference Include="Dapr.Extensions.Configuration" Version="1.16.1" />
         <PackageReference Include="Elkhair.Common.Observability" Version="1.0.4" />
+        <PackageReference Include="AspNetCore.HealthChecks.Redis" Version="9.0.0" />
         <PackageReference Include="JobBoard.HealthChecks" Version="1.0.8" />
         <PackageReference Include="AspNetCore.HealthChecks.UI" Version="9.0.0" />
         <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
@@ -37,6 +36,11 @@
       <Content Include="..\..\.dockerignore">
         <Link>.dockerignore</Link>
       </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\monolith\Src\Infrastructure\JobBoard.Infrastructure.Vault\JobBoard.Infrastructure.Vault.csproj" />
+        <ProjectReference Include="..\monolith\Src\Infrastructure\JobBoard.Infrastructure.RedisConfig\JobBoard.Infrastructure.RedisConfig.csproj" />
     </ItemGroup>
 
 </Project>

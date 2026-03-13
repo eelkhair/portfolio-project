@@ -16,6 +16,8 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="AspNetCore.HealthChecks.Redis" Version="9.0.0" />
+        <PackageReference Include="AspNetCore.HealthChecks.RabbitMQ" Version="9.0.0" />
         <PackageReference Include="JobBoard.HealthChecks" Version="1.0.8" />
         <PackageReference Include="Microsoft.AspNetCore.OData" Version="9.4.1" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.6" />
@@ -40,7 +42,10 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\Infrastructure\JobBoard.Infrastructure.Configuration\JobBoard.Infrastructure.Configuration.csproj" />
-      <ProjectReference Include="..\..\Infrastructure\JobBoard.Infrastructure.Dapr\JobBoard.Infrastructure.Dapr.csproj" />
+      <ProjectReference Include="..\..\Infrastructure\JobBoard.Infrastructure.HttpClients\JobBoard.Infrastructure.HttpClients.csproj" />
+      <ProjectReference Include="..\..\Infrastructure\JobBoard.Infrastructure.Messaging\JobBoard.Infrastructure.Messaging.csproj" />
+      <ProjectReference Include="..\..\Infrastructure\JobBoard.Infrastructure.RedisConfig\JobBoard.Infrastructure.RedisConfig.csproj" />
+      <ProjectReference Include="..\..\Infrastructure\JobBoard.Infrastructure.Vault\JobBoard.Infrastructure.Vault.csproj" />
       <ProjectReference Include="..\..\Infrastructure\JobBoard.Infrastructure.Diagnostics\JobBoard.Infrastructure.Diagnostics.csproj" />
       <ProjectReference Include="..\..\Infrastructure\JobBoard.Infrastructure.Outbox\JobBoard.Infrastructure.Outbox.csproj" />
       <ProjectReference Include="..\..\Infrastructure\JobBoard.Infrastructure.Persistence\JobBoard.Infrastructure.Persistence.csproj" />

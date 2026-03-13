@@ -1,12 +1,13 @@
 using System.Diagnostics;
 using Elkhair.Common.Observability;
 using Gateway.Api.Infrastructure;
+using JobBoard.Infrastructure.RedisConfig;
+using JobBoard.Infrastructure.Vault;
 const string CorsPolicy = "AllowJobAdmin";
-#if DEBUG
-Debugger.Launch();
-#endif
+
 var builder = WebApplication.CreateBuilder(args);
-(await builder.AddDaprServices("gateway"))
+builder.AddVaultSecrets(["gateway", "shared", "shared-local"]);
+(await builder.AddRedisConfiguration("gateway", TimeSpan.FromSeconds(8)))
     .ConfigureLogging("gateway")
     .AddCustomHealthChecks()
     .Services
@@ -14,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
     .AddApplicationServices()
     .AddReverseProxy()
     .LoadFromMemory(YarpProvider.GetRoutes(),
-        YarpProvider.GetClusters(useDapr: builder.Configuration.GetValue<bool>("Gateway:UseDaprInvocation")));
+        YarpProvider.GetClusters());
 
 var app = builder.Build();
 

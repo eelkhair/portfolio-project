@@ -34,11 +34,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "company-api", "company-api"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{97DBD6A3-512E-4CD4-AE68-6EC565FBC253}"
 	ProjectSection(SolutionItems) = preProject
-		scripts\docker-compose.registry.yml = scripts\docker-compose.registry.yml
 		scripts\docker-publsh.sh = scripts\docker-publsh.sh
 		scripts\migration.sh = scripts\migration.sh
 		scripts\nuget-push.ps1 = scripts\nuget-push.ps1
 		scripts\CopyMicroservicesToMonolith.linq = scripts\CopyMicroservicesToMonolith.linq
+		scripts\docker-compose.dev.yml = scripts\docker-compose.dev.yml
+		scripts\docker-compose.prod.yml = scripts\docker-compose.prod.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "user-api", "user-api", "{D27A4457-B09A-4389-B56C-7A1E180B5F89}"
@@ -169,7 +170,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.API", "services\mo
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "micro-services", "micro-services", "{C188C6D3-42A7-48DB-82B2-15E67325DE94}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.Infrastructure.Dapr", "services\monolith\Src\Infrastructure\JobBoard.Infrastructure.Dapr\JobBoard.Infrastructure.Dapr.csproj", "{63D880B4-88BA-4F02-9CE7-4AF5D49E42A3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.Infrastructure.Vault", "services\monolith\Src\Infrastructure\JobBoard.Infrastructure.Vault\JobBoard.Infrastructure.Vault.csproj", "{A1B2C3D4-1111-2222-3333-444455556666}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.Infrastructure.RedisConfig", "services\monolith\Src\Infrastructure\JobBoard.Infrastructure.RedisConfig\JobBoard.Infrastructure.RedisConfig.csproj", "{A1B2C3D4-1111-2222-3333-444455557777}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.Infrastructure.Messaging", "services\monolith\Src\Infrastructure\JobBoard.Infrastructure.Messaging\JobBoard.Infrastructure.Messaging.csproj", "{A1B2C3D4-1111-2222-3333-444455558888}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.Infrastructure.HttpClients", "services\monolith\Src\Infrastructure\JobBoard.Infrastructure.HttpClients\JobBoard.Infrastructure.HttpClients.csproj", "{A1B2C3D4-1111-2222-3333-444455559999}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.AI.Infrastructure.HttpClients", "services\ai-service.v2\Src\Infrastructure\JobBoard.AI.Infrastructure.HttpClients\JobBoard.AI.Infrastructure.HttpClients.csproj", "{A1B2C3D4-1111-2222-3333-44445555AAAA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "connector-api", "connector-api", "{5E0D2CFC-5C65-4046-9C74-2B06EA5B397C}"
 	ProjectSection(SolutionItems) = preProject
@@ -604,18 +613,26 @@ Global
 		{43614005-1121-4F50-9705-963590729F45}.Release|x64.Build.0 = Release|Any CPU
 		{43614005-1121-4F50-9705-963590729F45}.Release|x86.ActiveCfg = Release|Any CPU
 		{43614005-1121-4F50-9705-963590729F45}.Release|x86.Build.0 = Release|Any CPU
-		{63D880B4-88BA-4F02-9CE7-4AF5D49E42A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{63D880B4-88BA-4F02-9CE7-4AF5D49E42A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{63D880B4-88BA-4F02-9CE7-4AF5D49E42A3}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{63D880B4-88BA-4F02-9CE7-4AF5D49E42A3}.Debug|x64.Build.0 = Debug|Any CPU
-		{63D880B4-88BA-4F02-9CE7-4AF5D49E42A3}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{63D880B4-88BA-4F02-9CE7-4AF5D49E42A3}.Debug|x86.Build.0 = Debug|Any CPU
-		{63D880B4-88BA-4F02-9CE7-4AF5D49E42A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{63D880B4-88BA-4F02-9CE7-4AF5D49E42A3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{63D880B4-88BA-4F02-9CE7-4AF5D49E42A3}.Release|x64.ActiveCfg = Release|Any CPU
-		{63D880B4-88BA-4F02-9CE7-4AF5D49E42A3}.Release|x64.Build.0 = Release|Any CPU
-		{63D880B4-88BA-4F02-9CE7-4AF5D49E42A3}.Release|x86.ActiveCfg = Release|Any CPU
-		{63D880B4-88BA-4F02-9CE7-4AF5D49E42A3}.Release|x86.Build.0 = Release|Any CPU
+		{A1B2C3D4-1111-2222-3333-444455556666}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-1111-2222-3333-444455556666}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-1111-2222-3333-444455556666}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-1111-2222-3333-444455556666}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1B2C3D4-1111-2222-3333-444455557777}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-1111-2222-3333-444455557777}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-1111-2222-3333-444455557777}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-1111-2222-3333-444455557777}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1B2C3D4-1111-2222-3333-444455558888}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-1111-2222-3333-444455558888}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-1111-2222-3333-444455558888}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-1111-2222-3333-444455558888}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1B2C3D4-1111-2222-3333-444455559999}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-1111-2222-3333-444455559999}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-1111-2222-3333-444455559999}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-1111-2222-3333-444455559999}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1B2C3D4-1111-2222-3333-44445555AAAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-1111-2222-3333-44445555AAAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-1111-2222-3333-44445555AAAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-1111-2222-3333-44445555AAAA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{ECBB5C93-9D0E-43CE-BA02-E818B106414E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{ECBB5C93-9D0E-43CE-BA02-E818B106414E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ECBB5C93-9D0E-43CE-BA02-E818B106414E}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -849,7 +866,10 @@ Global
 		{8C2AB03D-33D7-4965-A686-EA8BFE5F21FA} = {F14B3350-CE99-4C91-9077-1C0840D9A738}
 		{43614005-1121-4F50-9705-963590729F45} = {AD9ACDC2-CC8A-4163-8C51-7BFA37233E39}
 		{C188C6D3-42A7-48DB-82B2-15E67325DE94} = {6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}
-		{63D880B4-88BA-4F02-9CE7-4AF5D49E42A3} = {F14B3350-CE99-4C91-9077-1C0840D9A738}
+		{A1B2C3D4-1111-2222-3333-444455556666} = {F14B3350-CE99-4C91-9077-1C0840D9A738}
+		{A1B2C3D4-1111-2222-3333-444455557777} = {F14B3350-CE99-4C91-9077-1C0840D9A738}
+		{A1B2C3D4-1111-2222-3333-444455558888} = {F14B3350-CE99-4C91-9077-1C0840D9A738}
+		{A1B2C3D4-1111-2222-3333-444455559999} = {F14B3350-CE99-4C91-9077-1C0840D9A738}
 		{5E0D2CFC-5C65-4046-9C74-2B06EA5B397C} = {6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}
 		{ECBB5C93-9D0E-43CE-BA02-E818B106414E} = {5E0D2CFC-5C65-4046-9C74-2B06EA5B397C}
 		{E222CA10-E2B1-40BA-9F1C-067212D08F7B} = {EA007C0E-E085-4F85-903B-087E954D0CA4}
@@ -873,6 +893,7 @@ Global
 		{D64AF132-AA17-4D81-A97A-2D3BB74FBFF5} = {643D81E9-C0AD-41ED-88C6-3971436A27D5}
 		{3EEE3CD1-11C7-407F-BCCD-F8B577A3DD83} = {BF88B5C8-F307-4228-90D1-F1AB5E2D896B}
 		{174B20B4-E0E2-4EAD-A91C-B07EFB9D1F87} = {643D81E9-C0AD-41ED-88C6-3971436A27D5}
+		{A1B2C3D4-1111-2222-3333-44445555AAAA} = {643D81E9-C0AD-41ED-88C6-3971436A27D5}
 		{E81F17F9-408B-4A45-9A36-11443F44DF73} = {643D81E9-C0AD-41ED-88C6-3971436A27D5}
 		{3A64A767-61EC-42D8-8055-3BC76AF446BD} = {643D81E9-C0AD-41ED-88C6-3971436A27D5}
 		{6587ED0D-4DF7-493C-AEF4-1D7ADAF35933} = {2E899BAD-CF02-48F6-BFEE-B7986DF4EC25}

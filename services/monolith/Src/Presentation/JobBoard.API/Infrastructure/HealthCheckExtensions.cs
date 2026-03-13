@@ -1,9 +1,6 @@
-using AH.Metadata.Domain.Constants;
-using Dapr.Client;
-using Elkhair.Dev.Common.Domain.Constants;
 using JobBoard.HealthChecks;
-using JobBoard.HealthChecks.Dtos;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using RabbitMQ.Client;
 
 namespace JobBoard.API.Infrastructure;
 
@@ -11,29 +8,10 @@ internal static class HealthCheckExtensions
 {
     public static WebApplicationBuilder AddCustomHealthChecks(this WebApplicationBuilder builder)
     {
-        // --- Dapr infrastructure singletons ---
-        var stateStore = new StateStoreOptions()
-        {
-            StoreName = StateStores.Redis
-        };
-        builder.Services.AddSingleton(_ => new DaprStateStoreHealthCheck(new DaprClientBuilder().Build(), stateStore));
-
-        var secretStore = new SecretStoreOptions
-        {
-            StoreName = SecretStoreNames.Local
-        };
-        builder.Services.AddSingleton(_ => new DaprSecretStoreHealthCheck(new DaprClientBuilder().Build(), secretStore));
-
-        var pubSub = new DistributedEventBusOptions
-        {
-            Prefix = string.Empty,
-            Postfix = string.Empty,
-            PubSubName = PubSubNames.RabbitMq
-        };
-
-        builder.Services.AddSingleton(_ => new DaprPubSubHealthCheck(new DaprClientBuilder().Build(), pubSub));
-
         builder.Services.AddHttpClient();
+
+        var rabbitUri = builder.Configuration["RabbitMQ:Host"]
+                        ?? "amqp://guest:guest@192.168.1.160:5672/local";
 
         builder.Services
             .AddHealthChecks()
@@ -54,17 +32,25 @@ internal static class HealthCheckExtensions
             {
                 o.Authority = builder.Configuration["Keycloak:Authority"]
                               ?? throw new InvalidOperationException("Keycloak:Authority is not configured.");
-                o.ClientIds = ["angular-admin", "angular-public", "dapr-service-client", "swagger-client"];
+                o.ClientIds = ["angular-admin", "angular-public", "swagger-client"];
             })
 
-            // -- Dapr sidecar, state store, secret store, pub/sub --
-            .AddDapr()
+            // -- Redis (config + state) --
+            .AddRedis(
+                builder.Configuration.GetConnectionString("Redis")
+                ?? "192.168.1.160:6379",
+                name: "Redis",
+                tags: ["infrastructure"])
 
-            // -- Dapr configuration stores --
-            .AddDaprConfigurationStore("global", o =>
-                o.StoreName = "appconfig-global")
-            .AddDaprConfigurationStore("monolith", o =>
-                o.StoreName = "appconfig-monolith-api");
+            // -- RabbitMQ (messaging) --
+            .AddRabbitMQ(
+                _ =>
+                {
+                    var factory = new ConnectionFactory { Uri = new Uri(rabbitUri) };
+                    return factory.CreateConnectionAsync().GetAwaiter().GetResult();
+                },
+                name: "RabbitMQ",
+                tags: ["infrastructure"]);
 
         return builder;
     }

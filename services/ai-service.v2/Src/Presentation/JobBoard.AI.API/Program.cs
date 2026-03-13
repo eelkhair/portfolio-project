@@ -8,6 +8,7 @@ using JobBoard.AI.Application.Interfaces.Notifications;
 using JobBoard.AI.Infrastructure.AI;
 using JobBoard.AI.Infrastructure.Configuration;
 using JobBoard.AI.Infrastructure.Dapr;
+using JobBoard.AI.Infrastructure.HttpClients;
 using Azure.Storage.Blobs;
 using JobBoard.AI.Infrastructure.Diagnostics;
 using JobBoard.AI.Infrastructure.Persistence;
@@ -27,6 +28,8 @@ Debugger.Launch();
     .AddConfiguredSwagger(builder.Configuration)
     .AddOpenTelemetryServices(builder.Configuration, "ai-service-v2")
     .AddSignalR();
+
+builder.Services.AddMonolithHttpClient(builder.Configuration);
 
 builder.Services.AddScoped<IAiNotificationHub, AiNotificationHubNotifier>();
 

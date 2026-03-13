@@ -1,4 +1,4 @@
-﻿using JobBoard.infrastructure.Dapr;
+﻿using JobBoard.Application.Interfaces.Infrastructure;
 using Microsoft.AspNetCore.SignalR;
 
 namespace JobBoard.API.Infrastructure.SignalR.FeatureFlags;

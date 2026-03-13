@@ -1,6 +1,6 @@
-﻿using Dapr.Client;
-using JobBoard.Application.Actions.Outbox;
+﻿using JobBoard.Application.Actions.Outbox;
 using JobBoard.Application.Interfaces.Users;
+using JobBoard.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,12 +15,12 @@ namespace JobBoard.API.Controllers;
 public class OutboxController(IUserAccessor accessor) : BaseApiController
 {
     /// <summary>
-    /// Process OutboxMessages
+    /// Process OutboxMessages (manual trigger)
     /// </summary>
     /// <returns></returns>
     [HttpPost("process-outbox-messages")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [Authorize(Policy = "DaprInternal")]
+    [Authorize(Policy = AuthorizationPolicies.Admin)]
     public async Task<ActionResult> ProcessMessages()
     {
         accessor.UserId = "OutboxProcessor";
