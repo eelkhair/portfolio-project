@@ -14,7 +14,7 @@ public static class DependencyInjection
 
         services.AddHttpClient<IMonolithApiClient, HttpMonolithApiClient>(client =>
             {
-                var baseUrl = configuration["Services:MonolithApi:BaseUrl"]
+                var baseUrl = configuration["MonolithUrl"]
                               ?? "http://localhost:5280/";
                 client.BaseAddress = new Uri(baseUrl);
             })

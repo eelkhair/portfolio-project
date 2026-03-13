@@ -6,7 +6,7 @@ using JobBoard.Infrastructure.Vault;
 const string CorsPolicy = "AllowJobAdmin";
 
 var builder = WebApplication.CreateBuilder(args);
-builder.AddVaultSecrets(["gateway", "shared", "shared-local"]);
+builder.AddVaultSecrets("gateway");
 (await builder.AddRedisConfiguration("gateway", TimeSpan.FromSeconds(8)))
     .ConfigureLogging("gateway")
     .AddCustomHealthChecks()
@@ -15,7 +15,7 @@ builder.AddVaultSecrets(["gateway", "shared", "shared-local"]);
     .AddApplicationServices()
     .AddReverseProxy()
     .LoadFromMemory(YarpProvider.GetRoutes(),
-        YarpProvider.GetClusters());
+        YarpProvider.GetClusters(builder.Configuration));
 
 var app = builder.Build();
 

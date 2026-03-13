@@ -159,9 +159,9 @@ app.UseFastEndpoints(c =>
         });
 app.UseSwaggerGen();        
 app.MapGet("/", (HttpContext ctx) => ctx.Response.Redirect("/swagger")).ExcludeFromDescription();
-#if DEBUG
-Debugger.Launch();
-#endif
+// #if DEBUG
+// Debugger.Launch();
+// #endif
 app.MapCustomHealthChecks("/healthzEndpoint", "/liveness", UIResponseWriter.WriteHealthCheckUIResponse);
 
 app.Run();

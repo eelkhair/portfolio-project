@@ -158,9 +158,6 @@ app.UseFastEndpoints(c =>
         });
 app.UseSwaggerGen();        
 app.MapGet("/", (HttpContext ctx) => ctx.Response.Redirect("/swagger")).ExcludeFromDescription();
-#if DEBUG
-Debugger.Launch();
-#endif
 
 app.Use(async (context, next) =>
 {

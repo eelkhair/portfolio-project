@@ -8,6 +8,6 @@ namespace ConnectorAPI.Interfaces.Clients;
 public interface IJobApiClient
 {
     Task SendCompanyCreatedAsync(EventDto<CompanyCreatedJobApiPayload> payload, CancellationToken cancellationToken);
-    Task<JobApiResponse> SendJobCreatedAsync(JobCreatedJobApiPayload payload, CancellationToken cancellationToken);
-    Task SendCompanyUpdatedAsync(Guid companyUId, CompanyUpdatedJobApiPayload payload, CancellationToken cancellationToken);
+    Task<JobApiResponse> SendJobCreatedAsync(EventDto<JobCreatedJobApiPayload> payload, CancellationToken cancellationToken);
+    Task SendCompanyUpdatedAsync(Guid companyUId, EventDto<CompanyUpdatedJobApiPayload> payload, CancellationToken cancellationToken);
 }

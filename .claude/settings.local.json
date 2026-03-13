@@ -56,7 +56,9 @@
       "Bash(dotnet nuget push \"C:/Users/elkha/RiderProjects/portfolio project/nupkgs/JobBoard.HealthChecks.1.0.7.nupkg\" --source \"Home\")",
       "Bash(dotnet restore services/ai-service.v2/Src/Presentation/JobBoard.AI.API/JobBoard.AI.API.csproj)",
       "Bash(dotnet nuget push \"C:/Users/elkha/RiderProjects/portfolio project/nupkgs/JobBoard.HealthChecks.1.0.8.nupkg\" --source \"Home\")",
-      "Bash(dotnet restore:*)"
+      "Bash(dotnet restore:*)",
+      "Bash(dotnet pack:*)",
+      "Bash(dotnet nuget:*)"
     ]
   }
 }

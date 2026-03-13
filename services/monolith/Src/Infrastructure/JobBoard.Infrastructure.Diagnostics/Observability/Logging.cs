@@ -119,11 +119,6 @@ public static class LoggingFilters
         builder.AddFilter("Microsoft.AspNetCore.DataProtection", LogLevel.Warning);
         builder.AddFilter("Microsoft.AspNetCore.Server", LogLevel.Warning);
         builder.AddFilter("Microsoft.AspNetCore", LogLevel.Warning);
-        builder.AddFilter("Dapr", LogLevel.Warning);
-        builder.AddFilter("Dapr.Client", LogLevel.Warning);
-        builder.AddFilter("Dapr.Runtime", LogLevel.Warning);
-        builder.AddFilter("Dapr.Actors", LogLevel.Warning);
-        builder.AddFilter("Dapr.Sidecar", LogLevel.Warning);
         builder.AddFilter("Microsoft.AspNetCore.Server.Kestrel", LogLevel.Warning);
         builder.AddFilter("Microsoft.AspNetCore.Server", LogLevel.Warning);
         builder.AddFilter("Microsoft.AspNetCore.HttpLogging", LogLevel.Warning);
@@ -131,16 +126,6 @@ public static class LoggingFilters
         builder.AddFilter("Microsoft.AspNetCore.DataProtection", LogLevel.Warning);
         builder.AddFilter("Microsoft.AspNetCore", LogLevel.Warning);
 
-// Dapr
-        builder.AddFilter("Dapr", LogLevel.Warning);
-        builder.AddFilter("Dapr.Client", LogLevel.Warning);
-        builder.AddFilter("Dapr.Runtime", LogLevel.Warning);
-        builder.AddFilter("Dapr.Actors", LogLevel.Warning);
-        builder.AddFilter("Dapr.Sidecar", LogLevel.Warning);
-        builder.AddFilter("Dapr.Placement", LogLevel.Warning);
-        builder.AddFilter("Dapr.Contrib", LogLevel.Warning);
-
-// Hide Dapr → ASP.NET Core internal pings
         builder.AddFilter("Microsoft.AspNetCore.Hosting.Internal", LogLevel.Warning);
         builder.AddFilter("Microsoft.AspNetCore.Hosting", LogLevel.Warning);
   

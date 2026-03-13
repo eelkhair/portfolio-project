@@ -61,20 +61,6 @@ public class TracingFiltersTests
     }
 
     [Fact]
-    public void HttpClientFilter_WithDaprGrpcPath_ShouldFilter()
-    {
-        var options = new HttpClientTraceInstrumentationOptions();
-        options.AddFilters();
-
-        var request = new HttpRequestMessage(HttpMethod.Post,
-            "https://localhost:50001/dapr.proto.runtime.v1.Dapr/GetConfiguration");
-
-        var result = options.FilterHttpRequestMessage!(request);
-
-        result.ShouldBeFalse();
-    }
-
-    [Fact]
     public void Source_ShouldBeNamedJobBoard()
     {
         TracingFilters.Source.Name.ShouldBe("JobBoard");

@@ -51,7 +51,16 @@ public static class DependencyInjection
             options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
         });
         
-        services.AddScoped<IMonolithClient, MonolithOClient>();
+        services.AddHttpClient<IMonolithClient, MonolithOClient>((sp, client) =>
+        {
+            var config = sp.GetRequiredService<IConfiguration>();
+            var monolithUrl = config["MonolithUrl"] ?? "http://monolith-api:8080";
+            client.BaseAddress = new Uri(monolithUrl);
+
+            var apiKey = config["InternalApiKey"];
+            if (!string.IsNullOrEmpty(apiKey))
+                client.DefaultRequestHeaders.Add("X-Api-Key", apiKey);
+        });
         services.AddScoped<IAdminApiClient, AdminApiClient>();
         services.AddScoped<ICompanyApiClient, CompanyApiClient>();
         services.AddScoped<IJobApiClient, JobApiClient>();

@@ -33,23 +33,28 @@ public sealed class CloudEventsPublisher : IAsyncDisposable
         return new CloudEventsPublisher(connection, channel, logger);
     }
 
-    public async Task PublishAsync(string exchange, object data, string eventType, string source, CancellationToken ct)
+    public async Task PublishAsync(string exchange, object data, string eventType, string source, string? traceparent, CancellationToken ct)
     {
         await _channel.ExchangeDeclareAsync(
             exchange: exchange,
             type: ExchangeType.Fanout,
-            durable: true,
+            durable: false,
             autoDelete: false,
             cancellationToken: ct);
 
         var cloudEvent = new Dictionary<string, object>
         {
             ["specversion"] = "1.0",
-            ["type"] = eventType,
+            ["type"] = "com.dapr.event.sent",
             ["source"] = source,
             ["id"] = Guid.CreateVersion7().ToString(),
             ["time"] = DateTime.UtcNow.ToString("O"),
             ["datacontenttype"] = "application/json",
+            ["pubsubname"] = "rabbitmq.pubsub",
+            ["topic"] = exchange,
+            ["traceid"] = traceparent ?? "",
+            ["traceparent"] = traceparent ?? "",
+            ["tracestate"] = "",
             ["data"] = data
         };
 

@@ -15,9 +15,9 @@ using JobBoard.AI.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
-#if DEBUG
-Debugger.Launch();
-#endif
+// #if DEBUG
+// Debugger.Launch();
+// #endif
 (await builder.AddDaprServices("ai-service-v2")).ConfigureLogging("ai-service-v2").AddCustomHealthChecks().Services
     .AddApplicationServices()
     .AddConfigurationServices(builder.Configuration)

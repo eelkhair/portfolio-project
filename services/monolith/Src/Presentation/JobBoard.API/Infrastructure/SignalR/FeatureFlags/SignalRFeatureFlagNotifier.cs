@@ -1,4 +1,4 @@
-﻿using JobBoard.Application.Interfaces.Infrastructure;
+﻿using JobBoard.Infrastructure.RedisConfig;
 using Microsoft.AspNetCore.SignalR;
 
 namespace JobBoard.API.Infrastructure.SignalR.FeatureFlags;

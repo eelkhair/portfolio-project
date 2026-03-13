@@ -44,7 +44,10 @@ public class JobProvisioningSaga
             Models.JobCreated.JobApiResponse jobResponse;
             using (_activitySource.StartActivity("provision.job.saga.forward"))
             {
-                var payload = JobCreatedMapper.Map(@event.Data);
+                var payload = new EventDto<Models.JobCreated.JobCreatedJobApiPayload>(
+                    @event.UserId,
+                    Guid.CreateVersion7().ToString(),
+                    JobCreatedMapper.Map(@event.Data));
                 jobResponse = await _jobApi.SendJobCreatedAsync(payload, ct);
             }
 

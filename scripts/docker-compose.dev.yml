@@ -115,29 +115,11 @@
     ports:
       - "5280:8080"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_ENVIRONMENT=dev
+      - VAULT_ADDR=${VAULT_ADDR}
+      - VAULT_TOKEN=${VAULT_TOKEN}
     networks:
       - ai-job-board-net
-
-  monolith-api-sidecar:
-    image: "daprio/daprd:1.15.8"
-    container_name: "monolith-api-side-car"
-    depends_on:
-      - monolith-api
-    volumes:
-      - "/home/eelkhair/Dapr/shared/Components:/Components"
-      - "/home/eelkhair/Dapr/monolith-api/:/Dapr"
-    network_mode: "service:monolith-api"
-    command: [
-      "./daprd",
-      "--app-id", "monolith-api",
-      "--app-port", "8080",
-      "--resources-path", "./Components",
-      "--resources-path", "./Dapr/Components",
-      "--resources-path", "./Dapr/Components/Secrets",
-      "--resources-path", "./Dapr/Components/Timers",
-      "-config", "./Dapr/Config/config.yaml"
-    ]
   
   ai-service-v2:
     image: registry.eelkhair.net/ai-service-v2:latest
@@ -202,29 +184,11 @@
     ports:
       - "5238:8080"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_ENVIRONMENT=dev
+      - VAULT_ADDR=${VAULT_ADDR}
+      - VAULT_TOKEN=${VAULT_TOKEN}
     networks:
       - ai-job-board-net
-
-  gateway-sidecar:
-    image: "daprio/daprd:1.15.8"
-    container_name: "gateway-side-car"
-    depends_on:
-      - gateway
-    volumes:
-      - "/home/eelkhair/Dapr/shared/Components:/Components"
-      - "/home/eelkhair/Dapr/gateway/:/Dapr"
-    network_mode: "service:gateway"
-    command: [
-      "./daprd",
-      "--app-id", "gateway",
-      "--app-port", "8080",
-      "--resources-path", "./Components",
-      "--resources-path", "./Dapr/Components",
-      "--resources-path", "./Dapr/Components/Secrets",
-      "--resources-path", "./Dapr/Components/Timers",
-      "-config", "./Dapr/Config/config.yaml"
-    ]
 
   company-api:
     build:

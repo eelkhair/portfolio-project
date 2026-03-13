@@ -1,3 +1,4 @@
+using JobBoard.Infrastructure.Vault;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Gateway.Api.Infrastructure;
@@ -17,7 +18,10 @@ internal static class HealthCheckExtensions
                 builder.Configuration.GetConnectionString("Redis")
                 ?? "192.168.1.160:6379",
                 name: "Redis Config Store",
-                tags: ["infrastructure"]);
+                tags: ["infrastructure"])
+
+            // -- Vault (secrets) --
+            .AddVaultHealthCheck(tags: ["infrastructure"]);
 
         return builder;
     }
