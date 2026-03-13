@@ -2,7 +2,6 @@ using HealthChecks.UI.Client;
 using JobBoard.API.Infrastructure.SignalR;
 using JobBoard.Domain;
 using JobBoard.HealthChecks;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.OData;
 using Microsoft.IdentityModel.Tokens;
@@ -32,13 +31,13 @@ public static class DependencyInjection
                         "http://localhost:5280",
                         "https://localhost:5280",
                         "http://127.0.0.1:4200",
-                        
+
                         "https://job-admin-dev.eelkhair.net",
                         "https://jobs-dev.eelkhair.net",
                         "https://job-dev.eelkhair.net",
                         "http://192.168.1.200:9000",
                         "https://swagger-dev.eelkhair.net",
-                        
+
                         "http://192.168.1.112:9000",
                         "https://swagger.eelkhair.net",
                         "https://job-admin.eelkhair.net",
@@ -59,25 +58,8 @@ public static class DependencyInjection
         services
             .AddAuthentication(options =>
             {
-                options.DefaultAuthenticateScheme = "Auto";
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddPolicyScheme("Auto", "JWT or Dapr", options =>
-            {
-                options.ForwardDefaultSelector = context =>
-                {
-                    var authHeader = context.Request.Headers.Authorization.FirstOrDefault();
-                    if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
-                        return JwtBearerDefaults.AuthenticationScheme;
-
-                    // SignalR WebSocket/SSE transports cannot send Authorization headers;
-                    // the token is passed as ?access_token= query param instead.
-                    if (!string.IsNullOrEmpty(context.Request.Query["access_token"]) &&
-                        context.Request.Path.StartsWithSegments("/hubs"))
-                        return JwtBearerDefaults.AuthenticationScheme;
-
-                    return "DaprInternalScheme";
-                };
             })
             .AddJwtBearer(options =>
             {
@@ -124,15 +106,7 @@ public static class DependencyInjection
                         return Task.CompletedTask;
                     }
                 };
-            })
-
-            // -----------------------------------------------------------------
-            // Dapr Internal API Token Authentication
-            // -----------------------------------------------------------------
-            .AddScheme<AuthenticationSchemeOptions, DaprInternalAuthenticationHandler>(
-                "DaprInternalScheme", _ => { });
-
-
+            });
 
         // ---------------------------------------------------------------------
         // Authorization Policies
@@ -148,16 +122,7 @@ public static class DependencyInjection
                 policy.RequireClaim("groups", UserRoles.Recruiter))
 
             .AddPolicy(AuthorizationPolicies.AllUsers, policy =>
-                policy.RequireClaim("groups", UserRoles.Admin, UserRoles.Recruiter))
-
-            // -----------------------------------------------------------------
-            // Dapr Internal Policy (Dapr → App calls)
-            // -----------------------------------------------------------------
-            .AddPolicy("DaprInternal", policy =>
-            {
-                policy.AddAuthenticationSchemes("DaprInternalScheme");
-                policy.RequireAuthenticatedUser();
-            });
+                policy.RequireClaim("groups", UserRoles.Admin, UserRoles.Recruiter));
 
         return services;
     }
@@ -191,8 +156,6 @@ public static class DependencyInjection
         {
             app.MapCustomHealthChecks("/healthzEndpoint", "/liveness", UIResponseWriter.WriteHealthCheckUIResponse);
             app.MapGet("/", (HttpContext ctx) => ctx.Response.Redirect("/swagger")).ExcludeFromDescription();
-            app.UseCloudEvents();
-            app.MapSubscribeHandler();
             app.MapHub<NotificationsHub>("/hubs/notifications").RequireAuthorization();
             app.Run();
         }

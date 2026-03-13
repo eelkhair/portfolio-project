@@ -1,4 +1,4 @@
-﻿services:
+services:
   job-admin:
     image: registry.eelkhair.net/job-admin:latest
     ports:
@@ -196,7 +196,7 @@
       "--resources-path", "./Dapr/Components/Timers",
       "-config", "./Dapr/Config/config.yaml"
     ]
-    
+  
   gateway:
     image: registry.eelkhair.net/gateway:latest
     ports:

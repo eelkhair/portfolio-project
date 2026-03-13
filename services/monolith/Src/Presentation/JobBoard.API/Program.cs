@@ -6,14 +6,17 @@ using JobBoard.API.Infrastructure.SignalR.CompanyActivation;
 using JobBoard.API.Infrastructure.SignalR.FeatureFlags;
 using JobBoard.API.Infrastructure.SignalR.ResumeParse;
 using JobBoard.Application;
+using JobBoard.Application.Interfaces.Infrastructure;
 using JobBoard.Application.Interfaces.Users;
-using JobBoard.infrastructure.Dapr;
-using JobBoard.Infrastructure.Dapr;
 using JobBoard.Infrastructure.Diagnostics;
+using JobBoard.Infrastructure.HttpClients;
+using JobBoard.Infrastructure.Messaging;
 using JobBoard.Infrastructure.Outbox;
 using JobBoard.Infrastructure.Persistence;
 using JobBoard.Infrastructure.BlobStorage;
+using JobBoard.Infrastructure.RedisConfig;
 using JobBoard.Infrastructure.Smtp;
+using JobBoard.Infrastructure.Vault;
 
 var builder = WebApplication.CreateBuilder(args);
 #if DEBUG
@@ -32,7 +35,12 @@ if (isTesting)
 }
 else
 {
-    (await builder.AddDaprServices("monolith-api")).ConfigureLogging("monolith-api").AddCustomHealthChecks();
+    builder.AddVaultSecrets(["monolith-local", "monolith", "shared", "shared-local"]);
+    (await builder.AddRedisConfiguration("monolith-api", TimeSpan.FromSeconds(5)))
+        .ConfigureLogging("monolith-api")
+        .AddCustomHealthChecks();
+    builder.Services.AddMassTransitMessaging(builder.Configuration);
+    builder.Services.AddAiServiceHttpClient(builder.Configuration);
 }
 
 builder.Services

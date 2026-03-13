@@ -1,8 +1,3 @@
-using AH.Metadata.Domain.Constants;
-using Dapr.Client;
-using Elkhair.Dev.Common.Domain.Constants;
-using JobBoard.HealthChecks;
-using JobBoard.HealthChecks.Dtos;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Gateway.Api.Infrastructure;
@@ -11,35 +6,18 @@ internal static class HealthCheckExtensions
 {
     public static WebApplicationBuilder AddCustomHealthChecks(this WebApplicationBuilder builder)
     {
-        var stateStore = new StateStoreOptions
-        {
-            StoreName = StateStores.Redis
-        };
-        builder.Services.AddSingleton(_ => new DaprStateStoreHealthCheck(new DaprClientBuilder().Build(), stateStore));
-       
-        var secretStore = new SecretStoreOptions
-        {
-            StoreName = SecretStoreNames.Local
-        };
-        builder.Services.AddSingleton(_ => new DaprSecretStoreHealthCheck(new DaprClientBuilder().Build(), secretStore));
-
-        var pubSub = new DistributedEventBusOptions
-        {
-            Prefix = string.Empty,
-            Postfix = string.Empty,
-            PubSubName = PubSubNames.RabbitMq
-        };
-        
-        builder.Services.AddSingleton(_ => new DaprPubSubHealthCheck(new DaprClientBuilder().Build(), pubSub));
-        
         builder.Services
             .AddHealthChecks()
+
+            // -- Liveness --
             .AddCheck("self", () => HealthCheckResult.Healthy())
-            .AddDapr()
-            .AddDaprConfigurationStore("global", o =>
-                o.StoreName = "appconfig-global")
-            .AddDaprConfigurationStore("gateway", o =>
-                o.StoreName = "appconfig-gateway");
+
+            // -- Redis (config store) --
+            .AddRedis(
+                builder.Configuration.GetConnectionString("Redis")
+                ?? "192.168.1.160:6379",
+                name: "Redis Config Store",
+                tags: ["infrastructure"]);
 
         return builder;
     }

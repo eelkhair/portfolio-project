@@ -36,7 +36,6 @@ public static class DependencyInjection
         builder.Services.AddKeyedScoped<IAiTools, PublicMonolithToolRegistry>("public-monolith");
         builder.Services.AddKeyedScoped<IAiTools, PublicMicroToolRegistry>("public-micro");
        
-        builder.Services.AddScoped<IMonolithApiClient, MonolithApiClient>();
         builder.Services.AddScoped<IAdminApiClient, AdminApiClient>();
         builder.Services.AddScoped<IIdempotencyService, DaprIdempotencyService>();
         // Vault secrets
