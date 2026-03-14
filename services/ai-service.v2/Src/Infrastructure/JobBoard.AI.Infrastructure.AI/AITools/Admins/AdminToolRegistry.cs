@@ -1,5 +1,6 @@
 using JobBoard.AI.Application.Interfaces.Clients;
 using JobBoard.AI.Application.Interfaces.Configurations;
+using JobBoard.AI.Application.Interfaces.Notifications;
 using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Infrastructure.AI.AITools.Admins.System;
 using JobBoard.AI.Infrastructure.AI.Services;
@@ -15,7 +16,10 @@ public class AdminToolRegistry(
     IUserAccessor userAccessor,
     ILogger<AdminToolRegistry> logger,
     IConversationContext conversationContext,
-    IConversationStore conversationStore
+    IConversationStore conversationStore,
+    IDraftPersistence draftPersistence,
+    IAiNotificationHub notificationHub,
+    ISettingsService settingsService
 ) : IAiTools
 {
     public IEnumerable<AITool> GetTools()
@@ -23,5 +27,8 @@ public class AdminToolRegistry(
         yield return TraceIdTool.Get(activityFactory, redisStore, userAccessor, conversationContext, conversationStore);
         yield return ConversationIdTool.Get(activityFactory, conversationContext);
         yield return ProviderRetrievalTool.Get(activityFactory, toolResolver, logger);
+        yield return GenerateDraftTool.Get(activityFactory, toolResolver, draftPersistence, notificationHub, userAccessor, logger);
+        yield return IsMonolithTool.Get(activityFactory, settingsService);
+        yield return SetModeTool.Get(activityFactory, settingsService, logger);
     }
 }

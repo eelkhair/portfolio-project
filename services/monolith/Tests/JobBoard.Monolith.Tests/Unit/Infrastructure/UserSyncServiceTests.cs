@@ -1,7 +1,7 @@
 using JobBoard.Application.Infrastructure.UserSync;
 using JobBoard.Application.Interfaces;
 using JobBoard.Application.Interfaces.Repositories;
-using JobBoard.Application.Interfaces.Users;
+using JobBoard.Mcp.Common;
 using JobBoard.Domain.Entities.Users;
 using NSubstitute;
 using Shouldly;

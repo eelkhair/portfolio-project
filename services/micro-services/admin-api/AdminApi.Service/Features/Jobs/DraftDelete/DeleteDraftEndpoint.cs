@@ -1,4 +1,4 @@
-using AdminApi.Application.Commands.Interfaces;
+using AdminAPI.Contracts.Services;
 using FastEndpoints;
 
 namespace AdminApi.Features.Jobs.DraftDelete;

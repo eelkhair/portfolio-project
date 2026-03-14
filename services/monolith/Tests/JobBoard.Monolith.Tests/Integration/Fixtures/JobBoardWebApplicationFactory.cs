@@ -1,7 +1,7 @@
 using JobBoard.API.Infrastructure.SignalR.CompanyActivation;
 using JobBoard.Application.Interfaces.Infrastructure;
 using JobBoard.Application.Interfaces.Observability;
-using JobBoard.Application.Interfaces.Users;
+using JobBoard.Mcp.Common;
 using JobBoard.Infrastructure.Diagnostics.Observability;
 using JobBoard.Infrastructure.Persistence.Context;
 using JobBoard.Monolith.Contracts.Drafts;

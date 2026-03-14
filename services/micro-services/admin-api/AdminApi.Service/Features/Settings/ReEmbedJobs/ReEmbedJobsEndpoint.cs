@@ -1,4 +1,4 @@
-using AdminApi.Application.Commands.Interfaces;
+using AdminAPI.Contracts.Services;
 using AdminAPI.Contracts.Models.Settings;
 using Elkhair.Dev.Common.Application;
 using FastEndpoints;

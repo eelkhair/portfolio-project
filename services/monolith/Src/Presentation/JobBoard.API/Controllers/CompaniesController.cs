@@ -4,7 +4,7 @@ using JobBoard.API.Infrastructure.SignalR.CompanyActivation;
 using JobBoard.Application.Actions.Companies.Activate;
 using JobBoard.Application.Actions.Companies.Create;
 using JobBoard.Application.Actions.Companies.Update;
-using JobBoard.Application.Interfaces.Users;
+using JobBoard.Mcp.Common;
 using JobBoard.Domain;
 using JobBoard.Monolith.Contracts.Companies;
 using Microsoft.AspNetCore.Authorization;

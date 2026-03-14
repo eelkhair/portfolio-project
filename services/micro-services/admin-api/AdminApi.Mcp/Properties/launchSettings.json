@@ -1,0 +1,19 @@
+{
+  "profiles": {
+    "dapr": {
+      "commandName": "Executable",
+      "workingDirectory": "$(ProjectDir)/../AdminApi.Service",
+      "applicationUrl": "http://localhost:3334",
+      "executablePath": "dapr.exe",
+      "commandLineArgs": "run --app-id admin-api-mcp --resources-path ../../../../Components/ --resources-path ./Dapr/Components/Secrets --resources-path ./Dapr/Components --config ./Dapr/Config/config.yaml --app-port 3334 --dapr-http-port 6046 --log-level debug -- dotnet run --project ../AdminApi.Mcp/AdminApi.Mcp.csproj"
+    },
+    "AdminApi.Mcp": {
+      "commandName": "Project",
+      "applicationUrl": "http://localhost:3334",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  },
+  "$schema": "https://json.schemastore.org/launchsettings.json"
+}

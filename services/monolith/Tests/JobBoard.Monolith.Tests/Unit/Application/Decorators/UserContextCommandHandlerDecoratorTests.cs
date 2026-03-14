@@ -2,6 +2,7 @@ using JobBoard.Application.Infrastructure.Decorators;
 using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Application.Interfaces.Observability;
 using JobBoard.Application.Interfaces.Users;
+using JobBoard.Mcp.Common;
 using NSubstitute;
 using Shouldly;
 using System.Diagnostics;

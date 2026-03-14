@@ -1,12 +1,12 @@
 using System.Diagnostics;
 using JobBoard.API.Infrastructure;
 using JobBoard.API.Infrastructure.Authorization;
+using JobBoard.Mcp.Common;
 using JobBoard.API.Infrastructure.OpenApi;
 using JobBoard.API.Infrastructure.SignalR.CompanyActivation;
 using JobBoard.API.Infrastructure.SignalR.FeatureFlags;
 using JobBoard.API.Infrastructure.SignalR.ResumeParse;
 using JobBoard.Application;
-using JobBoard.Application.Interfaces.Users;
 using JobBoard.Infrastructure.RedisConfig;
 using JobBoard.Infrastructure.Diagnostics;
 using JobBoard.Infrastructure.HttpClients;

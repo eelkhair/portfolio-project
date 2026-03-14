@@ -2,6 +2,7 @@ using System.Diagnostics;
 using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Application.Interfaces.Observability;
 using JobBoard.Application.Interfaces.Users;
+using JobBoard.Mcp.Common;
 
 namespace JobBoard.Application.Infrastructure.Decorators;
 

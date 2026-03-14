@@ -81,7 +81,20 @@
       "Read(//c/tmp/**)",
       "Bash(dotnet tool:*)",
       "Bash(dotnet --version)",
-      "Bash(ilspycmd ~/.nuget/packages/modelcontextprotocol.core/1.1.0/lib/net10.0/ModelContextProtocol.Core.dll -o /tmp/mcp_decompiled)"
+      "Bash(ilspycmd ~/.nuget/packages/modelcontextprotocol.core/1.1.0/lib/net10.0/ModelContextProtocol.Core.dll -o /tmp/mcp_decompiled)",
+      "Read(//c/Users/elkha/Downloads/**)",
+      "Bash(dotnet C:Userselkha.nugetpackagesmodelcontextprotocol1.1.0libnet9.0ModelContextProtocol.dll)",
+      "Read(//c/Users/elkha/RiderProjects/portfolio project/services/micro-services/admin-api/$HOME/.nuget/packages/**)",
+      "Bash(ilspycmd \"/c/Users/elkha/.nuget/packages/modelcontextprotocol.aspnetcore/1.1.0/lib/net10.0/ModelContextProtocol.AspNetCore.dll\" -t ModelContextProtocol.AspNetCore.McpEndpointRouteBuilderExtensions)",
+      "Bash(ilspycmd \"/c/Users/elkha/.nuget/packages/modelcontextprotocol.aspnetcore/1.1.0/lib/net10.0/ModelContextProtocol.AspNetCore.dll\")",
+      "Bash(dotnet sln:*)",
+      "Bash(while read:*)",
+      "Bash(do sed:*)",
+      "Bash(done)",
+      "Bash(for f:*)",
+      "Bash(do awk:*)",
+      "Bash(\"$f.tmp\")",
+      "Bash(mv \"$f.tmp\" \"$f\")"
     ]
   }
 }

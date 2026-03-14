@@ -14,7 +14,7 @@ using JobBoard.Application.Actions.Resumes.SetDefault;
 using JobBoard.Application.Actions.Resumes.Upload;
 using JobBoard.Application.Infrastructure.Exceptions;
 using JobBoard.Application.Interfaces.Configurations;
-using JobBoard.Application.Interfaces.Users;
+using JobBoard.Mcp.Common;
 using JobBoard.Monolith.Contracts.Public;
 using JobBoard.Domain;
 using Microsoft.AspNetCore.Authorization;
