@@ -4,10 +4,6 @@ using Dapr.Client;
 using Dapr.Extensions.Configuration;
 using JobBoard.AI.Application.Interfaces.Clients;
 using JobBoard.AI.Application.Interfaces.Configurations;
-using JobBoard.AI.Infrastructure.Dapr.AITools.Admins.Micro;
-using JobBoard.AI.Infrastructure.Dapr.AITools.Admins.Monolith;
-using JobBoard.AI.Infrastructure.Dapr.AITools.Public.Micro;
-using JobBoard.AI.Infrastructure.Dapr.AITools.Public.Monolith;
 using JobBoard.AI.Infrastructure.Dapr.ApiClients;
 using JobBoard.AI.Infrastructure.Dapr.Services;
 using Microsoft.AspNetCore.Builder;
@@ -30,12 +26,6 @@ public static class DependencyInjection
             PropertyNameCaseInsensitive = true,
             Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
         }));
-        builder.Services.AddKeyedScoped<IAiTools, AdminMonolithToolRegistry>("admin-monolith");
-        builder.Services.AddKeyedScoped<IAiTools, AdminMicroToolRegistry>("admin-micro");
-        
-        builder.Services.AddKeyedScoped<IAiTools, PublicMonolithToolRegistry>("public-monolith");
-        builder.Services.AddKeyedScoped<IAiTools, PublicMicroToolRegistry>("public-micro");
-       
         builder.Services.AddScoped<IAdminApiClient, AdminApiClient>();
         builder.Services.AddScoped<MonolithDraftPersistence>();
         builder.Services.AddScoped<MicroDraftPersistence>();

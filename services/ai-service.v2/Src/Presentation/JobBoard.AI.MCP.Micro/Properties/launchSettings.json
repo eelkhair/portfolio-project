@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "dapr": {
+      "commandName": "Executable",
+      "executablePath": "dapr.exe",
+      "commandLineArgs": "run --app-id ai-service-mcp-micro --resources-path ../../../../../Components/ --resources-path ./Dapr/Components/Secrets --resources-path ./Dapr/Components --config ./Dapr/Config/config.yaml --app-port 3334 --dapr-http-port 7010 --log-level debug dotnet run",
+      "workingDirectory": "$(ProjectDir)",
+      "applicationUrl": "http://localhost:3334"
+    },
+    "http": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://localhost:3334"
+    },
+    "stdio": {
+      "commandName": "Project",
+      "commandLineArgs": "--stdio",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

@@ -65,7 +65,23 @@
       "WebSearch",
       "WebFetch(domain:devblogs.microsoft.com)",
       "WebFetch(domain:github.com)",
-      "WebFetch(domain:csharp.sdk.modelcontextprotocol.io)"
+      "WebFetch(domain:csharp.sdk.modelcontextprotocol.io)",
+      "Bash(mkdir -p \"C:\\\\Users\\\\elkha\\\\RiderProjects\\\\portfolio project\\\\services\\\\ai-service.v2\\\\Src\\\\Presentation\\\\JobBoard.AI.MCP.Micro/Infrastructure\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\elkha\\\\RiderProjects\\\\portfolio project\\\\services\\\\ai-service.v2\\\\Src\\\\Presentation\\\\JobBoard.AI.MCP.Micro/Tools/Admin\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\elkha\\\\RiderProjects\\\\portfolio project\\\\services\\\\ai-service.v2\\\\Src\\\\Presentation\\\\JobBoard.AI.MCP.Micro/Tools/CompanyAdmin\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\elkha\\\\RiderProjects\\\\portfolio project\\\\services\\\\ai-service.v2\\\\Src\\\\Presentation\\\\JobBoard.AI.MCP.Micro/Tools/Public\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\elkha\\\\RiderProjects\\\\portfolio project\\\\services\\\\ai-service.v2\\\\Src\\\\Presentation\\\\JobBoard.AI.MCP.Integration/Infrastructure\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\elkha\\\\RiderProjects\\\\portfolio project\\\\services\\\\ai-service.v2\\\\Src\\\\Presentation\\\\JobBoard.AI.MCP.Integration/Tools/Admin\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\elkha\\\\RiderProjects\\\\portfolio project\\\\services\\\\ai-service.v2\\\\Src\\\\Presentation\\\\JobBoard.AI.MCP.Integration/Tools/CompanyAdmin\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\elkha\\\\RiderProjects\\\\portfolio project\\\\services\\\\ai-service.v2\\\\Src\\\\Presentation\\\\JobBoard.AI.MCP.Integration/Tools/Public\")",
+      "Read(//c/Users/elkha/.nuget/packages/modelcontextprotocol/1.1.0/**)",
+      "Bash(2)",
+      "WebFetch(domain:modelcontextprotocol.github.io)",
+      "WebFetch(domain:markheath.net)",
+      "Read(//c/tmp/**)",
+      "Bash(dotnet tool:*)",
+      "Bash(dotnet --version)",
+      "Bash(ilspycmd ~/.nuget/packages/modelcontextprotocol.core/1.1.0/lib/net10.0/ModelContextProtocol.Core.dll -o /tmp/mcp_decompiled)"
     ]
   }
 }
