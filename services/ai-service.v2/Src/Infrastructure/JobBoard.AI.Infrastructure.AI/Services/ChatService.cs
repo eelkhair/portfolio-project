@@ -7,6 +7,7 @@ using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Infrastructure.AI.Infrastructure;
 using Microsoft.Extensions.AI;
+using McpCtx = JobBoard.AI.Infrastructure.AI.Infrastructure.McpRequestContext;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ChatMessage = Microsoft.Extensions.AI.ChatMessage;
@@ -47,13 +48,23 @@ public class ChatService(
         messages.AddRange(savedMessages);
 
         var options = chatOptionsFactory.Create(serviceProvider, scope);
-        
+
         messages.Add(new(ChatRole.User, userMessage));
 
-        var response = await client.GetResponseAsync(
-            messages,
-            options,
-            cancellationToken: cancellationToken);
+        // Flow user's token to MCP servers via AsyncLocal → DelegatingHandler
+        McpCtx.CurrentToken = userAccessor.Token;
+        Microsoft.Extensions.AI.ChatResponse response;
+        try
+        {
+            response = await client.GetResponseAsync(
+                messages,
+                options,
+                cancellationToken: cancellationToken);
+        }
+        finally
+        {
+            McpCtx.CurrentToken = null;
+        }
 
         Activity.Current?.SetTag("ai.response.length", response.Text.Length);
         Activity.Current?.SetTag("ai.tokens.total", response.Usage?.TotalTokenCount ?? 0);

@@ -14,6 +14,8 @@ using JobBoard.AI.Infrastructure.AI.Services;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using ModelContextProtocol.Client;
 using OpenAI.Chat;
 using OpenAI.Embeddings;
 
@@ -27,13 +29,13 @@ public static class DependencyInjection
             apiKey: configuration["AI:OPENAI_API_KEY"] ??
                     throw new InvalidOperationException("Missing api key for OpenAI")).AsIEmbeddingGenerator());
 
-        services.AddKeyedSingleton("openai", 
+        services.AddKeyedSingleton("openai",
             new ChatClient(
-                 configuration["AI:OPENAI_MODEL"]!, 
+                 configuration["AI:OPENAI_MODEL"]!,
                 configuration["AI:OPENAI_API_KEY"]
                                                    ?? throw new InvalidOperationException("Missing api key for OpenAI")).AsIChatClient());
 
-        services.AddKeyedSingleton("azure", 
+        services.AddKeyedSingleton("azure",
             new AzureOpenAIClient(
                     new Uri(configuration["AI:AZURE_API_ENDPOINT"]!),
                     new ApiKeyCredential(configuration["AI:AZURE_API_KEY"]!)
@@ -41,19 +43,19 @@ public static class DependencyInjection
                 .GetChatClient(configuration["AI:AZURE_OPENAI_MODEL"]!)
                 .AsIChatClient());
 
-        services.AddKeyedSingleton<IChatClient>("gemini", 
+        services.AddKeyedSingleton<IChatClient>("gemini",
             new GeminiChatClient(new GeminiClientOptions
             {
                 ApiKey = configuration["AI:GEMINI_API_KEY"]!,
                 ModelId = configuration["AI:GEMINI_MODEL"]!
             }));
-        
+
         services.AddKeyedSingleton<IChatClient>("claude",
             new AnthropicClient(
                 new APIAuthentication(configuration["AI:CLAUDE_API_KEY"]!)
             ).Messages);
 
-        
+
         services.AddKeyedScoped<IAiTools, AdminToolRegistry>("admin-ai");
         services.AddKeyedScoped<IAiTools, PublicToolRegistry>("public-ai");
         services.AddKeyedScoped<IAiTools, CompanyAdminToolRegistry>("company.admin-ai");
@@ -64,6 +66,38 @@ public static class DependencyInjection
         services.AddScoped<IChatService, ChatService>();
         services.AddScoped<IEmbeddingService, EmbeddingService>();
         services.AddScoped<IEmbeddingProviderResolver, EmbeddingProviderResolver>();
+        return services;
+    }
+
+    /// <summary>
+    /// Registers lazy McpToolProviders as keyed IAiTools.
+    /// Connection to MCP servers happens on first tool request, not at startup.
+    /// </summary>
+    public static IServiceCollection AddMcpToolProviders(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        var integrationUrl = configuration["McpServer:IntegrationUrl"];
+        var microUrl = configuration["McpServer:MicroUrl"];
+
+        if (!string.IsNullOrEmpty(integrationUrl))
+        {
+            var integrationProvider = new McpToolProvider(integrationUrl, "mcp-integration",
+                LoggerFactory.Create(b => b.AddConsole()).CreateLogger<McpToolProvider>());
+
+            services.AddKeyedSingleton<IAiTools>("admin-monolith", integrationProvider);
+            services.AddKeyedSingleton<IAiTools>("public-monolith", integrationProvider);
+        }
+
+        if (!string.IsNullOrEmpty(microUrl))
+        {
+            var microProvider = new McpToolProvider(microUrl, "mcp-micro",
+                LoggerFactory.Create(b => b.AddConsole()).CreateLogger<McpToolProvider>());
+
+            services.AddKeyedSingleton<IAiTools>("admin-micro", microProvider);
+            services.AddKeyedSingleton<IAiTools>("public-micro", microProvider);
+        }
+
         return services;
     }
 }

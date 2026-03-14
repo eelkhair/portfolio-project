@@ -36,6 +36,8 @@ builder.Services.AddScoped<IAiNotificationHub, AiNotificationHubNotifier>();
 var blobConnectionString = builder.Configuration.GetConnectionString("BlobStorage") ?? "UseDevelopmentStorage=true";
 builder.Services.AddSingleton(new BlobServiceClient(blobConnectionString));
 
+builder.Services.AddMcpToolProviders(builder.Configuration);
+
 builder.Build().UseConfiguredSwagger(builder.Configuration)
     .UseApplicationServices()
     .Start();

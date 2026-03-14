@@ -53,6 +53,8 @@ declare -A services=(
   ["job-public"]="../apps/job-public"
   ["ai-service"]="../services/ai-service"
   ["ai-service-v2"]="../services/ai-service.v2"
+  ["ai-mcp-integration"]="../services/ai-service.v2"
+  ["ai-mcp-micro"]="../services/ai-service.v2"
   ["job-api"]="../services/micro-services/job-api"
   ["company-api"]="../services/micro-services/company-api"
   ["admin-api"]="../services/micro-services/admin-api"
@@ -95,6 +97,16 @@ build_and_push_backends() {
     if [ "$name" = "ai-service-v2" ]; then
       docker build \
         -f "/c/Users/elkha/RiderProjects/portfolio project/services/ai-service.v2/Src/Presentation/JobBoard.AI.API/Dockerfile" \
+        -t "$image" \
+        "/c/Users/elkha/RiderProjects/portfolio project/services/ai-service.v2"
+    elif [ "$name" = "ai-mcp-integration" ]; then
+      docker build \
+        -f "/c/Users/elkha/RiderProjects/portfolio project/services/ai-service.v2/Src/Presentation/JobBoard.AI.MCP.Integration/Dockerfile" \
+        -t "$image" \
+        "/c/Users/elkha/RiderProjects/portfolio project/services/ai-service.v2"
+    elif [ "$name" = "ai-mcp-micro" ]; then
+      docker build \
+        -f "/c/Users/elkha/RiderProjects/portfolio project/services/ai-service.v2/Src/Presentation/JobBoard.AI.MCP.Micro/Dockerfile" \
         -t "$image" \
         "/c/Users/elkha/RiderProjects/portfolio project/services/ai-service.v2"
     elif [ "$name" = "monolith-api" ]; then
