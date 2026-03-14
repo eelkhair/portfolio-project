@@ -5,6 +5,7 @@ using Elkhair.Dev.Common.Application;
 using JobBoard.AI.Application.Interfaces.Clients;
 using JobBoard.IntegrationEvents.Resume;
 using JobBoard.Monolith.Contracts.Companies;
+using JobBoard.Monolith.Contracts.Drafts;
 using JobBoard.Monolith.Contracts.Jobs;
 using Microsoft.Extensions.Logging;
 
@@ -218,6 +219,78 @@ public class HttpMonolithApiClient(
         catch (HttpRequestException ex)
         {
             logger.LogError(ex, "Error notifying monolith of all sections completed");
+            throw;
+        }
+    }
+
+    public async Task<List<DraftResponse>> ListDraftsAsync(Guid companyId, CancellationToken ct)
+    {
+        try
+        {
+            var result = await client.GetFromJsonAsync<ApiResponse<List<DraftResponse>>>($"api/jobs/{companyId}/list-drafts", JsonOpts, ct);
+            return result?.Data ?? [];
+        }
+        catch (HttpRequestException ex)
+        {
+            logger.LogError(ex, "Error listing drafts from monolith-api");
+            throw;
+        }
+    }
+
+    public async Task<DraftResponse> SaveDraftAsync(Guid companyId, DraftResponse draft, CancellationToken ct)
+    {
+        try
+        {
+            var response = await client.PutAsJsonAsync($"api/jobs/{companyId}/save-draft", draft, JsonOpts, ct);
+            response.EnsureSuccessStatusCode();
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<DraftResponse>>(JsonOpts, ct);
+            return result!.Data!;
+        }
+        catch (HttpRequestException ex)
+        {
+            logger.LogError(ex, "Error saving draft in monolith-api");
+            throw;
+        }
+    }
+
+    public async Task DeleteDraftAsync(Guid companyId, Guid draftId, CancellationToken ct)
+    {
+        try
+        {
+            var response = await client.DeleteAsync($"api/jobs/{companyId}/drafts/{draftId}", ct);
+            response.EnsureSuccessStatusCode();
+        }
+        catch (HttpRequestException ex)
+        {
+            logger.LogError(ex, "Error deleting draft from monolith-api");
+            throw;
+        }
+    }
+
+    public async Task<DraftResponse?> GetDraftByIdAsync(Guid draftId, CancellationToken ct)
+    {
+        try
+        {
+            var result = await client.GetFromJsonAsync<ApiResponse<DraftResponse>>($"api/jobs/drafts/{draftId}", JsonOpts, ct);
+            return result?.Data;
+        }
+        catch (HttpRequestException ex)
+        {
+            logger.LogError(ex, "Error getting draft from monolith-api");
+            throw;
+        }
+    }
+
+    public async Task<Dictionary<Guid, DraftsByCompanyItemResponse>> ListAllDraftsByCompanyAsync(CancellationToken ct)
+    {
+        try
+        {
+            var result = await client.GetFromJsonAsync<ApiResponse<Dictionary<Guid, DraftsByCompanyItemResponse>>>("api/jobs/drafts/by-company", JsonOpts, ct);
+            return result?.Data ?? new();
+        }
+        catch (HttpRequestException ex)
+        {
+            logger.LogError(ex, "Error listing drafts by company from monolith-api");
             throw;
         }
     }

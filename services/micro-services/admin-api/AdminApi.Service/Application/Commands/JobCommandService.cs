@@ -6,6 +6,7 @@ using AdminAPI.Contracts.Models.Jobs.Requests;
 using AdminAPI.Contracts.Models.Jobs.Responses;
 using Dapr.Client;
 using Elkhair.Dev.Common.Application;
+using Elkhair.Dev.Common.Dapr;
 using JobAPI.Contracts.Models.Jobs.Responses;
 
 namespace AdminApi.Application.Commands;
@@ -25,14 +26,16 @@ public class JobCommandService(DaprClient client, UserContextService accessor, I
         {
             var req = client.CreateInvokeMethodRequest(
                 HttpMethod.Put,
-                appId: "ai-service-v2",
-                methodName: $"drafts/{companyId}/upsert"
+                appId: "job-api",
+                methodName: $"api/drafts/{companyId}"
             );
 
             if (accessor.GetHeader("Authorization") is { } auth && !string.IsNullOrWhiteSpace(auth))
                 req.Headers.TryAddWithoutValidation("Authorization", auth);
 
-            req.Content = JsonContent.Create(request, options: JsonOpts);
+            var userId = accessor.GetCurrentUser() ?? "unknown";
+            var envelope = new EventDto<JobDraftRequest>(userId, Guid.NewGuid().ToString(), request);
+            req.Content = JsonContent.Create(envelope, options: JsonOpts);
 
             using var resp = await client.InvokeMethodWithResponseAsync(req, ct);
 
@@ -40,15 +43,20 @@ public class JobCommandService(DaprClient client, UserContextService accessor, I
 
             if (!resp.IsSuccessStatusCode)
             {
-                _logger.LogError("ai-service-v2 returned {StatusCode}: {Body}", (int)resp.StatusCode, raw);
+                _logger.LogError("job-api returned {StatusCode}: {Body}", (int)resp.StatusCode, raw);
 
                 throw new HttpRequestException(
-                    $"ai-service-v2 {resp.StatusCode}: {raw}", null, resp.StatusCode);
+                    $"job-api {resp.StatusCode}: {raw}", null, resp.StatusCode);
             }
 
-            var response = JsonSerializer.Deserialize<ApiResponse<JobDraftResponse>>(raw, JsonOpts);
+            var draft = JsonSerializer.Deserialize<JobDraftResponse>(raw, JsonOpts);
 
-            return response ?? throw new InvalidOperationException("Empty or invalid JSON from ai-service-v2.");
+            return new ApiResponse<JobDraftResponse>
+            {
+                Data = draft,
+                Success = true,
+                StatusCode = HttpStatusCode.OK
+            };
         }catch (Exception e)
         {
             _logger.LogError(e, "Error creating job draft");
@@ -157,5 +165,25 @@ public class JobCommandService(DaprClient client, UserContextService accessor, I
         }
     }
 
+    public async Task DeleteDraft(string companyId, Guid draftId, CancellationToken ct)
+    {
+        try
+        {
+            var req = client.CreateInvokeMethodRequest(
+                HttpMethod.Delete,
+                appId: "job-api",
+                methodName: $"api/drafts/{draftId}"
+            );
 
+            if (accessor.GetHeader("Authorization") is { } auth && !string.IsNullOrWhiteSpace(auth))
+                req.Headers.TryAddWithoutValidation("Authorization", auth);
+
+            await client.InvokeMethodAsync(req, ct);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error deleting draft {DraftId} for company {CompanyId}", draftId, companyId);
+            throw;
+        }
+    }
 }

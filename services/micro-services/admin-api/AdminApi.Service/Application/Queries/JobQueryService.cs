@@ -119,13 +119,12 @@ public class JobQueryService(DaprClient client, UserContextService accessor, ILo
         {
             var req = client.CreateInvokeMethodRequest(
                 HttpMethod.Get,
-                appId: "ai-service-v2",
-                methodName: $"drafts/{companyId}"
+                appId: "job-api",
+                methodName: $"api/drafts/{companyId}"
             );
 
             if (accessor.GetHeader("Authorization") is { } auth && !string.IsNullOrWhiteSpace(auth))
                 req.Headers.TryAddWithoutValidation("Authorization", auth);
-
 
             using var resp = await client.InvokeMethodWithResponseAsync(req, ct);
 
@@ -133,15 +132,20 @@ public class JobQueryService(DaprClient client, UserContextService accessor, ILo
 
             if (!resp.IsSuccessStatusCode)
             {
-                _logger.LogError("ai-service-v2 returned {StatusCode}: {Body}", (int)resp.StatusCode, raw);
+                _logger.LogError("job-api returned {StatusCode}: {Body}", (int)resp.StatusCode, raw);
 
                 throw new HttpRequestException(
-                    $"ai-service-v2 {resp.StatusCode}: {raw}", null, resp.StatusCode);
+                    $"job-api {resp.StatusCode}: {raw}", null, resp.StatusCode);
             }
 
-            var result = JsonSerializer.Deserialize<ApiResponse<List<JobDraftResponse>>>(raw, JsonOpts);
+            var drafts = JsonSerializer.Deserialize<List<JobDraftResponse>>(raw, JsonOpts);
 
-            return result ?? throw new InvalidOperationException("Empty or invalid JSON from ai-service-v2.");
+            return new ApiResponse<List<JobDraftResponse>>
+            {
+                Data = drafts ?? [],
+                Success = true,
+                StatusCode = HttpStatusCode.OK
+            };
         }catch (Exception e)
         {
             _logger.LogError(e, "Error listing drafts");
@@ -156,4 +160,55 @@ public class JobQueryService(DaprClient client, UserContextService accessor, ILo
         }
     }
 
+    public async Task<ApiResponse<JobDraftResponse?>> GetDraft(Guid draftId, CancellationToken ct)
+    {
+        try
+        {
+            var req = client.CreateInvokeMethodRequest(
+                HttpMethod.Get,
+                appId: "job-api",
+                methodName: $"api/drafts/detail/{draftId}"
+            );
+
+            if (accessor.GetHeader("Authorization") is { } auth && !string.IsNullOrWhiteSpace(auth))
+                req.Headers.TryAddWithoutValidation("Authorization", auth);
+
+            using var resp = await client.InvokeMethodWithResponseAsync(req, ct);
+            var raw = await resp.Content.ReadAsStringAsync(ct);
+
+            if (!resp.IsSuccessStatusCode)
+            {
+                _logger.LogError("job-api returned {StatusCode}: {Body}", (int)resp.StatusCode, raw);
+                return new ApiResponse<JobDraftResponse?>
+                {
+                    Data = null,
+                    Success = false,
+                    StatusCode = resp.StatusCode
+                };
+            }
+
+            var draft = JsonSerializer.Deserialize<JobDraftResponse>(raw, JsonOpts);
+
+            return new ApiResponse<JobDraftResponse?>
+            {
+                Data = draft,
+                Success = true,
+                StatusCode = HttpStatusCode.OK
+            };
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error getting draft {DraftId}", draftId);
+            return new ApiResponse<JobDraftResponse?>
+            {
+                Success = false,
+                StatusCode = HttpStatusCode.InternalServerError,
+                Exceptions = new ApiError
+                {
+                    Message = e.Message,
+                    Errors = new Dictionary<string, string[]> { { "Error", [e.Message] } }
+                }
+            };
+        }
+    }
 }

@@ -1,5 +1,4 @@
 using JobBoard.AI.Application.Actions.Shared;
-using JobBoard.AI.Domain.Drafts;
 
 namespace JobBoard.AI.Application.Actions.Drafts;
 

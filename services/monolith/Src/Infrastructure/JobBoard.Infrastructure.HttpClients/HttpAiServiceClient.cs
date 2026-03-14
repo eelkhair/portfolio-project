@@ -28,20 +28,6 @@ public sealed class HttpAiServiceClient(
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
 
-    public async Task<List<DraftResponse>> ListDrafts(Guid companyId, CancellationToken cancellationToken)
-    {
-        EnrichActivity(companyId, "drafts.list");
-        using var response = await client.GetAsync($"drafts/{companyId}", cancellationToken);
-        await EnsureSuccess(response, "drafts.list", cancellationToken);
-
-        var result = await response.Content.ReadFromJsonAsync<ApiResponse<List<DraftResponse>>>(JsonOpts, cancellationToken)
-                     ?? throw new InvalidOperationException($"{ServiceName} returned empty JSON payload.");
-
-        Activity.Current?.SetTag("ai.drafts.count", result.Data?.Count);
-        logger.LogInformation("{Service} returned {Count} drafts for company {CompanyId}", ServiceName, result.Data?.Count, companyId);
-        return result.Data!;
-    }
-
     public async Task<DraftRewriteResponse> RewriteItem(DraftItemRewriteRequest requestModel, CancellationToken cancellationToken)
     {
         EnrichActivity(null, "drafts.rewrite.item");
@@ -66,19 +52,6 @@ public sealed class HttpAiServiceClient(
         Activity.Current?.SetTag("ai.draft.title", result.Data?.Title);
         logger.LogInformation("{Service} generated draft {DraftId} with title '{Title}' for company {CompanyId}",
             ServiceName, result.Data?.DraftId, result.Data?.Title, companyId);
-        return result.Data!;
-    }
-
-    public async Task<DraftResponse> SaveDraft(Guid companyId, DraftResponse draft, CancellationToken cancellationToken)
-    {
-        EnrichActivity(companyId, "drafts.upsert");
-        using var response = await client.PutAsJsonAsync($"drafts/{companyId}/upsert", draft, JsonOpts, cancellationToken);
-        await EnsureSuccess(response, "drafts.upsert", cancellationToken);
-
-        var result = await response.Content.ReadFromJsonAsync<ApiResponse<DraftResponse>>(JsonOpts, cancellationToken)
-                     ?? throw new InvalidOperationException($"{ServiceName} returned empty JSON payload.");
-
-        logger.LogInformation("{Service} saved draft {DraftId} for company {CompanyId}", ServiceName, result.Data?.Id, companyId);
         return result.Data!;
     }
 

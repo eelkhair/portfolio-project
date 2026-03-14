@@ -8,7 +8,6 @@ namespace JobBoard.AI.Infrastructure.Persistence;
 
 public sealed class AiDbContext : DbContext, IAiDbContext
 {
-    public DbSet<Draft> Drafts => Set<Draft>();
     public DbSet<JobEmbedding> JobEmbeddings => Set<JobEmbedding>();
     public DbSet<ResumeEmbedding> ResumeEmbeddings => Set<ResumeEmbedding>();
     
@@ -20,21 +19,6 @@ public sealed class AiDbContext : DbContext, IAiDbContext
     {
         modelBuilder.HasPostgresExtension("vector");
         modelBuilder.Entity<JobCandidate>().HasNoKey();
-        modelBuilder.Entity<Draft>(b =>
-        {
-            b.ToTable("drafts");
-            b.HasKey(x => x.Id);
-
-            b.Property(x => x.Type)
-                .HasConversion(v => v.Value, v => new DraftType(v));
-
-            b.Property(x => x.Status)
-                .HasConversion(v => v.Value, v => new DraftStatus(v));
-
-            b.Property(x => x.ContentJson)
-                .HasColumnType("jsonb");
-            
-        });
         modelBuilder.Entity<JobEmbedding>(b =>
         {
             b.ToTable("job_embeddings");

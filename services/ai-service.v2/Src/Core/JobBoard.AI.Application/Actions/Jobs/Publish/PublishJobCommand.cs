@@ -55,30 +55,6 @@ public class PublishJobCommandHandler(IHandlerContext context,
 
         await dbContext.JobEmbeddings.AddAsync(jobEmbedding, cancellationToken);
 
-        if (!string.IsNullOrWhiteSpace(job.DraftId))
-        {
-            if (job.DeleteDraft)
-            {
-                var draft = await dbContext.Drafts.FirstOrDefaultAsync(c=> c.Id.ToString()== job.DraftId, cancellationToken);
-                if (draft != null)
-                {
-                    dbContext.Drafts.Remove(draft);
-                }
-                Activity.Current?.SetTag("job.draft.delete", true);
-            }
-            else
-            {
-                Activity.Current?.SetTag("job.draft.delete", false);
-            }
-
-            Activity.Current?.SetTag("job.draft.id", job.DraftId);
-        }
-        else
-        {
-            Activity.Current?.SetTag("job.draft.delete", false);
-            Activity.Current?.SetTag("job.draft.id", null);
-        }
-        
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;

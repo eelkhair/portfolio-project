@@ -24,6 +24,8 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
 
             modelBuilder.HasSequence<int>("Companies_Sequence");
 
+            modelBuilder.HasSequence<int>("Drafts_Sequence");
+
             modelBuilder.HasSequence<int>("Industries_Sequence");
 
             modelBuilder.HasSequence<int>("JobApplications_Sequence");
@@ -143,6 +145,79 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                     b.ToTable(tb => tb.IsTemporal(ttb =>
                             {
                                 ttb.UseHistoryTable("CompaniesHistory", "Company");
+                                ttb
+                                    .HasPeriodStart("PeriodStart")
+                                    .HasColumnName("PeriodStart");
+                                ttb
+                                    .HasPeriodEnd("PeriodEnd")
+                                    .HasColumnName("PeriodEnd");
+                            }));
+                });
+
+            modelBuilder.Entity("JobBoard.Domain.Entities.Draft", b =>
+                {
+                    b.Property<int>("InternalId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR Drafts_Sequence");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ContentJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("DraftStatus")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("DraftType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("PeriodEnd")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("PeriodEnd");
+
+                    b.Property<DateTime>("PeriodStart")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("PeriodStart");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("InternalId");
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("CompanyId", "DraftStatus");
+
+                    b.ToTable("Drafts", "Draft");
+
+                    b.ToTable(tb => tb.IsTemporal(ttb =>
+                            {
+                                ttb.UseHistoryTable("DraftsHistory", "Draft");
                                 ttb
                                     .HasPeriodStart("PeriodStart")
                                     .HasColumnName("PeriodStart");
@@ -1063,11 +1138,11 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                             b1.Property<string>("CredentialId")
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.Property<DateTime?>("ExpirationDate")
-                                .HasColumnType("datetime2");
+                            b1.Property<string>("ExpirationDate")
+                                .HasColumnType("nvarchar(max)");
 
-                            b1.Property<DateTime?>("IssueDate")
-                                .HasColumnType("datetime2");
+                            b1.Property<string>("IssueDate")
+                                .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("IssuingOrganization")
                                 .HasColumnType("nvarchar(max)");
@@ -1099,8 +1174,8 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.Property<DateTime?>("EndDate")
-                                .HasColumnType("datetime2");
+                            b1.Property<string>("EndDate")
+                                .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("FieldOfStudy")
                                 .HasColumnType("nvarchar(max)");
@@ -1109,8 +1184,8 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.Property<DateTime>("StartDate")
-                                .HasColumnType("datetime2");
+                            b1.Property<string>("StartDate")
+                                .HasColumnType("nvarchar(max)");
 
                             b1.HasKey("JobApplicationInternalId", "__synthesizedOrdinal");
 
@@ -1171,8 +1246,8 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                             b1.Property<string>("Description")
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.Property<DateTime?>("EndDate")
-                                .HasColumnType("datetime2");
+                            b1.Property<string>("EndDate")
+                                .HasColumnType("nvarchar(max)");
 
                             b1.Property<bool>("IsCurrent")
                                 .HasColumnType("bit");
@@ -1181,8 +1256,8 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.Property<DateTime>("StartDate")
-                                .HasColumnType("datetime2");
+                            b1.Property<string>("StartDate")
+                                .HasColumnType("nvarchar(max)");
 
                             b1.HasKey("JobApplicationInternalId", "__synthesizedOrdinal");
 
@@ -1321,11 +1396,11 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                             b1.Property<string>("CredentialId")
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.Property<DateTime?>("ExpirationDate")
-                                .HasColumnType("datetime2");
+                            b1.Property<string>("ExpirationDate")
+                                .HasColumnType("nvarchar(max)");
 
-                            b1.Property<DateTime?>("IssueDate")
-                                .HasColumnType("datetime2");
+                            b1.Property<string>("IssueDate")
+                                .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("IssuingOrganization")
                                 .HasColumnType("nvarchar(max)");
@@ -1357,8 +1432,8 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.Property<DateTime?>("EndDate")
-                                .HasColumnType("datetime2");
+                            b1.Property<string>("EndDate")
+                                .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("FieldOfStudy")
                                 .HasColumnType("nvarchar(max)");
@@ -1367,8 +1442,8 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.Property<DateTime>("StartDate")
-                                .HasColumnType("datetime2");
+                            b1.Property<string>("StartDate")
+                                .HasColumnType("nvarchar(max)");
 
                             b1.HasKey("UserProfileInternalId", "__synthesizedOrdinal");
 
@@ -1429,8 +1504,8 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                             b1.Property<string>("Description")
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.Property<DateTime?>("EndDate")
-                                .HasColumnType("datetime2");
+                            b1.Property<string>("EndDate")
+                                .HasColumnType("nvarchar(max)");
 
                             b1.Property<bool>("IsCurrent")
                                 .HasColumnType("bit");
@@ -1439,8 +1514,8 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.Property<DateTime>("StartDate")
-                                .HasColumnType("datetime2");
+                            b1.Property<string>("StartDate")
+                                .HasColumnType("nvarchar(max)");
 
                             b1.HasKey("UserProfileInternalId", "__synthesizedOrdinal");
 

@@ -5,6 +5,7 @@ using JobBoard.AI.Application.Interfaces.Clients;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.IntegrationEvents.Resume;
 using JobBoard.Monolith.Contracts.Companies;
+using JobBoard.Monolith.Contracts.Drafts;
 using JobBoard.Monolith.Contracts.Jobs;
 using Microsoft.Extensions.Logging;
 
@@ -241,6 +242,86 @@ public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<Mon
         {
             var body = await ex.Response.Content.ReadAsStringAsync(ct);
             logger.LogError(ex, "Error notifying monolith of all sections completed: {Body}", body);
+            throw;
+        }
+    }
+
+    public async Task<List<DraftResponse>> ListDraftsAsync(Guid companyId, CancellationToken ct)
+    {
+        try
+        {
+            var request = CreateRequest(HttpMethod.Get, $"api/jobs/{companyId}/list-drafts", "monolith-api");
+            var response = await Client.InvokeMethodAsync<ApiResponse<List<DraftResponse>>>(request, ct);
+            return response.Data ?? [];
+        }
+        catch (InvocationException ex)
+        {
+            var body = await ex.Response.Content.ReadAsStringAsync(ct);
+            logger.LogError(ex, "Error listing drafts from monolith-api: {Body}", body);
+            throw;
+        }
+    }
+
+    public async Task<DraftResponse> SaveDraftAsync(Guid companyId, DraftResponse draft, CancellationToken ct)
+    {
+        try
+        {
+            var request = CreateRequest(HttpMethod.Put, $"api/jobs/{companyId}/save-draft", "monolith-api");
+            request.Content = JsonContent.Create(draft);
+            var response = await Client.InvokeMethodAsync<ApiResponse<DraftResponse>>(request, ct);
+            return response.Data!;
+        }
+        catch (InvocationException ex)
+        {
+            var body = await ex.Response.Content.ReadAsStringAsync(ct);
+            logger.LogError(ex, "Error saving draft in monolith-api: {Body}", body);
+            throw;
+        }
+    }
+
+    public async Task DeleteDraftAsync(Guid companyId, Guid draftId, CancellationToken ct)
+    {
+        try
+        {
+            var request = CreateRequest(HttpMethod.Delete, $"api/jobs/{companyId}/drafts/{draftId}", "monolith-api");
+            await Client.InvokeMethodAsync(request, ct);
+        }
+        catch (InvocationException ex)
+        {
+            var body = await ex.Response.Content.ReadAsStringAsync(ct);
+            logger.LogError(ex, "Error deleting draft from monolith-api: {Body}", body);
+            throw;
+        }
+    }
+
+    public async Task<DraftResponse?> GetDraftByIdAsync(Guid draftId, CancellationToken ct)
+    {
+        try
+        {
+            var request = CreateRequest(HttpMethod.Get, $"api/jobs/drafts/{draftId}", "monolith-api");
+            var response = await Client.InvokeMethodAsync<ApiResponse<DraftResponse>>(request, ct);
+            return response.Data;
+        }
+        catch (InvocationException ex)
+        {
+            var body = await ex.Response.Content.ReadAsStringAsync(ct);
+            logger.LogError(ex, "Error getting draft from monolith-api: {Body}", body);
+            throw;
+        }
+    }
+
+    public async Task<Dictionary<Guid, DraftsByCompanyItemResponse>> ListAllDraftsByCompanyAsync(CancellationToken ct)
+    {
+        try
+        {
+            var request = CreateRequest(HttpMethod.Get, "api/jobs/drafts/by-company", "monolith-api");
+            var response = await Client.InvokeMethodAsync<ApiResponse<Dictionary<Guid, DraftsByCompanyItemResponse>>>(request, ct);
+            return response.Data ?? new();
+        }
+        catch (InvocationException ex)
+        {
+            var body = await ex.Response.Content.ReadAsStringAsync(ct);
+            logger.LogError(ex, "Error listing drafts by company from monolith-api: {Body}", body);
             throw;
         }
     }

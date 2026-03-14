@@ -22,6 +22,7 @@ public partial class JobBoardDbContext
     public DbSet<Industry> Industries { get; set; }
     public DbSet<UserCompany> UserCompanies { get; set; }
     public DbSet<Company> Companies { get; set; }
+    public DbSet<Draft> Drafts { get; set; }
 }
 
 public partial class JobBoardDbContext(DbContextOptions<JobBoardDbContext> options)

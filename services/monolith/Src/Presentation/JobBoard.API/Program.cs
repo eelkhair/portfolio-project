@@ -14,9 +14,11 @@ using JobBoard.Infrastructure.Messaging;
 using JobBoard.Infrastructure.Outbox;
 using JobBoard.Infrastructure.Persistence;
 using JobBoard.Infrastructure.BlobStorage;
+using JobBoard.Infrastructure.Persistence.Context;
 using JobBoard.Infrastructure.RedisConfig;
 using JobBoard.Infrastructure.Smtp;
 using JobBoard.Infrastructure.Vault;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 // #if DEBUG
@@ -57,7 +59,16 @@ builder.Services
     .AddOpenTelemetryServices(builder.Configuration, "monolith-api")
     .AddSignalR();
 
-builder.Build().UseConfiguredSwagger(builder.Configuration)
+var app = builder.Build();
+
+if (!isTesting)
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<JobBoardDbContext>();
+    await db.Database.MigrateAsync();
+}
+
+app.UseConfiguredSwagger(builder.Configuration)
     .UseApplicationServices()
     .Start();
 

@@ -105,6 +105,8 @@ builder.Services.AddScoped<IJobDbContext, JobDbContext>();
 builder.Services.AddScoped<ICompanyCommandService, CompanyCommandService>();
 builder.Services.AddScoped<IJobQueryService, JobQueryService>();
 builder.Services.AddScoped<IJobCommandService, JobCommandService>();
+builder.Services.AddScoped<IDraftCommandService, DraftCommandService>();
+builder.Services.AddScoped<IDraftQueryService, DraftQueryService>();
 
 builder.Services.AddAuthentication(options =>
     {
@@ -129,6 +131,12 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.User ?? new ClaimsPrincipal());
 builder.Services.AddDaprClient();
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<JobDbContext>();
+    await db.Database.MigrateAsync();
+}
 
 app.UseCors(CorsPolicy);
 

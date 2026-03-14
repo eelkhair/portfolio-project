@@ -58,7 +58,14 @@
       "Bash(dotnet nuget push \"C:/Users/elkha/RiderProjects/portfolio project/nupkgs/JobBoard.HealthChecks.1.0.8.nupkg\" --source \"Home\")",
       "Bash(dotnet restore:*)",
       "Bash(dotnet pack:*)",
-      "Bash(dotnet nuget:*)"
+      "Bash(dotnet nuget:*)",
+      "Bash(dotnet run:*)",
+      "Bash(dotnet ef:*)",
+      "Bash(python generate_architecture_pdf.py)",
+      "WebSearch",
+      "WebFetch(domain:devblogs.microsoft.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:csharp.sdk.modelcontextprotocol.io)"
     ]
   }
 }

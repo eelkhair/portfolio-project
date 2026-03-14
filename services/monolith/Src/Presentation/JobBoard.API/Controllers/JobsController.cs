@@ -1,5 +1,8 @@
-﻿using JobBoard.Application.Actions.Drafts.Generate;
+﻿using JobBoard.Application.Actions.Drafts.Delete;
+using JobBoard.Application.Actions.Drafts.Generate;
+using JobBoard.Application.Actions.Drafts.Get;
 using JobBoard.Application.Actions.Drafts.List;
+using JobBoard.Application.Actions.Drafts.ListByCompany;
 using JobBoard.Application.Actions.Drafts.Rewrite;
 using JobBoard.Application.Actions.Drafts.Save;
 using JobBoard.Application.Actions.Jobs.Create;
@@ -67,6 +70,28 @@ public class JobsController : BaseApiController
     public async Task<IActionResult> RewriteDraftItem(DraftItemRewriteRequest request)
         => await ExecuteCommandAsync(new RewriteDraftItemCommand{DraftItemRewriteRequest = request}, Ok);
 
-    
+    /// <summary>
+    /// Get a draft by its ID
+    /// </summary>
+    [HttpGet("drafts/{draftId:guid}")]
+    public async Task<IActionResult> GetDraft(Guid draftId) =>
+        await ExecuteQueryAsync(new GetDraftByIdQuery { DraftId = draftId }, Ok);
 
+    /// <summary>
+    /// Get all drafts grouped by company
+    /// </summary>
+    [HttpGet("drafts/by-company")]
+    public async Task<IActionResult> DraftsByCompany() =>
+        await ExecuteQueryAsync(new ListAllDraftsByCompanyQuery(), Ok);
+
+    /// <summary>
+    /// Delete a draft
+    /// </summary>
+    [HttpDelete("{companyId:guid}/drafts/{draftId:guid}")]
+    public async Task<IActionResult> DeleteDraft(Guid companyId, Guid draftId) =>
+        await ExecuteCommandAsync(new DeleteDraftCommand
+        {
+            CompanyId = companyId,
+            DraftId = draftId
+        }, Ok);
 }

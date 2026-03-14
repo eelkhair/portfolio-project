@@ -1,9 +1,11 @@
 using System.Diagnostics;
 using JobBoard.Application.Actions.Base;
+using JobBoard.Application.Interfaces;
 using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Application.Interfaces.Repositories;
 using JobBoard.Domain.Entities;
 using JobBoard.Monolith.Contracts.Jobs;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace JobBoard.Application.Actions.Jobs.Create;
@@ -31,6 +33,19 @@ public class CreateJobCommandHandler(IHandlerContext context,
         
         await jobRepository.AddAsync(job, cancellationToken);
         
+        // Delete draft if requested
+        if (command.Request.DeleteDraft && !string.IsNullOrWhiteSpace(command.Request.DraftId)
+            && Guid.TryParse(command.Request.DraftId, out var draftGuid))
+        {
+            var draftsDbSet = ((IJobBoardQueryDbContext)Context).Drafts;
+            var draft = await draftsDbSet.FirstOrDefaultAsync(d => d.Id == draftGuid, cancellationToken);
+            if (draft is not null)
+            {
+                draftsDbSet.Remove(draft);
+                Logger.LogInformation("Draft {DraftId} will be deleted with job creation", command.Request.DraftId);
+            }
+        }
+
         var integrationEvent = command.Request.ToIntegrationEvent(uId);
         await OutboxPublisher.PublishAsync(integrationEvent, cancellationToken);
         await Context.SaveChangesAsync(command.UserId, cancellationToken);

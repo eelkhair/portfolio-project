@@ -13,6 +13,7 @@ public partial class JobDbContext
     public DbSet<Job> Jobs { get; set; }
     public DbSet<Qualification> Qualifications { get; set; }
     public DbSet<Responsibility> Responsibilities { get; set; }
+    public DbSet<Draft> Drafts { get; set; }
 }
 
 public partial class JobDbContext : DbContext, IJobDbContext

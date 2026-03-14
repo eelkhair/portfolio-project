@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using AdminAPI.Contracts.Models.Companies.Requests;
+using AdminAPI.Contracts.Models.Jobs.Responses;
 using CompanyAPI.Contracts.Models.Companies.Responses;
 using CompanyAPI.Contracts.Models.Industries.Responses;
 using Dapr.Client;
@@ -128,6 +129,67 @@ public class AdminApiClient(DaprClient client, IUserAccessor accessor, ILogger<A
             var body = await response.Content.ReadAsStringAsync(ct);
             logger.LogError(ex, "Error getting industries from monolith-api: {Body}", body);
 
+            throw;
+        }
+    }
+
+    public async Task<ApiResponse<List<JobDraftResponse>>> ListDraftsAsync(Guid companyId, CancellationToken ct)
+    {
+        try
+        {
+            var request = CreateRequest(HttpMethod.Get, $"api/jobs/{companyId}/list-drafts", "admin-api");
+            return await Client.InvokeMethodAsync<ApiResponse<List<JobDraftResponse>>>(request, ct);
+        }
+        catch (InvocationException ex)
+        {
+            var body = await ex.Response.Content.ReadAsStringAsync(ct);
+            logger.LogError(ex, "Error listing drafts from admin-api: {Body}", body);
+            throw;
+        }
+    }
+
+    public async Task<ApiResponse<JobDraftResponse>> SaveDraftAsync(Guid companyId, object draft, CancellationToken ct)
+    {
+        try
+        {
+            var request = CreateRequest(HttpMethod.Put, $"api/jobs/{companyId}/save-draft", "admin-api");
+            request.Content = JsonContent.Create(draft);
+            return await Client.InvokeMethodAsync<ApiResponse<JobDraftResponse>>(request, ct);
+        }
+        catch (InvocationException ex)
+        {
+            var body = await ex.Response.Content.ReadAsStringAsync(ct);
+            logger.LogError(ex, "Error saving draft in admin-api: {Body}", body);
+            throw;
+        }
+    }
+
+    public async Task DeleteDraftAsync(Guid companyId, Guid draftId, CancellationToken ct)
+    {
+        try
+        {
+            var request = CreateRequest(HttpMethod.Delete, $"api/jobs/{companyId}/drafts/{draftId}", "admin-api");
+            await Client.InvokeMethodAsync(request, ct);
+        }
+        catch (InvocationException ex)
+        {
+            var body = await ex.Response.Content.ReadAsStringAsync(ct);
+            logger.LogError(ex, "Error deleting draft from admin-api: {Body}", body);
+            throw;
+        }
+    }
+
+    public async Task<ApiResponse<JobDraftResponse?>> GetDraftByIdAsync(Guid draftId, CancellationToken ct)
+    {
+        try
+        {
+            var request = CreateRequest(HttpMethod.Get, $"api/jobs/drafts/{draftId}", "admin-api");
+            return await Client.InvokeMethodAsync<ApiResponse<JobDraftResponse?>>(request, ct);
+        }
+        catch (InvocationException ex)
+        {
+            var body = await ex.Response.Content.ReadAsStringAsync(ct);
+            logger.LogError(ex, "Error getting draft from admin-api: {Body}", body);
             throw;
         }
     }

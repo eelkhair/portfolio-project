@@ -12,4 +12,5 @@ public interface IJobCommandService
 
     Task<ApiResponse<JobRewriteResponse>> RewriteItem(JobRewriteRequest request, CancellationToken ct);
     Task<ApiResponse<JobResponse>> CreateJob(JobCreateRequest request, CancellationToken ct);
+    Task DeleteDraft(string companyId, Guid draftId, CancellationToken ct);
 }
