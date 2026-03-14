@@ -22,6 +22,7 @@ public interface IJobBoardQueryDbContext
     DbSet<Industry> Industries { get; set; }
     DbSet<UserCompany> UserCompanies { get; set; }
     DbSet<Company> Companies { get; set; }
+    DbSet<Draft> Drafts { get; set; }
 
 }
 

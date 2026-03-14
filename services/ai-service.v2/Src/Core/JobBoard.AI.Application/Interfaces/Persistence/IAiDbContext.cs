@@ -5,7 +5,6 @@ namespace JobBoard.AI.Application.Interfaces.Persistence;
 
 public interface IAiDbContext
 {
-    DbSet<Draft> Drafts { get; }
     DbSet<JobEmbedding> JobEmbeddings { get; }
     DbSet<ResumeEmbedding> ResumeEmbeddings { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);

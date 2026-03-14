@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Elkhair.Dev.Common.Application;
 using JobBoard.IntegrationEvents.Resume;
 using JobBoard.Monolith.Contracts.Companies;
+using JobBoard.Monolith.Contracts.Drafts;
 using JobBoard.Monolith.Contracts.Jobs;
 
 namespace JobBoard.AI.Application.Interfaces.Clients;
@@ -22,6 +23,19 @@ public interface IMonolithApiClient
     Task NotifySectionParsedAsync(ResumeSectionParsedRequest model, CancellationToken ct);
     Task NotifySectionFailedAsync(ResumeSectionFailedRequest model, CancellationToken ct);
     Task NotifyAllSectionsCompletedAsync(ResumeAllSectionsCompletedRequest model, CancellationToken ct);
+
+    // Draft CRUD — persistence lives in monolith
+    Task<List<DraftResponse>> ListDraftsAsync(Guid companyId, CancellationToken ct);
+    Task<DraftResponse> SaveDraftAsync(Guid companyId, DraftResponse draft, CancellationToken ct);
+    Task DeleteDraftAsync(Guid companyId, Guid draftId, CancellationToken ct);
+    Task<DraftResponse?> GetDraftByIdAsync(Guid draftId, CancellationToken ct);
+    Task<Dictionary<Guid, DraftsByCompanyItemResponse>> ListAllDraftsByCompanyAsync(CancellationToken ct);
+}
+
+public class DraftsByCompanyItemResponse
+{
+    public List<DraftResponse> Drafts { get; set; } = [];
+    public int Count { get; set; }
 }
 
 public class ResumeParseCompletedRequest

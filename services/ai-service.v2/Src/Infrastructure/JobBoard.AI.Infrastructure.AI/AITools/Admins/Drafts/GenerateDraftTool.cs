@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using JobBoard.AI.Application.Actions.Drafts;
 using JobBoard.AI.Application.Actions.Drafts.Generate;
+using JobBoard.AI.Application.Interfaces.Clients;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Notifications;
 using JobBoard.AI.Application.Interfaces.Observability;
@@ -10,7 +11,7 @@ namespace JobBoard.AI.Infrastructure.AI.AITools.Admins.Drafts;
 
 public static class GenerateDraftTool
 {
-    public static AIFunction Get(IActivityFactory activityFactory, IAiToolHandlerResolver toolResolver, IAiNotificationHub notificationHub, IUserAccessor userAccessor)
+    public static AIFunction Get(IActivityFactory activityFactory, IAiToolHandlerResolver toolResolver, IDraftPersistence draftPersistence, IAiNotificationHub notificationHub, IUserAccessor userAccessor)
     {
         return AIFunctionFactory.Create(
             async (GenerateDraftCommand cmd, CancellationToken ct) =>
@@ -21,16 +22,21 @@ public static class GenerateDraftTool
 
                 activity?.AddTag("ai.operation", "generate_draft");
                 activity?.AddTag("tool.Title", cmd.Request.TitleSeed);
-                
                 activity?.AddTag("tool.company_id", cmd.CompanyId);
 
                 var handler = toolResolver.Resolve<GenerateDraftCommand, DraftResponse>();
 
                 var result = await handler.HandleAsync(cmd, ct);
-                
-                var userId = userAccessor.UserId 
+
+                // Save the generated draft via mode-aware persistence
+                var saved = await draftPersistence.SaveDraftAsync(cmd.CompanyId, result, ct);
+                result.Id = saved.Id;
+
+                activity?.SetTag("tool.draft.id", result.Id);
+
+                var userId = userAccessor.UserId
                              ?? throw new InvalidOperationException("UserId is required for AI notifications.");
-                
+
                 await notificationHub.SendToUserAsync(
                     userId,
                     AiNotificationMethods.Notification,
@@ -39,8 +45,8 @@ public static class GenerateDraftTool
                         Title: $"{cmd.Request.TitleSeed}",
                         EntityId: result.Id,
                         EntityType: "draft",
-                        TraceParent: Activity.Current?.Id,                 
-                        TraceState: Activity.Current?.TraceStateString, 
+                        TraceParent: Activity.Current?.Id,
+                        TraceState: Activity.Current?.TraceStateString,
                         CorrelationId: activity?.TraceId.ToString(),
                         Timestamp: DateTimeOffset.UtcNow,
                         Metadata: new Dictionary<string, object>

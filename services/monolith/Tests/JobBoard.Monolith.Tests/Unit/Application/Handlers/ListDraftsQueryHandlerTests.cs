@@ -1,7 +1,10 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using JobBoard.Application.Actions.Drafts.List;
 using JobBoard.Application.Interfaces;
-using JobBoard.Application.Interfaces.Infrastructure;
+using JobBoard.Domain.Entities;
 using JobBoard.Monolith.Contracts.Drafts;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Shouldly;
@@ -11,63 +14,38 @@ namespace JobBoard.Monolith.Tests.Unit.Application.Handlers;
 [Trait("Category", "Unit")]
 public class ListDraftsQueryHandlerTests
 {
-    private readonly IAiServiceClient _aiServiceClient;
+    private static readonly JsonSerializerOptions JsonOpts = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+    };
+
     private readonly ListDraftsQueryHandler _sut;
+    private readonly DraftTestDbContext _dbContext;
 
     public ListDraftsQueryHandlerTests()
     {
-        var context = Substitute.For<IJobBoardQueryDbContext, ITransactionDbContext>();
-        var changeTracker = new StubQueryDbContext().ChangeTracker;
-        ((ITransactionDbContext)context).ChangeTracker.Returns(changeTracker);
+        _dbContext = new DraftTestDbContext();
+        _dbContext.Database.EnsureCreated();
 
-        _aiServiceClient = Substitute.For<IAiServiceClient>();
+        var queryContext = Substitute.For<IJobBoardQueryDbContext, ITransactionDbContext>();
+        queryContext.Drafts.Returns(_dbContext.Drafts);
+        var changeTracker = _dbContext.ChangeTracker;
+        ((ITransactionDbContext)queryContext).ChangeTracker.Returns(changeTracker);
 
         _sut = new ListDraftsQueryHandler(
-            context,
-            Substitute.For<ILogger<ListDraftsQueryHandler>>(),
-            _aiServiceClient);
+            queryContext,
+            Substitute.For<ILogger<ListDraftsQueryHandler>>());
     }
 
-    [Fact]
-    public async Task HandleAsync_ShouldCallAiServiceWithCompanyId()
-    {
-        var companyId = Guid.NewGuid();
-        var query = new ListDraftsQuery { CompanyId = companyId };
-        _aiServiceClient.ListDrafts(companyId, Arg.Any<CancellationToken>())
-            .Returns(new List<DraftResponse>());
-
-        await _sut.HandleAsync(query, CancellationToken.None);
-
-        await _aiServiceClient.Received(1).ListDrafts(companyId, Arg.Any<CancellationToken>());
-    }
-
-    [Fact]
-    public async Task HandleAsync_ShouldReturnDraftsFromAiService()
-    {
-        var companyId = Guid.NewGuid();
-        var expectedDrafts = new List<DraftResponse>
-        {
-            new() { Id = "draft-1", Title = "Backend Engineer", Location = "Remote" },
-            new() { Id = "draft-2", Title = "Frontend Engineer", Location = "NYC" }
-        };
-        _aiServiceClient.ListDrafts(companyId, Arg.Any<CancellationToken>())
-            .Returns(expectedDrafts);
-
-        var result = await _sut.HandleAsync(
-            new ListDraftsQuery { CompanyId = companyId },
-            CancellationToken.None);
-
-        result.Count.ShouldBe(2);
-        result[0].Title.ShouldBe("Backend Engineer");
-        result[1].Title.ShouldBe("Frontend Engineer");
-    }
+    // TODO: Rewrite tests to seed Draft entities into the in-memory DbSet
+    // and verify that the handler deserializes ContentJson correctly.
+    // Commenting out old tests that relied on IAiServiceClient.ListDrafts which no longer exists.
 
     [Fact]
     public async Task HandleAsync_WhenNoDrafts_ShouldReturnEmptyList()
     {
         var companyId = Guid.NewGuid();
-        _aiServiceClient.ListDrafts(companyId, Arg.Any<CancellationToken>())
-            .Returns(new List<DraftResponse>());
 
         var result = await _sut.HandleAsync(
             new ListDraftsQuery { CompanyId = companyId },
@@ -77,46 +55,70 @@ public class ListDraftsQueryHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_WhenAiServiceThrows_ShouldPropagateException()
+    public async Task HandleAsync_ShouldReturnDraftsFromDatabase()
     {
         var companyId = Guid.NewGuid();
-        _aiServiceClient.ListDrafts(companyId, Arg.Any<CancellationToken>())
-            .Returns(Task.FromException<List<DraftResponse>>(new HttpRequestException("AI service down")));
-
-        await Should.ThrowAsync<HttpRequestException>(
-            () => _sut.HandleAsync(
-                new ListDraftsQuery { CompanyId = companyId },
-                CancellationToken.None));
-    }
-
-    [Fact]
-    public async Task HandleAsync_ShouldReturnDraftWithAllFields()
-    {
-        var companyId = Guid.NewGuid();
-        var draft = new DraftResponse
+        var draftContent = new DraftResponse
         {
-            Id = "draft-abc",
-            Title = "DevOps Engineer",
-            AboutRole = "Manage CI/CD pipelines",
-            Location = "London",
-            JobType = "Full-time",
-            SalaryRange = "$120k-$160k",
-            Responsibilities = ["Manage deployments", "Monitor systems"],
-            Qualifications = ["AWS certification", "Terraform experience"]
+            Title = "Backend Engineer",
+            Location = "Remote"
         };
-        _aiServiceClient.ListDrafts(companyId, Arg.Any<CancellationToken>())
-            .Returns(new List<DraftResponse> { draft });
+        var contentJson = JsonSerializer.Serialize(draftContent, JsonOpts);
+        var draft = Draft.Create(companyId, contentJson, 1, Guid.NewGuid());
+        _dbContext.Drafts.Add(draft);
+        await _dbContext.SaveChangesAsync();
 
         var result = await _sut.HandleAsync(
             new ListDraftsQuery { CompanyId = companyId },
             CancellationToken.None);
 
-        var returned = result.ShouldHaveSingleItem();
-        returned.Title.ShouldBe("DevOps Engineer");
-        returned.AboutRole.ShouldBe("Manage CI/CD pipelines");
-        returned.JobType.ShouldBe("Full-time");
-        returned.SalaryRange.ShouldBe("$120k-$160k");
-        returned.Responsibilities.Count.ShouldBe(2);
-        returned.Qualifications.Count.ShouldBe(2);
+        result.Count.ShouldBe(1);
+        result[0].Title.ShouldBe("Backend Engineer");
+        result[0].Location.ShouldBe("Remote");
+    }
+
+    [Fact]
+    public async Task HandleAsync_ShouldOnlyReturnDraftsForRequestedCompany()
+    {
+        var companyId = Guid.NewGuid();
+        var otherCompanyId = Guid.NewGuid();
+
+        var content1 = JsonSerializer.Serialize(new DraftResponse { Title = "Draft 1" }, JsonOpts);
+        var content2 = JsonSerializer.Serialize(new DraftResponse { Title = "Draft 2" }, JsonOpts);
+
+        _dbContext.Drafts.Add(Draft.Create(companyId, content1, 1, Guid.NewGuid()));
+        _dbContext.Drafts.Add(Draft.Create(otherCompanyId, content2, 2, Guid.NewGuid()));
+        await _dbContext.SaveChangesAsync();
+
+        var result = await _sut.HandleAsync(
+            new ListDraftsQuery { CompanyId = companyId },
+            CancellationToken.None);
+
+        result.ShouldHaveSingleItem();
+        result[0].Title.ShouldBe("Draft 1");
+    }
+}
+
+/// <summary>
+/// Minimal DbContext with Draft entity for in-memory testing.
+/// </summary>
+internal class DraftTestDbContext : DbContext
+{
+    public DbSet<Draft> Drafts { get; set; } = null!;
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        => optionsBuilder.UseInMemoryDatabase($"DraftTests_{Guid.NewGuid()}");
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Draft>(e =>
+        {
+            e.HasKey(d => d.InternalId);
+            e.Property(d => d.Id);
+            e.Property(d => d.CompanyId);
+            e.Property(d => d.ContentJson);
+            e.Property(d => d.DraftType);
+            e.Property(d => d.DraftStatus);
+        });
     }
 }

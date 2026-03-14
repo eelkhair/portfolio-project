@@ -37,6 +37,15 @@ public static class DependencyInjection
         builder.Services.AddKeyedScoped<IAiTools, PublicMicroToolRegistry>("public-micro");
        
         builder.Services.AddScoped<IAdminApiClient, AdminApiClient>();
+        builder.Services.AddScoped<MonolithDraftPersistence>();
+        builder.Services.AddScoped<MicroDraftPersistence>();
+        builder.Services.AddScoped<IDraftPersistence>(sp =>
+        {
+            var isMonolith = sp.GetRequiredService<IConfiguration>().GetValue<bool>("FeatureFlags:Monolith");
+            return isMonolith
+                ? sp.GetRequiredService<MonolithDraftPersistence>()
+                : sp.GetRequiredService<MicroDraftPersistence>();
+        });
         builder.Services.AddScoped<IIdempotencyService, DaprIdempotencyService>();
         // Vault secrets
         builder.Configuration.AddDaprSecretStore(

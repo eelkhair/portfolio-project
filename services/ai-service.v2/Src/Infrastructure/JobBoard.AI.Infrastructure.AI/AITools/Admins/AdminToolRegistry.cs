@@ -1,3 +1,4 @@
+using JobBoard.AI.Application.Interfaces.Clients;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Notifications;
 using JobBoard.AI.Application.Interfaces.Observability;
@@ -20,19 +21,16 @@ public class AdminToolRegistry(
     ILogger<AdminToolRegistry> logger,
     IAiNotificationHub notificationHub,
     IConversationContext conversationContext,
-    IConversationStore conversationStore
+    IConversationStore conversationStore,
+    IDraftPersistence draftPersistence
 ) : IAiTools
 {
     private static readonly TimeSpan ToolTtl = TimeSpan.FromMinutes(5);
 
     public IEnumerable<AITool> GetTools()
     {
-        yield return GenerateDraftTool.Get(activityFactory, toolResolver, notificationHub, userAccessor);
-        yield return SaveDraftTool.Get(activityFactory, toolResolver);
-        yield return ListDraftsTool.Get(activityFactory, toolResolver, cache, conversationContext, ToolTtl);
-        yield return ListDraftsByLocationTool.Get(activityFactory, toolResolver, cache, conversationContext, ToolTtl);
+        yield return GenerateDraftTool.Get(activityFactory, toolResolver, draftPersistence, notificationHub, userAccessor);
         yield return TraceIdTool.Get(activityFactory, redisStore, userAccessor, conversationContext, conversationStore);
-        yield return DraftsByCompanyTool.Get(activityFactory, toolResolver, cache, conversationContext, ToolTtl);
         yield return ConversationIdTool.Get(activityFactory, conversationContext);
         yield return ProviderRetrievalTool.Get(activityFactory, toolResolver, logger);
         yield return IsMonolithTool.Get(activityFactory, settingsService, logger);

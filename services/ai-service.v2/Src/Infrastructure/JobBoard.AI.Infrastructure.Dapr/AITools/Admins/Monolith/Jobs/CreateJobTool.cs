@@ -1,14 +1,10 @@
 using System.Diagnostics;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using JobBoard.AI.Application.Actions.Drafts;
 using JobBoard.AI.Application.Interfaces.Clients;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Notifications;
 using JobBoard.AI.Application.Interfaces.Observability;
-using JobBoard.AI.Application.Interfaces.Persistence;
 using JobBoard.AI.Infrastructure.Dapr.AITools.Admins.Shared;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
 
@@ -16,17 +12,11 @@ namespace JobBoard.AI.Infrastructure.Dapr.AITools.Admins.Monolith.Jobs;
 
 public static class CreateJobTool
 {
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-    };
-
-    public static AIFunction Get(IActivityFactory activityFactory, IMonolithApiClient client, IAiDbContext dbContext, ILoggerFactory loggerFactory, IAiNotificationHub notificationHub, IUserAccessor userAccessor)
+    public static AIFunction Get(IActivityFactory activityFactory, IMonolithApiClient client, ILoggerFactory loggerFactory, IAiNotificationHub notificationHub, IUserAccessor userAccessor)
     {
         var logger = loggerFactory.CreateLogger(typeof(CreateJobTool));
         return AIFunctionFactory.Create(
-            async Task<object> (string draftId, bool deleteDraft, CancellationToken ct) =>
+            async Task<object> (Guid companyId, string draftId, bool deleteDraft, CancellationToken ct) =>
             {
                 using var activity = activityFactory.StartActivity(
                     "tool.create_job",
@@ -43,24 +33,16 @@ public static class CreateJobTool
                     return new { error = "Invalid draftId format. Must be a valid GUID." };
                 }
 
-                var draft = await dbContext.Drafts
-                    .FirstOrDefaultAsync(d => d.Id == id, ct);
+                var content = await client.GetDraftByIdAsync(id, ct);
 
-                if (draft is null)
+                if (content is null)
                 {
                     logger.LogWarning("Draft {DraftId} not found", draftId);
                     return new { error = $"Draft '{draftId}' not found." };
                 }
 
-                var content = JsonSerializer.Deserialize<DraftResponse>(draft.ContentJson, JsonOptions);
-                if (content is null)
-                {
-                    logger.LogWarning("Failed to deserialize draft {DraftId} content", draftId);
-                    return new { error = "Failed to deserialize draft content." };
-                }
-
-                logger.LogInformation("Draft {DraftId} resolved — Title: {Title}, Company: {CompanyId}",
-                    draftId, content.Title, draft.CompanyId);
+                logger.LogInformation("Draft {DraftId} resolved — Title: {Title}",
+                    draftId, content.Title);
 
                 var request = new CreateJobRequest
                 {
@@ -71,7 +53,7 @@ public static class CreateJobTool
                     SalaryRange = content.SalaryRange,
                     Responsibilities = content.Responsibilities,
                     Qualifications = content.Qualifications,
-                    CompanyUId = draft.CompanyId,
+                    CompanyUId = companyId,
                     DraftId = draftId,
                     DeleteDraft = deleteDraft
                 };
@@ -99,10 +81,7 @@ public static class CreateJobTool
                         TraceState: Activity.Current?.TraceStateString,
                         CorrelationId: activity?.TraceId.ToString(),
                         Timestamp: DateTimeOffset.UtcNow,
-                        Metadata: new Dictionary<string, object>
-                        {
-                            { "companyId", draft.CompanyId }
-                        }
+                        Metadata: new Dictionary<string, object>()
                     ), ct);
 
                 return result;
@@ -111,7 +90,7 @@ public static class CreateJobTool
             {
                 Name = "create_job",
                 Description =
-                    "Creates a job from an existing draft. Requires draftId and deleteDraft (bool). Before calling this tool, you MUST ask the user whether they want to delete the draft after publishing and use their answer for the deleteDraft parameter."
+                    "Creates a job from an existing draft. Requires companyId, draftId and deleteDraft (bool). Before calling this tool, you MUST ask the user whether they want to delete the draft after publishing and use their answer for the deleteDraft parameter."
             });
     }
 }

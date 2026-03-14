@@ -66,8 +66,6 @@ public class JobBoardWebApplicationFactory : WebApplicationFactory<Program>
                     .Returns(new ApplicationModeDto { IsMonolith = true });
                 mock.GenerateDraft(Arg.Any<Guid>(), Arg.Any<DraftGenRequest>(), Arg.Any<CancellationToken>())
                     .Returns(new DraftGenResponse { Title = "Test Draft", DraftId = "draft-1", AboutRole = "Test role" });
-                mock.ListDrafts(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
-                    .Returns(new List<DraftResponse> { new() { Id = "draft-1", Title = "Test Draft" } });
                 mock.RewriteItem(Arg.Any<DraftItemRewriteRequest>(), Arg.Any<CancellationToken>())
                     .Returns(new DraftRewriteResponse { Field = "title", Options = ["Option A"] });
                 return mock;
