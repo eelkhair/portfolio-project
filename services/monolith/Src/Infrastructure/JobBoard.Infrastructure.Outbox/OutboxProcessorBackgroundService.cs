@@ -1,6 +1,6 @@
 using JobBoard.Application.Actions.Outbox;
 using JobBoard.Application.Interfaces.Configurations;
-using JobBoard.Application.Interfaces.Users;
+using JobBoard.Mcp.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

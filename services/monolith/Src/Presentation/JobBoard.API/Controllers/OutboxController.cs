@@ -1,5 +1,5 @@
 ﻿using JobBoard.Application.Actions.Outbox;
-using JobBoard.Application.Interfaces.Users;
+using JobBoard.Mcp.Common;
 using JobBoard.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

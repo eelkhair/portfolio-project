@@ -2,10 +2,10 @@ using HealthChecks.UI.Client;
 using JobBoard.API.Infrastructure.SignalR;
 using JobBoard.Domain;
 using JobBoard.HealthChecks;
+using JobBoard.Mcp.Common;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.OData;
-using Microsoft.IdentityModel.Tokens;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Trace;
 
@@ -54,62 +54,27 @@ public static class DependencyInjection
         });
 
         // ---------------------------------------------------------------------
-        // JWT Bearer Auth (Keycloak)
+        // JWT Bearer Auth (Keycloak) + InternalApiKey
         // ---------------------------------------------------------------------
         services
-            .AddAuthentication(options =>
+            .AddKeycloakJwtAuth(configuration, jwt =>
             {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                // SignalR: read access_token from query string for WebSocket connections
+                jwt.Events!.OnMessageReceived = context =>
+                {
+                    var path = context.HttpContext.Request.Path;
+                    var token = context.Request.Query["access_token"];
+
+                    if (!string.IsNullOrEmpty(token) &&
+                        path.StartsWithSegments("/hubs/notifications"))
+                    {
+                        context.Token = token;
+                    }
+                    return Task.CompletedTask;
+                };
             })
             .AddScheme<AuthenticationSchemeOptions, InternalApiKeyAuthenticationHandler>(
-                "InternalApiKey", _ => { })
-            .AddJwtBearer(options =>
-            {
-                options.RequireHttpsMetadata = false;
-                options.MapInboundClaims = false;
-                options.Authority = configuration["Keycloak:Authority"];
-                options.Audience = configuration["Keycloak:Audience"];
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true
-                };
-                options.Events = new JwtBearerEvents
-                {
-                    OnMessageReceived = context =>
-                    {
-                        var path = context.HttpContext.Request.Path;
-                        var token = context.Request.Query["access_token"];
-
-                        if (!string.IsNullOrEmpty(token) &&
-                            path.StartsWithSegments("/hubs/notifications"))
-                        {
-                            context.Token = token;
-                        }
-                        return Task.CompletedTask;
-                    },
-                    OnTokenValidated = context =>
-                    {
-                        // Keycloak "Full group path" emits /Admins, /Companies/... — strip leading /
-                        var identity = context.Principal?.Identity as System.Security.Claims.ClaimsIdentity;
-                        if (identity is not null)
-                        {
-                            var groupClaims = identity.FindAll("groups").ToList();
-                            foreach (var claim in groupClaims)
-                            {
-                                if (claim.Value.StartsWith('/'))
-                                {
-                                    identity.RemoveClaim(claim);
-                                    identity.AddClaim(new System.Security.Claims.Claim("groups", claim.Value.TrimStart('/')));
-                                }
-                            }
-                        }
-                        return Task.CompletedTask;
-                    }
-                };
-            });
+                "InternalApiKey", _ => { });
 
         // ---------------------------------------------------------------------
         // Authorization Policies

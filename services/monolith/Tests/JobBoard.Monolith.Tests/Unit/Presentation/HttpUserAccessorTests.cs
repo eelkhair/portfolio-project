@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using JobBoard.API.Infrastructure;
+using JobBoard.Mcp.Common;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using Shouldly;

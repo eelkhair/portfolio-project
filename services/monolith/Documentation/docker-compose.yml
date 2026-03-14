@@ -1,60 +1,386 @@
-version: '3.8'
-
 services:
+
+  # ==================== Infrastructure ====================
+
   azurite:
     image: mcr.microsoft.com/azure-storage/azurite
     container_name: azurite
     ports:
-      - "10000:10000" # Blob storage
-      - "10001:10001" # Queue storage
-      - "10002:10002" # Table storage
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
     command: ["azurite", "--blobHost", "0.0.0.0", "--queueHost", "0.0.0.0", "--tableHost", "0.0.0.0", "--location", "/data", "--debug", "/data/debug.log"]
     volumes:
-      - ./azurite_data:/data
+      - azurite_data:/data
+    networks:
+      - local-net
 
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.3.0
-    container_name: zookeeper
-    hostname: zookeeper
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
     ports:
-      - "2181:2181"
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    volumes:
-      - zookeeper_data:/var/lib/zookeeper
-      - zookeeper_log:/var/lib/zookeeper/log
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - local-net
 
-  kafka:
-    image: confluentinc/cp-kafka:7.3.0
-    container_name: kafka
-    hostname: kafka
-    depends_on:
-      - zookeeper
+  redis:
+    image: redis:7-alpine
+    container_name: redis
     ports:
-      - "9092:9092"
-      - "29092:29092"
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://localhost:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
-    volumes:
-      - kafka_data:/var/lib/kafka/data
+      - "6379:6379"
+    networks:
+      - local-net
 
-  kafka-ui:
-    image: provectuslabs/kafka-ui:latest
-    container_name: kafka-ui
-    depends_on:
-      - kafka
+  seq:
+    image: datalust/seq:latest
+    container_name: seq
+    ports:
+      - "5341:80"
+    environment:
+      - ACCEPT_EULA=Y
+      - SEQ_FIRSTRUN_NOAUTHENTICATION=true
+    networks:
+      - local-net
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    networks:
+      - local-net
+
+  dapr-dashboard:
+    image: daprio/dashboard:latest
+    container_name: dapr-dashboard
+    command:
+      [
+        "--docker-compose=true",
+        "--components-path", "/Components/",
+        "--config-path=/Config",
+        "--docker-compose-path=/home/nonroot/docker-compose.yml"
+      ]
     ports:
       - "8080:8080"
-    environment:
-      KAFKA_CLUSTERS_0_NAME: local-kafka-cluster
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
-      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
-      DYNAMIC_CONFIG_ENABLED: 'true'
+    volumes:
+      - ../../../EnvironmentDapr/Dev/shared/Config:/Config:ro
+      - ./docker-compose.yml:/home/nonroot/docker-compose.yml:ro
+      - ../../../EnvironmentDapr/Dev/_all:/Components:ro
+    networks:
+      - local-net
 
-  
-  
+  # ==================== Frontend ====================
+
+  job-admin:
+    build:
+      context: ../../../apps/job-admin
+      args:
+        BUILD_CONFIG: development
+    ports:
+      - "6080:80"
+    networks:
+      - local-net
+
+  job-public:
+    build:
+      context: ../../../apps/job-public
+      args:
+        BUILD_CONFIG: development
+    ports:
+      - "6081:3000"
+    networks:
+      - local-net
+
+  # ==================== Monolith ====================
+
+  monolith-api:
+    build:
+      context: ../../../services/monolith
+      dockerfile: Src/Presentation/JobBoard.API/Dockerfile
+    ports:
+      - "5280:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - VAULT_ADDR=${VAULT_ADDR}
+      - VAULT_TOKEN=${VAULT_TOKEN}
+    networks:
+      - local-net
+
+  monolith-mcp:
+    build:
+      context: ../../../services/monolith
+      dockerfile: Src/Presentation/JobBoard.API.Mcp/Dockerfile
+    ports:
+      - "5283:3333"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:3333
+      - VAULT_ADDR=${VAULT_ADDR}
+      - VAULT_TOKEN=${VAULT_TOKEN}
+    networks:
+      - local-net
+
+  # ==================== AI Services ====================
+
+  ai-service-v2:
+    build:
+      context: ../../..
+      dockerfile: services/ai-service.v2/Src/Presentation/JobBoard.AI.API/Dockerfile
+    ports:
+      - "5200:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - McpServer__IntegrationUrl=http://monolith-mcp:3333
+      - McpServer__MicroUrl=http://admin-api-mcp:3334
+    networks:
+      - local-net
+
+  ai-service-v2-sidecar:
+    image: daprio/daprd:1.15.8
+    container_name: ai-service-v2-side-car
+    depends_on:
+      - ai-service-v2
+    network_mode: "service:ai-service-v2"
+    volumes:
+      - ../../../EnvironmentDapr/Dev/shared/Components:/Components
+      - ../../../EnvironmentDapr/Dev/ai-service-v2:/Dapr
+    command: [
+      "./daprd",
+      "--app-id", "ai-service-v2",
+      "--app-port", "8080",
+      "--resources-path", "./Components",
+      "--resources-path", "./Dapr/Components",
+      "--resources-path", "./Dapr/Components/Secrets",
+      "--resources-path", "./Dapr/Components/Timers",
+      "-config", "./Dapr/Config/config.yaml"
+    ]
+
+  # ==================== Microservices ====================
+
+  job-api:
+    build:
+      context: ../../../services/micro-services/job-api
+    ports:
+      - "6084:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    networks:
+      - local-net
+
+  job-api-sidecar:
+    image: daprio/daprd:1.15.8
+    container_name: job-api-side-car
+    depends_on:
+      - job-api
+    network_mode: "service:job-api"
+    volumes:
+      - ../../../EnvironmentDapr/Dev/shared/Components:/Components
+      - ../../../EnvironmentDapr/Dev/job-api:/Dapr
+    command: [
+      "./daprd",
+      "--app-id", "job-api",
+      "--app-port", "8080",
+      "--resources-path", "./Components",
+      "--resources-path", "./Dapr/Components",
+      "--resources-path", "./Dapr/Components/Secrets",
+      "-config", "./Dapr/Config/config.yaml"
+    ]
+
+  company-api:
+    build:
+      context: ../../../services/micro-services/company-api
+    ports:
+      - "6072:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    networks:
+      - local-net
+
+  company-api-sidecar:
+    image: daprio/daprd:1.15.8
+    container_name: company-api-side-car
+    depends_on:
+      - company-api
+    network_mode: "service:company-api"
+    volumes:
+      - ../../../EnvironmentDapr/Dev/shared/Components:/Components
+      - ../../../EnvironmentDapr/Dev/company-api:/Dapr
+    command: [
+      "./daprd",
+      "--app-id", "company-api",
+      "--app-port", "8080",
+      "--resources-path", "./Components",
+      "--resources-path", "./Dapr/Components/Secrets",
+      "-config", "./Dapr/Config/config.yaml"
+    ]
+
+  admin-api:
+    build:
+      context: ../../../services/micro-services/admin-api
+    ports:
+      - "6062:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    networks:
+      - local-net
+
+  admin-api-sidecar:
+    image: daprio/daprd:1.15.8
+    container_name: admin-api-side-car
+    depends_on:
+      - admin-api
+    network_mode: "service:admin-api"
+    volumes:
+      - ../../../EnvironmentDapr/Dev/shared/Components:/Components
+      - ../../../EnvironmentDapr/Dev/admin-api:/Dapr
+    command: [
+      "./daprd",
+      "--app-id", "admin-api",
+      "--app-port", "8080",
+      "--resources-path", "./Components",
+      "--resources-path", "./Dapr/Components",
+      "--resources-path", "./Dapr/Components/Secrets",
+      "-config", "./Dapr/Config/config.yaml"
+    ]
+
+  admin-api-mcp:
+    build:
+      context: ../../../services/micro-services/admin-api
+      dockerfile: AdminApi.Mcp/Dockerfile
+    ports:
+      - "6063:3334"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:3334
+    networks:
+      - local-net
+
+  admin-api-mcp-sidecar:
+    image: daprio/daprd:1.15.8
+    container_name: admin-api-mcp-side-car
+    depends_on:
+      - admin-api-mcp
+    network_mode: "service:admin-api-mcp"
+    volumes:
+      - ../../../EnvironmentDapr/Dev/shared/Components:/Components
+      - ../../../EnvironmentDapr/Dev/admin-api-mcp:/Dapr
+    command: [
+      "./daprd",
+      "--app-id", "admin-api-mcp",
+      "--app-port", "3334",
+      "--resources-path", "./Components",
+      "--resources-path", "./Dapr/Components",
+      "--resources-path", "./Dapr/Components/Secrets",
+      "-config", "./Dapr/Config/config.yaml"
+    ]
+
+  user-api:
+    build:
+      context: ../../../services/micro-services/user-api
+    ports:
+      - "6092:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    networks:
+      - local-net
+
+  user-api-sidecar:
+    image: daprio/daprd:1.15.8
+    container_name: user-api-side-car
+    depends_on:
+      - user-api
+    network_mode: "service:user-api"
+    volumes:
+      - ../../../EnvironmentDapr/Dev/shared/Components:/Components
+      - ../../../EnvironmentDapr/Dev/user-api:/Dapr
+    command: [
+      "./daprd",
+      "--app-id", "user-api",
+      "--app-port", "8080",
+      "--resources-path", "./Components",
+      "--resources-path", "./Dapr/Components",
+      "--resources-path", "./Dapr/Components/Secrets",
+      "--resources-path", "./Dapr/Components/Timers",
+      "-config", "./Dapr/Config/config.yaml"
+    ]
+
+  # ==================== Supporting Services ====================
+
+  connector-api:
+    build:
+      context: ../../../services/connector-api
+    ports:
+      - "5284:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    networks:
+      - local-net
+
+  connector-api-sidecar:
+    image: daprio/daprd:1.15.8
+    container_name: connector-api-side-car
+    depends_on:
+      - connector-api
+    network_mode: "service:connector-api"
+    volumes:
+      - ../../../EnvironmentDapr/Dev/shared/Components:/Components
+      - ../../../EnvironmentDapr/Dev/connector-api:/Dapr
+    command: [
+      "./daprd",
+      "--app-id", "connector-api",
+      "--app-port", "8080",
+      "--resources-path", "./Components",
+      "--resources-path", "./Dapr/Components",
+      "--resources-path", "./Dapr/Components/Secrets",
+      "--resources-path", "./Dapr/Components/Timers",
+      "-config", "./Dapr/Config/config.yaml"
+    ]
+
+  gateway:
+    build:
+      context: ../../../services/gateway
+    ports:
+      - "5238:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - VAULT_ADDR=${VAULT_ADDR}
+      - VAULT_TOKEN=${VAULT_TOKEN}
+    networks:
+      - local-net
+
+  health-check:
+    build:
+      context: ../../../services/micro-services/HealthChecks
+    ports:
+      - "5107:8080"
+    environment:
+      - HealthChecksUI__HealthChecks__0__Name=Monolith API
+      - HealthChecksUI__HealthChecks__0__Uri=http://monolith-api:8080/healthzEndpoint
+      - HealthChecksUI__HealthChecks__1__Name=AI Service V2
+      - HealthChecksUI__HealthChecks__1__Uri=http://ai-service-v2:8080/healthzEndpoint
+      - HealthChecksUI__HealthChecks__2__Name=Admin API
+      - HealthChecksUI__HealthChecks__2__Uri=http://admin-api:8080/healthzEndpoint
+      - HealthChecksUI__HealthChecks__3__Name=Company API
+      - HealthChecksUI__HealthChecks__3__Uri=http://company-api:8080/healthzEndpoint
+      - HealthChecksUI__HealthChecks__4__Name=Job API
+      - HealthChecksUI__HealthChecks__4__Uri=http://job-api:8080/healthzEndpoint
+      - HealthChecksUI__HealthChecks__5__Name=User API
+      - HealthChecksUI__HealthChecks__5__Uri=http://user-api:8080/healthzEndpoint
+      - HealthChecksUI__HealthChecks__6__Name=Connector API
+      - HealthChecksUI__HealthChecks__6__Uri=http://connector-api:8080/healthzEndpoint
+      - HealthChecksUI__HealthChecks__7__Name=Gateway
+      - HealthChecksUI__HealthChecks__7__Uri=http://gateway:8080/healthzEndpoint
+    networks:
+      - local-net
+
+volumes:
+  azurite_data:
+
+networks:
+  local-net:
+    name: jobboard-local

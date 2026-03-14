@@ -1,0 +1,110 @@
+
+sequenceDiagram
+autonumber
+
+participant FE as Admin FE<br/>(Angular)
+participant GW as Gateway<br/>(YARP)
+participant AI as AI Service v2
+participant OAI as OpenAI API
+participant MCP as MCP Integration
+participant MON as Monolith API
+participant OBX as Outbox Processor
+participant CON as Connector API<br/>(Saga)
+participant USR as User API
+participant CMP as Company API
+participant JOB as Job API
+participant KC as Keycloak
+
+Note over FE,KC: Phase 1 — Chat request + tool selection (0ms → 2,327ms)
+
+FE->>+GW: POST /ai/v2/chat
+GW->>+AI: proxy → ai-service-v2
+AI->>+OAI: POST /v1/chat/completions
+Note right of OAI: Tool selection<br/>1,601ms
+OAI-->>-AI: tool_call: create_company
+
+Note over FE,KC: Phase 2 — MCP tool execution (2,328ms → 2,683ms)
+
+AI->>+MCP: tools/call → create_company
+Note right of MCP: MCP client invocation<br/>377ms
+MCP->>+MON: POST /api/companies
+
+Note over FE,KC: Phase 3 — CQRS command pipeline (2,343ms → 2,673ms)
+
+Note over MON: Validate (60ms)<br/>• Company name uniqueness<br/>• Company email uniqueness<br/>• Admin email uniqueness<br/>• Industry existence
+Note over MON: Handle + commit (234ms)<br/>• Create company entity<br/>• Create admin user<br/>• Write outbox message #790<br/>• Commit transaction
+MON-->>-MCP: 201 Created
+MCP-->>-AI: tool result (success)
+
+AI->>+OAI: POST /v1/chat/completions
+Note right of OAI: Response generation<br/>1,292ms
+OAI-->>-AI: "Company Hashmab created..."
+AI-->>-GW: 200 OK (streamed)
+GW-->>-FE: chat response
+
+Note over FE,KC: Phase 4 — Outbox → Pub/Sub (~1,090ms poll gap + 24ms)
+
+Note over OBX: Poll picks up message #790
+OBX->>CON: Dapr pub/sub<br/>company.created.v1<br/>(CloudEvent)
+
+Note over FE,KC: Phase 5 — Provisioning saga (4,035ms → 5,555ms)
+
+activate CON
+Note over CON: Idempotency check (3ms)
+
+CON->>+MON: GET /odata/companies({id})
+MON-->>-CON: 200 (company data)
+CON->>+MON: GET /odata/users({id})
+MON-->>-CON: 200 (admin data)
+Note over CON: Saga: fetch data complete (232ms)
+
+Note over FE,KC: Phase 6 — Parallel fan-out via Dapr service invocation
+
+par Dapr → user-api (1,440ms)
+CON->>+USR: POST /api/companies<br/>(Dapr invoke)
+
+Note over USR,KC: Phase 7 — Keycloak provisioning (1,389ms)
+
+USR->>+KC: GET /groups (list groups)
+KC-->>-USR: 200 (12ms)
+USR->>+KC: POST /groups/.../children<br/>(company group)
+KC-->>-USR: 201 (19ms)
+USR->>+KC: POST /groups/.../children<br/>(CompanyAdmins)
+KC-->>-USR: 201 (14ms)
+USR->>+KC: POST /groups/.../children<br/>(Recruiters)
+KC-->>-USR: 201 (9ms)
+USR->>+KC: GET /users (check existing)
+KC-->>-USR: 200 (10ms)
+USR->>+KC: POST /users (create user)
+KC-->>-USR: 201 (269ms)
+USR->>+KC: PUT /users/{id}/groups/{gid}
+KC-->>-USR: 204 (12ms)
+USR->>+KC: PUT /users/{id}/send-verify-email
+KC-->>-USR: 204 (36ms)
+
+Note over USR: Persist user + company<br/>records (987ms)
+
+USR-->>-CON: 200 OK
+and Dapr → company-api (1,133ms)
+CON->>+CMP: POST /api/companies<br/>(Dapr invoke)
+Note over CMP: Create company<br/>projection
+CMP-->>-CON: 200 OK
+and Dapr → job-api (268ms)
+CON->>+JOB: POST /api/companies<br/>(Dapr invoke)
+Note over JOB: Create company<br/>projection
+JOB-->>-CON: 204 No Content
+end
+
+Note over FE,KC: Phase 8 — Company activation (5,484ms → 5,537ms)
+
+USR-)CMP: Dapr pub/sub<br/>provision.user.success
+
+CON->>+MON: POST /api/companies/<br/>company-created-success
+Note over MON: ActivateCompanyCommand<br/>52ms
+MON-->>-CON: 200 OK
+
+Note over FE,KC: Phase 9 — Saga complete (5,555ms)
+
+Note over CON: Saga finalized ✓<br/>Company provisioned
+deactivate CON
+

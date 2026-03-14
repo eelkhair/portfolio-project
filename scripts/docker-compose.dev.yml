@@ -120,15 +120,27 @@
       - VAULT_TOKEN=${VAULT_TOKEN}
     networks:
       - ai-job-board-net
-  
+
+  monolith-mcp:
+    image: registry.eelkhair.net/monolith-mcp:latest
+    ports:
+      - "5283:3333"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=dev
+      - ASPNETCORE_URLS=http://+:3333
+      - VAULT_ADDR=${VAULT_ADDR}
+      - VAULT_TOKEN=${VAULT_TOKEN}
+    networks:
+      - ai-job-board-net
+
   ai-service-v2:
     image: registry.eelkhair.net/ai-service-v2:latest
     ports:
       - "5200:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - McpServer__IntegrationUrl=http://ai-mcp-integration:3333
-      - McpServer__MicroUrl=http://ai-mcp-micro:3334
+      - McpServer__IntegrationUrl=http://monolith-mcp:3333
+      - McpServer__MicroUrl=http://admin-api-mcp:3334
     networks:
       - ai-job-board-net
 
@@ -149,64 +161,6 @@
       "--resources-path", "./Dapr/Components",
       "--resources-path", "./Dapr/Components/Secrets",
       "--resources-path", "./Dapr/Components/Timers",
-      "-config", "./Dapr/Config/config.yaml"
-    ]
-
-  ai-mcp-integration:
-    image: registry.eelkhair.net/ai-mcp-integration:latest
-    ports:
-      - "5203:3333"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-    restart: unless-stopped
-    networks:
-      - ai-job-board-net
-
-  ai-mcp-integration-sidecar:
-    image: "daprio/daprd:1.15.8"
-    container_name: "ai-mcp-integration-side-car"
-    depends_on:
-      - ai-mcp-integration
-    volumes:
-      - "/home/eelkhair/Dapr/shared/Components:/Components"
-      - "/home/eelkhair/Dapr/ai-mcp-integration/:/Dapr"
-    network_mode: "service:ai-mcp-integration"
-    command: [
-      "./daprd",
-      "--app-id", "ai-service-mcp-integration",
-      "--app-port", "3333",
-      "--resources-path", "./Components",
-      "--resources-path", "./Dapr/Components",
-      "--resources-path", "./Dapr/Components/Secrets",
-      "-config", "./Dapr/Config/config.yaml"
-    ]
-
-  ai-mcp-micro:
-    image: registry.eelkhair.net/ai-mcp-micro:latest
-    ports:
-      - "5204:3334"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-    restart: unless-stopped
-    networks:
-      - ai-job-board-net
-
-  ai-mcp-micro-sidecar:
-    image: "daprio/daprd:1.15.8"
-    container_name: "ai-mcp-micro-side-car"
-    depends_on:
-      - ai-mcp-micro
-    volumes:
-      - "/home/eelkhair/Dapr/shared/Components:/Components"
-      - "/home/eelkhair/Dapr/ai-mcp-micro/:/Dapr"
-    network_mode: "service:ai-mcp-micro"
-    command: [
-      "./daprd",
-      "--app-id", "ai-service-mcp-micro",
-      "--app-port", "3334",
-      "--resources-path", "./Components",
-      "--resources-path", "./Dapr/Components",
-      "--resources-path", "./Dapr/Components/Secrets",
       "-config", "./Dapr/Config/config.yaml"
     ]
 
@@ -303,6 +257,35 @@
       "./daprd",
       "--app-id", "admin-api",
       "--app-port", "8080",
+      "--resources-path", "./Components",
+      "--resources-path", "./Dapr/Components",
+      "--resources-path", "./Dapr/Components/Secrets",
+      "-config", "./Dapr/Config/config.yaml"
+    ]
+
+  admin-api-mcp:
+    image: registry.eelkhair.net/admin-api-mcp:latest
+    ports:
+      - "6063:3334"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:3334
+    networks:
+      - ai-job-board-net
+
+  admin-api-mcp-sidecar:
+    image: "daprio/daprd:1.15.8"
+    container_name: "admin-api-mcp-side-car"
+    depends_on:
+      - admin-api-mcp
+    volumes:
+      - "/home/eelkhair/Dapr/shared/Components/:/Components"
+      - "/home/eelkhair/Dapr/admin-api-mcp/:/Dapr"
+    network_mode: "service:admin-api-mcp"
+    command: [
+      "./daprd",
+      "--app-id", "admin-api-mcp",
+      "--app-port", "3334",
       "--resources-path", "./Components",
       "--resources-path", "./Dapr/Components",
       "--resources-path", "./Dapr/Components/Secrets",

@@ -5,6 +5,7 @@ using JobBoard.Application.Infrastructure.Exceptions;
 using JobBoard.Application.Infrastructure.UserSync;
 using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Application.Interfaces.Users;
+using JobBoard.Mcp.Common;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace JobBoard.Application;

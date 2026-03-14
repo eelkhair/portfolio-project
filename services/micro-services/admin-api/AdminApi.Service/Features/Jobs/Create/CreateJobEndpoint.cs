@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using AdminApi.Application.Commands.Interfaces;
+using AdminAPI.Contracts.Services;
 using AdminAPI.Contracts.Models.Jobs.Events;
 using AdminAPI.Contracts.Models.Jobs.Requests;
 using Elkhair.Dev.Common.Application;

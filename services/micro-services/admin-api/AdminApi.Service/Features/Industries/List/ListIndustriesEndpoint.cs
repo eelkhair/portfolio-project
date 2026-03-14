@@ -1,4 +1,4 @@
-﻿using AdminApi.Application.Queries.Interfaces;
+﻿using AdminAPI.Contracts.Services;
 using CompanyAPI.Contracts.Models.Industries.Responses;
 using Elkhair.Dev.Common.Application;
 using FastEndpoints;

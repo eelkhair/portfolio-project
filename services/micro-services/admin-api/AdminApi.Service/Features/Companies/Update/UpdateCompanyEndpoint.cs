@@ -1,4 +1,4 @@
-using AdminApi.Application.Commands.Interfaces;
+using AdminAPI.Contracts.Services;
 using AdminAPI.Contracts.Models.Companies.Requests;
 using CompanyAPI.Contracts.Models.Companies.Responses;
 using Elkhair.Dev.Common.Application;

@@ -14,8 +14,9 @@ ARG BUILD_CONFIGURATION=Development
 WORKDIR /src
 COPY ["Nuget.Config", "."]
 COPY ["AdminApi.Service/AdminApi.Service.csproj", "AdminApi.Service/"]
+COPY ["AdminApi.Core/AdminApi.Core.csproj", "AdminApi.Core/"]
 COPY ["AdminAPI.Contracts/AdminAPI.Contracts.csproj", "AdminAPI.Contracts/"]
-RUN dotnet restore "./AdminApi.Service/AdminApi.Service.csproj"  --configfile "Nuget.Config"
+RUN dotnet restore "./AdminApi.Service/AdminApi.Service.csproj" --configfile "Nuget.Config"
 COPY . .
 WORKDIR "/src/AdminApi.Service"
 RUN dotnet build "./AdminApi.Service.csproj" -c $BUILD_CONFIGURATION -o /app/build

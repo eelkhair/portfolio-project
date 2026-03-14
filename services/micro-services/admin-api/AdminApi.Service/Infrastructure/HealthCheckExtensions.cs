@@ -56,6 +56,23 @@ internal static class HealthCheckExtensions
             .AddDaprConfigurationStore("global", o =>
                 o.StoreName = "appconfig-global")
             .AddDaprConfigurationStore("admin", o =>
-                o.StoreName = "appconfig-admin-api");
+                o.StoreName = "appconfig-admin-api")
+
+            // -- MCP Server --
+            .AddCheck("mcp-server", () =>
+            {
+                try
+                {
+                    using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(5) };
+                    var response = client.GetAsync("http://localhost:3334/").GetAwaiter().GetResult();
+                    return response.IsSuccessStatusCode
+                        ? HealthCheckResult.Healthy("MCP server is reachable")
+                        : HealthCheckResult.Degraded($"MCP server returned {response.StatusCode}");
+                }
+                catch (Exception ex)
+                {
+                    return HealthCheckResult.Unhealthy("MCP server unreachable", ex);
+                }
+            }, tags: ["mcp"]);
     }
 }

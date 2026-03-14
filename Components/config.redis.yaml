@@ -12,11 +12,13 @@ spec:
       value: "1"
 scopes:
   - admin-api
+  - admin-api-mcp
   - connector-api
   - job-api
   - user-api
   - ai-service
   - monolith-api
+  - monolith-mcp
   - company-api
   - ai-service-v2
   - gateway

@@ -54,7 +54,24 @@ internal static class HealthCheckExtensions
                 tags: ["infrastructure"])
 
             // -- Vault (secrets) --
-            .AddVaultHealthCheck(tags: ["infrastructure"]);
+            .AddVaultHealthCheck(tags: ["infrastructure"])
+
+            // -- MCP Server --
+            .AddCheck("MCP Server", () =>
+            {
+                try
+                {
+                    using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(5) };
+                    var response = client.GetAsync("http://localhost:3333").GetAwaiter().GetResult();
+                    return response.IsSuccessStatusCode
+                        ? HealthCheckResult.Healthy("MCP server is responding")
+                        : HealthCheckResult.Degraded($"MCP server returned {response.StatusCode}");
+                }
+                catch (Exception ex)
+                {
+                    return HealthCheckResult.Unhealthy("MCP server is unreachable", ex);
+                }
+            }, tags: ["infrastructure", "mcp"]);
 
         return builder;
     }

@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "JobBoard.API.Mcp": {
+      "commandName": "Project",
+      "applicationUrl": "http://localhost:3333",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  },
+  "$schema": "https://json.schemastore.org/launchsettings.json"
+}

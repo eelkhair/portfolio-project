@@ -1,19 +1,15 @@
 using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using AdminApi.Application.Commands;
-using AdminApi.Application.Commands.Interfaces;
-using AdminApi.Application.Queries;
-using AdminApi.Application.Queries.Interfaces;
+using AdminApi.Core;
 using AdminApi.Infrastructure;
 using Elkhair.Common.Observability;
 using Elkhair.Dev.Common.Dapr;
+using JobBoard.Mcp.Common;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using HealthChecks.UI.Client;
 using JobBoard.HealthChecks;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using NSwag;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -82,47 +78,23 @@ builder.Services.AddCors(options =>
 });
 builder.AddCustomHealthChecks();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<ICompanyQueryService, CompanyQueryService>();
-builder.Services.AddScoped<ICompanyCommandService, CompanyCommandService>();
-builder.Services.AddScoped<IIndustryQueryService, IndustryQueryService>();
-builder.Services.AddScoped<IJobQueryService, JobQueryService>();
-builder.Services.AddScoped<IOpenAICommandService, OpenAICommandService>();
-builder.Services.AddScoped<IJobCommandService, JobCommandService>();
-builder.Services.AddScoped<ISettingsCommandService, SettingsCommandService>();
+builder.Services.AddAdminApiCoreServices();
 
-
-
-builder.Services.AddAuthentication(options =>
+builder.Services
+    .AddKeycloakJwtAuth(cfg, jwt =>
     {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        options.RequireHttpsMetadata = false;
-        options.MapInboundClaims = false;
-        options.Authority = cfg["Keycloak:Authority"];
-        options.Audience = cfg["Keycloak:Audience"];
-        options.TokenValidationParameters = new TokenValidationParameters
+        // SignalR: read access_token from query string for WebSocket connections
+        jwt.Events!.OnMessageReceived = context =>
         {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true
-        };
-        options.Events = new JwtBearerEvents
-        {
-            OnMessageReceived = context =>
+            var path = context.HttpContext.Request.Path;
+            var token = context.Request.Query["access_token"];
+
+            if (!string.IsNullOrEmpty(token) &&
+                path.StartsWithSegments("/hubs/notifications"))
             {
-                var path = context.HttpContext.Request.Path;
-                var token = context.Request.Query["access_token"];
-
-                if (!string.IsNullOrEmpty(token) &&
-                    path.StartsWithSegments("/hubs/notifications"))
-                {
-                    context.Token = token;
-                }
-                return Task.CompletedTask;
+                context.Token = token;
             }
+            return Task.CompletedTask;
         };
     });
 builder.Services.AddAuthorization();
@@ -135,7 +107,7 @@ builder.Services.ConfigureHttpJsonOptions(opts =>
 });
 var app = builder.Build();
 app.UseCors(CorsPolicy);
-app.UseAuthentication();    
+app.UseAuthentication();
 app.UseAuthorization();  
 app.UseCloudEvents();
 app.MapSubscribeHandler();
@@ -174,5 +146,6 @@ app.Use(async (context, next) =>
 
 app.MapHub<NotificationsHub>("/hubs/notifications").RequireAuthorization(); 
 app.MapCustomHealthChecks("/healthzEndpoint", "/liveness", UIResponseWriter.WriteHealthCheckUIResponse);
+
 await app.RunAsync();
 

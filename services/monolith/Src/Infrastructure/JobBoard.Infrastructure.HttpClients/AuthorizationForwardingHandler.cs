@@ -1,4 +1,4 @@
-using JobBoard.Application.Interfaces.Users;
+using JobBoard.Mcp.Common;
 
 namespace JobBoard.Infrastructure.HttpClients;
 

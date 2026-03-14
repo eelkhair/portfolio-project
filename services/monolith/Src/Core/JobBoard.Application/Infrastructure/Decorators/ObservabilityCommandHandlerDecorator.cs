@@ -3,7 +3,7 @@ using FluentValidation;
 using JobBoard.Application.Actions.Base;
 using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Application.Interfaces.Observability;
-using JobBoard.Application.Interfaces.Users;
+using JobBoard.Mcp.Common;
 using Microsoft.Extensions.Logging;
 
 namespace JobBoard.Application.Infrastructure.Decorators;

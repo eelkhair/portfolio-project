@@ -53,13 +53,13 @@ declare -A services=(
   ["job-public"]="../apps/job-public"
   ["ai-service"]="../services/ai-service"
   ["ai-service-v2"]="../services/ai-service.v2"
-  ["ai-mcp-integration"]="../services/ai-service.v2"
-  ["ai-mcp-micro"]="../services/ai-service.v2"
   ["job-api"]="../services/micro-services/job-api"
   ["company-api"]="../services/micro-services/company-api"
   ["admin-api"]="../services/micro-services/admin-api"
+  ["admin-api-mcp"]="../services/micro-services/admin-api"
   ["user-api"]="../services/micro-services/user-api"
   ["monolith-api"]="../services/monolith"
+  ["monolith-mcp"]="../services/monolith"
   ["connector-api"]="../services/connector-api"
   ["gateway"]="../services/gateway"
   ["health-check"]="../services/micro-services/HealthChecks"
@@ -99,21 +99,21 @@ build_and_push_backends() {
         -f "/c/Users/elkha/RiderProjects/portfolio project/services/ai-service.v2/Src/Presentation/JobBoard.AI.API/Dockerfile" \
         -t "$image" \
         "/c/Users/elkha/RiderProjects/portfolio project/services/ai-service.v2"
-    elif [ "$name" = "ai-mcp-integration" ]; then
-      docker build \
-        -f "/c/Users/elkha/RiderProjects/portfolio project/services/ai-service.v2/Src/Presentation/JobBoard.AI.MCP.Integration/Dockerfile" \
-        -t "$image" \
-        "/c/Users/elkha/RiderProjects/portfolio project/services/ai-service.v2"
-    elif [ "$name" = "ai-mcp-micro" ]; then
-      docker build \
-        -f "/c/Users/elkha/RiderProjects/portfolio project/services/ai-service.v2/Src/Presentation/JobBoard.AI.MCP.Micro/Dockerfile" \
-        -t "$image" \
-        "/c/Users/elkha/RiderProjects/portfolio project/services/ai-service.v2"
     elif [ "$name" = "monolith-api" ]; then
       docker build \
-        -f "/c/Users/elkha/RiderProjects/portfolio project/services/monolith/Src/Presentation/JobBoard.API/Dockerfile" \
+        -f "$path/Src/Presentation/JobBoard.API/Dockerfile" \
         -t "$image" \
-        "/c/Users/elkha/RiderProjects/portfolio project/services/monolith"
+        "$path"
+    elif [ "$name" = "monolith-mcp" ]; then
+      docker build \
+        -f "$path/Src/Presentation/JobBoard.API.Mcp/Dockerfile" \
+        -t "$image" \
+        "$path"
+    elif [ "$name" = "admin-api-mcp" ]; then
+      docker build \
+        -f "$path/AdminApi.Mcp/Dockerfile" \
+        -t "$image" \
+        "$path"
     else
       docker build -t "$image" "$path"
     fi
