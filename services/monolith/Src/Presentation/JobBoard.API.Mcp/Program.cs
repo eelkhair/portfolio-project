@@ -1,6 +1,8 @@
+using HealthChecks.UI.Client;
 using JobBoard.API.Mcp.Infrastructure;
 using JobBoard.API.Mcp.Tools;
 using JobBoard.Application;
+using JobBoard.HealthChecks;
 using JobBoard.Mcp.Common;
 using JobBoard.Infrastructure.BlobStorage;
 using JobBoard.Infrastructure.Diagnostics;
@@ -59,17 +61,29 @@ builder.Services
         transport.Stateless = true;
     });
 
+// ── CORS (for MCP Inspector) ────────────────────────────────────────────
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 // ── Health checks ────────────────────────────────────────────────────────
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
 // No UseWhen/RequireHost needed — this process owns the whole port
+app.UseCors();
 app.UseMiddleware<ForwardedAuthMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 app.Urls.Add($"http://+:3333");
 app.MapMcp();
-app.MapHealthChecks("/healthz");
+app.MapCustomHealthChecks("/healthzEndpoint", "/liveness", UIResponseWriter.WriteHealthCheckUIResponse);
 
 await app.RunAsync();
