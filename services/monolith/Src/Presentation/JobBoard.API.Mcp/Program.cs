@@ -26,7 +26,7 @@ builder.AddVaultSecrets("monolith");
 builder.Services
     .AddApplicationServices()
     .AddPersistenceServices(builder.Configuration)
-    .AddOutboxServices()
+    .AddOutboxPublisher()  // Publisher only — no background processor (monolith-api owns processing)
     .AddMassTransitMessaging(builder.Configuration)
     .AddSmtpServices(builder.Configuration)
     .AddBlobStorageServices(builder.Configuration)

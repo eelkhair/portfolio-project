@@ -41,6 +41,10 @@ export class JobService {
     return this.http.put<ApiResponse<EnhancementResponse>>(`${this.baseUrl}api/jobs/drafts/rewrite`, model);
   }
 
+  deleteDraft(companyId: string, draftId: string) {
+    return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}api/jobs/${companyId}/drafts/${draftId}`);
+  }
+
   createJob(model: CreateJobDto) {
     return this.http.post<ApiResponse<Job[]>>(`${this.baseUrl}api/jobs`, model);
   }

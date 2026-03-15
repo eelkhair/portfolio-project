@@ -5,6 +5,7 @@ using JobBoard.Application.Actions.Base;
 using JobBoard.Application.Interfaces;
 using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Domain.Entities;
+using JobBoard.IntegrationEvents.Draft;
 using JobBoard.Monolith.Contracts.Drafts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -57,6 +58,20 @@ public class SaveDraftCommandHandler(IHandlerContext handlerContext)
             draft = Draft.Create(command.CompanyId, contentJson, id, uid);
             dbSet.Add(draft);
         }
+
+        var draftEvent = new DraftSavedV1Event(
+            draft.Id,
+            command.CompanyId,
+            command.Draft.Title,
+            command.Draft.AboutRole,
+            command.Draft.Location,
+            command.Draft.JobType,
+            command.Draft.SalaryRange,
+            command.Draft.Notes,
+            command.Draft.Responsibilities,
+            command.Draft.Qualifications
+        ) { UserId = command.UserId };
+        await OutboxPublisher.PublishAsync(draftEvent, cancellationToken);
 
         await Context.SaveChangesAsync(command.UserId, cancellationToken);
 

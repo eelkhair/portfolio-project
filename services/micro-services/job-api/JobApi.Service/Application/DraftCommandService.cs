@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -20,6 +21,9 @@ public class DraftCommandService(IJobDbContext context) : IDraftCommandService
 
     public async Task<DraftResponse> SaveDraftAsync(Guid companyUId, SaveDraftRequest request, ClaimsPrincipal user, CancellationToken ct)
     {
+        Activity.Current?.SetTag("draft.incoming.id", request.Id);
+        Activity.Current?.SetTag("draft.companyUid", companyUId);
+
         var company = await context.Companies.FirstAsync(c => c.UId == companyUId, ct);
         var contentJson = JsonSerializer.Serialize(request, JsonOpts);
 
@@ -31,11 +35,13 @@ public class DraftCommandService(IJobDbContext context) : IDraftCommandService
 
         if (draft is not null)
         {
+            Activity.Current?.SetTag("draft.isNew", false);
             draft.ContentJson = contentJson;
             draft.DraftStatus = "generated";
         }
         else
         {
+            Activity.Current?.SetTag("draft.isNew", true);
             draft = new Draft
             {
                 CompanyId = company.Id,
@@ -44,9 +50,20 @@ public class DraftCommandService(IJobDbContext context) : IDraftCommandService
                 ContentJson = contentJson
             };
             context.Drafts.Add(draft);
+
+            // Preserve the monolith's UId — set AFTER Add() and mark non-temporary
+            // to override ValueGeneratedOnAdd from HasDefaultValueSql("newsequentialid()")
+            if (!string.IsNullOrWhiteSpace(request.Id) && Guid.TryParse(request.Id, out var providedUId))
+            {
+                draft.UId = providedUId;
+                ((DbContext)context).Entry(draft).Property(e => e.UId).IsTemporary = false;
+                Activity.Current?.SetTag("draft.providedUId", providedUId);
+            }
         }
 
         await context.SaveChangesAsync(user, ct);
+
+        Activity.Current?.SetTag("draft.final.uid", draft.UId);
 
         var response = JsonSerializer.Deserialize<DraftResponse>(draft.ContentJson, JsonOpts) ?? new DraftResponse();
         response.Id = draft.UId.ToString();
@@ -55,6 +72,8 @@ public class DraftCommandService(IJobDbContext context) : IDraftCommandService
 
     public async Task DeleteDraftAsync(Guid draftUId, ClaimsPrincipal user, CancellationToken ct)
     {
+        Activity.Current?.SetTag("draft.uid", draftUId);
+
         var draft = await context.Drafts.FirstOrDefaultAsync(d => d.UId == draftUId, ct)
                     ?? throw new InvalidOperationException($"Draft '{draftUId}' not found.");
 
