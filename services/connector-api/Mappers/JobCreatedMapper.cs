@@ -8,6 +8,7 @@ public static class JobCreatedMapper
     public static JobCreatedJobApiPayload Map(JobCreatedV1Event evt)
         => new()
         {
+            UId = evt.UId,
             Title = evt.Title,
             CompanyUId = evt.CompanyUId,
             Location = evt.Location,

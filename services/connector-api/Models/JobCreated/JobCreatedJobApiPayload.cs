@@ -10,6 +10,7 @@ public enum JobType
 
 public class JobCreatedJobApiPayload
 {
+    public Guid? UId { get; init; }
     public required string Title { get; init; }
     public Guid CompanyUId { get; init; }
     public required string Location { get; init; }

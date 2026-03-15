@@ -94,7 +94,10 @@
       "Bash(for f:*)",
       "Bash(do awk:*)",
       "Bash(\"$f.tmp\")",
-      "Bash(mv \"$f.tmp\" \"$f\")"
+      "Bash(mv \"$f.tmp\" \"$f\")",
+      "Bash(do)",
+      "Bash(sed -i 's/Elkhair.Dev.Common\"\" Version=\"\"1.0.21\"\"/Elkhair.Dev.Common\"\" Version=\"\"1.0.22\"\"/' \"$f\")",
+      "Bash(echo \"Updated: $f\")"
     ]
   }
 }
