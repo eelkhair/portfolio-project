@@ -2,8 +2,9 @@
 
 namespace JobAPI.Contracts.Models.Jobs.Requests;
 
-public class CreateJobRequest 
+public class CreateJobRequest
 {
+    public Guid? UId { get; set; }
     public required string Title { get; set; }
     public Guid CompanyUId { get; set; }
     public required string Location { get; set; }

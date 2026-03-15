@@ -1,10 +1,7 @@
-﻿using System.Text.Json.Serialization;
-
-namespace JobAPI.Contracts.Models.Jobs.Responses;
+﻿namespace JobAPI.Contracts.Models.Jobs.Responses;
 
 public class JobResponse
 {
-    [JsonPropertyName("id")]
     public Guid UId { get; set; }
     public string Title { get; set; }
     public Guid CompanyUId { get; set; }

@@ -49,8 +49,8 @@ public static class DaprExtensions
     
     public static ClaimsPrincipal CreateUser(string userId)
     {
-        var claims = new List<Claim> () { 
-            new Claim (ClaimTypes.NameIdentifier, userId), 
+        var claims = new List<Claim> () {
+            new Claim ("sub", userId),
         }; 
         var identity = new ClaimsIdentity (claims, "TestAuthType"); 
         return new ClaimsPrincipal (identity);
