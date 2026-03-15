@@ -2,16 +2,18 @@ using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using AdminAPI.Contracts.Services;
+using AdminAPI.Contracts.Models.Jobs.Events;
 using AdminAPI.Contracts.Models.Jobs.Requests;
 using AdminAPI.Contracts.Models.Jobs.Responses;
 using Dapr.Client;
 using Elkhair.Dev.Common.Application;
 using Elkhair.Dev.Common.Dapr;
+using Elkhair.Dev.Common.Domain.Constants;
 using JobAPI.Contracts.Models.Jobs.Responses;
 
 namespace AdminApi.Application.Commands;
 
-public class JobCommandService(DaprClient client, UserContextService accessor, ILogger<JobCommandService> _logger) : IJobCommandService
+public class JobCommandService(DaprClient client, UserContextService accessor, IMessageSender sender, ILogger<JobCommandService> _logger) : IJobCommandService
 {
     static readonly JsonSerializerOptions JsonOpts = new()
     {
@@ -142,6 +144,30 @@ public class JobCommandService(DaprClient client, UserContextService accessor, I
             }
 
             var result = JsonSerializer.Deserialize<JobResponse>(raw, JsonOpts);
+
+            if (result is { } job)
+            {
+                await sender.SendEventAsync(PubSubNames.RabbitMq, "job.published.v2",
+                    accessor.GetCurrentUser() ?? "unknown",
+                    new JobPublishedEvent
+                    {
+                        UId = job.UId,
+                        Title = job.Title,
+                        CompanyUId = job.CompanyUId,
+                        CompanyName = job.CompanyName,
+                        Location = job.Location,
+                        JobType = job.JobType.ToString(),
+                        AboutRole = job.AboutRole,
+                        SalaryRange = job.SalaryRange,
+                        Responsibilities = job.Responsibilities,
+                        Qualifications = job.Qualifications,
+                        CreatedAt = job.CreatedAt,
+                        UpdatedAt = job.UpdatedAt,
+                        DraftId = request.DraftId,
+                        DeleteDraft = request.DeleteDraft
+                    }, ct);
+            }
+
             return new ApiResponse<JobResponse>
             {
                 Data = result,

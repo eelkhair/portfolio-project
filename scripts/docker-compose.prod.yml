@@ -118,6 +118,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - VAULT_ADDR=${VAULT_ADDR}
       - VAULT_TOKEN=${VAULT_TOKEN}
+      - McpServer__HealthUrl=http://monolith-mcp:3333/liveness
     networks:
       - ai-job-board-net
 
@@ -241,6 +242,7 @@ services:
       - "6062:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
+      - McpServer__HealthUrl=http://admin-api-mcp:3334/liveness
     networks:
       - ai-job-board-net
 
@@ -280,7 +282,7 @@ services:
       - admin-api-mcp
     volumes:
       - "/home/eelkhair/Dapr/shared/Components/:/Components"
-      - "/home/eelkhair/Dapr/admin-api-mcp/:/Dapr"
+      - "/home/eelkhair/Dapr/admin-api/:/Dapr"
     network_mode: "service:admin-api-mcp"
     command: [
       "./daprd",
@@ -315,6 +317,10 @@ services:
       - HealthChecksUI__HealthChecks__7__Uri=https://job-users-api.eelkhair.net/healthzEndpoint
       - HealthChecksUI__HealthChecks__8__Name=Gateway
       - HealthChecksUI__HealthChecks__8__Uri=https://job-gateway.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__9__Name=Monolith MCP
+      - HealthChecksUI__HealthChecks__9__Uri=https://mono-mcp.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__10__Name=Admin API MCP
+      - HealthChecksUI__HealthChecks__10__Uri=https://micro-mcp.eelkhair.net/healthzEndpoint
 
 
     ports:

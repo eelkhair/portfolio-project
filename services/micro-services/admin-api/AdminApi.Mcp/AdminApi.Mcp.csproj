@@ -10,6 +10,7 @@
     <ItemGroup>
         <PackageReference Include="Elkhair.Common.Observability" Version="1.0.4" />
         <PackageReference Include="Elkhair.Dev.Common" Version="1.0.20" />
+        <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
         <PackageReference Include="JobBoard.HealthChecks" Version="1.0.8" />
         <PackageReference Include="ModelContextProtocol" Version="1.1.0" />
         <PackageReference Include="ModelContextProtocol.AspNetCore" Version="1.1.0" />

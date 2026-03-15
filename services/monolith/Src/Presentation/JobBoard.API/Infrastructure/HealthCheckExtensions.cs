@@ -59,10 +59,11 @@ internal static class HealthCheckExtensions
             // -- MCP Server --
             .AddCheck("MCP Server", () =>
             {
+                var mcpUrl = builder.Configuration["McpServer:HealthUrl"] ?? "http://localhost:3333/liveness";
                 try
                 {
                     using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(5) };
-                    var response = client.GetAsync("http://localhost:3333").GetAwaiter().GetResult();
+                    var response = client.GetAsync(mcpUrl).GetAwaiter().GetResult();
                     return response.IsSuccessStatusCode
                         ? HealthCheckResult.Healthy("MCP server is responding")
                         : HealthCheckResult.Degraded($"MCP server returned {response.StatusCode}");
