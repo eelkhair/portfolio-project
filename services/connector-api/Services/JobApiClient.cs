@@ -56,11 +56,12 @@ public class JobApiClient(DaprClient client, ActivitySource activitySource, ILog
         return await client.InvokeMethodAsync<List<DraftResponse>>(HttpMethod.Get, "job-api", $"api/drafts/{companyUId}", cancellationToken);
     }
 
-    public async Task DeleteDraftAsync(Guid draftUId, CancellationToken cancellationToken)
+    public async Task DeleteDraftAsync(Guid draftUId, string userId, CancellationToken cancellationToken)
     {
         using var activity = activitySource.StartActivity("job-api.DeleteDraftAsync");
         logger.LogInformation("Deleting draft {DraftUId} from job-api", draftUId);
         var message = client.CreateInvokeMethodRequest(HttpMethod.Delete, "job-api", $"api/drafts/{draftUId}");
+        message.Content = JsonContent.Create(new { UserId = userId });
         await client.InvokeMethodAsync(message, cancellationToken);
     }
 

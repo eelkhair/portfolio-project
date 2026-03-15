@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using ConnectorAPI.Endpoints.Company;
+using ConnectorAPI.Endpoints.Draft;
 using ConnectorAPI.Endpoints.Job;
 using ConnectorAPI.Infrastructure;
 using Elkhair.Common.Observability;
@@ -21,6 +22,8 @@ var app = builder.Build();
     app.MapCompanyCreatedEndpoint()
         .MapCompanyUpdatedEndpoint()
         .MapJobCreatedEndpoint()
+        .MapDraftSavedEndpoint()
+        .MapDraftDeletedEndpoint()
         .MapSubscribeHandler();
 
     app.MapServices().Run();

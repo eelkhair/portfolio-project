@@ -4,6 +4,7 @@ using JobBoard.Application.Interfaces;
 using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Application.Interfaces.Repositories;
 using JobBoard.Domain.Entities;
+using JobBoard.IntegrationEvents.Draft;
 using JobBoard.Monolith.Contracts.Jobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -42,6 +43,8 @@ public class CreateJobCommandHandler(IHandlerContext context,
             if (draft is not null)
             {
                 draftsDbSet.Remove(draft);
+                var draftDeletedEvent = new DraftDeletedV1Event(draft.Id, command.Request.CompanyUId) { UserId = command.UserId };
+                await OutboxPublisher.PublishAsync(draftDeletedEvent, cancellationToken);
                 Logger.LogInformation("Draft {DraftId} will be deleted with job creation", command.Request.DraftId);
             }
         }

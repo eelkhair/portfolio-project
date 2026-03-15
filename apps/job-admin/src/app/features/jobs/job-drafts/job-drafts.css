@@ -1,0 +1,7 @@
+::ng-deep .p-confirmdialog-message {
+  padding: 1rem 0.5rem;
+}
+
+::ng-deep .p-confirmdialog-footer {
+  gap: 0.75rem;
+}

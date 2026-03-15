@@ -15,6 +15,6 @@ public interface IJobApiClient
     // Draft CRUD — routed to job-api microservice
     Task<DraftResponse> SaveDraftAsync(Guid companyUId, EventDto<SaveDraftPayload> payload, CancellationToken cancellationToken);
     Task<List<DraftResponse>> ListDraftsAsync(Guid companyUId, CancellationToken cancellationToken);
-    Task DeleteDraftAsync(Guid draftUId, CancellationToken cancellationToken);
+    Task DeleteDraftAsync(Guid draftUId, string userId, CancellationToken cancellationToken);
     Task<DraftResponse?> GetDraftAsync(Guid draftUId, CancellationToken cancellationToken);
 }

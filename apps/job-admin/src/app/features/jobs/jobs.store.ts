@@ -186,6 +186,14 @@ export class JobsStore {
   }
 
 
+  deleteDraft(draftId: string) {
+    const companyId = this.selectedCompany()?.uId!;
+    return this.jobService.deleteDraft(companyId, draftId).pipe(tap(() => {
+      this.drafts.update(list => list.filter(d => d.id !== draftId));
+      this.notificationService.success('Success', 'Draft deleted successfully.');
+    }));
+  }
+
   loadDrafts(companyId: string) {
     return this.jobService.loadDrafts(companyId).pipe(tap(drafts => {
       if(drafts?.data) {

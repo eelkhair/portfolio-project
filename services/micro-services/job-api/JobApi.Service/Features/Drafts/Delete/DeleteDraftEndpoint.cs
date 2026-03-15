@@ -21,7 +21,7 @@ public class DeleteDraftEndpoint(IDraftCommandService service) : Endpoint<Delete
 
     public override async Task HandleAsync(DeleteDraftRequest request, CancellationToken ct)
     {
-        await service.DeleteDraftAsync(request.DraftUId, DaprExtensions.CreateUser(request.UserId), ct);
+        await service.DeleteDraftAsync(request.DraftUId, DaprExtensions.CreateUser(request.UserId ?? "system"), ct);
         await Send.NoContentAsync(cancellation: ct);
     }
 }

@@ -3,6 +3,7 @@ using JobBoard.Application.Actions.Base;
 using JobBoard.Application.Interfaces;
 using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Domain.Exceptions;
+using JobBoard.IntegrationEvents.Draft;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -32,6 +33,10 @@ public class DeleteDraftCommandHandler(IHandlerContext handlerContext)
                 [new Error("Draft.NotFound", $"Draft '{command.DraftId}' not found for company '{command.CompanyId}'.")]);
 
         dbSet.Remove(draft);
+
+        var draftEvent = new DraftDeletedV1Event(draft.Id, command.CompanyId) { UserId = command.UserId };
+        await OutboxPublisher.PublishAsync(draftEvent, cancellationToken);
+
         await Context.SaveChangesAsync(command.UserId, cancellationToken);
 
         Logger.LogInformation("Deleted draft {DraftId} for company {CompanyId}", command.DraftId, command.CompanyId);
