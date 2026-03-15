@@ -13,7 +13,7 @@ public class UserContextService
 
     public string? GetCurrentUser()
     {
-        return _httpContextAccessor.HttpContext?.User?.Identity?.Name;
+        return _httpContextAccessor.HttpContext?.User?.FindFirst("sub")?.Value;
     }
 
     public string? GetHeader(string key)
