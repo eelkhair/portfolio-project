@@ -6,6 +6,6 @@ namespace JobApi.Application.Interfaces;
 
 public interface IDraftCommandService
 {
-    Task<DraftResponse> SaveDraftAsync(Guid companyUId, SaveDraftRequest request, ClaimsPrincipal user, CancellationToken ct);
-    Task DeleteDraftAsync(Guid draftUId, ClaimsPrincipal user, CancellationToken ct);
+    Task<DraftResponse> SaveDraftAsync(Guid companyUId, SaveDraftRequest request, ClaimsPrincipal user, CancellationToken ct, bool publishEvent = true);
+    Task DeleteDraftAsync(Guid draftUId, ClaimsPrincipal user, CancellationToken ct, bool publishEvent = true);
 }

@@ -45,6 +45,7 @@ public class JobApiClient(DaprClient client, ActivitySource activitySource, ILog
         using var activity = activitySource.StartActivity("job-api.SaveDraftAsync");
         logger.LogInformation("Saving draft to job-api for company {CompanyUId}", companyUId);
         var message = client.CreateInvokeMethodRequest(HttpMethod.Put, "job-api", $"api/drafts/{companyUId}");
+        message.Headers.Add("X-Sync-Source", "forward");
         message.Content = JsonContent.Create(payload);
         return await client.InvokeMethodAsync<DraftResponse>(message, cancellationToken);
     }
@@ -61,6 +62,7 @@ public class JobApiClient(DaprClient client, ActivitySource activitySource, ILog
         using var activity = activitySource.StartActivity("job-api.DeleteDraftAsync");
         logger.LogInformation("Deleting draft {DraftUId} from job-api", draftUId);
         var message = client.CreateInvokeMethodRequest(HttpMethod.Delete, "job-api", $"api/drafts/{draftUId}");
+        message.Headers.Add("X-Sync-Source", "forward");
         message.Content = JsonContent.Create(new { UserId = userId });
         await client.InvokeMethodAsync(message, cancellationToken);
     }

@@ -11,6 +11,7 @@ using JobApi.Application.Interfaces;
 using JobAPI.Contracts.Models.Jobs.Requests;
 
 using JobApi.Features.Jobs.Create;
+using Elkhair.Dev.Common.Dapr;
 using JobApi.Infrastructure;
 using JobApi.Infrastructure.Data;
 using JobBoard.HealthChecks;
@@ -107,6 +108,7 @@ builder.Services.AddScoped<IJobQueryService, JobQueryService>();
 builder.Services.AddScoped<IJobCommandService, JobCommandService>();
 builder.Services.AddScoped<IDraftCommandService, DraftCommandService>();
 builder.Services.AddScoped<IDraftQueryService, DraftQueryService>();
+builder.Services.AddMessageSender();
 
 builder.Services.AddAuthentication(options =>
     {

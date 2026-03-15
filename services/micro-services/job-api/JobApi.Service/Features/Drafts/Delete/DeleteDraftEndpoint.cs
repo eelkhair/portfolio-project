@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Elkhair.Dev.Common.Application;
 using FastEndpoints;
 using JobApi.Application.Interfaces;
@@ -21,7 +22,10 @@ public class DeleteDraftEndpoint(IDraftCommandService service) : Endpoint<Delete
 
     public override async Task HandleAsync(DeleteDraftRequest request, CancellationToken ct)
     {
-        await service.DeleteDraftAsync(request.DraftUId, DaprExtensions.CreateUser(request.UserId ?? "system"), ct);
+        var isForwardSync = HttpContext.Request.Headers["X-Sync-Source"].FirstOrDefault() == "forward";
+        Activity.Current?.SetTag("draft.isForwardSync", isForwardSync);
+
+        await service.DeleteDraftAsync(request.DraftUId, DaprExtensions.CreateUser(request.UserId ?? "system"), ct, publishEvent: !isForwardSync);
         await Send.NoContentAsync(cancellation: ct);
     }
 }

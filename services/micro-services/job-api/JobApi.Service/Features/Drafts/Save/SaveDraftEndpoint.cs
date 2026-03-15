@@ -20,11 +20,14 @@ public class SaveDraftEndpoint(IDraftCommandService service) : Endpoint<EventDto
     public override async Task HandleAsync(EventDto<SaveDraftRequest> request, CancellationToken ct)
     {
         var companyUId = Route<Guid>("companyUId");
+        var isForwardSync = HttpContext.Request.Headers["X-Sync-Source"].FirstOrDefault() == "forward";
+
         Activity.Current?.SetTag("draft.request.id", request.Data.Id);
         Activity.Current?.SetTag("draft.companyUid", companyUId);
         Activity.Current?.SetTag("userId", request.UserId);
+        Activity.Current?.SetTag("draft.isForwardSync", isForwardSync);
 
-        var response = await service.SaveDraftAsync(companyUId, request.Data, DaprExtensions.CreateUser(request.UserId), ct);
+        var response = await service.SaveDraftAsync(companyUId, request.Data, DaprExtensions.CreateUser(request.UserId), ct, publishEvent: !isForwardSync);
 
         Activity.Current?.SetTag("draft.saved.uid", response.Id);
         await Send.OkAsync(response, cancellation: ct);
