@@ -9,7 +9,7 @@
     <ItemGroup>
         <PackageReference Include="DocumentFormat.OpenXml" Version="3.4.1" />
         <PackageReference Include="Microsoft.Extensions.AI" Version="10.3.0" />
-        <PackageReference Include="Elkhair.Dev.Common" Version="1.0.20" />
+        <PackageReference Include="Elkhair.Dev.Common" Version="1.0.21" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
         <PackageReference Include="JobBoard.AdminAPI.Contracts" Version="1.0.1" />
         <PackageReference Include="JobBoard.IntegrationEvents" Version="1.0.9" />

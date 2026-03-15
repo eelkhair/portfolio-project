@@ -51,7 +51,6 @@ public class ChatService(
 
         messages.Add(new(ChatRole.User, userMessage));
 
-        // Flow user's token to MCP servers via AsyncLocal → DelegatingHandler
         McpCtx.CurrentToken = userAccessor.Token;
         Microsoft.Extensions.AI.ChatResponse response;
         try

@@ -126,7 +126,9 @@ public class JobCommandService(DaprClient client, UserContextService accessor, I
             if (accessor.GetHeader("Authorization") is { } auth && !string.IsNullOrWhiteSpace(auth))
                 req.Headers.TryAddWithoutValidation("Authorization", auth);
 
-            req.Content = JsonContent.Create(request, options: JsonOpts);
+            var userId = accessor.GetCurrentUser() ?? "unknown";
+            var envelope = new EventDto<JobCreateRequest>(userId, Guid.NewGuid().ToString(), request);
+            req.Content = JsonContent.Create(envelope, options: JsonOpts);
 
             using var resp = await client.InvokeMethodWithResponseAsync(req, ct);
             var raw = await resp.Content.ReadAsStringAsync(ct);
