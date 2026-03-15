@@ -56,3 +56,9 @@ public static class MonolithTopicNames
             ? topic
             : throw new ArgumentException($"No topic mapped for event type '{eventType}'");
 }
+
+public static class MicroTopicNames
+{
+    public const string DraftSavedV1 = "micro.draft-saved.v1";
+    public const string DraftDeletedV1 = "micro.draft-deleted.v1";
+}

@@ -197,9 +197,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{EA007C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elkhair.Common.Observability", "Common\Elkhair.Common.Observability\Elkhair.Common.Observability.csproj", "{E222CA10-E2B1-40BA-9F1C-067212D08F7B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "monolith-sync", "monolith-sync", "{A9B0D052-9CC4-44EE-803D-9D6DDE62F5EF}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "reverse-connector-api", "reverse-connector-api", "{A9B0D052-9CC4-44EE-803D-9D6DDE62F5EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "monolith-sync", "services\monolith-sync\monolith-sync.csproj", "{DC5D5B75-8316-4677-ADF6-EBF38C17363A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "reverse-connector-api", "services\reverse-connector-api\reverse-connector-api.csproj", "{DC5D5B75-8316-4677-ADF6-EBF38C17363A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ADRs", "ADRs", "{97769D49-12AC-486F-88DC-4E25F78EB71B}"
 	ProjectSection(SolutionItems) = preProject
