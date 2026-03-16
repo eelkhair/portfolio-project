@@ -138,6 +138,18 @@ All significant decisions documented in `docs/ADRs/`:
 - ADR-005: CQRS and Decorator Pipeline
 - ADR-006: RabbitMQ vs Azure Service Bus
 - ADR-007: Trace Context Propagation
+- ADR-008: YARP Gateway Direct Proxy
+- ADR-009: AI Service Multi-Provider Function Calling
+- ADR-010: Real-Time AI Notifications SignalR
+- ADR-011: Strangler-Fig Connector API Provisioning Sagas
+- ADR-012: Reverse Connector Bidirectional Strangler-Fig
+- ADR-013: Keycloak Migration Auth Strategy
+- ADR-014: Resume Embedding Pipeline (RAG)
+- ADR-015: MCP Server Integration
+- ADR-016: Multi-Scope AI Chat
+- ADR-017: IntegrationEvents Shared NuGet Package
+- ADR-018: Docker Deployment Topology
+- ADR-019: EF Core Dual-ID Sequence Generation
 
 ## Debugging Workflow
 

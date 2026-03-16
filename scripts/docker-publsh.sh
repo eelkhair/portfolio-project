@@ -61,6 +61,7 @@ declare -A services=(
   ["monolith-api"]="../services/monolith"
   ["monolith-mcp"]="../services/monolith"
   ["connector-api"]="../services/connector-api"
+  ["reverse-connector-api"]="../services/reverse-connector-api"
   ["gateway"]="../services/gateway"
   ["health-check"]="../services/micro-services/HealthChecks"
   ["keycloak"]="../infrastructure/keycloak"
