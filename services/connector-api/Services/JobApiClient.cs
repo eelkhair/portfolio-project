@@ -27,6 +27,7 @@ public class JobApiClient(DaprClient client, ActivitySource activitySource, ILog
         using var activity = activitySource.StartActivity("job-api.SendJobCreatedAsync");
         logger.LogInformation("Sending job created event to job-api");
         var message = client.CreateInvokeMethodRequest(HttpMethod.Post, "job-api", "api/jobs");
+        message.Headers.Add("X-Sync-Source", "forward");
         message.Content = JsonContent.Create(payload);
         return await client.InvokeMethodAsync<JobApiResponse>(message, cancellationToken);
     }

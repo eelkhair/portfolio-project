@@ -17,8 +17,9 @@ public class UpdateCompanyEndpoint(ICompanyCommandService service, ILogger<Updat
     public override async Task HandleAsync(UpdateCompanyRequest request, CancellationToken ct)
     {
         var companyUId = Route<Guid>("id");
-        logger.LogInformation("Updating Company: {CompanyUId}", companyUId);
-        var company = await service.UpdateAsync(companyUId, request, User, ct);
+        var isForwardSync = HttpContext.Request.Headers["X-Sync-Source"].FirstOrDefault() == "forward";
+        logger.LogInformation("Updating Company: {CompanyUId}, isForwardSync: {IsForwardSync}", companyUId, isForwardSync);
+        var company = await service.UpdateAsync(companyUId, request, User, ct, publishEvent: !isForwardSync);
         await Send.OkAsync(company, cancellation: ct);
     }
 }

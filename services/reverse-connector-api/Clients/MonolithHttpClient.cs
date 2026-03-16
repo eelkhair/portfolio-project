@@ -56,4 +56,98 @@ public class MonolithHttpClient(HttpClient httpClient, ActivitySource activitySo
 
         logger.LogInformation("Draft {DraftId} deleted from monolith successfully", draftUId);
     }
+
+    public async Task SyncCompanyCreateAsync(SyncCompanyCreatePayload payload, string userId, CancellationToken ct)
+    {
+        using var activity = activitySource.StartActivity("monolith.SyncCompanyCreate");
+        activity?.SetTag("company.id", payload.CompanyId.ToString());
+        activity?.SetTag("company.name", payload.Name);
+        activity?.SetTag("userId", userId);
+
+        logger.LogInformation("Syncing company create {CompanyId} ({CompanyName}) to monolith",
+            payload.CompanyId, payload.Name);
+
+        var request = new
+        {
+            payload.CompanyId,
+            payload.Name,
+            payload.CompanyEmail,
+            payload.CompanyWebsite,
+            payload.IndustryUId,
+            payload.AdminFirstName,
+            payload.AdminLastName,
+            payload.AdminEmail,
+            payload.AdminUId,
+            payload.UserCompanyUId,
+            UserId = userId
+        };
+
+        var response = await httpClient.PostAsJsonAsync("api/sync/companies", request, JsonOpts, ct);
+        response.EnsureSuccessStatusCode();
+
+        logger.LogInformation("Company {CompanyId} create synced to monolith successfully", payload.CompanyId);
+    }
+
+    public async Task SyncCompanyUpdateAsync(SyncCompanyUpdatePayload payload, string userId, CancellationToken ct)
+    {
+        using var activity = activitySource.StartActivity("monolith.SyncCompanyUpdate");
+        activity?.SetTag("company.id", payload.CompanyId.ToString());
+        activity?.SetTag("company.name", payload.Name);
+        activity?.SetTag("userId", userId);
+
+        logger.LogInformation("Syncing company update {CompanyId} ({CompanyName}) to monolith",
+            payload.CompanyId, payload.Name);
+
+        var request = new
+        {
+            payload.Name,
+            payload.CompanyEmail,
+            payload.CompanyWebsite,
+            payload.Phone,
+            payload.Description,
+            payload.About,
+            payload.EEO,
+            payload.Founded,
+            payload.Size,
+            payload.Logo,
+            payload.IndustryUId,
+            UserId = userId
+        };
+
+        var response = await httpClient.PutAsJsonAsync($"api/sync/companies/{payload.CompanyId}", request, JsonOpts, ct);
+        response.EnsureSuccessStatusCode();
+
+        logger.LogInformation("Company {CompanyId} update synced to monolith successfully", payload.CompanyId);
+    }
+
+    public async Task SyncJobCreateAsync(SyncJobCreatePayload payload, string userId, CancellationToken ct)
+    {
+        using var activity = activitySource.StartActivity("monolith.SyncJobCreate");
+        activity?.SetTag("job.id", payload.JobId.ToString());
+        activity?.SetTag("job.companyId", payload.CompanyId.ToString());
+        activity?.SetTag("job.title", payload.Title);
+        activity?.SetTag("userId", userId);
+
+        logger.LogInformation("Syncing job create {JobId} ({JobTitle}) to monolith",
+            payload.JobId, payload.Title);
+
+        var request = new
+        {
+            payload.JobId,
+            payload.CompanyId,
+            payload.Title,
+            payload.AboutRole,
+            payload.Location,
+            payload.SalaryRange,
+            payload.JobType,
+            payload.Responsibilities,
+            payload.Qualifications,
+            UserId = userId
+        };
+
+        var response = await httpClient.PostAsJsonAsync("api/sync/jobs", request, JsonOpts, ct);
+        response.EnsureSuccessStatusCode();
+
+        logger.LogInformation("Job {JobId} create synced to monolith successfully", payload.JobId);
+    }
 }

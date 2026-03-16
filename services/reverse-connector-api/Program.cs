@@ -17,6 +17,9 @@ var app = builder.Build();
 app.UseCloudEvents();
 app.MapDraftSavedEndpoint()
     .MapDraftDeletedEndpoint()
+    .MapCompanyCreatedEndpoint()
+    .MapCompanyUpdatedEndpoint()
+    .MapJobCreatedEndpoint()
     .MapSubscribeHandler();
 
 app.MapHealthChecks("/healthzEndpoint");

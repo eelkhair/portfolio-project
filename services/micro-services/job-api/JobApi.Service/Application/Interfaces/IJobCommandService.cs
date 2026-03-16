@@ -6,5 +6,5 @@ namespace JobApi.Application.Interfaces;
 
 public interface IJobCommandService
 {
-    Task<JobResponse> CreateJobAsync(CreateJobRequest request, ClaimsPrincipal user, CancellationToken ct);
+    Task<JobResponse> CreateJobAsync(CreateJobRequest request, ClaimsPrincipal user, CancellationToken ct, bool publishEvent = true);
 }

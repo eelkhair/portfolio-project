@@ -5,6 +5,7 @@ using Dapr.Client;
 using Elkhair.Dev.Common.Application;
 using Elkhair.Dev.Common.Dapr;
 using Elkhair.Dev.Common.Domain.Constants;
+using JobBoard.IntegrationEvents.Company;
 using UserAPI.Contracts.Models.Events;
 
 namespace AdminApi.Application.Commands;
@@ -22,8 +23,10 @@ public class CompanyCommandService(DaprClient client, UserContextService accesso
 
         if (company.Success && company.Data is { } data)
         {
+            var userId = request.UserId ?? accessor.GetCurrentUser() ?? "unknown";
+
             await sender.SendEventAsync(PubSubNames.RabbitMq, "company.created",
-                request.UserId ?? accessor.GetCurrentUser() ?? "unknown",
+                userId,
                 new ProvisionUserEvent
                 {
                     CompanyName = data.Name,
@@ -35,6 +38,18 @@ public class CompanyCommandService(DaprClient client, UserContextService accesso
                     CompanyEmail = request.CompanyEmail,
                     UId = request.AdminUserId,
                     UserCompanyUId = request.UserCompanyId
+                }, ct);
+
+            // Reverse-sync: publish company created event for monolith sync
+            await sender.SendEventAsync(PubSubNames.RabbitMq, "micro.company-created.v1",
+                userId,
+                new MicroCompanyCreatedV1Event(
+                    data.UId, data.Name, request.CompanyEmail, request.CompanyWebsite,
+                    request.IndustryUId,
+                    request.AdminFirstName, request.AdminLastName, request.AdminEmail,
+                    request.AdminUserId, request.UserCompanyId)
+                {
+                    UserId = userId
                 }, ct);
         }
 

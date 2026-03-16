@@ -1,0 +1,98 @@
+using System.Diagnostics;
+using AH.Metadata.Domain.Constants;
+using Dapr;
+using Dapr.Client;
+using Elkhair.Dev.Common.Dapr;
+using JobBoard.IntegrationEvents.Job;
+using ReverseConnectorAPI.Clients;
+using ReverseConnectorAPI.Mappers;
+using ReverseConnectorAPI.Models;
+
+namespace ReverseConnectorAPI.Endpoints;
+
+public static class JobCreatedEndpointExtensions
+{
+    public static WebApplication MapJobCreatedEndpoint(this WebApplication app)
+    {
+        app.MapPost("/sync/job-created",
+            [Topic("rabbitmq.pubsub", "micro.job-created.v1")]
+            async (
+                EventDto<MicroJobCreatedV1Event> @event,
+                MonolithHttpClient monolithClient,
+                ActivitySource activitySource,
+                DaprClient client,
+                ILogger<MicroJobCreatedV1Event> logger,
+                CancellationToken cancellationToken) =>
+            {
+                using var parentSpan = activitySource.StartActivity("reverse-sync.job.create");
+                parentSpan?.SetTag("job.uid", @event.Data.UId);
+                parentSpan?.SetTag("job.companyUid", @event.Data.CompanyUId);
+                parentSpan?.SetTag("job.title", @event.Data.Title);
+                parentSpan?.SetTag("idempotency.key", @event.IdempotencyKey);
+                parentSpan?.SetTag("userId", @event.UserId);
+
+                var stateKey = $"ReverseJobCreated:{@event.IdempotencyKey}";
+                using (var spanIdempotency =
+                       activitySource.StartActivity("reverse-sync.job.create.idempotency"))
+                {
+                    spanIdempotency?.SetTag("idempotency.state_key", stateKey);
+
+                    logger.LogInformation("Received micro job created event {JobUId}", @event.Data.UId);
+                    var existing = await client.GetStateAsync<string>(StateStores.Redis, stateKey,
+                        cancellationToken: cancellationToken);
+
+                    if (existing is not null)
+                    {
+                        spanIdempotency?.SetTag("idempotency.duplicate", true);
+                        logger.LogInformation("Skipping reverse job create sync. Idempotency key already processed");
+                        return Results.Accepted();
+                    }
+
+                    spanIdempotency?.SetTag("idempotency.duplicate", false);
+
+                    await client.SaveStateAsync(
+                        StateStores.Redis,
+                        stateKey,
+                        "processing",
+                        metadata: new Dictionary<string, string>
+                            { ["ttlInSeconds"] = IdempotencyOptions.PendingTTLSeconds.ToString() },
+                        cancellationToken: cancellationToken);
+                }
+
+                try
+                {
+                    var payload = JobMapper.ToPayload(@event.Data);
+                    await monolithClient.SyncJobCreateAsync(payload, @event.UserId, cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    parentSpan?.AddException(ex);
+                    parentSpan?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                    logger.LogError(ex, "Unhandled error while reverse-syncing job create {JobUId}",
+                        @event.Data.UId);
+                    return Results.Accepted();
+                }
+
+                using (activitySource.StartActivity("reverse-sync.job.create.finalize"))
+                {
+                    logger.LogInformation("Marking reverse job create sync as completed");
+
+                    await client.SaveStateAsync(
+                        StateStores.Redis,
+                        stateKey,
+                        "done",
+                        metadata: new Dictionary<string, string>
+                        {
+                            ["ttlInSeconds"] = IdempotencyOptions.CompletedTTLSeconds.ToString()
+                        },
+                        cancellationToken: cancellationToken);
+                }
+
+                logger.LogInformation("Job {JobUId} reverse-synced to monolith successfully",
+                    @event.Data.UId);
+                return Results.Accepted();
+            });
+
+        return app;
+    }
+}
