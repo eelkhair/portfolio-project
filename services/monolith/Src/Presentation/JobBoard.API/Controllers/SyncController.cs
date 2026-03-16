@@ -15,42 +15,48 @@ namespace JobBoard.API.Controllers;
 [Authorize(Policy = AuthorizationPolicies.InternalOrJwt)]
 public class SyncController(IUserAccessor accessor) : BaseApiController
 {
+    private void SetSyncUserContext(string userId)
+    {
+        accessor.UserId = userId;
+        // Override identity fields so UserSyncService creates a distinct user
+        // (avoids unique email conflicts with JWT-authenticated users)
+        accessor.Email = $"{userId}@sync.internal";
+        accessor.FirstName = "Sync";
+        accessor.LastName = "Service";
+    }
+
     [HttpPost("drafts")]
     public async Task<IActionResult> SyncDraft([FromBody] SyncDraftRequest request, CancellationToken ct)
     {
-        accessor.UserId = request.UserId;
+        SetSyncUserContext(request.UserId);
 
-        await ExecuteCommandAsync(new SyncDraftSaveCommand
+        return await ExecuteCommandAsync(new SyncDraftSaveCommand
         {
             DraftId = request.DraftId,
             CompanyId = request.CompanyId,
             ContentJson = request.ContentJson
         }, Ok);
-
-        return Ok();
     }
 
     [HttpDelete("drafts/{draftId:guid}")]
     public async Task<IActionResult> DeleteDraft(Guid draftId, [FromQuery] Guid companyId,
         [FromHeader(Name = "x-user-id")] string? userId, CancellationToken ct)
     {
-        accessor.UserId = userId ?? "system";
+        SetSyncUserContext(userId ?? "system");
 
-        await ExecuteCommandAsync(new SyncDraftDeleteCommand
+        return await ExecuteCommandAsync(new SyncDraftDeleteCommand
         {
             DraftId = draftId,
             CompanyId = companyId
         }, Ok);
-
-        return Ok();
     }
 
     [HttpPost("companies")]
     public async Task<IActionResult> SyncCompanyCreate([FromBody] SyncCompanyCreateRequest request, CancellationToken ct)
     {
-        accessor.UserId = request.UserId;
+        SetSyncUserContext(request.UserId);
 
-        await ExecuteCommandAsync(new SyncCompanyCreateCommand
+        return await ExecuteCommandAsync(new SyncCompanyCreateCommand
         {
             CompanyId = request.CompanyId,
             Name = request.Name,
@@ -63,16 +69,14 @@ public class SyncController(IUserAccessor accessor) : BaseApiController
             AdminUId = request.AdminUId,
             UserCompanyUId = request.UserCompanyUId
         }, Ok);
-
-        return Ok();
     }
 
     [HttpPut("companies/{companyId:guid}")]
     public async Task<IActionResult> SyncCompanyUpdate(Guid companyId, [FromBody] SyncCompanyUpdateRequest request, CancellationToken ct)
     {
-        accessor.UserId = request.UserId;
+        SetSyncUserContext(request.UserId);
 
-        await ExecuteCommandAsync(new SyncCompanyUpdateCommand
+        return await ExecuteCommandAsync(new SyncCompanyUpdateCommand
         {
             CompanyId = companyId,
             Name = request.Name,
@@ -87,16 +91,14 @@ public class SyncController(IUserAccessor accessor) : BaseApiController
             Logo = request.Logo,
             IndustryUId = request.IndustryUId
         }, Ok);
-
-        return Ok();
     }
 
     [HttpPost("jobs")]
     public async Task<IActionResult> SyncJobCreate([FromBody] SyncJobCreateRequest request, CancellationToken ct)
     {
-        accessor.UserId = request.UserId;
+        SetSyncUserContext(request.UserId);
 
-        await ExecuteCommandAsync(new SyncJobCreateCommand
+        return await ExecuteCommandAsync(new SyncJobCreateCommand
         {
             JobId = request.JobId,
             CompanyId = request.CompanyId,
@@ -108,7 +110,5 @@ public class SyncController(IUserAccessor accessor) : BaseApiController
             Responsibilities = request.Responsibilities,
             Qualifications = request.Qualifications
         }, Ok);
-
-        return Ok();
     }
 }

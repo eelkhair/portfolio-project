@@ -4,4 +4,5 @@ node_modules
 bin
 obj
 JobBoard.sln.DotSettings.user
+coveragereport
 secrets/*
