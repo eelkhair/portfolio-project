@@ -1,6 +1,9 @@
 using Elkhair.Common.Observability;
+using HealthChecks.UI.Client;
+using JobBoard.HealthChecks;
 using ReverseConnectorAPI;
 using ReverseConnectorAPI.Endpoints;
+using ReverseConnectorAPI.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 (await builder.AddDaprServices("reverse-connector-api"))
@@ -10,7 +13,7 @@ builder.Services
     .AddOpenTelemetryServices(builder.Configuration, "reverse-connector-api")
     .AddApplicationServices(builder.Configuration);
 
-builder.Services.AddHealthChecks();
+builder.AddCustomHealthChecks();
 
 var app = builder.Build();
 
@@ -22,8 +25,10 @@ app.MapDraftSavedEndpoint()
     .MapJobCreatedEndpoint()
     .MapSubscribeHandler();
 
-app.MapHealthChecks("/healthzEndpoint");
-app.MapHealthChecks("/liveness");
+app.MapCustomHealthChecks(
+    "/healthzEndpoint",
+    "/liveness",
+    UIResponseWriter.WriteHealthCheckUIResponse);
 
 app.UseSwagger();
 app.UseSwaggerUI(options =>
