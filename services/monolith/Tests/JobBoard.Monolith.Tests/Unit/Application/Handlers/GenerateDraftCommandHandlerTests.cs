@@ -4,8 +4,10 @@ using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Application.Interfaces.Infrastructure;
 using JobBoard.Application.Interfaces.Messaging;
 using JobBoard.Application.Interfaces.Observability;
+using JobBoard.Domain.Entities;
 using JobBoard.Monolith.Contracts.Drafts;
 using JobBoard.Monolith.Tests.Unit.Application.Decorators;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Shouldly;
@@ -20,9 +22,13 @@ public class GenerateDraftCommandHandlerTests
 
     public GenerateDraftCommandHandlerTests()
     {
-        var unitOfWork = Substitute.For<IUnitOfWork, ITransactionDbContext>();
+        var unitOfWork = Substitute.For<IUnitOfWork, ITransactionDbContext, IJobBoardQueryDbContext>();
         var changeTracker = new StubDbContext().ChangeTracker;
         ((ITransactionDbContext)unitOfWork).ChangeTracker.Returns(changeTracker);
+
+        // Stub Drafts DbSet for GenerateDraftCommandHandler which casts to IJobBoardQueryDbContext
+        var draftsDbSet = Substitute.For<DbSet<Draft>>();
+        ((IJobBoardQueryDbContext)unitOfWork).Drafts.Returns(draftsDbSet);
 
         _aiServiceClient = Substitute.For<IAiServiceClient>();
 
@@ -86,17 +92,17 @@ public class GenerateDraftCommandHandlerTests
 
         var result = await _sut.HandleAsync(command, CancellationToken.None);
 
-        result.ShouldBe(expectedResponse);
-        result.DraftId.ShouldBe("draft-001");
         result.Title.ShouldBe("Senior Software Engineer");
+        result.DraftId.ShouldNotBeNullOrEmpty();
     }
 
     [Fact]
-    public async Task HandleAsync_ShouldImplementINoTransaction()
+    public void GenerateDraftCommand_RequiresTransaction()
     {
         var command = new GenerateDraftCommand();
 
-        command.ShouldBeAssignableTo<INoTransaction>();
+        // GenerateDraftCommand now saves drafts to DB, so it should NOT be INoTransaction
+        command.ShouldNotBeAssignableTo<INoTransaction>();
     }
 
     [Fact]

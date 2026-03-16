@@ -99,7 +99,9 @@
       "Bash(sed -i 's/Elkhair.Dev.Common\"\" Version=\"\"1.0.21\"\"/Elkhair.Dev.Common\"\" Version=\"\"1.0.22\"\"/' \"$f\")",
       "Bash(echo \"Updated: $f\")",
       "Bash(find \"C:/Users/elkha/RiderProjects/portfolio project/services/monolith/Src\" -path \"*/Application/Actions/*\" -type f -name \"*.cs\" -exec grep -l \"class.*IHandler<\" {})",
-      "Bash(sed 's/Tests.cs//')"
+      "Bash(sed 's/Tests.cs//')",
+      "Bash(/tmp/cmd_summary.txt:*)",
+      "Read(//tmp/**)"
     ]
   }
 }
