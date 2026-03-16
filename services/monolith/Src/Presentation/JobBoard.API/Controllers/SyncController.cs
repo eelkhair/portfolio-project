@@ -44,4 +44,71 @@ public class SyncController(IUserAccessor accessor) : BaseApiController
 
         return Ok();
     }
+
+    [HttpPost("companies")]
+    public async Task<IActionResult> SyncCompanyCreate([FromBody] SyncCompanyCreateRequest request, CancellationToken ct)
+    {
+        accessor.UserId = request.UserId;
+
+        await ExecuteCommandAsync(new SyncCompanyCreateCommand
+        {
+            CompanyId = request.CompanyId,
+            Name = request.Name,
+            CompanyEmail = request.CompanyEmail,
+            CompanyWebsite = request.CompanyWebsite,
+            IndustryUId = request.IndustryUId,
+            AdminFirstName = request.AdminFirstName,
+            AdminLastName = request.AdminLastName,
+            AdminEmail = request.AdminEmail,
+            AdminUId = request.AdminUId,
+            UserCompanyUId = request.UserCompanyUId
+        }, Ok);
+
+        return Ok();
+    }
+
+    [HttpPut("companies/{companyId:guid}")]
+    public async Task<IActionResult> SyncCompanyUpdate(Guid companyId, [FromBody] SyncCompanyUpdateRequest request, CancellationToken ct)
+    {
+        accessor.UserId = request.UserId;
+
+        await ExecuteCommandAsync(new SyncCompanyUpdateCommand
+        {
+            CompanyId = companyId,
+            Name = request.Name,
+            CompanyEmail = request.CompanyEmail,
+            CompanyWebsite = request.CompanyWebsite,
+            Phone = request.Phone,
+            Description = request.Description,
+            About = request.About,
+            EEO = request.EEO,
+            Founded = request.Founded,
+            Size = request.Size,
+            Logo = request.Logo,
+            IndustryUId = request.IndustryUId
+        }, Ok);
+
+        return Ok();
+    }
+
+    [HttpPost("jobs")]
+    public async Task<IActionResult> SyncJobCreate([FromBody] SyncJobCreateRequest request, CancellationToken ct)
+    {
+        accessor.UserId = request.UserId;
+
+        await ExecuteCommandAsync(new SyncJobCreateCommand
+        {
+            JobId = request.JobId,
+            CompanyId = request.CompanyId,
+            Title = request.Title,
+            AboutRole = request.AboutRole,
+            Location = request.Location,
+            SalaryRange = request.SalaryRange,
+            JobType = request.JobType,
+            Responsibilities = request.Responsibilities,
+            Qualifications = request.Qualifications
+        }, Ok);
+
+        return Ok();
+    }
 }

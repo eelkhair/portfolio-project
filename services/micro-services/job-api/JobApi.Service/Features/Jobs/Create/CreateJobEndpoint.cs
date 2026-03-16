@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Elkhair.Dev.Common.Application;
 using Elkhair.Dev.Common.Dapr;
 using FastEndpoints;
@@ -18,7 +19,9 @@ public class CreateJobEndpoint(IJobCommandService service) :  Endpoint<EventDto<
 
     public override async Task HandleAsync(EventDto<CreateJobRequest> request, CancellationToken ct)
     {
-        var response = await service.CreateJobAsync(request.Data, DaprExtensions.CreateUser(request.UserId), ct);
+        var isForwardSync = HttpContext.Request.Headers["X-Sync-Source"].FirstOrDefault() == "forward";
+        Activity.Current?.SetTag("job.isForwardSync", isForwardSync);
+        var response = await service.CreateJobAsync(request.Data, DaprExtensions.CreateUser(request.UserId), ct, publishEvent: !isForwardSync);
         await Send.OkAsync(response, cancellation:ct);
     }
 }

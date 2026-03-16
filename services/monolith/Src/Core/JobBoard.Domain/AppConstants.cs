@@ -59,6 +59,9 @@ public static class MonolithTopicNames
 
 public static class MicroTopicNames
 {
+    public const string CompanyCreatedV1 = "micro.company-created.v1";
+    public const string CompanyUpdatedV1 = "micro.company-updated.v1";
+    public const string JobCreatedV1 = "micro.job-created.v1";
     public const string DraftSavedV1 = "micro.draft-saved.v1";
     public const string DraftDeletedV1 = "micro.draft-deleted.v1";
 }
