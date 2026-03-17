@@ -29,6 +29,16 @@ public static class YarpProvider
         },
         new RouteConfig
         {
+            RouteId = "public-api",
+            ClusterId = "monolith",
+            Match = new RouteMatch
+            {
+                Path = "/api/public/{**catch-all}"
+            },
+            Order = 0 // Higher priority than catch-all routes
+        },
+        new RouteConfig
+        {
             RouteId = "admin-api",
             ClusterId = "admin",
             Match = new RouteMatch

@@ -8,50 +8,49 @@ namespace JobBoard.AI.API.Infrastructure.Authorization;
 
 /// <summary>
 /// A custom authentication handler that ensures requests are authenticated
-/// only if they originate from loopback IP addresses (127.0.0.1 or ::1).
-/// Designed for internal Dapr → service calls.
+/// if they originate from loopback IP addresses (Dapr sidecar) or carry
+/// a valid internal API key (non-Daprized services like the monolith).
 /// </summary>
-public class DaprInternalAuthenticationHandler
-    : AuthenticationHandler<AuthenticationSchemeOptions>
+public class DaprInternalAuthenticationHandler(
+    IOptionsMonitor<AuthenticationSchemeOptions> options,
+    ILoggerFactory logger,
+    UrlEncoder encoder,
+    IConfiguration configuration)
+    : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
 {
-    /// <summary>
-    /// A custom authentication handler that ensures requests are authenticated
-    /// only if they originate from loopback IP addresses (127.0.0.1 or ::1).
-    /// Designed for internal Dapr → service calls.
-    /// </summary>
-    public DaprInternalAuthenticationHandler(
-        IOptionsMonitor<AuthenticationSchemeOptions> options,
-        ILoggerFactory logger,
-        UrlEncoder encoder,
-        TimeProvider timeProvider   // ⭐ REPLACES ISystemClock
-    )
-        : base(options, logger, encoder)
-    {
-    }
+    private const string ApiKeyHeaderName = "X-Api-Key";
 
-    /// <summary>
-    /// Validates that the incoming request is from a loopback IP.
-    /// If so, authenticates it as "DaprCron".
-    /// </summary>
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         var ip = Context.Connection.RemoteIpAddress;
 
+        // Dapr sidecar calls arrive from loopback
         if (ip != null && IPAddress.IsLoopback(ip))
+            return Success("DaprCron");
+
+        // Non-Daprized internal services authenticate via shared API key
+        if (Request.Headers.TryGetValue(ApiKeyHeaderName, out var apiKeyHeader))
         {
-            var identity = new ClaimsIdentity(
-                new[] { new Claim(ClaimTypes.Name, "DaprCron") },
-                Scheme.Name
-            );
+            var expectedKey = configuration["InternalApiKey"];
+            if (!string.IsNullOrEmpty(expectedKey) &&
+                string.Equals(apiKeyHeader, expectedKey, StringComparison.Ordinal))
+                return Success("InternalService");
 
-            var principal = new ClaimsPrincipal(identity);
-            var ticket = new AuthenticationTicket(principal, Scheme.Name);
-
-            return Task.FromResult(AuthenticateResult.Success(ticket));
+            return Task.FromResult(AuthenticateResult.Fail("Invalid API key"));
         }
 
         return Task.FromResult(
             AuthenticateResult.Fail($"Unauthorized IP: {ip}")
         );
+    }
+
+    private Task<AuthenticateResult> Success(string name)
+    {
+        var identity = new ClaimsIdentity(
+            [new Claim(ClaimTypes.Name, name)],
+            Scheme.Name);
+        var principal = new ClaimsPrincipal(identity);
+        var ticket = new AuthenticationTicket(principal, Scheme.Name);
+        return Task.FromResult(AuthenticateResult.Success(ticket));
     }
 }
