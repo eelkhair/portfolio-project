@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
   envName: 'PROD',
-  apiUrl: 'https://job-monolith.eelkhair.net/api/',
+  apiUrl: 'https://job-gateway.eelkhair.net/api/',
   aiUrl: 'https://job-ai-v2.eelkhair.net/',
   monolithUrl: 'https://job-monolith.eelkhair.net/',
   otel: 'https://otel.eelkhair.net/v1/traces',
