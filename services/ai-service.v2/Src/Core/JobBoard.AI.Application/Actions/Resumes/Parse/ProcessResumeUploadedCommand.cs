@@ -66,7 +66,7 @@ public class ProcessResumeUploadedCommandHandler(
 
             // Phase 1: Quick parse (contact info + summary + skills)
             await ParseSectionAsync<ResumeQuickParseResponse>(
-                "quick", parseRequest, resumeText,
+                "quick", resumeText,
                 ParseResumeQuickPrompt.SystemPrompt,
                 ParseResumeQuickPrompt.BuildUserPrompt(parseRequest),
                 eventData, request.Event.UserId, result =>
@@ -82,28 +82,28 @@ public class ProcessResumeUploadedCommandHandler(
             // Phase 2: Parallel section parsing — all 4 sections are independent
             await Task.WhenAll(
                 ParseSectionAsync<ResumeWorkHistoryParseResponse>(
-                    "workHistory", parseRequest, resumeText,
+                    "workHistory", resumeText,
                     ParseResumeWorkHistoryPrompt.SystemPrompt,
                     ParseResumeWorkHistoryPrompt.BuildUserPrompt(parseRequest),
                     eventData, request.Event.UserId, null,
                     cancellationToken),
 
                 ParseSectionAsync<ResumeEducationParseResponse>(
-                    "education", parseRequest, resumeText,
+                    "education", resumeText,
                     ParseResumeEducationPrompt.SystemPrompt,
                     ParseResumeEducationPrompt.BuildUserPrompt(parseRequest),
                     eventData, request.Event.UserId, null,
                     cancellationToken),
 
                 ParseSectionAsync<ResumeCertificationsParseResponse>(
-                    "certifications", parseRequest, resumeText,
+                    "certifications", resumeText,
                     ParseResumeCertificationsPrompt.SystemPrompt,
                     ParseResumeCertificationsPrompt.BuildUserPrompt(parseRequest),
                     eventData, request.Event.UserId, null,
                     cancellationToken),
 
                 ParseSectionAsync<ResumeProjectsParseResponse>(
-                    "projects", parseRequest, resumeText,
+                    "projects", resumeText,
                     ParseResumeProjectsPrompt.SystemPrompt,
                     ParseResumeProjectsPrompt.BuildUserPrompt(parseRequest),
                     eventData, request.Event.UserId, null,
@@ -148,7 +148,6 @@ public class ProcessResumeUploadedCommandHandler(
 
     private async Task ParseSectionAsync<T>(
         string sectionName,
-        ResumeParseRequest parseRequest,
         string resumeText,
         string systemPrompt,
         string userPromptTemplate,

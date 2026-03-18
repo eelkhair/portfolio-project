@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using JobBoard.Application.Actions.Outbox;
 using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Mcp.Common;
@@ -11,14 +12,18 @@ public sealed class OutboxProcessorBackgroundService(
     IServiceScopeFactory scopeFactory,
     ILogger<OutboxProcessorBackgroundService> logger) : BackgroundService
 {
-    private static readonly TimeSpan Interval = TimeSpan.FromSeconds(10);
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        logger.LogInformation("Outbox processor background service started (interval: {Interval}s)", Interval.TotalSeconds);
+        var delay = TimeSpan.FromMilliseconds(500);
+
+        logger.LogInformation("Outbox processor started (interval: {Interval}ms)", delay.TotalMilliseconds);
 
         while (!stoppingToken.IsCancellationRequested)
         {
+            var processedAny = false;
+            var start = Stopwatch.GetTimestamp();
+
             try
             {
                 await using var scope = scopeFactory.CreateAsyncScope();
@@ -33,7 +38,9 @@ public sealed class OutboxProcessorBackgroundService(
                 var handler = scope.ServiceProvider
                     .GetRequiredService<IHandler<ProcessOutboxMessageCommand, bool>>();
 
-                await handler.HandleAsync(new ProcessOutboxMessageCommand(), stoppingToken);
+                processedAny = await handler.HandleAsync(
+                    new ProcessOutboxMessageCommand(), 
+                    stoppingToken);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
@@ -44,9 +51,18 @@ public sealed class OutboxProcessorBackgroundService(
                 logger.LogError(ex, "Error processing outbox messages");
             }
 
-            await Task.Delay(Interval, stoppingToken);
+            delay = processedAny
+                ? TimeSpan.FromMilliseconds(100)
+                : TimeSpan.FromSeconds(2);
+
+            var elapsed = Stopwatch.GetElapsedTime(start);
+
+            logger.LogDebug("Outbox iteration complete. ProcessedAny: {ProcessedAny}, Delay: {Delay}ms, Elapsed: {Elapsed}ms",
+                processedAny, delay.TotalMilliseconds, elapsed.TotalMilliseconds);
+
+            await Task.Delay(delay, stoppingToken);
         }
 
-        logger.LogInformation("Outbox processor background service stopped");
+        logger.LogInformation("Outbox processor stopped");
     }
 }
