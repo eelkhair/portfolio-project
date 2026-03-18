@@ -9,18 +9,18 @@ public class AuthorizationForwardingHandler(IUserAccessor accessor, IConfigurati
         HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
+        // Always include internal API key for service-to-service authentication
+        var apiKey = configuration["InternalApiKey"];
+        if (!string.IsNullOrEmpty(apiKey))
+        {
+            request.Headers.TryAddWithoutValidation("X-Api-Key", apiKey);
+        }
+
+        // Also forward the user's JWT when available (for user-context propagation)
         var token = accessor.Token;
         if (!string.IsNullOrEmpty(token))
         {
             request.Headers.TryAddWithoutValidation("Authorization", token);
-        }
-        else
-        {
-            var apiKey = configuration["InternalApiKey"];
-            if (!string.IsNullOrEmpty(apiKey))
-            {
-                request.Headers.TryAddWithoutValidation("X-Api-Key", apiKey);
-            }
         }
 
         return await base.SendAsync(request, cancellationToken);

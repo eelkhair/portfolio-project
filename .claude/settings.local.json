@@ -101,7 +101,8 @@
       "Bash(find \"C:/Users/elkha/RiderProjects/portfolio project/services/monolith/Src\" -path \"*/Application/Actions/*\" -type f -name \"*.cs\" -exec grep -l \"class.*IHandler<\" {})",
       "Bash(sed 's/Tests.cs//')",
       "Bash(/tmp/cmd_summary.txt:*)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(python generate_plan_pdf.py)"
     ]
   }
 }
