@@ -42,7 +42,6 @@ export class ProfileStore {
     certifications: 'pending',
     projects: 'pending',
   });
-  readonly currentParsingSection = signal<string | null>(null);
   readonly progressiveParsedContent = signal<ResumeData | null>(null);
   readonly lastUploadedResumeId = signal<string | null>(null);
   readonly lastUploadedFileName = signal('');
@@ -57,9 +56,11 @@ export class ProfileStore {
   });
 
   readonly currentParsingSectionLabel = computed(() => {
-    const section = this.currentParsingSection();
-    if (!section) return null;
-    return SECTION_LABELS[section as ResumeSection] ?? section;
+    const statuses = this.sectionStatuses();
+    const parsing = ALL_RESUME_SECTIONS.filter(s => statuses[s] === 'parsing');
+    if (parsing.length === 0) return null;
+    if (parsing.length === 1) return SECTION_LABELS[parsing[0]];
+    return `${parsing.length} sections`;
   });
 
   // Default resume parsed content (for summary display)
@@ -179,7 +180,6 @@ export class ProfileStore {
       certifications: 'pending',
       projects: 'pending',
     });
-    this.currentParsingSection.set('quick');
 
     const currentPage = this.router.url;
 
@@ -207,13 +207,15 @@ export class ProfileStore {
     // Mark this section done
     this.sectionStatuses.update(s => ({ ...s, [section]: 'done' }));
 
-    // Determine next section being parsed
-    const nextSection = this.getNextPendingSection();
-    if (nextSection) {
-      this.currentParsingSection.set(nextSection);
-      this.sectionStatuses.update(s => ({ ...s, [nextSection]: 'parsing' }));
-    } else {
-      this.currentParsingSection.set(null);
+    // When quick parse completes, kick all Phase 2 sections to 'parsing' (they run in parallel)
+    if (section === 'quick') {
+      this.sectionStatuses.update(s => ({
+        ...s,
+        workHistory: 'parsing',
+        education: 'parsing',
+        certifications: 'parsing',
+        projects: 'parsing',
+      }));
     }
 
     this.profileParseStatus.set('partial');
@@ -233,16 +235,7 @@ export class ProfileStore {
   /** Called when SignalR "ResumeSectionFailed" arrives */
   onSectionFailed(resumeId: string, section: ResumeSection): void {
     if (this.lastUploadedResumeId() !== resumeId) return;
-
     this.sectionStatuses.update(s => ({ ...s, [section]: 'failed' }));
-
-    const nextSection = this.getNextPendingSection();
-    if (nextSection) {
-      this.currentParsingSection.set(nextSection);
-      this.sectionStatuses.update(s => ({ ...s, [nextSection]: 'parsing' }));
-    } else {
-      this.currentParsingSection.set(null);
-    }
   }
 
   /** Called when SignalR "ResumeAllSectionsCompleted" arrives */
@@ -250,7 +243,6 @@ export class ProfileStore {
     if (this.lastUploadedResumeId() !== resumeId) return;
 
     this.profileParseStatus.set('complete');
-    this.currentParsingSection.set(null);
 
     // Fetch final merged content
     this.api.getResumeParsedContent(resumeId, traceParent).subscribe({
@@ -466,11 +458,6 @@ export class ProfileStore {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-  }
-
-  private getNextPendingSection(): ResumeSection | null {
-    const statuses = this.sectionStatuses();
-    return ALL_RESUME_SECTIONS.find(s => statuses[s] === 'pending') ?? null;
   }
 
   private emitUserDecisionSpan(decision: 'applied' | 'dismissed'): void {

@@ -13,8 +13,8 @@ namespace JobBoard.AI.Application.Actions.Resumes.Parse;
 
 /// <summary>
 /// Orchestrates the full resume-uploaded flow with progressive parsing:
-/// download blob → extract text → phase 1 (quick) → phase 2 (sections) → notify completion.
-/// Each section is parsed sequentially and reported to the monolith via callback,
+/// download blob → extract text → phase 1 (quick) → phase 2 (parallel sections) → notify completion.
+/// Phase 2 sections are parsed in parallel and each is reported to the monolith via callback,
 /// which streams results to the frontend via SignalR.
 /// </summary>
 public class ProcessResumeUploadedCommand(EventDto<ResumeUploadedV1Event> @event) : BaseCommand<Unit>, ISystemCommand
@@ -79,34 +79,35 @@ public class ProcessResumeUploadedCommandHandler(
                 },
                 cancellationToken);
 
-            // Phase 2: Sequential section parsing (maximizes LLM prompt caching)
-            await ParseSectionAsync<ResumeWorkHistoryParseResponse>(
-                "workHistory", parseRequest, resumeText,
-                ParseResumeWorkHistoryPrompt.SystemPrompt,
-                ParseResumeWorkHistoryPrompt.BuildUserPrompt(parseRequest),
-                eventData, request.Event.UserId, null,
-                cancellationToken);
+            // Phase 2: Parallel section parsing — all 4 sections are independent
+            await Task.WhenAll(
+                ParseSectionAsync<ResumeWorkHistoryParseResponse>(
+                    "workHistory", parseRequest, resumeText,
+                    ParseResumeWorkHistoryPrompt.SystemPrompt,
+                    ParseResumeWorkHistoryPrompt.BuildUserPrompt(parseRequest),
+                    eventData, request.Event.UserId, null,
+                    cancellationToken),
 
-            await ParseSectionAsync<ResumeEducationParseResponse>(
-                "education", parseRequest, resumeText,
-                ParseResumeEducationPrompt.SystemPrompt,
-                ParseResumeEducationPrompt.BuildUserPrompt(parseRequest),
-                eventData, request.Event.UserId, null,
-                cancellationToken);
+                ParseSectionAsync<ResumeEducationParseResponse>(
+                    "education", parseRequest, resumeText,
+                    ParseResumeEducationPrompt.SystemPrompt,
+                    ParseResumeEducationPrompt.BuildUserPrompt(parseRequest),
+                    eventData, request.Event.UserId, null,
+                    cancellationToken),
 
-            await ParseSectionAsync<ResumeCertificationsParseResponse>(
-                "certifications", parseRequest, resumeText,
-                ParseResumeCertificationsPrompt.SystemPrompt,
-                ParseResumeCertificationsPrompt.BuildUserPrompt(parseRequest),
-                eventData, request.Event.UserId, null,
-                cancellationToken);
+                ParseSectionAsync<ResumeCertificationsParseResponse>(
+                    "certifications", parseRequest, resumeText,
+                    ParseResumeCertificationsPrompt.SystemPrompt,
+                    ParseResumeCertificationsPrompt.BuildUserPrompt(parseRequest),
+                    eventData, request.Event.UserId, null,
+                    cancellationToken),
 
-            await ParseSectionAsync<ResumeProjectsParseResponse>(
-                "projects", parseRequest, resumeText,
-                ParseResumeProjectsPrompt.SystemPrompt,
-                ParseResumeProjectsPrompt.BuildUserPrompt(parseRequest),
-                eventData, request.Event.UserId, null,
-                cancellationToken);
+                ParseSectionAsync<ResumeProjectsParseResponse>(
+                    "projects", parseRequest, resumeText,
+                    ParseResumeProjectsPrompt.SystemPrompt,
+                    ParseResumeProjectsPrompt.BuildUserPrompt(parseRequest),
+                    eventData, request.Event.UserId, null,
+                    cancellationToken));
 
             // Phase 3: Notify all sections completed (triggers embedding pipeline)
             await monolithClient.NotifyAllSectionsCompletedAsync(new ResumeAllSectionsCompletedRequest
