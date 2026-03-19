@@ -144,12 +144,29 @@ export class ProfileStore {
   }
 
   loadMatchingJobs(traceParent?: string): void {
-    this.matchingJobsLoading.set(true);
+    const isInitialLoad = this.matchingJobs().length === 0;
+    if (isInitialLoad) {
+      this.matchingJobsLoading.set(true);
+    }
     this.matchingJobsError.set(null);
 
     this.api.getMatchingJobs(10, traceParent).subscribe({
       next: (jobs) => {
-        this.matchingJobs.set(jobs);
+        // Preserve existing explanations if the new data doesn't have them yet
+        const existing = this.matchingJobs();
+        if (existing.length > 0) {
+          const existingMap = new Map(existing.map(j => [j.jobId, j]));
+          const merged = jobs.map(j => {
+            const prev = existingMap.get(j.jobId);
+            if (prev && !j.matchSummary && prev.matchSummary) {
+              return { ...j, matchSummary: prev.matchSummary, matchDetails: prev.matchDetails, matchGaps: prev.matchGaps };
+            }
+            return j;
+          });
+          this.matchingJobs.set(merged);
+        } else {
+          this.matchingJobs.set(jobs);
+        }
         this.matchingJobsLoading.set(false);
       },
       error: (err) => {

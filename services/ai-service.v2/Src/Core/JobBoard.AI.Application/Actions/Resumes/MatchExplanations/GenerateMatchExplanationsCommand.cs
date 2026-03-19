@@ -129,10 +129,15 @@ public class GenerateMatchExplanationsCommandHandler(
             return Unit.Value;
         }
 
+        // Sort by similarity score descending so first batch = top visible cards
+        var orderedJobDetails = jobDetails
+            .OrderByDescending(j => scoresByJobId.GetValueOrDefault(j.JobId, 0))
+            .ToList();
+
         // 6. Generate in two batches: top 4 (visible cards) first, then the rest
         const int firstBatchSize = 4;
-        var firstBatch = jobDetails.Take(firstBatchSize).ToList();
-        var secondBatch = jobDetails.Skip(firstBatchSize).ToList();
+        var firstBatch = orderedJobDetails.Take(firstBatchSize).ToList();
+        var secondBatch = orderedJobDetails.Skip(firstBatchSize).ToList();
 
         var totalGenerated = 0;
 
