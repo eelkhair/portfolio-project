@@ -19,10 +19,14 @@ public interface IMonolithApiClient
     Task NotifyResumeParseCompletedAsync(ResumeParseCompletedRequest model, CancellationToken ct);
     Task NotifyResumeParseFailedAsync(ResumeParseFailedRequest model, CancellationToken ct);
     Task NotifyResumeEmbeddedAsync(ResumeEmbeddedRequest model, CancellationToken ct);
+    Task NotifyMatchExplanationsGeneratedAsync(MatchExplanationsGeneratedRequest model, CancellationToken ct);
     Task<ResumeParsedContentResponse?> GetResumeParsedContentAsync(Guid resumeUId, CancellationToken ct);
     Task NotifySectionParsedAsync(ResumeSectionParsedRequest model, CancellationToken ct);
     Task NotifySectionFailedAsync(ResumeSectionFailedRequest model, CancellationToken ct);
     Task NotifyAllSectionsCompletedAsync(ResumeAllSectionsCompletedRequest model, CancellationToken ct);
+
+    // Batch job details — for match explanation generation
+    Task<List<JobBatchDetailDto>> GetJobsBatchAsync(List<Guid> jobIds, CancellationToken ct);
 
     // Draft CRUD — persistence lives in monolith
     Task<List<DraftResponse>> ListDraftsAsync(Guid companyId, CancellationToken ct);
@@ -55,6 +59,12 @@ public class ResumeParseFailedRequest
 }
 
 public class ResumeEmbeddedRequest
+{
+    public Guid ResumeUId { get; set; }
+    public string UserId { get; set; } = string.Empty;
+}
+
+public class MatchExplanationsGeneratedRequest
 {
     public Guid ResumeUId { get; set; }
     public string UserId { get; set; } = string.Empty;
@@ -116,4 +126,16 @@ public class ResumeAllSectionsCompletedRequest
     public Guid ResumeUId { get; set; }
     public string UserId { get; set; } = string.Empty;
     public string? CurrentPage { get; set; }
+}
+
+public class JobBatchDetailDto
+{
+    public Guid JobId { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public string? AboutRole { get; set; }
+    public string? Location { get; set; }
+    public string? JobType { get; set; }
+    public string? SalaryRange { get; set; }
+    public List<string> Responsibilities { get; set; } = [];
+    public List<string> Qualifications { get; set; } = [];
 }

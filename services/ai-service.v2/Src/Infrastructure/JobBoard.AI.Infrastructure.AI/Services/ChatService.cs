@@ -141,7 +141,14 @@ public class ChatService(
         };
         try
         {
-            var chatOptions = chatOptionsFactory.Create(serviceProvider, allowTools ? ChatScope.Admin : ChatScope.Public);
+            var chatOptions = allowTools
+                ? chatOptionsFactory.Create(serviceProvider, ChatScope.Admin)
+                : new ChatOptions
+                {
+                    MaxOutputTokens = 5000,
+                    Temperature = 0.3f,
+                    ModelId = configuration["AIModel"]!
+                };
 
             var response = await client.GetResponseAsync(
                 messages, chatOptions,

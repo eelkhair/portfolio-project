@@ -187,4 +187,31 @@ public class ResumeParseNotifier(
                 resumeUId);
         }
     }
+
+    public async Task NotifyMatchExplanationsGeneratedAsync(Guid resumeUId, string userId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var act = activitySource.StartActivity("signalr.message.send", ActivityKind.Producer);
+            act?.SetTag("messaging.system", "signalr");
+            act?.SetTag("messaging.destination.name", "MatchExplanationsGenerated");
+            act?.SetTag("messaging.operation", "send");
+
+            var parent = Activity.Current;
+            await hub.Clients.Group(userId).SendAsync("MatchExplanationsGenerated", new
+            {
+                ResumeId = resumeUId,
+                TraceParent = parent?.Id,
+                TraceState = parent?.TraceStateString
+            }, cancellationToken);
+
+            act?.SetTag("enduser.id", userId);
+            act?.SetTag("resume.id", resumeUId);
+        }
+        catch (Exception ex)
+        {
+            log.LogError(ex, "Failed to push MatchExplanationsGenerated to user {UserId} for resume {ResumeUId}", userId,
+                resumeUId);
+        }
+    }
 }

@@ -44,6 +44,16 @@ public class PublishJobCommandHandler(IHandlerContext context,
         {
             dbContext.JobEmbeddings.Remove(existing);
             activity?.SetTag("job.embedding.replaced", true);
+
+            // Invalidate stale match explanations for this job
+            var staleExplanations = await dbContext.MatchExplanations
+                .Where(e => e.JobId == job.UId)
+                .ToListAsync(cancellationToken);
+            if (staleExplanations.Count > 0)
+            {
+                dbContext.MatchExplanations.RemoveRange(staleExplanations);
+                activity?.SetTag("explanations.deleted", staleExplanations.Count);
+            }
         }
 
         var jobEmbedding = new JobEmbedding(

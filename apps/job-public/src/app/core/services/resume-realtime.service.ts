@@ -114,6 +114,34 @@ export class ResumeRealtimeService {
       );
     });
 
+    this.hub.on('MatchExplanationsGenerated', (msg: ResumeEmbeddedMsg) => {
+      const parentCtx = this.extractTraceContext(msg);
+      this.tracer.startActiveSpan(
+        'signalr.message.received',
+        {
+          kind: SpanKind.CONSUMER,
+          attributes: {
+            'messaging.system': 'signalr',
+            'messaging.operation': 'process',
+            'messaging.destination.name': 'MatchExplanationsGenerated',
+            'resume.id': msg.resumeId,
+          },
+        },
+        parentCtx,
+        (span) => {
+          try {
+            this.profileStore.loadMatchingJobs(msg.traceParent);
+            span.setStatus({ code: SpanStatusCode.OK });
+          } catch (err: any) {
+            span.recordException(err);
+            span.setStatus({ code: SpanStatusCode.ERROR, message: err?.message });
+          } finally {
+            span.end();
+          }
+        },
+      );
+    });
+
     this.hub.on('featureFlagsUpdated', () => {});
 
     this.hub.on('ResumeParseFailed', (msg: ResumeParseFailedMsg) => {

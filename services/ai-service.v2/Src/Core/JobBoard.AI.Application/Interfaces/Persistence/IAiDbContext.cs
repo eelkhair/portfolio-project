@@ -7,6 +7,7 @@ public interface IAiDbContext
 {
     DbSet<JobEmbedding> JobEmbeddings { get; }
     DbSet<ResumeEmbedding> ResumeEmbeddings { get; }
+    DbSet<MatchExplanation> MatchExplanations { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     DbSet<T> Set<T>() where T : class;
 }

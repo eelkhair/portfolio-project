@@ -1,5 +1,6 @@
 using JobBoard.AI.API.Infrastructure.Authorization;
 using JobBoard.AI.Application.Actions.Jobs.ReEmbedAll;
+using JobBoard.AI.Application.Actions.Resumes.MatchExplanations;
 using JobBoard.AI.Application.Actions.Settings;
 using JobBoard.AI.Application.Actions.Settings.ApplicationMode;
 using JobBoard.AI.Application.Actions.Settings.Provider;
@@ -59,4 +60,13 @@ public class SettingsController : BaseApiController
     [StandardApiResponses]
     public async Task<IActionResult> ReEmbedAllJobs()
         => await ExecuteCommandAsync(new ReEmbedAllJobsCommand(), Ok);
+
+    /// <summary>
+    /// Generate match explanations for all existing resume embeddings.
+    /// Pre-computes "why this job matches" explanations using LLM for each resume's top matching jobs.
+    /// </summary>
+    [HttpPost("generate-match-explanations")]
+    [StandardApiResponses]
+    public async Task<IActionResult> GenerateAllMatchExplanations()
+        => await ExecuteCommandAsync(new GenerateAllMatchExplanationsCommand(), Ok);
 }

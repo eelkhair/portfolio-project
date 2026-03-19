@@ -18,7 +18,7 @@ using JobBoard.Infrastructure.Persistence.Context;
 using JobBoard.Infrastructure.RedisConfig;
 using JobBoard.Infrastructure.Smtp;
 using JobBoard.Infrastructure.Vault;
-using Microsoft.EntityFrameworkCore;
+using Elkhair.Common.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 // #if DEBUG
@@ -62,11 +62,7 @@ builder.Services
 var app = builder.Build();
 
 if (!isTesting)
-{
-    using var scope = app.Services.CreateScope();
-    var db = scope.ServiceProvider.GetRequiredService<JobBoardDbContext>();
-    await db.Database.MigrateAsync();
-}
+    await app.MigrateDatabase<JobBoardDbContext>();
 
 app.UseConfiguredSwagger(builder.Configuration)
     .UseApplicationServices()

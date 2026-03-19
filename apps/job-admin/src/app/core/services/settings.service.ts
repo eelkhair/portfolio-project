@@ -20,39 +20,53 @@ export interface ReEmbedJobsResponse {
   jobsProcessed: number;
 }
 
+export interface GenerateMatchExplanationsResponse {
+  resumesProcessed: number;
+  explanationsGenerated: number;
+}
+
 @Injectable({providedIn: 'root'})
 export class SettingsService {
   private http = inject(HttpClient);
 
+  private aiBase = `${environment.gatewayUrl}ai/v2/Settings`;
+
   getProvider() {
     return this.http.get<ApiResponse<ProviderSettings>>(
-      `${environment.gatewayUrl}api/settings/provider`
+      `${this.aiBase}/provider`
     );
   }
 
   updateProvider(request: ProviderSettings) {
     return this.http.put<ApiResponse<UpdateProviderResponse>>(
-      `${environment.gatewayUrl}api/settings/update-provider`,
+      `${this.aiBase}/update-provider`,
       request
     );
   }
 
   getApplicationMode() {
     return this.http.get<ApiResponse<ApplicationMode>>(
-      `${environment.gatewayUrl}api/settings/mode`
+      `${this.aiBase}/mode`
     );
   }
 
   updateApplicationMode(request: ApplicationMode) {
     return this.http.put<ApiResponse<ApplicationMode>>(
-      `${environment.gatewayUrl}api/settings/mode`,
+      `${this.aiBase}/mode`,
       request
     );
   }
 
   reEmbedAllJobs() {
     return this.http.post<ApiResponse<ReEmbedJobsResponse>>(
-      `${environment.gatewayUrl}api/settings/re-embed-jobs`,
+      `${this.aiBase}/re-embed-jobs`,
+      {}
+    );
+  }
+
+  generateMatchExplanations() {
+    return this.http.post<ApiResponse<GenerateMatchExplanationsResponse>>(
+      `${this.aiBase}/generate-match-explanations`,
       {}
     );
   }

@@ -102,7 +102,11 @@
       "Bash(sed 's/Tests.cs//')",
       "Bash(/tmp/cmd_summary.txt:*)",
       "Read(//tmp/**)",
-      "Bash(python generate_plan_pdf.py)"
+      "Bash(python generate_plan_pdf.py)",
+      "Bash(pandoc \"C:\\\\Users\\\\elkha\\\\Downloads\\\\Elkhair_Elkhair_Resume%20v2%20\\(1\\).docx\" -t markdown)",
+      "Bash(python \"C:/Users/elkha/AppData/Roaming/Claude/local-agent-mode-sessions/skills-plugin/874aa3ee-2aea-46ab-8b88-88033013d1e6/89f38e9c-e633-41f1-90c4-518ebf4e6379/skills/docx/scripts/office/unpack.py\" \"C:\\\\Users\\\\elkha\\\\Downloads\\\\Elkhair_Elkhair_Resume%20v2%20\\(1\\).docx\" /tmp/resume_unpacked/)",
+      "Bash(pip install:*)",
+      "Bash(python -c \":*)"
     ]
   }
 }

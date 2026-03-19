@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text.Json;
 using JobBoard.AI.Application.Actions.Base;
 using JobBoard.AI.Application.Actions.Jobs.Similar;
 using JobBoard.AI.Application.Interfaces.Configurations;
@@ -59,26 +60,52 @@ public class ListMatchingJobsQueryHandler(
             results = await WeightedCompositeSimilarity(resume, request.Limit, cancellationToken);
         }
 
+        // Merge cached match explanations (graceful — skip if table doesn't exist yet)
+        try
+        {
+            var jobIds = results.Select(r => r.JobId).ToList();
+            var explanations = await context.MatchExplanations
+                .Where(e => e.ResumeUId == request.ResumeId && jobIds.Contains(e.JobId))
+                .ToDictionaryAsync(e => e.JobId, cancellationToken);
+
+            foreach (var result in results)
+            {
+                if (explanations.TryGetValue(result.JobId, out var explanation))
+                {
+                    result.MatchSummary = explanation.Summary;
+                    result.MatchDetails = JsonSerializer.Deserialize<List<string>>(explanation.DetailsJson);
+                    result.MatchGaps = JsonSerializer.Deserialize<List<string>>(explanation.GapsJson);
+                }
+            }
+
+            activity?.SetTag("matching.explanations_found", explanations.Count);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Failed to load match explanations, returning results without explanations");
+            activity?.SetTag("matching.explanations_error", true);
+        }
+
         activity?.SetTag("matching.count", results.Count);
         return results;
     }
 
     private async Task<List<JobCandidate>> SimpleCosineSimilarity(Vector resumeVector, int limit, CancellationToken ct)
     {
-        var similarities = await context.JobEmbeddings
+        var raw = await context.JobEmbeddings
             .OrderByDescending(e => 1 - e.VectorData.CosineDistance(resumeVector))
-            .Select(c => new JobCandidate
-            {
-                JobId = c.JobId,
-                Similarity = 1 - c.VectorData.CosineDistance(resumeVector),
-            })
+            .Select(c => new { c.JobId, Similarity = 1 - c.VectorData.CosineDistance(resumeVector) })
             .Take(limit)
             .ToListAsync(ct);
 
-        for (var i = 0; i < similarities.Count; i++)
-            similarities[i].Rank = i + 1;
+        var results = raw.Select((r, i) => new JobCandidate
+        {
+            JobId = r.JobId,
+            Similarity = NormalizeScore(r.Similarity),
+            Rank = i + 1
+        }).ToList();
 
-        return similarities;
+        return results;
     }
 
     private async Task<List<JobCandidate>> WeightedCompositeSimilarity(
@@ -118,7 +145,7 @@ public class ListMatchingJobsQueryHandler(
         for (var i = 0; i < scored.Count; i++)
         {
             var s = scored[i];
-            results.Add(new JobCandidate { JobId = s.JobId, Similarity = s.Score, Rank = i + 1 });
+            results.Add(new JobCandidate { JobId = s.JobId, Similarity = NormalizeScore(s.Score), Rank = i + 1 });
 
             var p = $"matching.result.{i + 1}";
             Activity.Current?.SetTag($"{p}.job_id", s.JobId);
@@ -133,6 +160,18 @@ public class ListMatchingJobsQueryHandler(
 
     private static string F(double v) => v.ToString("F2");
     private static string SW(double sim, double weight) => $"{sim:F2} @{weight * 100:F0}%";
+
+    /// <summary>
+    /// Rescales raw cosine similarity (typically 0.35–0.70 for text embeddings)
+    /// to a more intuitive 0–100% range.
+    /// </summary>
+    internal static double NormalizeScore(double raw)
+    {
+        const double floor = 0.35; // below this = 0%
+        const double ceiling = 0.62; // above this = 100%
+        var normalized = (raw - floor) / (ceiling - floor);
+        return Math.Clamp(normalized, 0, 1);
+    }
 
     private static double CosineSimilarity(Vector a, Vector b)
     {

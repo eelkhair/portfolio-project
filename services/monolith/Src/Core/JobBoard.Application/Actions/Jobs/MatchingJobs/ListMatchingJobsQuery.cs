@@ -59,7 +59,10 @@ public class ListMatchingJobsQueryHandler(
                 Title = j.Title,
                 AboutRole = j.AboutRole,
                 SalaryRange = j.SalaryRange,
-                Similarity = s.Similarity
+                Similarity = s.Similarity,
+                MatchSummary = s.MatchSummary,
+                MatchDetails = s.MatchDetails,
+                MatchGaps = s.MatchGaps
             })
             .OrderByDescending(x => x.Similarity)
             .ToList();

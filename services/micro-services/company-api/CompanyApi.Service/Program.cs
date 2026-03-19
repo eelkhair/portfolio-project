@@ -15,6 +15,7 @@ using HealthChecks.UI.Client;
 using JobBoard.HealthChecks;
 using Mapster;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Elkhair.Common.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 
@@ -127,6 +128,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.User ?? new ClaimsPrincipal());
 builder.Services.AddDaprClient();
 var app = builder.Build();
+await app.MigrateDatabase<CompanyDbContext>();
 app.UseCors(CorsPolicy);
 
 app.UseAuthentication();    

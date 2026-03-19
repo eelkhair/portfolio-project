@@ -166,6 +166,20 @@ public class HttpMonolithApiClient(
         }
     }
 
+    public async Task NotifyMatchExplanationsGeneratedAsync(MatchExplanationsGeneratedRequest model, CancellationToken ct)
+    {
+        try
+        {
+            var response = await client.PostAsJsonAsync("api/resumes/match-explanations-generated", model, JsonOpts, ct);
+            response.EnsureSuccessStatusCode();
+        }
+        catch (HttpRequestException ex)
+        {
+            logger.LogError(ex, "Error notifying monolith of match explanations generation");
+            throw;
+        }
+    }
+
     public async Task<ResumeParsedContentResponse?> GetResumeParsedContentAsync(Guid resumeUId, CancellationToken ct)
     {
         try
@@ -219,6 +233,22 @@ public class HttpMonolithApiClient(
         catch (HttpRequestException ex)
         {
             logger.LogError(ex, "Error notifying monolith of all sections completed");
+            throw;
+        }
+    }
+
+    public async Task<List<JobBatchDetailDto>> GetJobsBatchAsync(List<Guid> jobIds, CancellationToken ct)
+    {
+        try
+        {
+            var response = await client.PostAsJsonAsync("api/public/jobs/batch", jobIds, JsonOpts, ct);
+            response.EnsureSuccessStatusCode();
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<List<JobBatchDetailDto>>>(JsonOpts, ct);
+            return result?.Data ?? [];
+        }
+        catch (HttpRequestException ex)
+        {
+            logger.LogError(ex, "Error getting batch job details from monolith-api");
             throw;
         }
     }
