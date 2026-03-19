@@ -34,11 +34,7 @@ export class JobDetail implements OnInit {
     return this.profileStore.matchingJobs().find(m => m.jobId === job.id) ?? null;
   });
 
-  protected readonly hasMatchSidebar = computed(() => {
-    // Default to 4-col layout while still loading to prevent layout flash
-    if (this.account.isAuthenticated() && this.profileStore.matchingJobsLoading()) return true;
-    return !!this.matchExplanation()?.matchSummary;
-  });
+  protected readonly hasMatchSidebar = computed(() => !!this.matchExplanation()?.matchSummary);
 
   ngOnInit(): void {
     if (this.account.isAuthenticated()) {
