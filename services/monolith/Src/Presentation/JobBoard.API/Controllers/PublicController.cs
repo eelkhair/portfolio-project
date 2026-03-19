@@ -176,4 +176,21 @@ public class PublicController : BaseApiController
     {
         return await ExecuteQueryAsync(new GetPublicStatsQuery(), Ok);
     }
+
+    /// <summary>
+    /// Retrieves job details for a batch of job IDs. Used by internal services
+    /// (e.g., AI service) to fetch job context for match explanation generation.
+    /// </summary>
+    /// <param name="jobIds">
+    /// A list of job unique identifiers to retrieve details for.
+    /// </param>
+    /// <returns>
+    /// An asynchronous operation that resolves to an IActionResult containing
+    /// the batch of job details.
+    /// </returns>
+    [HttpPost("jobs/batch")]
+    public async Task<IActionResult> GetJobsBatch([FromBody] List<Guid> jobIds)
+    {
+        return await ExecuteQueryAsync(new GetJobsBatchQuery(jobIds), Ok);
+    }
 }

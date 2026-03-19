@@ -189,6 +189,20 @@ public class ResumesController(IUserAccessor accessor, IResumeParseNotifier resu
     }
 
     /// <summary>
+    /// Callback from AI service after match explanations are generated.
+    /// </summary>
+    [HttpPost("match-explanations-generated")]
+    [Authorize(Policy = AuthorizationPolicies.InternalOrJwt)]
+    public async Task<IActionResult> MatchExplanationsGenerated([FromBody] ResumeEmbeddedModel request,
+        CancellationToken cancellationToken)
+    {
+        await resumeParseNotifier.NotifyMatchExplanationsGeneratedAsync(
+            request.ResumeUId, request.UserId, cancellationToken);
+
+        return Ok();
+    }
+
+    /// <summary>
     /// Callback from AI service after a single section is parsed.
     /// </summary>
     [HttpPost("section-parsed")]

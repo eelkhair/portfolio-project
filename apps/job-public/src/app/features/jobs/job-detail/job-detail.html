@@ -72,9 +72,58 @@
       </a>
     }
 
-    <div class="grid grid-cols-1 gap-10 lg:grid-cols-3">
+    <div class="grid grid-cols-1 gap-10" [class.lg:grid-cols-4]="hasMatchSidebar()" [class.lg:grid-cols-[1fr_320px]]="!hasMatchSidebar()">
+      <!-- Left sidebar: Why this matches -->
+      @if (hasMatchSidebar()) {
+      <aside class="space-y-6 lg:col-span-1">
+        @if (matchExplanation(); as match) {
+            <div class="card border-primary-200 p-5 dark:border-primary-800/30">
+              <div class="flex items-center gap-2">
+                <svg class="h-5 w-5 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456Z" />
+                </svg>
+                <h3 class="text-base font-semibold uppercase tracking-wider text-slate-400">
+                  Why this matches
+                </h3>
+                <span class="rounded-full bg-primary-100 px-3 py-1 text-base font-bold text-primary-700 dark:bg-primary-900/30 dark:text-primary-400">
+                  {{ (match.similarity * 100).toFixed(0) }}% match
+                </span>
+              </div>
+              <p class="mt-3 text-base leading-relaxed text-slate-600 dark:text-slate-400">
+                {{ match.matchSummary }}
+              </p>
+              @if (match.matchDetails && match.matchDetails.length > 0) {
+                <ul class="mt-4 space-y-2">
+                  @for (detail of match.matchDetails; track detail) {
+                    <li class="flex items-start gap-2 text-base text-slate-600 dark:text-slate-400">
+                      <svg class="mt-0.5 h-5 w-5 shrink-0 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                      </svg>
+                      {{ detail }}
+                    </li>
+                  }
+                </ul>
+              }
+              @if (match.matchGaps && match.matchGaps.length > 0) {
+                <p class="mt-4 text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">What you may be missing</p>
+                <ul class="mt-2 space-y-2">
+                  @for (gap of match.matchGaps; track gap) {
+                    <li class="flex items-start gap-2 text-base text-slate-600 dark:text-slate-400">
+                      <svg class="mt-0.5 h-5 w-5 shrink-0 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                      </svg>
+                      {{ gap }}
+                    </li>
+                  }
+                </ul>
+              }
+            </div>
+        }
+      </aside>
+      }
+
       <!-- Main content -->
-      <div class="lg:col-span-2 space-y-8">
+      <div class="space-y-8" [class.lg:col-span-2]="hasMatchSidebar()">
         <section>
           <h2 class="section-heading">About this role</h2>
           <p class="mt-3 leading-relaxed text-slate-600 dark:text-slate-400">
@@ -127,8 +176,8 @@
         </section>
       </div>
 
-      <!-- Sidebar -->
-      <aside class="space-y-6">
+      <!-- Right sidebar: Company + Job Details + Similar Jobs -->
+      <aside class="space-y-6 lg:col-span-1">
         <!-- Company card -->
         <div class="card p-6">
           <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-400">

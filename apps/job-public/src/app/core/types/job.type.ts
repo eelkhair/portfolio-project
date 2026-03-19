@@ -21,4 +21,7 @@ export interface MatchingJob {
   aboutRole: string | null;
   salaryRange: string | null;
   similarity: number;
+  matchSummary: string | null;
+  matchDetails: string[] | null;
+  matchGaps: string[] | null;
 }

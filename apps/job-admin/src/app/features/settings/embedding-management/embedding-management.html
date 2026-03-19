@@ -15,12 +15,29 @@
       </div>
     </div>
 
+    <div class="flex items-center gap-3 p-4 border-round surface-ground">
+      <i class="pi pi-sparkles text-2xl text-primary"></i>
+      <div>
+        <div class="font-semibold">Generate Match Explanations</div>
+        <div class="text-sm text-color-secondary">
+          Pre-compute "why this job matches" explanations for all existing resume embeddings.
+          Uses LLM to generate summaries and bullet points for each resume's top matching jobs.
+        </div>
+      </div>
+    </div>
+
     <div class="flex gap-2">
       <p-button
         label="Re-embed All Jobs"
         icon="pi pi-refresh"
         (onClick)="reEmbedJobs()"
         [loading]="loading()" />
+      <p-button
+        label="Generate Match Explanations"
+        icon="pi pi-sparkles"
+        severity="secondary"
+        (onClick)="generateExplanations()"
+        [loading]="explanationsLoading()" />
     </div>
   </div>
 </p-card>

@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Elkhair.Dev.Common.Dapr;
 using JobBoard.AI.Application.Actions.Base;
+using JobBoard.AI.Application.Actions.Resumes.MatchExplanations;
 using JobBoard.AI.Application.Interfaces.AI;
 using JobBoard.AI.Application.Interfaces.Clients;
 using JobBoard.AI.Application.Interfaces.Configurations;
@@ -10,6 +11,7 @@ using JobBoard.AI.Domain.AI;
 using JobBoard.AI.Domain.Drafts;
 using JobBoard.IntegrationEvents.Resume;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace JobBoard.AI.Application.Actions.Resumes.Embed;
@@ -24,7 +26,8 @@ public class EmbedResumeCommandHandler(
     IMonolithApiClient monolithClient,
     IAiDbContext dbContext,
     IEmbeddingService embeddingService,
-    IActivityFactory activityFactory) : BaseCommandHandler(context),
+    IActivityFactory activityFactory,
+    IServiceScopeFactory serviceScopeFactory) : BaseCommandHandler(context),
     IHandler<EmbedResumeCommand, Unit>
 {
     public async Task<Unit> HandleAsync(EmbedResumeCommand request, CancellationToken cancellationToken)
@@ -93,11 +96,42 @@ public class EmbedResumeCommandHandler(
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
+        // Invalidate stale match explanations before generating new ones
+        var staleExplanations = await dbContext.MatchExplanations
+            .Where(e => e.ResumeUId == resumeUId)
+            .ToListAsync(cancellationToken);
+
+        if (staleExplanations.Count > 0)
+        {
+            dbContext.MatchExplanations.RemoveRange(staleExplanations);
+            await dbContext.SaveChangesAsync(cancellationToken);
+            Logger.LogInformation("Deleted {Count} stale match explanations for resume {ResumeUId}",
+                staleExplanations.Count, resumeUId);
+        }
+
         await monolithClient.NotifyResumeEmbeddedAsync(new ResumeEmbeddedRequest
         {
             ResumeUId = resumeUId,
             UserId = request.Event.UserId
         }, cancellationToken);
+
+        // Fire-and-forget: pre-compute match explanations for top matching jobs
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                using var scope = serviceScopeFactory.CreateScope();
+                var handler = scope.ServiceProvider
+                    .GetRequiredService<IHandler<GenerateMatchExplanationsCommand, Unit>>();
+                await handler.HandleAsync(
+                    new GenerateMatchExplanationsCommand(resumeUId, request.Event.UserId),
+                    CancellationToken.None);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogWarning(ex, "Failed to generate match explanations for resume {ResumeUId}", resumeUId);
+            }
+        }, CancellationToken.None);
 
         return Unit.Value;
     }

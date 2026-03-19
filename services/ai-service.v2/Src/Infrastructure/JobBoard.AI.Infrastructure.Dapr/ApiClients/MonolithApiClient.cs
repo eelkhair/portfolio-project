@@ -182,6 +182,22 @@ public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<Mon
         }
     }
 
+    public async Task NotifyMatchExplanationsGeneratedAsync(MatchExplanationsGeneratedRequest model, CancellationToken ct)
+    {
+        try
+        {
+            var request = CreateRequest(HttpMethod.Post, "api/resumes/match-explanations-generated", "monolith-api");
+            request.Content = JsonContent.Create(model);
+            await Client.InvokeMethodAsync(request, ct);
+        }
+        catch (InvocationException ex)
+        {
+            var body = await ex.Response.Content.ReadAsStringAsync(ct);
+            logger.LogError(ex, "Error notifying monolith of match explanations generation: {Body}", body);
+            throw;
+        }
+    }
+
     public async Task<ResumeParsedContentResponse?> GetResumeParsedContentAsync(Guid resumeUId, CancellationToken ct)
     {
         try
@@ -242,6 +258,23 @@ public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<Mon
         {
             var body = await ex.Response.Content.ReadAsStringAsync(ct);
             logger.LogError(ex, "Error notifying monolith of all sections completed: {Body}", body);
+            throw;
+        }
+    }
+
+    public async Task<List<JobBatchDetailDto>> GetJobsBatchAsync(List<Guid> jobIds, CancellationToken ct)
+    {
+        try
+        {
+            var request = CreateRequest(HttpMethod.Post, "api/public/jobs/batch", "monolith-api");
+            request.Content = JsonContent.Create(jobIds);
+            var response = await Client.InvokeMethodAsync<ApiResponse<List<JobBatchDetailDto>>>(request, ct);
+            return response.Data ?? [];
+        }
+        catch (InvocationException ex)
+        {
+            var body = await ex.Response.Content.ReadAsStringAsync(ct);
+            logger.LogError(ex, "Error getting batch job details from monolith-api: {Body}", body);
             throw;
         }
     }

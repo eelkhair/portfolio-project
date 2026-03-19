@@ -17,6 +17,7 @@ using JobApi.Infrastructure.Data;
 using JobBoard.HealthChecks;
 using Mapster;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Elkhair.Common.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 
@@ -134,11 +135,7 @@ builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpContextAccessor>().H
 builder.Services.AddDaprClient();
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<JobDbContext>();
-    await db.Database.MigrateAsync();
-}
+await app.MigrateDatabase<JobDbContext>();
 
 app.UseCors(CorsPolicy);
 

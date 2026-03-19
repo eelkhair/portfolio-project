@@ -19,4 +19,6 @@ public interface IResumeParseNotifier
 
     Task NotifyAllSectionsCompletedAsync(Guid resumeUId, string userId, string? currentPage,
         CancellationToken cancellationToken);
+
+    Task NotifyMatchExplanationsGeneratedAsync(Guid resumeUId, string userId, CancellationToken cancellationToken);
 }

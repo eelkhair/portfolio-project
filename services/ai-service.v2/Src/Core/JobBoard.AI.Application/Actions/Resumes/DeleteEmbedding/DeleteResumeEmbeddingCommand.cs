@@ -41,10 +41,19 @@ public class DeleteResumeEmbeddingCommandHandler(
         }
 
         dbContext.ResumeEmbeddings.Remove(existing);
+
+        // Delete associated match explanations
+        var explanations = await dbContext.MatchExplanations
+            .Where(e => e.ResumeUId == resumeUId)
+            .ToListAsync(cancellationToken);
+        dbContext.MatchExplanations.RemoveRange(explanations);
+
         await dbContext.SaveChangesAsync(cancellationToken);
 
         activity?.SetTag("embedding.found", true);
-        Logger.LogInformation("Deleted embedding for resume {ResumeUId}", resumeUId);
+        activity?.SetTag("explanations.deleted", explanations.Count);
+        Logger.LogInformation("Deleted embedding and {ExplanationCount} match explanations for resume {ResumeUId}",
+            explanations.Count, resumeUId);
 
         return Unit.Value;
     }

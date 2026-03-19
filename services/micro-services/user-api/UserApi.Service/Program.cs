@@ -10,6 +10,7 @@ using JobBoard.HealthChecks;
 using UserApi.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
+using Elkhair.Common.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 
@@ -134,6 +135,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.User ?? new ClaimsPrincipal());
 builder.Services.AddDaprClient();
 var app = builder.Build();
+await app.MigrateDatabase<UserDbContext>();
 app.UseCors(CorsPolicy);
 
 app.UseAuthentication();    

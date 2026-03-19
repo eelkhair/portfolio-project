@@ -10,6 +10,7 @@ public sealed class AiDbContext : DbContext, IAiDbContext
 {
     public DbSet<JobEmbedding> JobEmbeddings => Set<JobEmbedding>();
     public DbSet<ResumeEmbedding> ResumeEmbeddings => Set<ResumeEmbedding>();
+    public DbSet<MatchExplanation> MatchExplanations => Set<MatchExplanation>();
     
 
     public AiDbContext(DbContextOptions<AiDbContext> options)
@@ -18,7 +19,14 @@ public sealed class AiDbContext : DbContext, IAiDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasPostgresExtension("vector");
-        modelBuilder.Entity<JobCandidate>().HasNoKey();
+        modelBuilder.Entity<JobCandidate>(b =>
+        {
+            b.HasNoKey();
+            b.ToView(null);
+            b.Ignore(x => x.MatchSummary);
+            b.Ignore(x => x.MatchDetails);
+            b.Ignore(x => x.MatchGaps);
+        });
         modelBuilder.Entity<JobEmbedding>(b =>
         {
             b.ToTable("job_embeddings");
@@ -61,6 +69,14 @@ public sealed class AiDbContext : DbContext, IAiDbContext
 
             b.Property(x => x.Model)
                 .HasConversion(v => v.Value, v => new(v));
+        });
+
+        modelBuilder.Entity<MatchExplanation>(b =>
+        {
+            b.ToTable("match_explanations");
+            b.HasIndex(x => new { x.ResumeUId, x.JobId }).IsUnique();
+            b.HasIndex(x => x.ResumeUId);
+            b.HasIndex(x => x.JobId);
         });
 
     }

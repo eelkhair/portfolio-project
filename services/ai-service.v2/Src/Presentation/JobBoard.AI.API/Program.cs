@@ -12,6 +12,7 @@ using JobBoard.AI.Infrastructure.HttpClients;
 using Azure.Storage.Blobs;
 using JobBoard.AI.Infrastructure.Diagnostics;
 using JobBoard.AI.Infrastructure.Persistence;
+using Elkhair.Common.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +39,8 @@ builder.Services.AddSingleton(new BlobServiceClient(blobConnectionString));
 
 builder.Services.AddMcpToolProviders(builder.Configuration);
 
-builder.Build().UseConfiguredSwagger(builder.Configuration)
+var app = builder.Build();
+await app.MigrateDatabase<AiDbContext>();
+app.UseConfiguredSwagger(builder.Configuration)
     .UseApplicationServices()
     .Start();
