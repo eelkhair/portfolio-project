@@ -1,0 +1,45 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+processors:
+  filter/dapr:
+    error_mode: ignore
+    traces:
+      span:
+        - 'name == "/dapr.proto.runtime.v1.Dapr/GetConfiguration"'
+        - 'name == "/dapr.proto.runtime.v1.Dapr/SubscribeConfiguration"'
+        - 'name == "/dapr.proto.runtime.v1.Dapr/SaveState"'
+        - 'name == "/dapr.proto.runtime.v1.Dapr/GetState"'
+        - 'name == "/dapr.proto.runtime.v1.Dapr/DeleteState"'
+        - 'name == "/dapr.proto.runtime.v1.Dapr/GetBulkSecret"'
+        - 'name == "/dapr.proto.runtime.v1.Dapr/GetSecret"'
+        - 'name == "JobBoard.AI.API.Infrastructure.SignalR.AiNotificationHub/OnConnectedAsync"'
+        - 'name == "/hubs/notifications/negotiate"'
+        - 'name == "/dapr.proto.runtime.v1.Dapr/PublishEvent" and attributes["messaging.destination.name"] == "healthCheckTopic"'
+        - 'IsMatch(name, "/v1\\.0/configuration/.*")'
+        - 'IsMatch(name, "/v1\\.0/secrets/.*")'
+        - 'IsMatch(name, "/v1\\.0/state/.*")'
+        - 'IsMatch(name, "/v1\\.0/publish/.*/healthCheckTopic")'
+        - 'attributes["url.full"] != nil and attributes["url.full"] == "http://localhost:3500/v1.0/healthz"'
+        - 'attributes["user_agent.original"] != nil and IsMatch(attributes["user_agent.original"], "Uptime-Kuma.*")'
+        - 'attributes["server.port"] != nil and attributes["server.port"] == 9200'
+  batch:
+exporters:
+  otlp/jaeger:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+  otlp/aspire:
+    endpoint: host.docker.internal:18889
+    tls:
+      insecure: true
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [filter/dapr, batch]
+      exporters: [otlp/jaeger, otlp/aspire]

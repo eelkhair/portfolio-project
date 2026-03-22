@@ -18,19 +18,25 @@ public static class DaprSetup
     {
         builder.Services.AddDaprClient();
 
-        builder.Configuration.AddDaprSecretStore(
-            "vault",
-            new DaprClientBuilder().Build(),
-            new Dictionary<string, string>()
-        );
+        // Load secrets and configuration from Dapr (skip if not available, e.g. Aspire local dev)
+        try
+        {
+            builder.Configuration.AddDaprSecretStore(
+                "vault",
+                new DaprClientBuilder().Build(),
+                new Dictionary<string, string>()
+            );
 
-        // Load configuration from Dapr store
-        var daprClient = new DaprClientBuilder().Build();
-        var cfg = await daprClient.GetConfiguration("appconfig-" + serviceName, new List<string>());
+            var daprClient = new DaprClientBuilder().Build();
+            var cfg = await daprClient.GetConfiguration("appconfig-" + serviceName, new List<string>());
 
-        // Apply config
-        ApplyScopedConfig(builder.Configuration, cfg, "jobboard:config:global:", serviceName);
-        ApplyScopedConfig(builder.Configuration, cfg, $"jobboard:config:{serviceName}:", serviceName);
+            ApplyScopedConfig(builder.Configuration, cfg, "jobboard:config:global:", serviceName);
+            ApplyScopedConfig(builder.Configuration, cfg, $"jobboard:config:{serviceName}:", serviceName);
+        }
+        catch (Exception)
+        {
+            // Dapr sidecar/config store not available — fall back to appsettings.json
+        }
 
         return builder;
     }

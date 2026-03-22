@@ -13,4 +13,14 @@ public static class DatabaseMigrationExtensions
         var db = scope.ServiceProvider.GetRequiredService<TDbContext>();
         await db.Database.MigrateAsync();
     }
+
+    public static async Task SeedDatabase<TDbContext>(this WebApplication app, string checkSql, string seedSql)
+        where TDbContext : DbContext
+    {
+        using var scope = app.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<TDbContext>();
+        var exists = await db.Database.SqlQueryRaw<int>(checkSql).AnyAsync();
+        if (!exists)
+            await db.Database.ExecuteSqlRawAsync(seedSql);
+    }
 }

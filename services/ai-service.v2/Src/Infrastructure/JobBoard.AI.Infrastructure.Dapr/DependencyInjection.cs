@@ -37,29 +37,37 @@ public static class DependencyInjection
                 : sp.GetRequiredService<MicroDraftPersistence>();
         });
         builder.Services.AddScoped<IIdempotencyService, DaprIdempotencyService>();
-        // Vault secrets
-        builder.Configuration.AddDaprSecretStore(
-            "vault",
-            new DaprClientBuilder().Build(),
-            new Dictionary<string, string>()
-        );
 
         // Initial config load (startup)
-        var daprClient = new DaprClientBuilder().Build();
-        var storeName = $"appconfig-{serviceName}";
+        try
+        {
+            // Vault secrets
+            builder.Configuration.AddDaprSecretStore(
+                "vault",
+                new DaprClientBuilder().Build(),
+                new Dictionary<string, string>()
+            );
 
-        var cfg = await daprClient.GetConfiguration(storeName, new List<string>());
+            var daprClient = new DaprClientBuilder().Build();
+            var storeName = $"appconfig-{serviceName}";
 
-        ApplyScopedConfig(builder.Configuration, cfg, "jobboard:config:global:", serviceName);
-        ApplyScopedConfig(builder.Configuration, cfg, $"jobboard:config:{serviceName}:", serviceName);
+            var cfg = await daprClient.GetConfiguration(storeName, new List<string>());
 
-        // Background watcher (CORRECT)
-        builder.Services.AddHostedService(sp =>
-            new ConfigurationWatcher(
-                sp.GetRequiredService<DaprClient>(),
-                sp.GetRequiredService<IConfiguration>(),
-                sp.GetRequiredService<ILogger<ConfigurationWatcher>>(),
-                serviceName));
+            ApplyScopedConfig(builder.Configuration, cfg, "jobboard:config:global:", serviceName);
+            ApplyScopedConfig(builder.Configuration, cfg, $"jobboard:config:{serviceName}:", serviceName);
+
+            // Background watcher
+            builder.Services.AddHostedService(sp =>
+                new ConfigurationWatcher(
+                    sp.GetRequiredService<DaprClient>(),
+                    sp.GetRequiredService<IConfiguration>(),
+                    sp.GetRequiredService<ILogger<ConfigurationWatcher>>(),
+                    serviceName));
+        }
+        catch (Exception)
+        {
+            // Dapr config store not available — fall back to appsettings.json
+        }
         
         return builder;
     }

@@ -5,7 +5,7 @@
       "executablePath": "dapr.exe",
       "commandLineArgs": "run --app-id connector-api --resources-path ../../Components/ --resources-path ./Dapr/Components/Secrets  --resources-path ./Dapr/Components/ --config ./Dapr/Config/config.yaml --app-port 5284 --dapr-http-port 6072  --log-level warn dotnet run",
       "workingDirectory": "$(ProjectDir)",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "applicationUrl": "http://localhost:5284"
     },
     "http": {
@@ -26,7 +26,7 @@
     },
     "Container (Dockerfile)": {
       "commandName": "Docker",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
       "environmentVariables": {
         "ASPNETCORE_HTTPS_PORTS": "8081",

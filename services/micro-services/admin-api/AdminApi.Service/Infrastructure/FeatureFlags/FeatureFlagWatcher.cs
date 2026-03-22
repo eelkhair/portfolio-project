@@ -71,6 +71,11 @@ public sealed class FeatureFlagWatcher : BackgroundService
                 await _notifier.NotifyAsync(featureFlags);
                 await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
             }
+            catch (Dapr.DaprException)
+            {
+                logger.LogWarning("Dapr config store not available — feature flag watching disabled, retrying in 60s");
+                await Task.Delay(TimeSpan.FromSeconds(60), stoppingToken);
+            }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error while watching for feature flag changes");

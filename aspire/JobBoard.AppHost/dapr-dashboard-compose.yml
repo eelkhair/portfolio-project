@@ -1,0 +1,61 @@
+# Documentation-only compose file for the Dapr Dashboard.
+# These services are actually launched by Aspire — this file
+# lets the Dapr Dashboard discover and display them.
+
+version: "3.8"
+services:
+  admin-api:
+    image: admin-api
+  admin-api-sidecar:
+    image: "daprio/daprd:1.16.3"
+    command: ["./daprd", "-app-id", "admin-api", "-app-port", "5262"]
+    depends_on:
+      - admin-api
+
+  company-api:
+    image: company-api
+  company-api-sidecar:
+    image: "daprio/daprd:1.16.3"
+    command: ["./daprd", "-app-id", "company-api", "-app-port", "5272"]
+    depends_on:
+      - company-api
+
+  job-api:
+    image: job-api
+  job-api-sidecar:
+    image: "daprio/daprd:1.16.3"
+    command: ["./daprd", "-app-id", "job-api", "-app-port", "5282"]
+    depends_on:
+      - job-api
+
+  user-api:
+    image: user-api
+  user-api-sidecar:
+    image: "daprio/daprd:1.16.3"
+    command: ["./daprd", "-app-id", "user-api", "-app-port", "5292"]
+    depends_on:
+      - user-api
+
+  ai-service-v2:
+    image: ai-service-v2
+  ai-service-v2-sidecar:
+    image: "daprio/daprd:1.16.3"
+    command: ["./daprd", "-app-id", "ai-service-v2", "-app-port", "5200"]
+    depends_on:
+      - ai-service-v2
+
+  connector-api:
+    image: connector-api
+  connector-api-sidecar:
+    image: "daprio/daprd:1.16.3"
+    command: ["./daprd", "-app-id", "connector-api", "-app-port", "5284"]
+    depends_on:
+      - connector-api
+
+  reverse-connector-api:
+    image: reverse-connector-api
+  reverse-connector-api-sidecar:
+    image: "daprio/daprd:1.16.3"
+    command: ["./daprd", "-app-id", "reverse-connector-api", "-app-port", "5285"]
+    depends_on:
+      - reverse-connector-api

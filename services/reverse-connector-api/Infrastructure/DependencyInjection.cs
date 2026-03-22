@@ -46,17 +46,24 @@ public static class DependencyInjection
     {
         builder.Services.AddDaprClient();
 
-        builder.Configuration.AddDaprSecretStore(
-            "vault",
-            new DaprClientBuilder().Build(),
-            new Dictionary<string, string>()
-        );
+        try
+        {
+            builder.Configuration.AddDaprSecretStore(
+                "vault",
+                new DaprClientBuilder().Build(),
+                new Dictionary<string, string>()
+            );
 
-        var daprClient = new DaprClientBuilder().Build();
-        var cfg = await daprClient.GetConfiguration("appconfig-" + serviceName, new List<string>());
+            var daprClient = new DaprClientBuilder().Build();
+            var cfg = await daprClient.GetConfiguration("appconfig-" + serviceName, new List<string>());
 
-        ApplyScopedConfig(builder.Configuration, cfg, "jobboard:config:global:", serviceName);
-        ApplyScopedConfig(builder.Configuration, cfg, $"jobboard:config:{serviceName}:", serviceName);
+            ApplyScopedConfig(builder.Configuration, cfg, "jobboard:config:global:", serviceName);
+            ApplyScopedConfig(builder.Configuration, cfg, $"jobboard:config:{serviceName}:", serviceName);
+        }
+        catch (Exception)
+        {
+            // Dapr config store not available — fall back to appsettings.json
+        }
 
         return builder;
     }

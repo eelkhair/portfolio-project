@@ -35,7 +35,7 @@ internal static class HealthCheckExtensions
 
         builder.Services.AddHttpClient();
 
-        builder.Services
+        var healthChecks = builder.Services
             .AddHealthChecks()
 
             // -- Liveness --
@@ -51,12 +51,6 @@ internal static class HealthCheckExtensions
 
             // -- Dapr sidecar, state store, secret store, pub/sub --
             .AddDapr()
-
-            // -- Dapr configuration stores --
-            .AddDaprConfigurationStore("global", o =>
-                o.StoreName = "appconfig-global")
-            .AddDaprConfigurationStore("admin", o =>
-                o.StoreName = "appconfig-admin-api")
 
             // -- MCP Server --
             .AddCheck("mcp-server", () =>
@@ -75,5 +69,13 @@ internal static class HealthCheckExtensions
                     return HealthCheckResult.Unhealthy("MCP server unreachable", ex);
                 }
             }, tags: ["mcp"]);
+
+        // Dapr configuration stores — only in deployed environments (Azure App Configuration)
+        if (!builder.Environment.IsDevelopment())
+        {
+            healthChecks
+                .AddDaprConfigurationStore("global", o => o.StoreName = "appconfig-global")
+                .AddDaprConfigurationStore("admin", o => o.StoreName = "appconfig-admin-api");
+        }
     }
 }

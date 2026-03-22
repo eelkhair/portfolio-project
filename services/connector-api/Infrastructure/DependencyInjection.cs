@@ -83,41 +83,48 @@ public static class DependencyInjection
     {
         builder.Services.AddDaprClient();
 
-        builder.Configuration.AddDaprSecretStore(
-            "vault",
-            new DaprClientBuilder().Build(),
-            new Dictionary<string, string>()
-        );
-
-        var daprClient = new DaprClientBuilder().Build();
-        var cfg = await daprClient.GetConfiguration("appconfig-" + serviceName, new List<string>());
-
-        ApplyScopedConfig(builder.Configuration, cfg, "jobboard:config:global:", serviceName);
-        ApplyScopedConfig(builder.Configuration, cfg, $"jobboard:config:{serviceName}:", serviceName);
-
-        // Subscribe for auto-refresh
-        var storeName = $"appconfig-{serviceName}";
-        await daprClient.SubscribeConfiguration(storeName, new List<string> { "*" });
-
-        _ = Task.Run(async () =>
+        try
         {
-            while (true)
+            builder.Configuration.AddDaprSecretStore(
+                "vault",
+                new DaprClientBuilder().Build(),
+                new Dictionary<string, string>()
+            );
+
+            var daprClient = new DaprClientBuilder().Build();
+            var cfg = await daprClient.GetConfiguration("appconfig-" + serviceName, new List<string>());
+
+            ApplyScopedConfig(builder.Configuration, cfg, "jobboard:config:global:", serviceName);
+            ApplyScopedConfig(builder.Configuration, cfg, $"jobboard:config:{serviceName}:", serviceName);
+
+            // Subscribe for auto-refresh
+            var storeName = $"appconfig-{serviceName}";
+            await daprClient.SubscribeConfiguration(storeName, new List<string> { "*" });
+
+            _ = Task.Run(async () =>
             {
-                var config = await daprClient.GetConfiguration(storeName, new List<string>());
-
-                foreach (var kvp in config.Items)
+                while (true)
                 {
-                    if (!kvp.Key.StartsWith($"jobboard:config:{serviceName}") 
-                        && !kvp.Key.StartsWith($"jobboard:config:global")) continue;
-                    
-                    var cleanedKey = CleanKey(kvp.Key, serviceName);
-                    builder.Configuration[cleanedKey] = kvp.Value.Value;
+                    var config = await daprClient.GetConfiguration(storeName, new List<string>());
 
+                    foreach (var kvp in config.Items)
+                    {
+                        if (!kvp.Key.StartsWith($"jobboard:config:{serviceName}")
+                            && !kvp.Key.StartsWith($"jobboard:config:global")) continue;
+
+                        var cleanedKey = CleanKey(kvp.Key, serviceName);
+                        builder.Configuration[cleanedKey] = kvp.Value.Value;
+
+                    }
+
+                    await Task.Delay(TimeSpan.FromMinutes(1));
                 }
-
-                await Task.Delay(TimeSpan.FromMinutes(1));
-            }
-        });
+            });
+        }
+        catch (Exception)
+        {
+            // Dapr config store not available — fall back to appsettings.json
+        }
         return builder;
     }
 

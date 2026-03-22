@@ -35,11 +35,15 @@ internal static class HealthCheckExtensions
         builder.Services
             .AddHealthChecks()
             .AddCheck("self", () => HealthCheckResult.Healthy())
-            .AddDapr()
-            .AddDaprConfigurationStore("global", o =>
-                o.StoreName = "appconfig-global")
-            .AddDaprConfigurationStore("connector", o =>
-                o.StoreName = "appconfig-connector-api");
+            .AddDapr();
+
+        // Dapr configuration stores — only in deployed environments (Azure App Configuration)
+        if (!builder.Environment.IsDevelopment())
+        {
+            builder.Services.AddHealthChecks()
+                .AddDaprConfigurationStore("global", o => o.StoreName = "appconfig-global")
+                .AddDaprConfigurationStore("connector", o => o.StoreName = "appconfig-connector-api");
+        }
 
         return builder;
     }
