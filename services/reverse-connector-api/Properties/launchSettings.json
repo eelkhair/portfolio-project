@@ -6,7 +6,7 @@
       "executablePath": "dapr.exe",
       "commandLineArgs": "run --app-id reverse-connector-api --resources-path ../../Components/ --resources-path ./Dapr/Components/Secrets --config ./Dapr/Config/config.yaml --app-port 5190 --dapr-http-port 6342 --log-level warn dotnet run",
       "workingDirectory": "$(ProjectDir)",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "applicationUrl": "http://localhost:5190"
     },
     "http": {

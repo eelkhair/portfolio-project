@@ -65,13 +65,15 @@ internal static class HealthCheckExtensions
             })
 
             // -- Dapr sidecar, state store, secret store, pub/sub --
-            .AddDapr()
+            .AddDapr();
 
-            // -- Dapr configuration stores --
-            .AddDaprConfigurationStore("global", o =>
-                o.StoreName = "appconfig-global")
-            .AddDaprConfigurationStore("appconfig-ai-service-v2", o =>
-                o.StoreName = "appconfig-ai-service-v2");
+        // Dapr configuration stores — only in deployed environments (Azure App Configuration)
+        if (!builder.Environment.IsDevelopment())
+        {
+            builder.Services.AddHealthChecks()
+                .AddDaprConfigurationStore("global", o => o.StoreName = "appconfig-global")
+                .AddDaprConfigurationStore("appconfig-ai-service-v2", o => o.StoreName = "appconfig-ai-service-v2");
+        }
 
         return builder;
     }

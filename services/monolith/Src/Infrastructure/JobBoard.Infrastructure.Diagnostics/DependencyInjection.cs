@@ -42,7 +42,8 @@ public static class DependencyInjection
              .AddZipkinExporter()
              .AddOtlpExporter(exporter =>
              {
-                 exporter.Endpoint = new Uri("http://192.168.1.160:4317");
+                 var otlpEndpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT");
+                     exporter.Endpoint = new Uri(otlpEndpoint ?? "http://192.168.1.160:4317");
              });
         });
 
@@ -53,7 +54,8 @@ public static class DependencyInjection
              .AddHttpClientInstrumentation()
              .AddOtlpExporter(exporter =>
              {
-                 exporter.Endpoint = new Uri("http://192.168.1.160:4317");
+                 var otlpEndpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT");
+                     exporter.Endpoint = new Uri(otlpEndpoint ?? "http://192.168.1.160:4317");
              });
         });
 
@@ -147,7 +149,7 @@ public static class DependencyInjection
         string environment)
     {
         return new ElasticsearchSinkOptions(
-            new Uri(configuration["ElasticConfiguration:Uri"] ?? ""))
+            new Uri(configuration["ElasticConfiguration:Uri"] ?? "http://localhost:9200"))
         {
             AutoRegisterTemplate = true,
             IndexFormat =

@@ -7,7 +7,7 @@
       "executablePath": "dapr.exe",
       "commandLineArgs": "run --app-id ai-service-v2 --resources-path ../../../../../Components/ --resources-path ./Dapr/Components/Secrets --resources-path ./Dapr/Components/Timers --resources-path ./Dapr/Components --config ./Dapr/Config/config.yaml --app-port 5200 --dapr-http-port 7000  --log-level debug dotnet run",
       "workingDirectory": "$(ProjectDir)",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "applicationUrl": "http://localhost:5280"
     },
     "http": {

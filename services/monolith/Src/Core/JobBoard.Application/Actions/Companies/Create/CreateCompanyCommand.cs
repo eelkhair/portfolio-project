@@ -87,8 +87,6 @@ public class CreateCompanyCommandHandler(IHandlerContext context
             Status = company.Status
         };
     }
-
-    
 }
 
 

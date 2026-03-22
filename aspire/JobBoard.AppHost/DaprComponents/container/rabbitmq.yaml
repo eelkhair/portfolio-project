@@ -1,0 +1,31 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: rabbitmq.pubsub
+spec:
+  type: pubsub.rabbitmq
+  version: v1
+  initTimeout: 60s
+  metadata:
+    - name: reconnectWait
+      value: "5s"
+    - name: backOffMaxRetries
+      value: "10"
+    - name: connectionString
+      value: "amqp://guest:guest@rabbitmq:5672/"
+    - name: hostname
+      value: "http://rabbitmq"
+    - name: durable
+      value: "false"
+    - name: autoAck
+      value: "false"
+    - name: enableDeadLetter
+      value: "true"
+    - name: exchangeKind
+      value: "fanout"
+    - name: publisherConfirm
+      value: "false"
+    - name: prefetchCount
+      value: "0"
+    - name: deliveryMode
+      value: "0"

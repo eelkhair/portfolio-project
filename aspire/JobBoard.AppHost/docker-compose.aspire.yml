@@ -1,0 +1,314 @@
+services:
+  # ── Monolith ─────────────────────────────────────────────
+  monolith-api:
+    build:
+      context: ../../services/monolith
+      dockerfile: Src/Presentation/JobBoard.API/Dockerfile
+    ports:
+      - "5280:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPIRE_MODE=true
+      - ConnectionStrings__Monolith=Server=sqlserver,1433;Database=JobBoard;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=true
+      - ConnectionStrings__BlobStorage=UseDevelopmentStorage=true
+      - Keycloak__Authority=${KEYCLOAK_AUTHORITY}
+      - Keycloak__Audience=${KEYCLOAK_AUDIENCE}
+      - AiServiceUrl=http://ai-service-v2:8080
+      - AdminApiUrl=http://admin-api:8080
+      - MonolithUrl=http://monolith-api:8080
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT}
+    networks:
+      - jobboard-aspire
+
+  monolith-mcp:
+    build:
+      context: ../../services/monolith
+      dockerfile: Src/Presentation/JobBoard.API.Mcp/Dockerfile
+    ports:
+      - "3333:3333"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:3333
+      - ConnectionStrings__Monolith=Server=sqlserver,1433;Database=JobBoard;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=true
+      - Keycloak__Authority=${KEYCLOAK_AUTHORITY}
+      - Keycloak__Audience=${KEYCLOAK_AUDIENCE}
+    depends_on:
+      - monolith-api
+    networks:
+      - jobboard-aspire
+
+  # ── AI Service v2 ────────────────────────────────────────
+  ai-service-v2:
+    build:
+      context: ../../services/ai-service.v2
+      dockerfile: Src/Presentation/JobBoard.AI.API/Dockerfile
+    ports:
+      - "5200:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__ai-db=${POSTGRES}
+      - ConnectionStrings__BlobStorage=UseDevelopmentStorage=true
+      - McpServer__IntegrationUrl=http://monolith-mcp:3333
+      - McpServer__MicroUrl=http://admin-api-mcp:3334
+      - Keycloak__Authority=${KEYCLOAK_AUTHORITY}
+      - Keycloak__Audience=${KEYCLOAK_AUDIENCE}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT}
+    networks:
+      - jobboard-aspire
+
+  ai-service-v2-sidecar:
+    image: "daprio/daprd:1.15.8"
+    depends_on:
+      - ai-service-v2
+    network_mode: "service:ai-service-v2"
+    volumes:
+      - ./DaprComponents/container:/Components
+      - ./DaprComponents/ai-service-v2:/Dapr
+    command: [
+      "./daprd",
+      "--app-id", "ai-service-v2",
+      "--app-port", "8080",
+      "--resources-path", "./Components",
+      "--resources-path", "./Dapr",
+      "-config", "./Components/config.yaml"
+    ]
+
+  # ── Gateway ──────────────────────────────────────────────
+  gateway:
+    build:
+      context: ../../services/gateway
+    ports:
+      - "5238:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Keycloak__Authority=${KEYCLOAK_AUTHORITY}
+      - Keycloak__Audience=${KEYCLOAK_AUDIENCE}
+    depends_on:
+      - monolith-api
+      - admin-api
+      - ai-service-v2
+    networks:
+      - jobboard-aspire
+
+  # ── Microservices ────────────────────────────────────────
+  admin-api:
+    build:
+      context: ../../services/micro-services/admin-api
+    ports:
+      - "5262:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    networks:
+      - jobboard-aspire
+
+  admin-api-sidecar:
+    image: "daprio/daprd:1.15.8"
+    depends_on:
+      - admin-api
+    network_mode: "service:admin-api"
+    volumes:
+      - ./DaprComponents/container:/Components
+    command: [
+      "./daprd",
+      "--app-id", "admin-api",
+      "--app-port", "8080",
+      "--resources-path", "./Components",
+      "-config", "./Components/config.yaml"
+    ]
+
+  admin-api-mcp:
+    build:
+      context: ../../services/micro-services/admin-api
+      dockerfile: AdminApi.Mcp/Dockerfile
+    ports:
+      - "3334:3334"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:3334
+    depends_on:
+      - admin-api
+    networks:
+      - jobboard-aspire
+
+  company-api:
+    build:
+      context: ../../services/micro-services/company-api
+    ports:
+      - "5272:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__CompanyDbContext=Server=sqlserver,1433;Database=CompanyDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=true
+    networks:
+      - jobboard-aspire
+
+  company-api-sidecar:
+    image: "daprio/daprd:1.15.8"
+    depends_on:
+      - company-api
+    network_mode: "service:company-api"
+    volumes:
+      - ./DaprComponents/container:/Components
+    command: [
+      "./daprd",
+      "--app-id", "company-api",
+      "--app-port", "8080",
+      "--resources-path", "./Components",
+      "-config", "./Components/config.yaml"
+    ]
+
+  job-api:
+    build:
+      context: ../../services/micro-services/job-api
+    ports:
+      - "5282:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__JobDbContext=Server=sqlserver,1433;Database=JobDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=true
+    networks:
+      - jobboard-aspire
+
+  job-api-sidecar:
+    image: "daprio/daprd:1.15.8"
+    depends_on:
+      - job-api
+    network_mode: "service:job-api"
+    volumes:
+      - ./DaprComponents/container:/Components
+    command: [
+      "./daprd",
+      "--app-id", "job-api",
+      "--app-port", "8080",
+      "--resources-path", "./Components",
+      "-config", "./Components/config.yaml"
+    ]
+
+  user-api:
+    build:
+      context: ../../services/micro-services/user-api
+    ports:
+      - "5292:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__UserDbContext=Server=sqlserver,1433;Database=UserDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=true
+    networks:
+      - jobboard-aspire
+
+  user-api-sidecar:
+    image: "daprio/daprd:1.15.8"
+    depends_on:
+      - user-api
+    network_mode: "service:user-api"
+    volumes:
+      - ./DaprComponents/container:/Components
+      - ./DaprComponents/user-api:/Dapr
+    command: [
+      "./daprd",
+      "--app-id", "user-api",
+      "--app-port", "8080",
+      "--resources-path", "./Components",
+      "--resources-path", "./Dapr",
+      "-config", "./Components/config.yaml"
+    ]
+
+  # ── Connectors ───────────────────────────────────────────
+  connector-api:
+    build:
+      context: ../../services/connector-api
+    ports:
+      - "5284:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    networks:
+      - jobboard-aspire
+
+  connector-api-sidecar:
+    image: "daprio/daprd:1.15.8"
+    depends_on:
+      - connector-api
+    network_mode: "service:connector-api"
+    volumes:
+      - ./DaprComponents/container:/Components
+    command: [
+      "./daprd",
+      "--app-id", "connector-api",
+      "--app-port", "8080",
+      "--resources-path", "./Components",
+      "-config", "./Components/config.yaml"
+    ]
+
+  reverse-connector-api:
+    build:
+      context: ../../services/reverse-connector-api
+    ports:
+      - "5285:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    networks:
+      - jobboard-aspire
+
+  reverse-connector-api-sidecar:
+    image: "daprio/daprd:1.15.8"
+    depends_on:
+      - reverse-connector-api
+    network_mode: "service:reverse-connector-api"
+    volumes:
+      - ./DaprComponents/container:/Components
+    command: [
+      "./daprd",
+      "--app-id", "reverse-connector-api",
+      "--app-port", "8080",
+      "--resources-path", "./Components",
+      "-config", "./Components/config.yaml"
+    ]
+
+  # ── Infrastructure (services stack) ──────────────────────
+  dapr-dashboard:
+    image: "daprio/dashboard:latest"
+    command: [
+      "--docker-compose=true",
+      "--components-path", "/Components/",
+      "--config-path=/Config",
+      "--docker-compose-path=/home/nonroot/docker-compose.yml"
+    ]
+    ports:
+      - "8888:8080"
+    volumes:
+      - ./DaprComponents/container:/Config:ro
+      - ./docker-compose.aspire.yml:/home/nonroot/docker-compose.yml:ro
+      - ./DaprComponents/container:/Components:ro
+    networks:
+      - jobboard-aspire
+
+  health-checks:
+    build:
+      context: ../../services/micro-services/HealthChecks
+    ports:
+      - "5107:8080"
+    environment:
+      - HealthChecksUI__HealthChecks__0__Name=Gateway
+      - HealthChecksUI__HealthChecks__0__Uri=http://gateway:8080/healthzEndpoint
+      - HealthChecksUI__HealthChecks__1__Name=Monolith API
+      - HealthChecksUI__HealthChecks__1__Uri=http://monolith-api:8080/healthzEndpoint
+      - HealthChecksUI__HealthChecks__2__Name=Monolith MCP
+      - HealthChecksUI__HealthChecks__2__Uri=http://monolith-mcp:3333/healthzEndpoint
+      - HealthChecksUI__HealthChecks__3__Name=AI Service V2
+      - HealthChecksUI__HealthChecks__3__Uri=http://ai-service-v2:8080/healthzEndpoint
+      - HealthChecksUI__HealthChecks__4__Name=Admin API
+      - HealthChecksUI__HealthChecks__4__Uri=http://admin-api:8080/healthzEndpoint
+      - HealthChecksUI__HealthChecks__5__Name=Company API
+      - HealthChecksUI__HealthChecks__5__Uri=http://company-api:8080/healthzEndpoint
+      - HealthChecksUI__HealthChecks__6__Name=Job API
+      - HealthChecksUI__HealthChecks__6__Uri=http://job-api:8080/healthzEndpoint
+      - HealthChecksUI__HealthChecks__7__Name=User API
+      - HealthChecksUI__HealthChecks__7__Uri=http://user-api:8080/healthzEndpoint
+      - HealthChecksUI__HealthChecks__8__Name=Connector API
+      - HealthChecksUI__HealthChecks__8__Uri=http://connector-api:8080/healthzEndpoint
+      - HealthChecksUI__HealthChecks__9__Name=Reverse Connector API
+      - HealthChecksUI__HealthChecks__9__Uri=http://reverse-connector-api:8080/healthzEndpoint
+    networks:
+      - jobboard-aspire
+
+networks:
+  jobboard-aspire:
+    external: true
+    name: aspire-persistent-network-1eb50dfa-JobBoard

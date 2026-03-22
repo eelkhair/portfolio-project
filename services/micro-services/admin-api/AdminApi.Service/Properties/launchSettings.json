@@ -5,14 +5,14 @@
     "dapr": {
       "commandName": "Executable",
       "workingDirectory": "$(ProjectDir)",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "applicationUrl": "http://localhost:5262",
       "executablePath": "dapr.exe",
       "commandLineArgs": "run --app-id admin-api --resources-path ../../../../Components/ --resources-path ./Dapr/Components/Secrets --resources-path ./Dapr/Components/Timers --resources-path ./Dapr/Components --config ./Dapr/Config/config.yaml --app-port 5262 --dapr-http-port 6045  --log-level debug dotnet run"
     },
     "http": {
       "commandName": "Project",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
@@ -21,7 +21,7 @@
     },
     "https": {
       "commandName": "Project",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
@@ -31,7 +31,7 @@
     },
     "IIS Express": {
       "commandName": "IISExpress",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
@@ -39,7 +39,7 @@
     },
     "Container (Dockerfile)": {
       "commandName": "Docker",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
       "environmentVariables": {
         "ASPNETCORE_HTTPS_PORTS": "8081",

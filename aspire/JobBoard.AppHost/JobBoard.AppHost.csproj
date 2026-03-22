@@ -1,0 +1,52 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.1">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.NodeJs" Version="9.5.2" />
+    <PackageReference Include="CommunityToolkit.Aspire.Hosting.Dapr" Version="13.0.0" />
+    <PackageReference Include="Aspire.Hosting.SqlServer" Version="13.1.2" />
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.1.2" />
+    <PackageReference Include="Aspire.Hosting.Redis" Version="13.1.2" />
+    <PackageReference Include="Aspire.Hosting.RabbitMQ" Version="13.1.2" />
+    <PackageReference Include="Aspire.Hosting.Keycloak" Version="13.1.3-preview.1.26166.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Monolith -->
+    <ProjectReference Include="..\..\services\monolith\Src\Presentation\JobBoard.API\JobBoard.API.csproj" />
+    <ProjectReference Include="..\..\services\monolith\Src\Presentation\JobBoard.API.Mcp\JobBoard.API.Mcp.csproj" />
+
+    <!-- AI Service v2 -->
+    <ProjectReference Include="..\..\services\ai-service.v2\Src\Presentation\JobBoard.AI.API\JobBoard.AI.API.csproj" />
+
+    <!-- Microservices -->
+    <ProjectReference Include="..\..\services\micro-services\admin-api\AdminApi.Service\AdminApi.Service.csproj" />
+    <ProjectReference Include="..\..\services\micro-services\admin-api\AdminApi.Mcp\AdminApi.Mcp.csproj" />
+    <ProjectReference Include="..\..\services\micro-services\company-api\CompanyApi.Service\CompanyApi.Service.csproj" />
+    <ProjectReference Include="..\..\services\micro-services\job-api\JobApi.Service\JobApi.Service.csproj" />
+    <ProjectReference Include="..\..\services\micro-services\user-api\UserApi.Service\UserApi.Service.csproj" />
+
+    <!-- Connectors -->
+    <ProjectReference Include="..\..\services\connector-api\connector-api.csproj" />
+    <ProjectReference Include="..\..\services\reverse-connector-api\reverse-connector-api.csproj" />
+
+    <!-- Gateway -->
+    <ProjectReference Include="..\..\services\gateway\Gateway.Api.csproj" />
+
+    <!-- Health Checks -->
+    <ProjectReference Include="..\..\services\micro-services\HealthChecks\JobBoard.WebStatus\JobBoard.WebStatus.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="DaprComponents\**\*" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="KeycloakRealm\**\*" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="OtelCollector\**\*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>
