@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -33,18 +34,31 @@ public static class DependencyInjection
         var otel = services.AddOpenTelemetry();
         otel.ConfigureResource(r => r.AddService(serviceName));
 
+        // Primary OTLP endpoint: Aspire injects OTEL_EXPORTER_OTLP_ENDPOINT automatically;
+        // fallback targets the dev server directly.
+        // Secondary OTLP endpoint: OTel Collector (filters Dapr noise) → Jaeger.
+        var primaryEndpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")
+                              ?? "http://192.168.1.160:4317";
+        var collectorEndpoint = Environment.GetEnvironmentVariable("OTEL_COLLECTOR_ENDPOINT");
+
         otel.WithTracing(t =>
         {
             t.AddSource(TracingFilters.Source.Name)
              .AddAspNetCoreInstrumentation(o => o.AddFilters())
              .AddEntityFrameworkCoreInstrumentation(o => o.AddFilters())
              .AddHttpClientInstrumentation(o => o.AddFilters())
-             .AddZipkinExporter()
-             .AddOtlpExporter(exporter =>
+             .AddOtlpExporter("primary", exporter =>
              {
-                 var otlpEndpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT");
-                     exporter.Endpoint = new Uri(otlpEndpoint ?? "http://192.168.1.160:4317");
+                 exporter.Endpoint = new Uri(primaryEndpoint);
              });
+
+            if (!string.IsNullOrEmpty(collectorEndpoint))
+            {
+                t.AddOtlpExporter("collector", exporter =>
+                {
+                    exporter.Endpoint = new Uri(collectorEndpoint);
+                });
+            }
         });
 
         otel.WithMetrics(m =>
@@ -54,8 +68,7 @@ public static class DependencyInjection
              .AddHttpClientInstrumentation()
              .AddOtlpExporter(exporter =>
              {
-                 var otlpEndpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT");
-                     exporter.Endpoint = new Uri(otlpEndpoint ?? "http://192.168.1.160:4317");
+                 exporter.Endpoint = new Uri(primaryEndpoint);
              });
         });
 
@@ -87,7 +100,6 @@ public static class DependencyInjection
         this WebApplicationBuilder builder,
         string appTag)
     {
-        builder.Logging.ClearProviders();
         builder.Logging.SetMinimumLevel(LogLevel.Warning);
         builder.Logging.AddFilters();
 
@@ -137,6 +149,15 @@ public static class DependencyInjection
             .WriteTo.Seq("http://seq")
             .WriteTo.Elasticsearch(
                 ConfigureElasticSink(builder.Configuration, builder.Environment.EnvironmentName))
+            .WriteTo.OpenTelemetry(options =>
+            {
+                var endpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT");
+                if (!string.IsNullOrEmpty(endpoint))
+                {
+                    options.Endpoint = endpoint;
+                    options.Protocol = Serilog.Sinks.OpenTelemetry.OtlpProtocol.Grpc;
+                }
+            })
             .CreateLogger();
 
         builder.Host.UseSerilog();

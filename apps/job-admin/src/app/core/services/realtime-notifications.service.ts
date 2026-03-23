@@ -29,6 +29,11 @@ export class RealtimeNotificationsService {
   private currentTopology: 'monolith' | 'micro' | null = null;
 
   constructor() {
+    // Bootstrap: connect to monolith hub to receive initial feature flags.
+    // Once flags arrive, the effect reconnects to the correct topology-specific hub.
+    this.currentTopology = 'monolith';
+    void this.start();
+
     effect(()=>{
       if (!this.featureFlagService.featureFlags()) return;
 

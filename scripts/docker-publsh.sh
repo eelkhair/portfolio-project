@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -uo pipefail
 
 # ===== ENVIRONMENT SELECTION =====
 echo "Select environment:"
@@ -47,25 +47,29 @@ echo
 echo "🔐 Logging into registry.eelkhair.net..."
 printf '%s\n' "$PASSWORD" | docker login registry.eelkhair.net --username eelkhair --password-stdin
 
-# ===== SERVICE DEFINITIONS =====
-declare -A services=(
-  ["job-admin"]="../apps/job-admin"
-  ["job-public"]="../apps/job-public"
-  ["ai-service"]="../services/ai-service"
-  ["ai-service-v2"]="../services/ai-service.v2"
-  ["job-api"]="../services/micro-services/job-api"
-  ["company-api"]="../services/micro-services/company-api"
-  ["admin-api"]="../services/micro-services/admin-api"
-  ["admin-api-mcp"]="../services/micro-services/admin-api"
-  ["user-api"]="../services/micro-services/user-api"
-  ["monolith-api"]="../services/monolith"
-  ["monolith-mcp"]="../services/monolith"
-  ["connector-api"]="../services/connector-api"
-  ["reverse-connector-api"]="../services/reverse-connector-api"
-  ["gateway"]="../services/gateway"
-  ["health-check"]="../services/micro-services/HealthChecks"
-  ["keycloak"]="../infrastructure/keycloak"
+# ===== SERVICE DEFINITIONS (ordered array for deterministic builds) =====
+# Each entry: "name|context|dockerfile_flag"
+#   dockerfile_flag: "default" = Dockerfile in context root
+#                    path     = custom Dockerfile relative to context
+BACKEND_SERVICES=(
+  "gateway|../services/gateway|default"
+  "monolith-api|../services/monolith|Src/Presentation/JobBoard.API/Dockerfile"
+  "monolith-mcp|../services/monolith|Src/Presentation/JobBoard.API.Mcp/Dockerfile"
+  "ai-service|../services/ai-service|default"
+  "ai-service-v2|../services/ai-service.v2|Src/Presentation/JobBoard.AI.API/Dockerfile"
+  "admin-api|../services/micro-services/admin-api|default"
+  "admin-api-mcp|../services/micro-services/admin-api|AdminApi.Mcp/Dockerfile"
+  "company-api|../services/micro-services/company-api|default"
+  "job-api|../services/micro-services/job-api|default"
+  "user-api|../services/micro-services/user-api|default"
+  "connector-api|../services/connector-api|default"
+  "reverse-connector-api|../services/reverse-connector-api|default"
+  "health-check|../services/micro-services/HealthChecks|default"
+  "keycloak|../infrastructure/keycloak|default"
 )
+
+FAILED_BUILDS=()
+SUCCESSFUL_BUILDS=()
 
 # ===== HELPER: resolve env-specific vars =====
 env_vars() {
@@ -84,66 +88,85 @@ env_vars() {
   esac
 }
 
-# ===== HELPER: build & push backend services (env-independent, run once) =====
+# ===== HELPER: build & push one service =====
+build_one() {
+  local name="$1"
+  local context="$2"
+  local dockerfile_flag="$3"
+  local image="registry.eelkhair.net/${name}:latest"
+
+  echo ""
+  echo "🔨 Building $name..."
+
+  if [ "$dockerfile_flag" = "default" ]; then
+    docker build -t "$image" "$context"
+  else
+    docker build -f "$context/$dockerfile_flag" -t "$image" "$context"
+  fi
+
+  if [ $? -ne 0 ]; then
+    echo "❌ BUILD FAILED: $name"
+    FAILED_BUILDS+=("$name")
+    return 1
+  fi
+
+  echo "📤 Pushing $image..."
+  docker push "$image"
+
+  if [ $? -ne 0 ]; then
+    echo "❌ PUSH FAILED: $name"
+    FAILED_BUILDS+=("$name")
+    return 1
+  fi
+
+  SUCCESSFUL_BUILDS+=("$name")
+  echo "✅ $name done"
+  echo "-----------------------------"
+}
+
+# ===== HELPER: build & push backend services =====
 build_and_push_backends() {
-  for name in "${!services[@]}"; do
-    # Skip Angular apps — they're built per-environment
-    if [ "$name" = "job-admin" ] || [ "$name" = "job-public" ]; then
-      continue
-    fi
-
-    path="${services[$name]}"
-    image="registry.eelkhair.net/${name}:latest"
-
-    if [ "$name" = "ai-service-v2" ]; then
-      docker build \
-        -f "/c/Users/elkha/RiderProjects/portfolio project/services/ai-service.v2/Src/Presentation/JobBoard.AI.API/Dockerfile" \
-        -t "$image" \
-        "/c/Users/elkha/RiderProjects/portfolio project/services/ai-service.v2"
-    elif [ "$name" = "monolith-api" ]; then
-      docker build \
-        -f "$path/Src/Presentation/JobBoard.API/Dockerfile" \
-        -t "$image" \
-        "$path"
-    elif [ "$name" = "monolith-mcp" ]; then
-      docker build \
-        -f "$path/Src/Presentation/JobBoard.API.Mcp/Dockerfile" \
-        -t "$image" \
-        "$path"
-    elif [ "$name" = "admin-api-mcp" ]; then
-      docker build \
-        -f "$path/AdminApi.Mcp/Dockerfile" \
-        -t "$image" \
-        "$path"
-    else
-      docker build -t "$image" "$path"
-    fi
-
-    echo "📤 Pushing $image to registry.eelkhair.net..."
-    docker push "$image"
-    echo "✅ $name done"
-    echo "-----------------------------"
+  for entry in "${BACKEND_SERVICES[@]}"; do
+    IFS='|' read -r name context dockerfile_flag <<< "$entry"
+    build_one "$name" "$context" "$dockerfile_flag" || true
   done
 }
 
-# ===== HELPER: build & push Angular apps (env-specific) =====
+# ===== HELPER: build & push Angular apps (env-specific tags) =====
 build_and_push_frontends() {
   local admin_config="$1"
   local public_config="$2"
+  local env_tag="$3"  # "dev" or "prod"
 
   for name in "job-admin" "job-public"; do
-    path="${services[$name]}"
-    image="registry.eelkhair.net/${name}:latest"
+    local image="registry.eelkhair.net/${name}:${env_tag}"
+    local config
 
     if [ "$name" = "job-admin" ]; then
-      docker build --build-arg BUILD_CONFIG="$admin_config" -t "$image" "$path"
+      config="$admin_config"
+      docker build --build-arg BUILD_CONFIG="$config" -t "$image" "../apps/job-admin"
     else
-      docker build --build-arg BUILD_CONFIG="$public_config" -t "$image" "$path"
+      config="$public_config"
+      docker build --build-arg BUILD_CONFIG="$config" -t "$image" "../apps/job-public"
     fi
 
-    echo "📤 Pushing $image to registry.eelkhair.net..."
+    if [ $? -ne 0 ]; then
+      echo "❌ BUILD FAILED: $name ($config)"
+      FAILED_BUILDS+=("$name")
+      continue
+    fi
+
+    echo "📤 Pushing $image..."
     docker push "$image"
-    echo "✅ $name ($admin_config) done"
+
+    if [ $? -ne 0 ]; then
+      echo "❌ PUSH FAILED: $name"
+      FAILED_BUILDS+=("$name")
+      continue
+    fi
+
+    SUCCESSFUL_BUILDS+=("$name")
+    echo "✅ $name ($config → :${env_tag}) done"
     echo "-----------------------------"
   done
 }
@@ -176,7 +199,7 @@ printf '%s\n' "\$PASSWORD" | docker login registry.eelkhair.net --username eelkh
 
 echo "📦 Pulling + starting stack..."
 docker compose -p job-board pull
-docker compose -p job-board up -d --force-recreate --remove-orphans
+docker compose -p job-board up -d --remove-orphans
 
 echo "🧹 Post-deploy cleanup..."
 
@@ -233,10 +256,31 @@ for target in "${DEPLOY_TARGETS[@]}"; do
   echo "🔨 Building frontends for $target..."
   echo "=========================================="
 
-  build_and_push_frontends "$ADMIN_BUILD_CONFIG" "$PUBLIC_BUILD_CONFIG"
+  build_and_push_frontends "$ADMIN_BUILD_CONFIG" "$PUBLIC_BUILD_CONFIG" "$target"
   deploy_remote "$REMOTE_HOST" "$target" || true
 done
 
+# ===== SUMMARY =====
+echo ""
+echo "=========================================="
+echo "📊 Build Summary"
+echo "=========================================="
+echo "✅ Succeeded (${#SUCCESSFUL_BUILDS[@]}):"
+for s in "${SUCCESSFUL_BUILDS[@]}"; do
+  echo "   - $s"
+done
+
+if [ ${#FAILED_BUILDS[@]} -gt 0 ]; then
+  echo ""
+  echo "❌ Failed (${#FAILED_BUILDS[@]}):"
+  for f in "${FAILED_BUILDS[@]}"; do
+    echo "   - $f"
+  done
+  echo ""
+  echo "⚠️  Some services failed to build. Deploy proceeded with available images."
+fi
+
 # wipe locally
 PASSWORD='' ; unset PASSWORD || true
+echo ""
 echo "🎉 All done! Deployed to: ${DEPLOY_TARGETS[*]}"

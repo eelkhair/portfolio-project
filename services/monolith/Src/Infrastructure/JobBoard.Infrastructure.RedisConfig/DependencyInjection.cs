@@ -17,7 +17,13 @@ public static class DependencyInjection
     {
         var redisConnection = builder.Configuration["Redis:ConnectionString"] ?? DefaultRedisConnection;
         var configDb = int.TryParse(builder.Configuration["Redis:ConfigDb"], out var db) ? db : 1;
-        var redis = await ConnectionMultiplexer.ConnectAsync(redisConnection);
+
+        var options = ConfigurationOptions.Parse(redisConnection);
+        options.AbortOnConnectFail = false;
+        options.ConnectRetry = 5;
+        options.ConnectTimeout = 10_000;
+
+        var redis = await ConnectionMultiplexer.ConnectAsync(options);
 
         builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
 

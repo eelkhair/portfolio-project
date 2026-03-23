@@ -7,7 +7,7 @@ export const environment = {
   microserviceUrl: 'http://localhost:5262/',
   aiServiceUrl: 'http://localhost:5200/',
   otel: '/v1/traces',
-  otelZipkin: 'api/v2/spans',
+  otelZipkin: '',
   oidc: {
     authority: 'http://localhost:9999/realms/job-board-local',
     redirectUrl: 'http://localhost:4200',

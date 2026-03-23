@@ -1,7 +1,7 @@
 services:
   # ── Frontend ──────────────────────────────────────────────
   job-admin:
-    image: registry.eelkhair.net/job-admin:latest
+    image: registry.eelkhair.net/job-admin:prod
     ports:
       - "6080:80"
     restart: unless-stopped
@@ -9,7 +9,7 @@ services:
       - ai-job-board-net
 
   job-public:
-    image: registry.eelkhair.net/job-public:latest
+    image: registry.eelkhair.net/job-public:prod
     ports:
       - "6081:3000"
     restart: unless-stopped
