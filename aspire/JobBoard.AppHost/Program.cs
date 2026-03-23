@@ -82,6 +82,14 @@ var elasticsearch = builder.AddContainer("elasticsearch", "docker.elastic.co/ela
     .WithVolume("aspire-elasticsearch-data", "/usr/share/elasticsearch/data")
     .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
 
+var azurite = builder.AddContainer("azurite", "mcr.microsoft.com/azure-storage/azurite", "latest")
+    .WithLifetime(ContainerLifetime.Persistent)
+    .WithEndpoint(10000, 10000, name: "blob", isProxied: false)
+    .WithEndpoint(10001, 10001, name: "queue", isProxied: false)
+    .WithEndpoint(10002, 10002, name: "table", isProxied: false)
+    .WithVolume("aspire-azurite-data", "/data")
+    .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
+
 var grafana = builder.AddContainer("grafana", "grafana/grafana", "latest")
     .WithLifetime(ContainerLifetime.Persistent)
     .WithHttpEndpoint(3200, 3000, name: "ui", isProxied: false)
@@ -145,16 +153,17 @@ DaprSidecarOptions DaprOptions(string appId, params string[] extraPaths)
 // Monolith
 // ---------------------------------------------------------------------------
 
-const string otelEndpoint = "http://localhost:4327";
+const string collectorEndpoint = "http://localhost:4327";
 
 var monolith = builder.AddProject<Projects.JobBoard_API>("monolith-api")
     .WithEnvironment("ASPIRE_MODE", "true")
-    .WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", otelEndpoint)
+    .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
     .WaitFor(sqlServer)
     .WaitFor(redis)
     .WaitFor(rabbitMq);
 
 var monolithMcp = builder.AddProject<Projects.JobBoard_API_Mcp>("monolith-mcp")
+    .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
     .WaitFor(monolith);
 
 // ---------------------------------------------------------------------------
@@ -162,7 +171,7 @@ var monolithMcp = builder.AddProject<Projects.JobBoard_API_Mcp>("monolith-mcp")
 // ---------------------------------------------------------------------------
 
 var gateway = builder.AddProject<Projects.Gateway_Api>("gateway")
-    .WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", otelEndpoint)
+    .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
     .WaitFor(monolith);
 
 // ---------------------------------------------------------------------------
@@ -186,45 +195,46 @@ var jobPublic = builder.AddNpmApp("job-public", "../../apps/job-public", "start"
 if (useDapr)
 {
     var aiService = builder.AddProject<Projects.JobBoard_AI_API>("ai-service-v2")
-        .WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", otelEndpoint)
+        .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
         .WithDaprSidecar(DaprOptions("ai-service-v2", "./DaprComponents/ai-service-v2"))
         .WaitFor(postgres)
         .WaitFor(redis)
         .WaitFor(rabbitMq);
 
     var adminApi = builder.AddProject<Projects.AdminApi_Service>("admin-api")
-        .WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", otelEndpoint)
+        .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
         .WithDaprSidecar(DaprOptions("admin-api"))
         .WaitFor(rabbitMq);
 
     var adminMcp = builder.AddProject<Projects.AdminApi_Mcp>("admin-api-mcp")
+        .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
         .WaitFor(adminApi);
 
     var companyApi = builder.AddProject<Projects.CompanyApi_Service>("company-api")
-        .WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", otelEndpoint)
+        .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
         .WithDaprSidecar(DaprOptions("company-api"))
         .WaitFor(sqlServer)
         .WaitFor(rabbitMq);
 
     var jobApi = builder.AddProject<Projects.JobApi_Service>("job-api")
-        .WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", otelEndpoint)
+        .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
         .WithDaprSidecar(DaprOptions("job-api"))
         .WaitFor(sqlServer)
         .WaitFor(rabbitMq);
 
     var userApi = builder.AddProject<Projects.UserApi_Service>("user-api")
-        .WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", otelEndpoint)
+        .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
         .WithDaprSidecar(DaprOptions("user-api", "./DaprComponents/user-api"))
         .WaitFor(sqlServer)
         .WaitFor(rabbitMq);
 
     var connectorApi = builder.AddProject<Projects.connector_api>("connector-api")
-        .WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", otelEndpoint)
+        .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
         .WithDaprSidecar(DaprOptions("connector-api"))
         .WaitFor(rabbitMq);
 
     var reverseConnectorApi = builder.AddProject<Projects.reverse_connector_api>("reverse-connector-api")
-        .WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", otelEndpoint)
+        .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
         .WithDaprSidecar(DaprOptions("reverse-connector-api"))
         .WaitFor(rabbitMq);
 

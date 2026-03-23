@@ -40,7 +40,9 @@ builder.Services.AddSingleton(new BlobServiceClient(blobConnectionString));
 builder.Services.AddMcpToolProviders(builder.Configuration);
 
 var app = builder.Build();
-await app.MigrateDatabase<AiDbContext>();
+
+if (app.Environment.IsDevelopment())
+    await app.MigrateDatabase<AiDbContext>();
 app.UseConfiguredSwagger(builder.Configuration)
     .UseApplicationServices()
     .Start();

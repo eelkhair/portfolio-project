@@ -1,12 +1,12 @@
 {
   "/v1/traces": {
-    "target": "http://localhost:4318",
+    "target": "http://localhost:4328",
     "secure": false,
     "changeOrigin": true,
     "logLevel": "debug"
   },
-  "/api/v2/spans": {
-    "target": "http://localhost:9411",
+  "/api": {
+    "target": "http://localhost:5238",
     "secure": false,
     "changeOrigin": true,
     "logLevel": "debug"

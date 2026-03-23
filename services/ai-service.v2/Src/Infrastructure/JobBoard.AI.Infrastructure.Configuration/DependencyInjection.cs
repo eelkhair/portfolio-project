@@ -16,7 +16,7 @@ public static class DependencyInjection
         services.AddScoped<ISettingsService, SettingsService>();
         services.AddSingleton<IRedisStore, RedisConfigurationStore>();
         services.AddSingleton<IConnectionMultiplexer>(_ =>
-            ConnectionMultiplexer.Connect(configuration["Redis:Host"] ?? "192.168.1.160:6379")
+            ConnectionMultiplexer.Connect(configuration["Redis:ConnectionString"] ?? "127.0.0.1:6379")
         );
         services.AddSingleton<IBlobStorageService, BlobStorageService>();
         return services;

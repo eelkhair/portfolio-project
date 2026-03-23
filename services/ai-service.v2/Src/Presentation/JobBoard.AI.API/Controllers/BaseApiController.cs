@@ -123,6 +123,13 @@ public abstract class BaseApiController : ControllerBase
 
     private IActionResult HandleException(Exception exception)
     {
+        if (exception is not (ValidationException or UnauthorizedAccessException
+            or ForbiddenAccessException or NotFoundException))
+        {
+            var logger = HttpContext.RequestServices.GetRequiredService<ILogger<BaseApiController>>();
+            logger.LogError(exception, "Unhandled exception in {Action}", HttpContext.Request.Path);
+        }
+
         return exception switch
         {
             ValidationException vex => BadRequest(
@@ -151,11 +158,10 @@ public abstract class BaseApiController : ControllerBase
             _ => StatusCode(
                 500,
                 ApiResponse.Fail<object>(
-                    "An unexpected error occurred.",
+                    exception.Message,
                     HttpStatusCode.InternalServerError
                 )
             )
         };
-
     }
 }
