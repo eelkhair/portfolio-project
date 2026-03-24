@@ -19,6 +19,7 @@ using JobBoard.Infrastructure.RedisConfig;
 using JobBoard.Infrastructure.Smtp;
 using JobBoard.Infrastructure.Vault;
 using Elkhair.Common.Persistence;
+using JobBoard.Infrastructure.Configuration;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,8 +40,10 @@ if (isTesting)
 }
 else if (isAspire)
 {
-    builder.ConfigureLogging("monolith-api");
-    builder.Services.AddHealthChecks();
+    (await builder.AddRedisConfiguration("monolith-api", TimeSpan.FromSeconds(5)))
+        .ConfigureLogging("monolith-api")
+        .AddCustomHealthChecks();
+    builder.Services.AddAppConfigurationServices();
     builder.Services.AddMassTransitMessaging(builder.Configuration);
     builder.Services.AddAiServiceHttpClient(builder.Configuration);
 }

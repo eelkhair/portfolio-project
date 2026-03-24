@@ -22,10 +22,10 @@ public sealed class McpToolProvider(
     {
         try
         {
-            var client = GetOrCreateClientAsync().GetAwaiter().GetResult();
+            var client = Task.Run(() => GetOrCreateClientAsync()).GetAwaiter().GetResult();
             if (client is null) return [];
 
-            var tools = client.ListToolsAsync().GetAwaiter().GetResult();
+            var tools = Task.Run(async () => await client.ListToolsAsync()).GetAwaiter().GetResult();
             logger.LogInformation("Loaded {Count} tools from MCP server {Server}",
                 tools.Count, serverName);
             return tools;
@@ -52,7 +52,7 @@ public sealed class McpToolProvider(
             {
                 InnerHandler = new HttpClientHandler()
             };
-            var httpClient = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(5) };
+            var httpClient = new HttpClient(handler) { Timeout = Timeout.InfiniteTimeSpan };
             _client = await McpClient.CreateAsync(
                 new HttpClientTransport(
                     new HttpClientTransportOptions

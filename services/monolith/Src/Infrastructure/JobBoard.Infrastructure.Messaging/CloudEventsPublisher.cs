@@ -39,7 +39,7 @@ public sealed class CloudEventsPublisher : IAsyncDisposable
             exchange: exchange,
             type: ExchangeType.Fanout,
             durable: false,
-            autoDelete: false,
+            autoDelete: true,
             cancellationToken: ct);
 
         var cloudEvent = new Dictionary<string, object>

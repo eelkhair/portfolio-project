@@ -52,10 +52,11 @@ export class RealtimeNotificationsService {
   async start() {
     if (this.hub || this.starting) return; // idempotent
     this.starting = true;
-    const baseUrl = this.featureFlagService.isMonolith()
+    const baseUrl = this.currentTopology === 'monolith'
       ? environment.monolithUrl
       : environment.microserviceUrl;
     const hubUrl = `${baseUrl}hubs/notifications`;
+    console.log('[SignalR] start() called, topology:', this.currentTopology, 'hubUrl:', hubUrl);
     this.hub = new signalR.HubConnectionBuilder()
       .withUrl(hubUrl, {
         accessTokenFactory: async () =>
@@ -66,6 +67,7 @@ export class RealtimeNotificationsService {
       .build();
 
     this.hub.on('featureFlagsUpdated', (msg: {flags: FeatureFlagsDto})=>{
+      console.log('[SignalR] featureFlagsUpdated received:', msg.flags);
       this.featureFlagService.setFlags(msg.flags);
     });
     this.hub.on('CompanyActivated', (msg: CompanyActivatedMsg) => {
@@ -124,12 +126,14 @@ export class RealtimeNotificationsService {
     });
 
     try {
+      console.log('[SignalR] Connecting to', hubUrl, '...');
       await this.hub.start();
       this.connected.set(true);
+      console.log('[SignalR] Connected successfully');
     } catch (err) {
       this.connected.set(false);
       this.notify.warn('Realtime offline', 'Could not connect to notifications hub.');
-      console.error(err);
+      console.error('[SignalR] Connection failed:', err);
     } finally {
       this.starting = false;
     }

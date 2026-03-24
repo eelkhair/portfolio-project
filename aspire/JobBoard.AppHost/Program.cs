@@ -32,6 +32,13 @@ var redis = builder.AddContainer("redis", "redis", "8.2")
     .WithEndpoint(6379, 6379, name: "tcp", isProxied: false)
     .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
 
+var redisSeed = builder.AddContainer("redis-seed", "redis", "8.2")
+    .WithBindMount("./RedisInit/seed.sh", "/seed.sh", isReadOnly: true)
+    .WithEntrypoint("/bin/sh")
+    .WithArgs("/seed.sh")
+    .WaitFor(redis)
+    .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
+
 var redisCommander = builder.AddContainer("redis-commander", "rediscommander/redis-commander")
     .WithLifetime(ContainerLifetime.Persistent)
     .WithHttpEndpoint(8081, 8081, name: "ui", isProxied: false)
@@ -155,15 +162,41 @@ DaprSidecarOptions DaprOptions(string appId, params string[] extraPaths)
 
 const string collectorEndpoint = "http://localhost:4327";
 
+// Connection strings — passed as env vars so they're available before Dapr sidecar starts
+const string sqlServerConn = "Server=127.0.0.1,11433;Database=JobBoard;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=true";
+const string microSqlConn = "Server=127.0.0.1,11433;Database=local-job-board;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=true";
+const string postgresConn = "Host=127.0.0.1;Port=5432;Database=AiEmbeddings;Username=postgres;Password=postgres";
+const string redisConn = "localhost:6379";
+const string rabbitMqConn = "amqp://guest:guest@localhost:5672";
+const string internalApiKey = "aspire-local-dev-key";
+
+// Keycloak — must be available at startup before Dapr vault loads
+const string keycloakAuthority = "http://localhost:9999/realms/job-board-local";
+const string keycloakAudience = "jobboard-api";
+const string keycloakSwaggerClientId = "angular-admin";
+
 var monolith = builder.AddProject<Projects.JobBoard_API>("monolith-api")
     .WithEnvironment("ASPIRE_MODE", "true")
     .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
+    .WithEnvironment("ConnectionStrings__Monolith", sqlServerConn)
+    .WithEnvironment("Redis__ConnectionString", redisConn)
+    .WithEnvironment("RabbitMQ__Host", rabbitMqConn)
+    .WithEnvironment("InternalApiKey", internalApiKey)
+    .WithEnvironment("Keycloak__Authority", keycloakAuthority)
+    .WithEnvironment("Keycloak__Audience", keycloakAudience)
+    .WithEnvironment("Keycloak__SwaggerClientId", keycloakSwaggerClientId)
     .WaitFor(sqlServer)
     .WaitFor(redis)
     .WaitFor(rabbitMq);
 
 var monolithMcp = builder.AddProject<Projects.JobBoard_API_Mcp>("monolith-mcp")
+    .WithEnvironment("ASPIRE_MODE", "true")
     .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
+    .WithEnvironment("ConnectionStrings__Monolith", sqlServerConn)
+    .WithEnvironment("Redis__ConnectionString", redisConn)
+    .WithEnvironment("RabbitMQ__Host", rabbitMqConn)
+    .WithEnvironment("Keycloak__Authority", keycloakAuthority)
+    .WithEnvironment("Keycloak__Audience", keycloakAudience)
     .WaitFor(monolith);
 
 // ---------------------------------------------------------------------------
@@ -172,6 +205,7 @@ var monolithMcp = builder.AddProject<Projects.JobBoard_API_Mcp>("monolith-mcp")
 
 var gateway = builder.AddProject<Projects.Gateway_Api>("gateway")
     .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
+    .WithEnvironment("ConnectionStrings__Redis", redisConn)
     .WaitFor(monolith);
 
 // ---------------------------------------------------------------------------
@@ -196,34 +230,59 @@ if (useDapr)
 {
     var aiService = builder.AddProject<Projects.JobBoard_AI_API>("ai-service-v2")
         .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
+        .WithEnvironment("McpServer__IntegrationUrl", monolithMcp.GetEndpoint("http"))
+        .WithEnvironment("ConnectionStrings__ai-db", postgresConn)
+        .WithEnvironment("ConnectionStrings__Monolith", sqlServerConn)
+        .WithEnvironment("Redis__ConnectionString", redisConn)
+        .WithEnvironment("InternalApiKey", internalApiKey)
+        .WithEnvironment("Keycloak__Authority", keycloakAuthority)
+        .WithEnvironment("Keycloak__Audience", keycloakAudience)
+        .WithEnvironment("AIProvider", "openai")
+        .WithEnvironment("AIModel", "gpt-4.1-mini")
+        .WithEnvironment("OpenAI__ApiKey", builder.Configuration["OpenAI:ApiKey"] ?? "")
         .WithDaprSidecar(DaprOptions("ai-service-v2", "./DaprComponents/ai-service-v2"))
         .WaitFor(postgres)
         .WaitFor(redis)
-        .WaitFor(rabbitMq);
+        .WaitFor(rabbitMq)
+        .WaitFor(monolithMcp);
 
     var adminApi = builder.AddProject<Projects.AdminApi_Service>("admin-api")
         .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
+        .WithEnvironment("ConnectionStrings__AdminDbContext", microSqlConn)
+        .WithEnvironment("Keycloak__Authority", keycloakAuthority)
+        .WithEnvironment("Keycloak__Audience", keycloakAudience)
         .WithDaprSidecar(DaprOptions("admin-api"))
         .WaitFor(rabbitMq);
 
     var adminMcp = builder.AddProject<Projects.AdminApi_Mcp>("admin-api-mcp")
+        .WithEnvironment("ASPIRE_MODE", "true")
         .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
+        .WithEnvironment("Keycloak__Authority", keycloakAuthority)
+        .WithEnvironment("Keycloak__Audience", keycloakAudience)
+        .WithDaprSidecar(DaprOptions("admin-api-mcp"))
         .WaitFor(adminApi);
+
+    aiService
+        .WithEnvironment("McpServer__MicroUrl", adminMcp.GetEndpoint("http"))
+        .WaitFor(adminMcp);
 
     var companyApi = builder.AddProject<Projects.CompanyApi_Service>("company-api")
         .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
+        .WithEnvironment("ConnectionStrings__CompanyDbContext", microSqlConn)
         .WithDaprSidecar(DaprOptions("company-api"))
         .WaitFor(sqlServer)
         .WaitFor(rabbitMq);
 
     var jobApi = builder.AddProject<Projects.JobApi_Service>("job-api")
         .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
+        .WithEnvironment("ConnectionStrings__JobDbContext", microSqlConn)
         .WithDaprSidecar(DaprOptions("job-api"))
         .WaitFor(sqlServer)
         .WaitFor(rabbitMq);
 
     var userApi = builder.AddProject<Projects.UserApi_Service>("user-api")
         .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
+        .WithEnvironment("ConnectionStrings__UserDbContext", microSqlConn)
         .WithDaprSidecar(DaprOptions("user-api", "./DaprComponents/user-api"))
         .WaitFor(sqlServer)
         .WaitFor(rabbitMq);

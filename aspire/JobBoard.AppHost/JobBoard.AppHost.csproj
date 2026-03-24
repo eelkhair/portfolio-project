@@ -48,6 +48,7 @@
     <Content Include="DaprComponents\**\*" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="KeycloakRealm\**\*" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="OtelCollector\**\*" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="RedisInit\**\*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

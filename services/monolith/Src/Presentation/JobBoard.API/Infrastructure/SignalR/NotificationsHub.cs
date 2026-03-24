@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using JobBoard.Application.Interfaces.Configurations;
 using Microsoft.AspNetCore.SignalR;
 
 namespace JobBoard.API.Infrastructure.SignalR;
@@ -8,7 +9,7 @@ namespace JobBoard.API.Infrastructure.SignalR;
 /// This hub manages user connections and group memberships
 /// for delivering personalized notifications.
 /// </summary>
-public class NotificationsHub(ActivitySource activitySource) : Hub
+public class NotificationsHub(ActivitySource activitySource, IFeatureFlagService featureFlagService) : Hub
 {
     /// <summary>
     /// Handles the event triggered when a client establishes a connection to the SignalR hub.
@@ -27,7 +28,11 @@ public class NotificationsHub(ActivitySource activitySource) : Hub
         act?.SetTag("enduser.id", userId);
         if (!string.IsNullOrWhiteSpace(userId))
             await Groups.AddToGroupAsync(Context.ConnectionId, userId);
-        
+
+        // Send current feature flags to the connecting client
+        var flags = await featureFlagService.GetAllFeaturesAsync();
+        await Clients.Caller.SendAsync("featureFlagsUpdated", new { flags });
+
         await base.OnConnectedAsync();
     }
 }

@@ -11,6 +11,7 @@ public class UserTokenForwardingHandler : DelegatingHandler
         CancellationToken cancellationToken)
     {
         var token = McpRequestContext.CurrentToken;
+        Console.WriteLine($"[MCP-Auth] Forwarding token to {request.RequestUri}: {(string.IsNullOrEmpty(token) ? "NO TOKEN" : $"Bearer {token[..20]}...")}");
         if (!string.IsNullOrEmpty(token))
         {
             request.Headers.TryAddWithoutValidation("X-Forwarded-Authorization", token);

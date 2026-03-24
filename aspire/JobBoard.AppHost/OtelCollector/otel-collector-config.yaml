@@ -33,13 +33,9 @@ exporters:
     endpoint: jaeger:4317
     tls:
       insecure: true
-  otlp/aspire:
-    endpoint: host.docker.internal:18889
-    tls:
-      insecure: true
 service:
   pipelines:
     traces:
       receivers: [otlp]
       processors: [filter/dapr, batch]
-      exporters: [otlp/jaeger, otlp/aspire]
+      exporters: [otlp/jaeger]

@@ -2,6 +2,7 @@ import {inject, Injectable, signal} from '@angular/core';
 import {ChatService} from '../../core/services/chat.service';
 import {marked} from 'marked';
 import {Observable, tap} from 'rxjs';
+import {environment} from '../../../environments/environment';
 
 export interface ChatMessage {
   role: 'user' | 'assistant';
@@ -26,6 +27,8 @@ export class ChatStore {
   readonly conversationId = signal<string | undefined>(undefined);
   readonly showJaeger = signal(localStorage.getItem(ChatStore.JAEGER_KEY) === 'true');
   readonly jaegerNotification = signal<string | null>(null);
+  readonly grafanaUrl = signal(environment.grafanaUrl);
+  readonly jaegerUrl = signal(environment.jaegerUrl);
 
   send(text: string): Observable<void> {
     this.messages.update(msgs => [...msgs, {role: 'user', content: text, time: this.formatTime()}]);
