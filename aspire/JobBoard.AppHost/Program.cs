@@ -173,6 +173,9 @@ const string internalApiKey = "aspire-local-dev-key";
 // Keycloak — must be available at startup before Dapr vault loads
 const string keycloakAuthority = "http://localhost:9999/realms/job-board-local";
 const string keycloakAudience = "jobboard-api";
+const string keycloakTokenUrl = "http://localhost:9999/realms/job-board-local/protocol/openid-connect/token";
+const string keycloakServiceClientId = "dapr-service-client";
+const string keycloakServiceClientSecret = "Yr4ou0lgnZA1ugdxodFWfvttxcr4dupr";
 const string keycloakSwaggerClientId = "angular-admin";
 
 var monolith = builder.AddProject<Projects.JobBoard_API>("monolith-api")
@@ -237,8 +240,9 @@ if (useDapr)
         .WithEnvironment("InternalApiKey", internalApiKey)
         .WithEnvironment("Keycloak__Authority", keycloakAuthority)
         .WithEnvironment("Keycloak__Audience", keycloakAudience)
-        .WithEnvironment("AIProvider", "openai")
-        .WithEnvironment("AIModel", "gpt-4.1-mini")
+        .WithEnvironment("AIProvider", "anthropic")
+        .WithEnvironment("AIModel", "claude-sonnet-4-20250514")
+        .WithEnvironment("AI__CLAUDE_API_KEY", builder.Configuration["AI:CLAUDE_API_KEY"] ?? "")
         .WithEnvironment("OpenAI__ApiKey", builder.Configuration["OpenAI:ApiKey"] ?? "")
         .WithDaprSidecar(DaprOptions("ai-service-v2", "./DaprComponents/ai-service-v2"))
         .WaitFor(postgres)
@@ -269,6 +273,8 @@ if (useDapr)
     var companyApi = builder.AddProject<Projects.CompanyApi_Service>("company-api")
         .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
         .WithEnvironment("ConnectionStrings__CompanyDbContext", microSqlConn)
+        .WithEnvironment("Keycloak__Authority", keycloakAuthority)
+        .WithEnvironment("Keycloak__Audience", keycloakAudience)
         .WithDaprSidecar(DaprOptions("company-api"))
         .WaitFor(sqlServer)
         .WaitFor(rabbitMq);
@@ -276,6 +282,8 @@ if (useDapr)
     var jobApi = builder.AddProject<Projects.JobApi_Service>("job-api")
         .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
         .WithEnvironment("ConnectionStrings__JobDbContext", microSqlConn)
+        .WithEnvironment("Keycloak__Authority", keycloakAuthority)
+        .WithEnvironment("Keycloak__Audience", keycloakAudience)
         .WithDaprSidecar(DaprOptions("job-api"))
         .WaitFor(sqlServer)
         .WaitFor(rabbitMq);
@@ -283,17 +291,30 @@ if (useDapr)
     var userApi = builder.AddProject<Projects.UserApi_Service>("user-api")
         .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
         .WithEnvironment("ConnectionStrings__UserDbContext", microSqlConn)
+        .WithEnvironment("Keycloak__Authority", keycloakAuthority)
+        .WithEnvironment("Keycloak__Audience", keycloakAudience)
+        .WithEnvironment("Keycloak__TokenUrl", keycloakTokenUrl)
+        .WithEnvironment("Keycloak__ServiceClientId", keycloakServiceClientId)
+        .WithEnvironment("Keycloak__ServiceClientSecret", keycloakServiceClientSecret)
         .WithDaprSidecar(DaprOptions("user-api", "./DaprComponents/user-api"))
         .WaitFor(sqlServer)
         .WaitFor(rabbitMq);
 
     var connectorApi = builder.AddProject<Projects.connector_api>("connector-api")
         .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
+        .WithEnvironment("Keycloak__Authority", keycloakAuthority)
+        .WithEnvironment("Keycloak__Audience", keycloakAudience)
+        .WithEnvironment("InternalApiKey", internalApiKey)
+        .WithEnvironment("MonolithUrl", "http://localhost:5280")
         .WithDaprSidecar(DaprOptions("connector-api"))
         .WaitFor(rabbitMq);
 
     var reverseConnectorApi = builder.AddProject<Projects.reverse_connector_api>("reverse-connector-api")
         .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
+        .WithEnvironment("Keycloak__Authority", keycloakAuthority)
+        .WithEnvironment("Keycloak__Audience", keycloakAudience)
+        .WithEnvironment("InternalApiKey", internalApiKey)
+        .WithEnvironment("MonolithUrl", "http://localhost:5280")
         .WithDaprSidecar(DaprOptions("reverse-connector-api"))
         .WaitFor(rabbitMq);
 
