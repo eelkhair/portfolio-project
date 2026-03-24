@@ -67,7 +67,9 @@ app.UseMiddleware<ForwardedAuthMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.Urls.Add($"http://+:3334");
+var isAspire = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ASPIRE_MODE"));
+if (!isAspire)
+    app.Urls.Add("http://+:3334");
 app.MapMcp();
 app.MapCustomHealthChecks("/healthzEndpoint", "/liveness", UIResponseWriter.WriteHealthCheckUIResponse);
 

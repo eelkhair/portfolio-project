@@ -18,9 +18,19 @@ using ModelContextProtocol.Protocol;
 var builder = WebApplication.CreateBuilder(args);
 
 // ── Vault + Redis config ────────────────────────────────────────────────
-builder.AddVaultSecrets("monolith");
-(await builder.AddRedisConfiguration("monolith-mcp", TimeSpan.FromSeconds(5)))
-    .ConfigureLogging("monolith-mcp");
+var isAspire = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ASPIRE_MODE"));
+
+if (isAspire)
+{
+    (await builder.AddRedisConfiguration("monolith-mcp", TimeSpan.FromSeconds(5)))
+        .ConfigureLogging("monolith-mcp");
+}
+else
+{
+    builder.AddVaultSecrets("monolith");
+    (await builder.AddRedisConfiguration("monolith-mcp", TimeSpan.FromSeconds(5)))
+        .ConfigureLogging("monolith-mcp");
+}
 
 // ── Infrastructure services (same as API, minus OData/Swagger/SignalR) ──
 builder.Services
@@ -82,7 +92,8 @@ app.UseCors();
 app.UseMiddleware<ForwardedAuthMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
-app.Urls.Add($"http://+:3333");
+if (!isAspire)
+    app.Urls.Add("http://+:3333");
 app.MapMcp();
 app.MapCustomHealthChecks("/healthzEndpoint", "/liveness", UIResponseWriter.WriteHealthCheckUIResponse);
 

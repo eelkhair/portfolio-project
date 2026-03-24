@@ -187,7 +187,17 @@
       "Bash(\"/c/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/Extensions/Microsoft/SQLDB/DAC/SqlPackage.exe\" /Action:Import /SourceFile:\"C:\\\\Users\\\\elkha\\\\OneDrive\\\\Documents\\\\SQL Server Management Studio\\\\Backup Files\\\\local-job-board.bacpac\" /TargetServerName:\"127.0.0.1,11433\" /TargetDatabaseName:\"local-job-board\" /TargetUser:sa /TargetPassword:\"YourStrong!Passw0rd\" /TargetTrustServerCertificate:true)",
       "Bash(sqlcmd -S 127.0.0.1,11433 -U sa -P \"YourStrong!Passw0rd\" -C -Q \"SELECT name FROM sys.databases WHERE name NOT IN \\(''master'',''tempdb'',''model'',''msdb''\\)\")",
       "Bash(sqlcmd -S \"127.0.0.1,11433\" -U sa -P 'YourStrong!Passw0rd' -C -No -Q \"SELECT name FROM sys.databases WHERE name NOT IN \\(''master'',''tempdb'',''model'',''msdb''\\)\")",
-      "Bash(sqlcmd -S \"127.0.0.1,11433\" -U sa -P 'YourStrong!Passw0rd' -C -Q \"SELECT name FROM sys.databases WHERE name NOT IN \\(''master'',''tempdb'',''model'',''msdb''\\)\")"
+      "Bash(sqlcmd -S \"127.0.0.1,11433\" -U sa -P 'YourStrong!Passw0rd' -C -Q \"SELECT name FROM sys.databases WHERE name NOT IN \\(''master'',''tempdb'',''model'',''msdb''\\)\")",
+      "Bash(MSYS_NO_PATHCONV=1 docker exec sqlserver-1eb50dfa /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong!Passw0rd' -C -Q \"SELECT name FROM sys.databases\")",
+      "Bash(MSYS_NO_PATHCONV=1 docker exec sqlserver-1eb50dfa /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"YourStrong!Passw0rd\" -C -Q \"SELECT name FROM sys.databases\" -No)",
+      "Bash(MSYS_NO_PATHCONV=1 docker exec sqlserver-1eb50dfa /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"YourStrong!Passw0rd\" -d JobBoard -C -Q \"SELECT InternalId, ExternalId, Email FROM [User].[Users] WHERE Email = ''admin@eelkhair.net''\" -No)",
+      "Bash(MSYS_NO_PATHCONV=1 docker exec sqlserver-1eb50dfa /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong!Passw0rd' -d JobBoard -C -No -Q \"SELECT InternalId, ExternalId, Email FROM [User].[Users] WHERE Email = ''admin@eelkhair.net''\")",
+      "Bash(MSYS_NO_PATHCONV=1 docker exec sqlserver-1eb50dfa /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"YourStrong!Passw0rd\" -C -No -Q \"USE JobBoard; SELECT InternalId, ExternalId, Email FROM [User].[Users] WHERE Email = ''admin@eelkhair.net''\")",
+      "Bash(MSYS_NO_PATHCONV=1 docker exec sqlserver-1eb50dfa /opt/mssql-tools18/bin/sqlcmd -S 127.0.0.1 -U sa -P \"YourStrong!Passw0rd\" -C -No -Q \"SELECT 1\")",
+      "Bash(MSYS_NO_PATHCONV=1 docker exec sqlserver-1eb50dfa /opt/mssql-tools18/bin/sqlcmd -S 127.0.0.1 -U sa -P \"YourStrong!Passw0rd\" -C -No -Q \"USE JobBoard; SELECT InternalId, ExternalId, Email FROM [User].[Users] WHERE Email = ''admin@eelkhair.net''\")",
+      "Bash(MSYS_NO_PATHCONV=1 docker exec sqlserver-1eb50dfa /opt/mssql-tools18/bin/sqlcmd -S 127.0.0.1 -U sa -P \"YourStrong!Passw0rd\" -C -No -Q \"USE JobBoard SELECT 1\")",
+      "Bash(MSYS_NO_PATHCONV=1 docker exec sqlserver-1eb50dfa /opt/mssql-tools18/bin/sqlcmd -S 127.0.0.1 -U sa -P \"YourStrong!Passw0rd\" -C -No -Q \"USE JobBoard SELECT InternalId, ExternalId, Email FROM [User].[Users] WHERE Email = ''admin@eelkhair.net''\")",
+      "Bash(MSYS_NO_PATHCONV=1 docker exec sqlserver-1eb50dfa /opt/mssql-tools18/bin/sqlcmd -S 127.0.0.1 -U sa -P \"YourStrong!Passw0rd\" -C -No -Q \"SELECT InternalId, ExternalId, Email FROM JobBoard.[User].[Users]\")"
     ]
   }
 }

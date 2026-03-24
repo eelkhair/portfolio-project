@@ -41,7 +41,10 @@ export class CompanyStore {
       );
     });
     effect(()=>{
-      if(this.featureFlagService.featureFlags()&& this.initial){
+      const flags = this.featureFlagService.featureFlags();
+      console.log('[CompanyStore] effect fired, flags:', flags, 'initial:', this.initial);
+      if(flags && this.initial){
+        console.log('[CompanyStore] Loading companies and industries...');
         this.loadIndustries().subscribe();
         this.loadCompanies().subscribe();
         this.initial=false;

@@ -35,14 +35,14 @@
             @if (store.showJaeger() && msg.traceId) {
               <div class="trace-links">
                 <a class="trace-link grafana"
-                   [href]="'https://grafana.eelkhair.net/d/bf5m5dwukfncwd/find-by-trace-id?orgId=1&var-TraceId=' + msg.traceId"
+                   [href]="store.grafanaUrl() + msg.traceId"
                    target="_blank"
                    rel="noopener"
                    title="View trace in Grafana">
                   <i class="pi pi-external-link"></i> <span class="trace-label">view in grafana</span>
                 </a>
                 <a class="trace-link"
-                   [href]="'https://jaeger.eelkhair.net/trace/' + msg.traceId"
+                   [href]="store.jaegerUrl() + msg.traceId"
                    target="_blank"
                    rel="noopener"
                    title="View trace in Jaeger">
