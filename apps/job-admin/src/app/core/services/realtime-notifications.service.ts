@@ -29,7 +29,7 @@ export class RealtimeNotificationsService {
   private currentTopology: 'monolith' | 'micro' | null = null;
 
   constructor() {
-    // Bootstrap: connect to monolith hub to receive initial feature flags.
+    // Bootstrap: connect to monolith hub first to receive initial feature flags.
     // Once flags arrive, the effect reconnects to the correct topology-specific hub.
     this.currentTopology = 'monolith';
     void this.start();
@@ -45,9 +45,13 @@ export class RealtimeNotificationsService {
 
       this.currentTopology = topology;
 
-      void this.stop();
-      void this.start();
+      void this.reconnect();
     })
+  }
+
+  private async reconnect() {
+    await this.stop();
+    await this.start();
   }
   async start() {
     if (this.hub || this.starting) return; // idempotent
