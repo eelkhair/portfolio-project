@@ -197,7 +197,11 @@
       "Bash(MSYS_NO_PATHCONV=1 docker exec sqlserver-1eb50dfa /opt/mssql-tools18/bin/sqlcmd -S 127.0.0.1 -U sa -P \"YourStrong!Passw0rd\" -C -No -Q \"USE JobBoard; SELECT InternalId, ExternalId, Email FROM [User].[Users] WHERE Email = ''admin@eelkhair.net''\")",
       "Bash(MSYS_NO_PATHCONV=1 docker exec sqlserver-1eb50dfa /opt/mssql-tools18/bin/sqlcmd -S 127.0.0.1 -U sa -P \"YourStrong!Passw0rd\" -C -No -Q \"USE JobBoard SELECT 1\")",
       "Bash(MSYS_NO_PATHCONV=1 docker exec sqlserver-1eb50dfa /opt/mssql-tools18/bin/sqlcmd -S 127.0.0.1 -U sa -P \"YourStrong!Passw0rd\" -C -No -Q \"USE JobBoard SELECT InternalId, ExternalId, Email FROM [User].[Users] WHERE Email = ''admin@eelkhair.net''\")",
-      "Bash(MSYS_NO_PATHCONV=1 docker exec sqlserver-1eb50dfa /opt/mssql-tools18/bin/sqlcmd -S 127.0.0.1 -U sa -P \"YourStrong!Passw0rd\" -C -No -Q \"SELECT InternalId, ExternalId, Email FROM JobBoard.[User].[Users]\")"
+      "Bash(MSYS_NO_PATHCONV=1 docker exec sqlserver-1eb50dfa /opt/mssql-tools18/bin/sqlcmd -S 127.0.0.1 -U sa -P \"YourStrong!Passw0rd\" -C -No -Q \"SELECT InternalId, ExternalId, Email FROM JobBoard.[User].[Users]\")",
+      "Bash(MSYS_NO_PATHCONV=1 curl -s http://localhost:61912/v1.0/metadata)",
+      "Bash(curl -s \"http://localhost:16686/api/traces/837a3ec557cdf02d3011711f025e2ef3\")",
+      "Bash(curl -s \"http://localhost:16686/api/traces/d2b8fdcdfe53eabf9d18a89300de811c\")",
+      "Bash(curl -s \"http://localhost:16686/api/traces/8fd84cd36de7b3f9efe6ee349db4d95d\")"
     ]
   }
 }
