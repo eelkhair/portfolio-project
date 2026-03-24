@@ -30,6 +30,7 @@ ADR Index: [`docs/ADRs`](./ADRs)
 - [Observability](#observability)
 - [Health checks](#health-checks)
 - [Running locally](#running-locally)
+- [Further reading](#further-reading)
 - [Architecture Decision Records](#architecture-decision-records)
 - [Screenshots](#screenshots)
 - [Roadmap](#roadmap)
@@ -277,7 +278,13 @@ The entire platform can be launched with a single command via the Aspire AppHost
 dotnet run --project aspire/JobBoard.AppHost/JobBoard.AppHost.csproj
 ```
 
-This orchestrates all services, Dapr sidecars, infrastructure containers (SQL Server, PostgreSQL, Redis, RabbitMQ, Keycloak), and the observability stack.
+This orchestrates all 36 resources — services, Dapr sidecars, infrastructure containers, and the observability stack:
+
+![Aspire Dashboard — 36 resources](./Images/Aspire/aspire-dashboard-resources.png)
+
+![Aspire Dashboard — topology graph](./Images/Aspire/aspire-dashboard-graph.png)
+
+See also: [`local-environment.md`](./local-environment.md) | [ADR-020](./ADRs/ADR-020-Aspire-Local-Orchestration.md)
 
 ### With Docker Compose
 
@@ -316,6 +323,19 @@ Rationale: [ADR-002](./ADRs/ADR-002-Dapr-Usage-Boundaries.md)
 
 ---
 
+## Further reading
+
+| Document | Description |
+|----------|-------------|
+| [`local-environment.md`](./local-environment.md) | Local development setup, Aspire orchestration, configuration sources, Azure mapping |
+| [`ai-service.md`](./ai-service.md) | AI service architecture: chat flow, multi-provider LLM, MCP integration, resume pipeline (RAG) |
+| [`observability.md`](./observability.md) | Distributed tracing, log correlation, Grafana/Jaeger workflows |
+| [`strangler-fig.md`](./strangler-fig.md) | Strangler-fig migration strategy, saga flow, stage diagrams |
+| [`health-checks.md`](./health-checks.md) | Health check dashboard, dependency monitoring |
+| [`screenshots.md`](./screenshots.md) | Curated UI and infrastructure screenshots |
+
+---
+
 ## Architecture Decision Records
 
 All significant architectural decisions are documented as ADRs:
@@ -339,6 +359,7 @@ All significant architectural decisions are documented as ADRs:
 - [ADR-017 -- IntegrationEvents Shared NuGet Package](./ADRs/ADR-017-IntegrationEvents-Shared-NuGet-Package.md)
 - [ADR-018 -- Docker Deployment Topology](./ADRs/ADR-018-Docker-Deployment-Topology.md)
 - [ADR-019 -- EF Core Dual-ID Sequence Generation](./ADRs/ADR-019-EF-Core-Dual-ID-Sequence-Generation.md)
+- [ADR-020 -- Aspire Local Orchestration](./ADRs/ADR-020-Aspire-Local-Orchestration.md)
 
 ---
 

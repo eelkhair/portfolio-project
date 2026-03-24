@@ -4,6 +4,24 @@ This repository includes **curated screenshots** to make the architecture and op
 
 ---
 
+## Aspire Local Orchestration
+
+### Resource dashboard (36 resources)
+
+The Aspire dashboard provides a unified view of all services, Dapr sidecars, infrastructure containers, and observability tools — launched with a single command.
+
+![Aspire Dashboard — 36 resources](Images/Aspire/aspire-dashboard-resources.png)
+
+---
+
+### Topology graph
+
+Visual representation of the full distributed system, showing service dependencies and communication paths.
+
+![Aspire Dashboard — topology graph](Images/Aspire/aspire-dashboard-graph.png)
+
+---
+
 ## Observability
 
 ### TraceId exposed in the browser

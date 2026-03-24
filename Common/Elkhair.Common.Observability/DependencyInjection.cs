@@ -132,8 +132,11 @@ public static class DependencyInjection
         IConfiguration configuration,
         string environment)
     {
-        return new ElasticsearchSinkOptions(
-            new Uri(configuration["ElasticConfiguration:Uri"] ?? "http://localhost:9200"))
+        var elasticUri = configuration["ElasticConfiguration:Uri"];
+        if (string.IsNullOrWhiteSpace(elasticUri) || !Uri.TryCreate(elasticUri, UriKind.Absolute, out _))
+            elasticUri = "http://localhost:9200";
+
+        return new ElasticsearchSinkOptions(new Uri(elasticUri))
         {
             AutoRegisterTemplate = true,
             IndexFormat =
