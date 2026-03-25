@@ -20,6 +20,13 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Compile Remove="Gateway.Tests\**" />
+        <Content Remove="Gateway.Tests\**" />
+        <EmbeddedResource Remove="Gateway.Tests\**" />
+        <None Remove="Gateway.Tests\**" />
+    </ItemGroup>
+
+    <ItemGroup>
         <Content Include="..\..\.dockerignore">
             <Link>.dockerignore</Link>
         </Content>

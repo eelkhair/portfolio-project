@@ -7,6 +7,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <InternalsVisibleTo Include="JobBoard.AI.Tests" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="DocumentFormat.OpenXml" Version="3.4.1" />
         <PackageReference Include="Microsoft.Extensions.AI" Version="10.3.0" />
         <PackageReference Include="Elkhair.Dev.Common" Version="1.0.22" />
