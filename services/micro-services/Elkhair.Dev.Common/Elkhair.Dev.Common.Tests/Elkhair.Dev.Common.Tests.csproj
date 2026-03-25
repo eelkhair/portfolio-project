@@ -15,7 +15,7 @@
         <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2"/>
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\Elkhair.Dev.Common\Elkhair.Dev.Common.csproj"/>
+        <ProjectReference Include="..\Elkhair.Dev.Common.csproj"/>
     </ItemGroup>
     <ItemGroup>
         <Using Include="Xunit"/>

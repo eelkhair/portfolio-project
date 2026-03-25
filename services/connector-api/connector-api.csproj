@@ -11,6 +11,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Remove="connector-api.tests\**" />
+        <Content Remove="connector-api.tests\**" />
+        <EmbeddedResource Remove="connector-api.tests\**" />
+        <None Remove="connector-api.tests\**" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="Dapr.AspNetCore" Version="1.16.1" />
         <PackageReference Include="Dapr.Extensions.Configuration" Version="1.16.1" />
         <PackageReference Include="Elkhair.Common.Observability" Version="1.0.7" />

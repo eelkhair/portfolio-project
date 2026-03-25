@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\connector-api\connector-api.csproj"/>
+        <ProjectReference Include="..\connector-api.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

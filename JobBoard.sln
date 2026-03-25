@@ -299,7 +299,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{5AD6106A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.Monolith.Tests", "services\monolith\Tests\JobBoard.Monolith.Tests\JobBoard.Monolith.Tests.csproj", "{A6D5F20C-842E-4229-A99F-06EC2B286183}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "connector-api.tests", "services\connector-api.tests\connector-api.tests.csproj", "{17881808-7925-42BF-A455-4428F26F0D62}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "connector-api.tests", "services\connector-api\connector-api.tests\connector-api.tests.csproj", "{17881808-7925-42BF-A455-4428F26F0D62}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.Infrastructure.BlobStorage", "services\monolith\Src\Infrastructure\JobBoard.Infrastructure.BlobStorage\JobBoard.Infrastructure.BlobStorage.csproj", "{23F13913-0615-4AA5-8152-DF2CB8B3D1E8}"
 EndProject
@@ -394,7 +394,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{FFF3B366
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.AI.Tests", "services\ai-service.v2\Tests\JobBoard.AI.Tests\JobBoard.AI.Tests.csproj", "{404D60C9-3DC1-4314-8459-CB717A19C18E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elkhair.Dev.Common.Tests", "services\micro-services\Elkhair.Dev.Common.Tests\Elkhair.Dev.Common.Tests.csproj", "{1CE63983-C24B-41FE-8A4A-CA38C37D92D4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elkhair.Dev.Common.Tests", "services\micro-services\Elkhair.Dev.Common\Elkhair.Dev.Common.Tests\Elkhair.Dev.Common.Tests.csproj", "{1CE63983-C24B-41FE-8A4A-CA38C37D92D4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1145,7 +1145,7 @@ Global
 		{AC1F8228-F38C-45D6-8B94-A18B64ABC3D6} = {13C13C26-632A-4BF0-A4B8-8A739D2AC73B}
 		{FFF3B366-FA40-6A63-7444-BD1E5A508463} = {D1513088-2D81-4516-A90E-0CC565FE9D97}
 		{404D60C9-3DC1-4314-8459-CB717A19C18E} = {FFF3B366-FA40-6A63-7444-BD1E5A508463}
-		{1CE63983-C24B-41FE-8A4A-CA38C37D92D4} = {C188C6D3-42A7-48DB-82B2-15E67325DE94}
+		{1CE63983-C24B-41FE-8A4A-CA38C37D92D4} = {55EFE0A8-3F4A-46E2-BD74-39D3D74D8B5E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A1C2D3E4-F5A6-47B8-9C0D-E1F2A3B4C5D6}

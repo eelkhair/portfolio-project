@@ -11,6 +11,14 @@
         <Description>Shared components for any project</Description>
         <IsPackable>true</IsPackable>
     </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Remove="Elkhair.Dev.Common.Tests\**" />
+        <Content Remove="Elkhair.Dev.Common.Tests\**" />
+        <EmbeddedResource Remove="Elkhair.Dev.Common.Tests\**" />
+        <None Remove="Elkhair.Dev.Common.Tests\**" />
+    </ItemGroup>
+
     <ItemGroup>
         <PackageReference Include="Dapr.Client" Version="1.15.4" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.7" />

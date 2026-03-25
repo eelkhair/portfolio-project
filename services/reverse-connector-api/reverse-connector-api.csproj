@@ -9,6 +9,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Remove="reverse-connector-api.tests\**" />
+        <Content Remove="reverse-connector-api.tests\**" />
+        <EmbeddedResource Remove="reverse-connector-api.tests\**" />
+        <None Remove="reverse-connector-api.tests\**" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
         <PackageReference Include="Dapr.AspNetCore" Version="1.16.1" />
         <PackageReference Include="Dapr.Extensions.Configuration" Version="1.16.1" />
