@@ -17,6 +17,8 @@ spec:
       value: "http://127.0.0.1"
     - name: durable
       value: "false"
+    - name: deletedWhenUnused
+      value: "false"
     - name: autoAck
       value: "false"
     - name: enableDeadLetter

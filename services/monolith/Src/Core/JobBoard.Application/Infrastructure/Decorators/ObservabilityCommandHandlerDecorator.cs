@@ -18,7 +18,7 @@ public class ObservabilityCommandHandlerDecorator<TRequest, TResult>(
 {
     public async Task<TResult> HandleAsync(TRequest request, CancellationToken cancellationToken)
     {
-       
+
         var requestType = typeof(TRequest).Name;
         Activity.Current?.SetTag("cqrs.request", requestType);
         Activity.Current?.SetTag("userId", userAccessor.UserId);
@@ -35,11 +35,15 @@ public class ObservabilityCommandHandlerDecorator<TRequest, TResult>(
                 logger.LogInformation("Executing query {Request}...", requestType);
             }
         }
+
+        var sw = Stopwatch.StartNew();
         try
         {
             var result = await innerHandler.HandleAsync(request, cancellationToken);
+            sw.Stop();
             metricsService.IncrementCommandSuccess(requestType);
-            
+            metricsService.RecordCommandDuration(requestType, sw.Elapsed.TotalMilliseconds);
+
             if (typeof(TRequest).Name == "ProcessOutboxMessageCommand") return result;
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
             if (request is BaseCommand<TResult>)
@@ -55,15 +59,19 @@ public class ObservabilityCommandHandlerDecorator<TRequest, TResult>(
         }
         catch (ValidationException)
         {
+            sw.Stop();
+            metricsService.RecordCommandDuration(requestType, sw.Elapsed.TotalMilliseconds);
             throw;
         }
         catch (Exception ex)
         {
+            sw.Stop();
             logger.LogError(ex, "An unexpected failure occurred while executing command {Request}", requestType);
             Activity.Current?.AddException(ex);
             Activity.Current?.SetStatus(ActivityStatusCode.Error, ex.Message);
 
             metricsService.IncrementCommandFailure(requestType);
+            metricsService.RecordCommandDuration(requestType, sw.Elapsed.TotalMilliseconds);
             throw;
         }
     }

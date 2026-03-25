@@ -27,7 +27,8 @@ public class ProcessResumeUploadedCommandHandler(
     IBlobStorageService blobStorage,
     IMonolithApiClient monolithClient,
     IChatService chatService,
-    IActivityFactory activityFactory) : BaseCommandHandler(context),
+    IActivityFactory activityFactory,
+    IMetricsService metricsService) : BaseCommandHandler(context),
     IHandler<ProcessResumeUploadedCommand, Unit>
 {
     private const string ResumeContainer = "resumes";
@@ -36,6 +37,7 @@ public class ProcessResumeUploadedCommandHandler(
     {
         using var activity = activityFactory.StartActivity(
             "ProcessResumeUploadedCommandHandler.HandleAsync", ActivityKind.Internal);
+        var sw = Stopwatch.StartNew();
 
         var eventData = request.Event.Data;
         activity?.SetTag("resume.uid", eventData.ResumeUId);
@@ -117,10 +119,15 @@ public class ProcessResumeUploadedCommandHandler(
                 CurrentPage = eventData.CurrentPage
             }, cancellationToken);
 
+            sw.Stop();
+            metricsService.RecordResumeParseDuration(sw.Elapsed.TotalMilliseconds);
+
             Logger.LogInformation("Resume {ResumeUId} all sections parsed successfully", eventData.ResumeUId);
         }
         catch (Exception ex)
         {
+            sw.Stop();
+            metricsService.RecordResumeParseDuration(sw.Elapsed.TotalMilliseconds);
             Logger.LogError(ex, "Failed to process resume {ResumeUId}", eventData.ResumeUId);
 
             try

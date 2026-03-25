@@ -22,7 +22,8 @@ public class ChatService(
     IConversationContext conversationContext,
     IUserAccessor userAccessor,
     IConfiguration configuration,
-    IServiceProvider serviceProvider)
+    IServiceProvider serviceProvider,
+    IMetricsService metricsService)
     : IChatService
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -38,6 +39,8 @@ public class ChatService(
         CancellationToken cancellationToken)
     {
         var client = new FunctionInvokingChatClient(GetClient());
+        var provider = configuration["AIProvider"]?.ToLowerInvariant() ?? "unknown";
+        var scopeName = scope.ToString();
 
         var messages = new List<ChatMessage>()
         {
@@ -51,6 +54,9 @@ public class ChatService(
 
         messages.Add(new(ChatRole.User, userMessage));
 
+        metricsService.IncrementChatRequest(scopeName, provider);
+        var sw = Stopwatch.StartNew();
+
         McpCtx.CurrentToken = userAccessor.Token;
         Microsoft.Extensions.AI.ChatResponse response;
         try
@@ -63,6 +69,8 @@ public class ChatService(
         finally
         {
             McpCtx.CurrentToken = null;
+            sw.Stop();
+            metricsService.RecordChatRequestDuration(scopeName, provider, sw.Elapsed.TotalMilliseconds);
         }
 
         Activity.Current?.SetTag("ai.response.length", response.Text.Length);
@@ -70,6 +78,23 @@ public class ChatService(
         Activity.Current?.SetTag("ai.tokens.input", response.Usage?.InputTokenCount ?? 0);
         Activity.Current?.SetTag("ai.tokens.output", response.Usage?.OutputTokenCount ?? 0);
         Activity.Current?.SetTag("ai.conversationId", conversationContext.ConversationId);
+
+        // Record token usage metrics
+        if (response.Usage is not null)
+        {
+            metricsService.RecordTokenUsage(scopeName, provider,
+                response.Usage.InputTokenCount ?? 0,
+                response.Usage.OutputTokenCount ?? 0);
+        }
+
+        // Count tool calls in the response
+        foreach (var msg in response.Messages)
+        {
+            foreach (var content in msg.Contents.OfType<FunctionCallContent>())
+            {
+                metricsService.IncrementToolCall(scopeName, content.Name ?? "unknown");
+            }
+        }
 
         messages.AddMessages(response);
         messages = messages.TakeLast(40).ToList();

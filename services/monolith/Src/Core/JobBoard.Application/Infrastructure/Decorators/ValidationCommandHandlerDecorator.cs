@@ -8,6 +8,7 @@ namespace JobBoard.Application.Infrastructure.Decorators;
 public class ValidationCommandHandlerDecorator<TRequest, TResult>(
     IHandler<TRequest, TResult> decorated,
     IActivityFactory activityFactory,
+    IMetricsService metricsService,
     IValidator<TRequest>? validator = null)
     : IHandler<TRequest, TResult>
     where TRequest : IRequest<TResult>
@@ -26,10 +27,11 @@ public class ValidationCommandHandlerDecorator<TRequest, TResult>(
                 if (!validationResult.IsValid)
                 {
                     activity?.SetStatus(ActivityStatusCode.Error);
+                    metricsService.IncrementValidationFailure(typeof(TRequest).Name);
                     throw new ValidationException(validationResult.Errors);
                 }
         }
-     
+
         return await decorated.HandleAsync(request, cancellationToken);
     }
 }

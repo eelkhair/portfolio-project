@@ -70,6 +70,7 @@ var otelCollector = builder.AddContainer("otel-collector", "otel/opentelemetry-c
     .WithLifetime(ContainerLifetime.Persistent)
     .WithEndpoint(4327, 4317, name: "otlp-grpc", isProxied: false)
     .WithEndpoint(4328, 4318, name: "otlp-http", isProxied: false)
+    .WithEndpoint(8889, 8889, name: "prometheus", isProxied: false)
     .WithBindMount("./OtelCollector/otel-collector-config.yaml", "/etc/otelcol-contrib/config.yaml", isReadOnly: true)
     .WaitFor(jaeger)
     .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
@@ -97,11 +98,23 @@ var azurite = builder.AddContainer("azurite", "mcr.microsoft.com/azure-storage/a
     .WithVolume("aspire-azurite-data", "/data")
     .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
 
+var prometheus = builder.AddContainer("prometheus", "prom/prometheus", "latest")
+    .WithLifetime(ContainerLifetime.Persistent)
+    .WithHttpEndpoint(9090, 9090, name: "ui", isProxied: false)
+    .WithBindMount("./PrometheusConfig/prometheus.yml", "/etc/prometheus/prometheus.yml", isReadOnly: true)
+    .WithVolume("aspire-prometheus-data", "/prometheus")
+    .WaitFor(otelCollector)
+    .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
+
 var grafana = builder.AddContainer("grafana", "grafana/grafana", "latest")
     .WithLifetime(ContainerLifetime.Persistent)
     .WithHttpEndpoint(3200, 3000, name: "ui", isProxied: false)
     .WithEnvironment("GF_SECURITY_ADMIN_PASSWORD", "admin")
     .WithVolume("aspire-grafana-data", "/var/lib/grafana")
+    .WithBindMount("./GrafanaProvisioning/datasources", "/etc/grafana/provisioning/datasources", isReadOnly: true)
+    .WithBindMount("./GrafanaProvisioning/dashboards", "/etc/grafana/provisioning/dashboards", isReadOnly: true)
+    .WithBindMount("./GrafanaDashboards", "/var/lib/grafana/dashboards", isReadOnly: true)
+    .WaitFor(prometheus)
     .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
 
 var useDapr = builder.Configuration.GetValue("USE_DAPR", true);
@@ -321,7 +334,8 @@ if (useDapr)
     gateway.WaitFor(adminApi).WaitFor(aiService);
 
     // Dapr Dashboard (requires dapr CLI)
-    builder.AddExecutable("dapr-dashboard", "dapr", ".", "dashboard", "-p", "8888");
+    builder.AddExecutable("dapr-dashboard", "dapr", ".", "dashboard", "-p", "8888")
+        .WithHttpEndpoint(8888, isProxied: false);
 }
 
 // ---------------------------------------------------------------------------

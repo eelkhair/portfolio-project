@@ -27,12 +27,14 @@ public class EmbedResumeCommandHandler(
     IAiDbContext dbContext,
     IEmbeddingService embeddingService,
     IActivityFactory activityFactory,
-    IServiceScopeFactory serviceScopeFactory) : BaseCommandHandler(context),
+    IServiceScopeFactory serviceScopeFactory,
+    IMetricsService metricsService) : BaseCommandHandler(context),
     IHandler<EmbedResumeCommand, Unit>
 {
     public async Task<Unit> HandleAsync(EmbedResumeCommand request, CancellationToken cancellationToken)
     {
         using var activity = activityFactory.StartActivity("EmbedResumeCommandHandler.HandleAsync", ActivityKind.Internal);
+        var sw = Stopwatch.StartNew();
 
         var resumeUId = request.Event.Data.ResumeUId;
         activity?.SetTag("resume.uid", resumeUId);
@@ -114,6 +116,9 @@ public class EmbedResumeCommandHandler(
             ResumeUId = resumeUId,
             UserId = request.Event.UserId
         }, cancellationToken);
+
+        sw.Stop();
+        metricsService.RecordEmbeddingDuration(sw.Elapsed.TotalMilliseconds);
 
         // Fire-and-forget: pre-compute match explanations for top matching jobs
         _ = Task.Run(async () =>

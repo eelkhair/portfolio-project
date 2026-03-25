@@ -1,5 +1,5 @@
 services:
-  # ── Frontend ──────────────────────────────────────────────
+  # -- Frontend ----------------------------------------------
   job-admin:
     image: registry.eelkhair.net/job-admin:prod
     ports:
@@ -16,7 +16,7 @@ services:
     networks:
       - ai-job-board-net
 
-  # ── Gateway ───────────────────────────────────────────────
+  # -- Gateway -----------------------------------------------
   gateway:
     image: registry.eelkhair.net/gateway:latest
     ports:
@@ -25,10 +25,12 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - VAULT_ADDR=${VAULT_ADDR}
       - VAULT_TOKEN=${VAULT_TOKEN}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
+      - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=prod
     networks:
       - ai-job-board-net
 
-  # ── AI Services ──────────────────────────────────────────
+  # -- AI Services ------------------------------------------
   ai-service:
     image: registry.eelkhair.net/ai-service:latest
     container_name: ai-service
@@ -67,6 +69,8 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - McpServer__IntegrationUrl=http://monolith-mcp:3333
       - McpServer__MicroUrl=http://admin-api-mcp:3334
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
+      - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=prod
     networks:
       - ai-job-board-net
 
@@ -90,7 +94,7 @@ services:
       "-config", "./Dapr/Config/config.yaml"
     ]
 
-  # ── Monolith ─────────────────────────────────────────────
+  # -- Monolith ---------------------------------------------
   monolith-api:
     image: registry.eelkhair.net/monolith-api:latest
     ports:
@@ -99,6 +103,8 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - VAULT_ADDR=${VAULT_ADDR}
       - VAULT_TOKEN=${VAULT_TOKEN}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
+      - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=prod
     networks:
       - ai-job-board-net
 
@@ -111,10 +117,12 @@ services:
       - ASPNETCORE_URLS=http://+:3333
       - VAULT_ADDR=${VAULT_ADDR}
       - VAULT_TOKEN=${VAULT_TOKEN}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
+      - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=prod
     networks:
       - ai-job-board-net
 
-  # ── Microservices ────────────────────────────────────────
+  # -- Microservices ----------------------------------------
   admin-api:
     build:
       context: ../services/admin-api/
@@ -123,6 +131,8 @@ services:
       - "6062:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
+      - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=prod
     networks:
       - ai-job-board-net
 
@@ -152,6 +162,8 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:3334
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
+      - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=prod
     networks:
       - ai-job-board-net
 
@@ -182,6 +194,8 @@ services:
       - "6072:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
+      - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=prod
     networks:
       - ai-job-board-net
 
@@ -211,6 +225,8 @@ services:
       - "6084:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
+      - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=prod
     networks:
       - ai-job-board-net
 
@@ -241,6 +257,8 @@ services:
       - "6092:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
+      - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=prod
     networks:
       - ai-job-board-net
 
@@ -264,13 +282,15 @@ services:
       "-config", "./Dapr/Config/config.yaml"
     ]
 
-  # ── Connectors ───────────────────────────────────────────
+  # -- Connectors -------------------------------------------
   connector-api:
     image: registry.eelkhair.net/connector-api:latest
     ports:
       - "5284:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
+      - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=prod
     networks:
       - ai-job-board-net
 
@@ -300,6 +320,8 @@ services:
       - "5285:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
+      - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=prod
     networks:
       - ai-job-board-net
 
@@ -323,7 +345,7 @@ services:
       "-config", "./Dapr/Config/config.yaml"
     ]
 
-  # ── Infrastructure ───────────────────────────────────────
+  # -- Infrastructure ---------------------------------------
   dapr-dashboard:
     image: "daprio/dashboard:latest"
     command: [
