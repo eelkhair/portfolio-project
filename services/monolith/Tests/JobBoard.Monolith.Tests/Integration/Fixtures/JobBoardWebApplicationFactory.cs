@@ -32,6 +32,9 @@ public class JobBoardWebApplicationFactory : WebApplicationFactory<Program>
     {
         // Must be set before the host is created so Program.cs sees Testing environment
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Testing");
+        // Connection string must be available as env var because Program.cs reads it
+        // during service registration, before ConfigureAppConfiguration callbacks run
+        Environment.SetEnvironmentVariable("ConnectionStrings__Monolith", dbFixture.ConnectionString);
         _dbFixture = dbFixture;
     }
 
