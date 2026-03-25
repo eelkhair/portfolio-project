@@ -1,0 +1,59 @@
+# ============================================================================
+# Observability Stack — runs on dev tools server (192.168.1.115)
+# Prometheus + OTel Collector (central receiver)
+#
+# Grafana (grafana.eelkhair.net) already exists on this server —
+# just add Prometheus as a datasource pointing to http://prometheus:9090
+#
+# Usage:
+#   docker compose -f docker-compose.observability.yml up -d
+# ============================================================================
+
+services:
+  # --------------------------------------------------------------------------
+  # Central Prometheus — stores metrics from all environments
+  # --------------------------------------------------------------------------
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/rules:/etc/prometheus/rules:ro
+      - prometheus-data:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=30d
+      - --storage.tsdb.retention.size=10GB
+      - --web.enable-lifecycle          # allows POST /-/reload for config changes
+      - --web.enable-remote-write-receiver  # allows remote-write from other Prometheus instances
+    networks:
+      - observability
+
+  # --------------------------------------------------------------------------
+  # Central OTel Collector — receives OTLP from dev & prod environments
+  # Adds environment label, exports to local Prometheus
+  # --------------------------------------------------------------------------
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: otel-collector
+    restart: unless-stopped
+    ports:
+      - "4317:4317"   # gRPC — services push OTLP here
+      - "4318:4318"   # HTTP  — services push OTLP here
+      - "8889:8889"   # Prometheus scrape endpoint
+    volumes:
+      - ./otel-collector/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml:ro
+    networks:
+      - observability
+
+volumes:
+  prometheus-data:
+
+networks:
+  observability:
+    name: observability
+    # If Grafana is already on a docker network, connect this one externally:
+    # external: true

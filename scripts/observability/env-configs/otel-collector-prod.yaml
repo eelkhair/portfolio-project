@@ -1,0 +1,50 @@
+# ============================================================================
+# OTel Collector — runs on PROD server
+# Receives OTLP from local services, forwards to central collector on 115
+# ============================================================================
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    send_batch_size: 512
+    timeout: 5s
+
+  # Tag all telemetry with environment=prod
+  resource/env:
+    attributes:
+      - key: deployment.environment
+        value: prod
+        action: upsert
+
+  # Filter Dapr noise locally before forwarding
+  filter/dapr:
+    error_mode: ignore
+    traces:
+      span:
+        - 'IsMatch(name, "/dapr.proto.runtime.v1.Dapr/.*")'
+        - 'IsMatch(name, "/v1\\.0/configuration/.*")'
+        - 'IsMatch(name, "/v1\\.0/secrets/.*")'
+        - 'IsMatch(name, "/v1\\.0/state/.*")'
+
+exporters:
+  # Forward everything to central collector on dev tools server
+  otlphttp/central:
+    endpoint: http://192.168.1.115:4318
+
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      processors: [resource/env, batch]
+      exporters: [otlphttp/central]
+    traces:
+      receivers: [otlp]
+      processors: [resource/env, filter/dapr, batch]
+      exporters: [otlphttp/central]

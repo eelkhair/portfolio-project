@@ -1,0 +1,60 @@
+# ============================================================================
+# Central OTel Collector — receives OTLP from dev & prod environments
+#
+# The environment label comes from the service's OTel resource attributes:
+#   OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
+#   OTEL_RESOURCE_ATTRIBUTES=deployment.environment=prod
+#
+# resource_to_telemetry_conversion promotes resource attributes (like
+# deployment.environment) to metric labels so Grafana can filter by env.
+# ============================================================================
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    send_batch_size: 1024
+    timeout: 5s
+
+  # Filter out noisy Dapr internal spans
+  filter/dapr:
+    error_mode: ignore
+    traces:
+      span:
+        - 'IsMatch(name, "/dapr.proto.runtime.v1.Dapr/.*")'
+        - 'IsMatch(name, "/v1\\.0/configuration/.*")'
+        - 'IsMatch(name, "/v1\\.0/secrets/.*")'
+        - 'IsMatch(name, "/v1\\.0/state/.*")'
+        - 'IsMatch(name, "/v1\\.0/publish/.*/healthCheckTopic")'
+        - 'attributes["user_agent.original"] != nil and IsMatch(attributes["user_agent.original"], "Uptime-Kuma.*")'
+
+exporters:
+  # Prometheus exporter — scraped by local Prometheus
+  prometheus:
+    endpoint: 0.0.0.0:8889
+    metric_expiration: 10m
+    resource_to_telemetry_conversion:
+      enabled: true    # promotes deployment_environment, service_name etc. to labels
+
+  # Forward traces to Jaeger (if running on the same server)
+  otlp/jaeger:
+    endpoint: 192.168.1.160:4317
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [prometheus]
+    traces:
+      receivers: [otlp]
+      processors: [filter/dapr, batch]
+      exporters: [otlp/jaeger]
