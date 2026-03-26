@@ -284,6 +284,8 @@ This orchestrates all 36 resources — services, Dapr sidecars, infrastructure c
 
 ![Aspire Dashboard — topology graph](./Images/Aspire/aspire-dashboard-graph.png)
 
+> **Known issue — cold start:** On the very first launch (when persistent containers don't exist yet), Dapr sidecars may fail because Redis/RabbitMQ containers aren't fully accepting connections before the sidecar tries to connect. Health checks on Redis and RabbitMQ mitigate this, but may not fully eliminate the race on cold start. **Workaround:** restart the AppHost — persistent containers are already running on the second launch and subsequent starts are instant.
+
 See also: [`local-environment.md`](./local-environment.md) | [ADR-020](./ADRs/ADR-020-Aspire-Local-Orchestration.md)
 
 ### With Docker Compose

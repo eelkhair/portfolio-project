@@ -64,10 +64,18 @@ public static class DependencyInjection
             m.AddMeter(AppMetrics.Meter.Name)
              .AddAspNetCoreInstrumentation()
              .AddHttpClientInstrumentation()
-             .AddOtlpExporter(exporter =>
+             .AddOtlpExporter("primary", exporter =>
              {
                  exporter.Endpoint = new Uri(primaryEndpoint);
              });
+
+            if (!string.IsNullOrEmpty(collectorEndpoint))
+            {
+                m.AddOtlpExporter("collector", exporter =>
+                {
+                    exporter.Endpoint = new Uri(collectorEndpoint);
+                });
+            }
         });
 
         return services;

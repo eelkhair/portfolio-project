@@ -30,7 +30,7 @@ export class AiRealtimeService {
     if (this.hub || this.starting) return;
     this.starting = true;
 
-    const hubUrl = `${environment.aiServiceUrl}hubs/notifications`;
+    const hubUrl = `${environment.gatewayUrl}ai/v2/hubs/notifications`;
 
     this.hub = new signalR.HubConnectionBuilder()
       .withUrl(hubUrl, {

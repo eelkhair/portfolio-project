@@ -19,6 +19,7 @@ builder.AddVaultSecrets("gateway");
 
 var app = builder.Build();
 
+app.UseWebSockets();
 app.UseMiddleware<TraceIdMiddleware>();
 app.UseMiddleware<RoutingMiddleware>();
 app.UseRouting();

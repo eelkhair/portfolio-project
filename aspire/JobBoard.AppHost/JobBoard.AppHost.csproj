@@ -10,7 +10,12 @@
 
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.NodeJs" Version="9.5.2" />
-    <PackageReference Include="CommunityToolkit.Aspire.Hosting.Dapr" Version="13.0.0" />
+    <PackageReference Include="CommunityToolkit.Aspire.Hosting.Dapr" Version="13.2.1-beta.532" />
+    <PackageReference Include="Aspire.Hosting.SqlServer" Version="13.2.0" />
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.2.0" />
+    <PackageReference Include="Aspire.Hosting.Redis" Version="13.2.0" />
+    <PackageReference Include="Aspire.Hosting.RabbitMQ" Version="13.2.0" />
+    <PackageReference Include="Aspire.Hosting.Keycloak" Version="13.2.0-preview.1.26170.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,6 +46,9 @@
 
   <ItemGroup>
     <Content Include="DaprComponents\**\*" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="KeycloakRealm\**\*" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="OtelCollector\**\*" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="RedisInit\**\*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
