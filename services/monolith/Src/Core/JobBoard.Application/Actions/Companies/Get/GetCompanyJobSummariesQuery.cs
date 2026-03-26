@@ -23,7 +23,7 @@ public class JobSummaryItemDto
     public DateTime CreatedAt { get; set; }
 }
 
-public class GetCompanyJobSummariesQuery : BaseQuery<IQueryable<CompanyJobSummaryDto>>;
+public class GetCompanyJobSummariesQuery : BaseQuery<IQueryable<CompanyJobSummaryDto>>, IAnonymousRequest;
 
 public class GetCompanyJobSummariesQueryHandler(IJobBoardQueryDbContext context, ILogger<GetCompanyJobSummariesQueryHandler> logger)
     : BaseQueryHandler(context, logger), IHandler<GetCompanyJobSummariesQuery, IQueryable<CompanyJobSummaryDto>>

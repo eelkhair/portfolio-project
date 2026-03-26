@@ -121,6 +121,7 @@ public class ProcessResumeUploadedCommandHandler(
 
             sw.Stop();
             metricsService.RecordResumeParseDuration(sw.Elapsed.TotalMilliseconds);
+            metricsService.IncrementResumesParsed();
 
             Logger.LogInformation("Resume {ResumeUId} all sections parsed successfully", eventData.ResumeUId);
         }
@@ -128,6 +129,7 @@ public class ProcessResumeUploadedCommandHandler(
         {
             sw.Stop();
             metricsService.RecordResumeParseDuration(sw.Elapsed.TotalMilliseconds);
+            metricsService.IncrementResumeParseFailed();
             Logger.LogError(ex, "Failed to process resume {ResumeUId}", eventData.ResumeUId);
 
             try

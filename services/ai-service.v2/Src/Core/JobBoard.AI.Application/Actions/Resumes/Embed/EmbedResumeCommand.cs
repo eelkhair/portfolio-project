@@ -119,6 +119,7 @@ public class EmbedResumeCommandHandler(
 
         sw.Stop();
         metricsService.RecordEmbeddingDuration(sw.Elapsed.TotalMilliseconds);
+        metricsService.IncrementEmbeddingsGenerated();
 
         // Fire-and-forget: pre-compute match explanations for top matching jobs
         _ = Task.Run(async () =>

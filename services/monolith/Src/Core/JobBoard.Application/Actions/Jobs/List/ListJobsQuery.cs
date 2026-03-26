@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace JobBoard.Application.Actions.Jobs.List;
 
-public class ListJobsQuery(Guid companyUId) : BaseQuery<IQueryable<JobResponse>>
+public class ListJobsQuery(Guid companyUId) : BaseQuery<IQueryable<JobResponse>>, IAnonymousRequest
 {
     public Guid CompanyUId { get; } = companyUId;
 }

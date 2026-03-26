@@ -33,70 +33,89 @@
   "panels": [
     {
       "id": 1,
-      "title": "HTTP Request Rate",
+      "title": "HTTP Requests Over Time",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
-          "expr": "sum(rate(http_server_request_count_total{deployment_environment=~\"$environment\"}[1m])) by (http_route, http_request_method)",
-          "legendFormat": "{{http_request_method}} {{http_route}}"
+          "expr": "sum(increase(http_server_request_duration_seconds_count{deployment_environment=~\"$environment\"}[1m])) by (http_request_method)",
+          "legendFormat": "{{http_request_method}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "reqps",
-          "custom": { "drawStyle": "line", "fillOpacity": 10 }
+          "unit": "short",
+          "custom": { "drawStyle": "bars", "fillOpacity": 50, "stacking": { "mode": "normal" } }
         }
       }
     },
     {
       "id": 2,
-      "title": "HTTP Latency (p50 / p95 / p99)",
-      "type": "timeseries",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "title": "Total HTTP Requests",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 0 },
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
-          "expr": "histogram_quantile(0.50, sum(rate(http_server_request_duration_bucket{deployment_environment=~\"$environment\",deployment_environment=~\"$environment\"}[5m])) by (le))",
-          "legendFormat": "p50"
-        },
-        {
-          "expr": "histogram_quantile(0.95, sum(rate(http_server_request_duration_bucket{deployment_environment=~\"$environment\",deployment_environment=~\"$environment\"}[5m])) by (le))",
-          "legendFormat": "p95"
-        },
-        {
-          "expr": "histogram_quantile(0.99, sum(rate(http_server_request_duration_bucket{deployment_environment=~\"$environment\",deployment_environment=~\"$environment\"}[5m])) by (le))",
-          "legendFormat": "p99"
+          "expr": "sum(http_server_request_duration_seconds_count{deployment_environment=~\"$environment\"})",
+          "legendFormat": "requests"
         }
       ],
       "fieldConfig": {
-        "defaults": {
-          "unit": "ms",
-          "custom": { "drawStyle": "line", "fillOpacity": 5 }
-        }
+        "defaults": { "unit": "short" }
       }
     },
     {
       "id": 3,
-      "title": "HTTP Error Rate (4xx / 5xx)",
-      "type": "timeseries",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "title": "HTTP Errors (total)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 3, "x": 18, "y": 0 },
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
-          "expr": "sum(rate(http_server_request_count_total{deployment_environment=~\"$environment\",http_response_status_code=~\"4..\"}[1m]))",
+          "expr": "sum(http_server_request_duration_seconds_count{deployment_environment=~\"$environment\",http_response_status_code=~\"4..\"}) or vector(0)",
           "legendFormat": "4xx"
         },
         {
-          "expr": "sum(rate(http_server_request_count_total{deployment_environment=~\"$environment\",http_response_status_code=~\"5..\"}[1m]))",
+          "expr": "sum(http_server_request_duration_seconds_count{deployment_environment=~\"$environment\",http_response_status_code=~\"5..\"}) or vector(0)",
           "legendFormat": "5xx"
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "reqps",
-          "custom": { "drawStyle": "line", "fillOpacity": 15 }
+          "unit": "short",
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 1 },
+              { "color": "red", "value": 10 }
+            ]
+          },
+          "color": { "mode": "thresholds" }
+        }
+      }
+    },
+    {
+      "id": 11,
+      "title": "HTTP Errors Over Time",
+      "type": "timeseries",
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 4 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "expr": "sum(increase(http_server_request_duration_seconds_count{deployment_environment=~\"$environment\",http_response_status_code=~\"4..\"}[1m]))",
+          "legendFormat": "4xx"
+        },
+        {
+          "expr": "sum(increase(http_server_request_duration_seconds_count{deployment_environment=~\"$environment\",http_response_status_code=~\"5..\"}[1m]))",
+          "legendFormat": "5xx"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": { "drawStyle": "bars", "fillOpacity": 50 }
         },
         "overrides": [
           {
@@ -112,66 +131,39 @@
     },
     {
       "id": 4,
-      "title": "CQRS Command Execution Rate",
+      "title": "CQRS Commands Over Time",
       "type": "timeseries",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
-          "expr": "sum(rate(cqrs_command_success_count_total{command_name=~\"$command\"}[1m])) by (command_name)",
+          "expr": "sum(increase(cqrs_command_success_count_total{deployment_environment=~\"$environment\",command_name=~\"$command\"}[1m])) by (command_name)",
           "legendFormat": "{{command_name}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "ops",
+          "unit": "short",
           "custom": { "drawStyle": "bars", "fillOpacity": 50, "stacking": { "mode": "normal" } }
         }
       }
     },
     {
-      "id": 5,
-      "title": "CQRS Command Duration (p50 / p95 / p99)",
-      "type": "timeseries",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-      "targets": [
-        {
-          "expr": "histogram_quantile(0.50, sum(rate(cqrs_command_duration_bucket{deployment_environment=~\"$environment\",command_name=~\"$command\"}[5m])) by (le, command_name))",
-          "legendFormat": "p50 {{command_name}}"
-        },
-        {
-          "expr": "histogram_quantile(0.95, sum(rate(cqrs_command_duration_bucket{deployment_environment=~\"$environment\",command_name=~\"$command\"}[5m])) by (le, command_name))",
-          "legendFormat": "p95 {{command_name}}"
-        },
-        {
-          "expr": "histogram_quantile(0.99, sum(rate(cqrs_command_duration_bucket{deployment_environment=~\"$environment\",command_name=~\"$command\"}[5m])) by (le, command_name))",
-          "legendFormat": "p99 {{command_name}}"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "ms",
-          "custom": { "drawStyle": "line", "fillOpacity": 5 }
-        }
-      }
-    },
-    {
       "id": 6,
-      "title": "CQRS Failure Rate",
+      "title": "CQRS Failures Over Time",
       "type": "timeseries",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
-          "expr": "sum(rate(cqrs_command_failure_count_total{deployment_environment=~\"$environment\",command_name=~\"$command\"}[1m])) by (command_name)",
+          "expr": "sum(increase(cqrs_command_failure_count_total{deployment_environment=~\"$environment\",command_name=~\"$command\"}[1m])) by (command_name)",
           "legendFormat": "{{command_name}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "ops",
-          "custom": { "drawStyle": "line", "fillOpacity": 10 }
+          "unit": "short",
+          "custom": { "drawStyle": "bars", "fillOpacity": 50 }
         },
         "overrides": [
           {
@@ -183,48 +175,48 @@
     },
     {
       "id": 7,
-      "title": "Validation Failures",
+      "title": "Validation Failures Over Time",
       "type": "timeseries",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
-          "expr": "sum(rate(cqrs_validation_failure_count_total{deployment_environment=~\"$environment\"}[1m])) by (command_name)",
+          "expr": "sum(increase(cqrs_validation_failure_count_total{deployment_environment=~\"$environment\"}[1m])) by (command_name)",
           "legendFormat": "{{command_name}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "ops",
+          "unit": "short",
           "custom": { "drawStyle": "bars", "fillOpacity": 50 }
         }
       }
     },
     {
       "id": 8,
-      "title": "Outbox Messages Processed / sec",
+      "title": "Outbox Messages Processed (total)",
       "type": "stat",
-      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 24 },
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 16 },
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
-          "expr": "rate(outbox_messages_processed_count_total{deployment_environment=~\"$environment\"}[1m])",
-          "legendFormat": "processed/s"
+          "expr": "sum(outbox_messages_processed_count_total{deployment_environment=~\"$environment\"})",
+          "legendFormat": "processed"
         }
       ],
       "fieldConfig": {
-        "defaults": { "unit": "ops" }
+        "defaults": { "unit": "short" }
       }
     },
     {
       "id": 9,
       "title": "Dead-Letter Messages (total)",
       "type": "stat",
-      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 24 },
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 16 },
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
-          "expr": "deadletter_messages_found_count_total{deployment_environment=~\"$environment\"}",
+          "expr": "sum(deadletter_messages_found_count_total{deployment_environment=~\"$environment\"}) or vector(0)",
           "legendFormat": "dead letters"
         }
       ],
@@ -246,22 +238,22 @@
       "id": 10,
       "title": "Outbox Processed Over Time",
       "type": "timeseries",
-      "gridPos": { "h": 4, "w": 12, "x": 12, "y": 28 },
+      "gridPos": { "h": 4, "w": 12, "x": 12, "y": 20 },
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
-          "expr": "rate(outbox_messages_processed_count_total{deployment_environment=~\"$environment\"}[1m])",
-          "legendFormat": "processed/s"
+          "expr": "sum(increase(outbox_messages_processed_count_total{deployment_environment=~\"$environment\"}[1m]))",
+          "legendFormat": "processed"
         },
         {
-          "expr": "rate(deadletter_messages_found_count_total[1m])",
-          "legendFormat": "dead-letter/s"
+          "expr": "sum(increase(deadletter_messages_found_count_total{deployment_environment=~\"$environment\"}[1m]))",
+          "legendFormat": "dead-letter"
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "ops",
-          "custom": { "drawStyle": "line", "fillOpacity": 10 }
+          "unit": "short",
+          "custom": { "drawStyle": "bars", "fillOpacity": 50 }
         }
       }
     }

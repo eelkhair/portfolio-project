@@ -71,6 +71,21 @@ public class MetricsService : IMetricsService
         unit: "ms",
         description: "Duration of full resume parse pipeline in milliseconds.");
 
+    private readonly Counter<long> _embeddingsGeneratedCounter = AppMetrics.Meter.CreateCounter<long>(
+        name: "ai.embeddings.generated.count",
+        unit: "{embeddings}",
+        description: "Total number of embeddings generated (jobs + resumes).");
+
+    private readonly Counter<long> _resumesParsedCounter = AppMetrics.Meter.CreateCounter<long>(
+        name: "ai.resumes.parsed.count",
+        unit: "{resumes}",
+        description: "Total number of resumes parsed.");
+
+    private readonly Counter<long> _resumeParseFailedCounter = AppMetrics.Meter.CreateCounter<long>(
+        name: "ai.resumes.parse.failed.count",
+        unit: "{resumes}",
+        description: "Total number of resume parse failures.");
+
     // --- CQRS ---
     public void IncrementCommandSuccess(string commandName)
     {
@@ -132,5 +147,20 @@ public class MetricsService : IMetricsService
     public void RecordResumeParseDuration(double durationMs)
     {
         _resumeParseDurationHistogram.Record(durationMs);
+    }
+
+    public void IncrementEmbeddingsGenerated(long count = 1)
+    {
+        _embeddingsGeneratedCounter.Add(count);
+    }
+
+    public void IncrementResumesParsed(long count = 1)
+    {
+        _resumesParsedCounter.Add(count);
+    }
+
+    public void IncrementResumeParseFailed()
+    {
+        _resumeParseFailedCounter.Add(1);
     }
 }

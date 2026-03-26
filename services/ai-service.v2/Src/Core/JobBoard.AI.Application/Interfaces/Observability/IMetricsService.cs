@@ -14,4 +14,7 @@ public interface IMetricsService
     void RecordEmbeddingDuration(double durationMs);
     void RecordResumeParseDuration(double durationMs);
     void IncrementChatRequest(string scope, string provider);
+    void IncrementEmbeddingsGenerated(long count = 1);
+    void IncrementResumesParsed(long count = 1);
+    void IncrementResumeParseFailed();
 }

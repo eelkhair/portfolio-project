@@ -21,7 +21,8 @@ public class ReEmbedAllJobsCommandHandler(
     IAiDbContext dbContext,
     IMonolithApiClient monolithApiClient,
     IEmbeddingService embeddingService,
-    IActivityFactory activityFactory)
+    IActivityFactory activityFactory,
+    IMetricsService metricsService)
     : BaseCommandHandler(context),
       IHandler<ReEmbedAllJobsCommand, ReEmbedAllJobsResponse>
 {
@@ -73,6 +74,7 @@ public class ReEmbedAllJobsCommandHandler(
                 jobs.Count, company.CompanyName, company.CompanyId);
         }
 
+        metricsService.IncrementEmbeddingsGenerated(totalProcessed);
         activity?.SetTag("jobs.processed", totalProcessed);
         Logger.LogInformation("Re-embed complete: {TotalProcessed} jobs processed", totalProcessed);
 
