@@ -5,149 +5,32 @@ using Microsoft.Extensions.Configuration;
 var builder = DistributedApplication.CreateBuilder(args);
 
 // ---------------------------------------------------------------------------
-// Infrastructure (persistent containers)
+// Infrastructure is managed by JobBoard.AppHost.Infrastructure — start it
+// first and leave it running. All containers below are persistent and should
+// already be accepting connections before this AppHost launches.
 // ---------------------------------------------------------------------------
-
-const string stack = "jobboard-aspire";
-
-var sqlServer = builder.AddContainer("sqlserver", "mcr.microsoft.com/mssql/server", "2022-latest")
-    .WithLifetime(ContainerLifetime.Persistent)
-    .WithEndpoint(11433, 1433, name: "tcp", isProxied: false)
-    .WithEnvironment("ACCEPT_EULA", "Y")
-    .WithEnvironment("MSSQL_SA_PASSWORD", "YourStrong!Passw0rd")
-    .WithVolume("aspire-sqlserver-data", "/var/opt/mssql")
-    .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
-
-var postgres = builder.AddContainer("postgres", "ankane/pgvector", "latest")
-    .WithLifetime(ContainerLifetime.Persistent)
-    .WithEndpoint(5432, 5432, name: "tcp", isProxied: false)
-    .WithEnvironment("POSTGRES_USER", "postgres")
-    .WithEnvironment("POSTGRES_PASSWORD", "postgres")
-    .WithEnvironment("POSTGRES_DB", "AiEmbeddings")
-    .WithVolume("postgres-data", "/var/lib/postgresql/data")
-    .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
-
-var redis = builder.AddContainer("redis", "redis", "8.2")
-    .WithLifetime(ContainerLifetime.Persistent)
-    .WithEndpoint(6379, 6379, name: "tcp", isProxied: false)
-    .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
-
-var redisSeed = builder.AddContainer("redis-seed", "redis", "8.2")
-    .WithBindMount("./RedisInit/seed.sh", "/seed.sh", isReadOnly: true)
-    .WithEntrypoint("/bin/sh")
-    .WithArgs("/seed.sh")
-    .WaitFor(redis)
-    .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
-
-var redisCommander = builder.AddContainer("redis-commander", "rediscommander/redis-commander")
-    .WithLifetime(ContainerLifetime.Persistent)
-    .WithHttpEndpoint(8081, 8081, name: "ui", isProxied: false)
-    .WithEnvironment("REDIS_HOSTS", "local:host.docker.internal:6379")
-    .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
-
-var rabbitMq = builder.AddContainer("rabbitmq", "rabbitmq", "4.2-management")
-    .WithLifetime(ContainerLifetime.Persistent)
-    .WithEndpoint(5672, 5672, name: "amqp", isProxied: false)
-    .WithHttpEndpoint(15672, 15672, name: "management", isProxied: false)
-    .WithEnvironment("RABBITMQ_DEFAULT_USER", "guest")
-    .WithEnvironment("RABBITMQ_DEFAULT_PASS", "guest")
-    .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
-
-var keycloakPassword = builder.AddParameter("keycloak-password", "admin");
-var keycloak = builder.AddKeycloak("keycloak", 9999, adminPassword: keycloakPassword)
-    .WithDataVolume()
-    .WithLifetime(ContainerLifetime.Persistent)
-    .WithRealmImport("./KeycloakRealm")
-    .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
-
-var jaeger = builder.AddContainer("jaeger", "jaegertracing/all-in-one", "1.64.0")
-    .WithLifetime(ContainerLifetime.Persistent)
-    .WithHttpEndpoint(16686, 16686, name: "ui", isProxied: false)
-    .WithEnvironment("LOG_LEVEL", "debug")
-    .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
-
-var otelCollector = builder.AddContainer("otel-collector", "otel/opentelemetry-collector-contrib", "latest")
-    .WithLifetime(ContainerLifetime.Persistent)
-    .WithEndpoint(4327, 4317, name: "otlp-grpc", isProxied: false)
-    .WithEndpoint(4328, 4318, name: "otlp-http", isProxied: false)
-    .WithEndpoint(8889, 8889, name: "prometheus", isProxied: false)
-    .WithBindMount("./OtelCollector/otel-collector-config.yaml", "/etc/otelcol-contrib/config.yaml", isReadOnly: true)
-    .WaitFor(jaeger)
-    .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
-
-var mailpit = builder.AddContainer("mailpit", "axllent/mailpit")
-    .WithLifetime(ContainerLifetime.Persistent)
-    .WithHttpEndpoint(8025, 8025, name: "ui", isProxied: false)
-    .WithEndpoint(1025, 1025, name: "smtp", isProxied: false)
-    .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
-
-var elasticsearch = builder.AddContainer("elasticsearch", "docker.elastic.co/elasticsearch/elasticsearch", "8.17.0")
-    .WithLifetime(ContainerLifetime.Persistent)
-    .WithEndpoint(9200, 9200, name: "http", isProxied: false)
-    .WithEnvironment("discovery.type", "single-node")
-    .WithEnvironment("xpack.security.enabled", "false")
-    .WithEnvironment("ES_JAVA_OPTS", "-Xms512m -Xmx512m")
-    .WithVolume("aspire-elasticsearch-data", "/usr/share/elasticsearch/data")
-    .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
-
-var azurite = builder.AddContainer("azurite", "mcr.microsoft.com/azure-storage/azurite", "latest")
-    .WithLifetime(ContainerLifetime.Persistent)
-    .WithEndpoint(10000, 10000, name: "blob", isProxied: false)
-    .WithEndpoint(10001, 10001, name: "queue", isProxied: false)
-    .WithEndpoint(10002, 10002, name: "table", isProxied: false)
-    .WithVolume("aspire-azurite-data", "/data")
-    .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
-
-var prometheus = builder.AddContainer("prometheus", "prom/prometheus", "latest")
-    .WithLifetime(ContainerLifetime.Persistent)
-    .WithHttpEndpoint(9090, 9090, name: "ui", isProxied: false)
-    .WithBindMount("./PrometheusConfig/prometheus.yml", "/etc/prometheus/prometheus.yml", isReadOnly: true)
-    .WithVolume("aspire-prometheus-data", "/prometheus")
-    .WaitFor(otelCollector)
-    .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
-
-var grafana = builder.AddContainer("grafana", "grafana/grafana", "latest")
-    .WithLifetime(ContainerLifetime.Persistent)
-    .WithHttpEndpoint(3200, 3000, name: "ui", isProxied: false)
-    .WithEnvironment("GF_SECURITY_ADMIN_PASSWORD", "admin")
-    .WithVolume("aspire-grafana-data", "/var/lib/grafana")
-    .WithBindMount("./GrafanaProvisioning/datasources", "/etc/grafana/provisioning/datasources", isReadOnly: true)
-    .WithBindMount("./GrafanaProvisioning/dashboards", "/etc/grafana/provisioning/dashboards", isReadOnly: true)
-    .WithBindMount("./GrafanaDashboards", "/var/lib/grafana/dashboards", isReadOnly: true)
-    .WaitFor(prometheus)
-    .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
 
 var useDapr = builder.Configuration.GetValue("USE_DAPR", true);
 
-// Health check entries — core services always, Dapr-dependent services only when USE_DAPR=true
-var checks = new List<(string Name, string Uri)>
-{
-    ("Gateway",              "http://localhost:5238/healthzEndpoint"),
-    ("Monolith API",         "http://localhost:5280/healthzEndpoint"),
-    ("Monolith MCP",         "http://localhost:3333/healthzEndpoint"),
-};
+// ---------------------------------------------------------------------------
+// Connection strings
+// ---------------------------------------------------------------------------
 
-if (useDapr)
-{
-    checks.AddRange([
-        ("AI Service V2",        "http://localhost:5200/healthzEndpoint"),
-        ("Admin API",            "http://localhost:5262/healthzEndpoint"),
-        ("Company API",          "http://localhost:5272/healthzEndpoint"),
-        ("Job API",              "http://localhost:5282/healthzEndpoint"),
-        ("User API",             "http://localhost:5292/healthzEndpoint"),
-        ("Connector API",        "http://localhost:5284/healthzEndpoint"),
-        ("Reverse Connector API","http://localhost:5190/healthzEndpoint"),
-    ]);
-}
+const string collectorEndpoint = "http://localhost:4327";
+const string sqlServerConn = "Server=127.0.0.1,11433;Database=JobBoard;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=true";
+const string microSqlConn = "Server=127.0.0.1,11433;Database=local-job-board;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=true";
+const string postgresConn = "Host=127.0.0.1;Port=5432;Database=AiEmbeddings;Username=postgres;Password=postgres";
+const string redisConn = "localhost:6379";
+const string rabbitMqConn = "amqp://guest:guest@localhost:5672";
+const string internalApiKey = "aspire-local-dev-key";
 
-var healthChecks = builder.AddProject<Projects.JobBoard_WebStatus>("health-checks");
-
-for (var i = 0; i < checks.Count; i++)
-{
-    healthChecks
-        .WithEnvironment($"HealthChecksUI__HealthChecks__{i}__Name", checks[i].Name)
-        .WithEnvironment($"HealthChecksUI__HealthChecks__{i}__Uri", checks[i].Uri);
-}
+// Keycloak
+const string keycloakAuthority = "http://localhost:9999/realms/job-board-local";
+const string keycloakAudience = "jobboard-api";
+const string keycloakTokenUrl = "http://localhost:9999/realms/job-board-local/protocol/openid-connect/token";
+const string keycloakServiceClientId = "dapr-service-client";
+const string keycloakServiceClientSecret = "Yr4ou0lgnZA1ugdxodFWfvttxcr4dupr";
+const string keycloakSwaggerClientId = "angular-admin";
 
 // ---------------------------------------------------------------------------
 // Dapr
@@ -173,24 +56,6 @@ DaprSidecarOptions DaprOptions(string appId, params string[] extraPaths)
 // Monolith
 // ---------------------------------------------------------------------------
 
-const string collectorEndpoint = "http://localhost:4327";
-
-// Connection strings — passed as env vars so they're available before Dapr sidecar starts
-const string sqlServerConn = "Server=127.0.0.1,11433;Database=JobBoard;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=true";
-const string microSqlConn = "Server=127.0.0.1,11433;Database=local-job-board;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=true";
-const string postgresConn = "Host=127.0.0.1;Port=5432;Database=AiEmbeddings;Username=postgres;Password=postgres";
-const string redisConn = "localhost:6379";
-const string rabbitMqConn = "amqp://guest:guest@localhost:5672";
-const string internalApiKey = "aspire-local-dev-key";
-
-// Keycloak — must be available at startup before Dapr vault loads
-const string keycloakAuthority = "http://localhost:9999/realms/job-board-local";
-const string keycloakAudience = "jobboard-api";
-const string keycloakTokenUrl = "http://localhost:9999/realms/job-board-local/protocol/openid-connect/token";
-const string keycloakServiceClientId = "dapr-service-client";
-const string keycloakServiceClientSecret = "Yr4ou0lgnZA1ugdxodFWfvttxcr4dupr";
-const string keycloakSwaggerClientId = "angular-admin";
-
 var monolith = builder.AddProject<Projects.JobBoard_API>("monolith-api")
     .WithEnvironment("ASPIRE_MODE", "true")
     .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
@@ -200,10 +65,7 @@ var monolith = builder.AddProject<Projects.JobBoard_API>("monolith-api")
     .WithEnvironment("InternalApiKey", internalApiKey)
     .WithEnvironment("Keycloak__Authority", keycloakAuthority)
     .WithEnvironment("Keycloak__Audience", keycloakAudience)
-    .WithEnvironment("Keycloak__SwaggerClientId", keycloakSwaggerClientId)
-    .WaitFor(sqlServer)
-    .WaitFor(redis)
-    .WaitFor(rabbitMq);
+    .WithEnvironment("Keycloak__SwaggerClientId", keycloakSwaggerClientId);
 
 var monolithMcp = builder.AddProject<Projects.JobBoard_API_Mcp>("monolith-mcp")
     .WithEnvironment("ASPIRE_MODE", "true")
@@ -225,18 +87,50 @@ var gateway = builder.AddProject<Projects.Gateway_Api>("gateway")
     .WaitFor(monolith);
 
 // ---------------------------------------------------------------------------
+// Health Checks
+// ---------------------------------------------------------------------------
+
+var checks = new List<(string Name, string Uri)>
+{
+    ("Gateway",              "http://localhost:5238/healthzEndpoint"),
+    ("Monolith API",         "http://localhost:5280/healthzEndpoint"),
+    ("Monolith MCP",         "http://localhost:3333/healthzEndpoint"),
+};
+
+if (useDapr)
+{
+    checks.AddRange([
+        ("AI Service V2",        "http://localhost:5200/healthzEndpoint"),
+        ("Admin API",            "http://localhost:5262/healthzEndpoint"),
+        ("Company API",          "http://localhost:5272/healthzEndpoint"),
+        ("Job API",              "http://localhost:5282/healthzEndpoint"),
+        ("User API",             "http://localhost:5292/healthzEndpoint"),
+        ("Connector API",        "http://localhost:5284/healthzEndpoint"),
+        ("Reverse Connector API","http://localhost:5190/healthzEndpoint"),
+    ]);
+}
+
+var healthChecks = builder.AddProject<Projects.JobBoard_WebStatus>("health-checks")
+    .WaitFor(gateway);
+
+for (var i = 0; i < checks.Count; i++)
+{
+    healthChecks
+        .WithEnvironment($"HealthChecksUI__HealthChecks__{i}__Name", checks[i].Name)
+        .WithEnvironment($"HealthChecksUI__HealthChecks__{i}__Uri", checks[i].Uri);
+}
+
+// ---------------------------------------------------------------------------
 // Frontend Apps
 // ---------------------------------------------------------------------------
 
 var jobAdmin = builder.AddNpmApp("job-admin", "../../apps/job-admin", "start")
     .WithHttpEndpoint(4200, isProxied: false)
-    .WaitFor(gateway)
-    .WaitFor(keycloak);
+    .WaitFor(gateway);
 
 var jobPublic = builder.AddNpmApp("job-public", "../../apps/job-public", "start")
     .WithHttpEndpoint(3000, isProxied: false)
-    .WaitFor(gateway)
-    .WaitFor(keycloak);
+    .WaitFor(gateway);
 
 // ---------------------------------------------------------------------------
 // Dapr-dependent services
@@ -258,9 +152,6 @@ if (useDapr)
         .WithEnvironment("AI__CLAUDE_API_KEY", builder.Configuration["AI:CLAUDE_API_KEY"] ?? "")
         .WithEnvironment("OpenAI__ApiKey", builder.Configuration["OpenAI:ApiKey"] ?? "")
         .WithDaprSidecar(DaprOptions("ai-service-v2", "./DaprComponents/ai-service-v2"))
-        .WaitFor(postgres)
-        .WaitFor(redis)
-        .WaitFor(rabbitMq)
         .WaitFor(monolithMcp);
 
     var adminApi = builder.AddProject<Projects.AdminApi_Service>("admin-api")
@@ -268,8 +159,7 @@ if (useDapr)
         .WithEnvironment("ConnectionStrings__AdminDbContext", microSqlConn)
         .WithEnvironment("Keycloak__Authority", keycloakAuthority)
         .WithEnvironment("Keycloak__Audience", keycloakAudience)
-        .WithDaprSidecar(DaprOptions("admin-api"))
-        .WaitFor(rabbitMq);
+        .WithDaprSidecar(DaprOptions("admin-api"));
 
     var adminMcp = builder.AddProject<Projects.AdminApi_Mcp>("admin-api-mcp")
         .WithEnvironment("ASPIRE_MODE", "true")
@@ -288,18 +178,14 @@ if (useDapr)
         .WithEnvironment("ConnectionStrings__CompanyDbContext", microSqlConn)
         .WithEnvironment("Keycloak__Authority", keycloakAuthority)
         .WithEnvironment("Keycloak__Audience", keycloakAudience)
-        .WithDaprSidecar(DaprOptions("company-api"))
-        .WaitFor(sqlServer)
-        .WaitFor(rabbitMq);
+        .WithDaprSidecar(DaprOptions("company-api"));
 
     var jobApi = builder.AddProject<Projects.JobApi_Service>("job-api")
         .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
         .WithEnvironment("ConnectionStrings__JobDbContext", microSqlConn)
         .WithEnvironment("Keycloak__Authority", keycloakAuthority)
         .WithEnvironment("Keycloak__Audience", keycloakAudience)
-        .WithDaprSidecar(DaprOptions("job-api"))
-        .WaitFor(sqlServer)
-        .WaitFor(rabbitMq);
+        .WithDaprSidecar(DaprOptions("job-api"));
 
     var userApi = builder.AddProject<Projects.UserApi_Service>("user-api")
         .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
@@ -309,9 +195,7 @@ if (useDapr)
         .WithEnvironment("Keycloak__TokenUrl", keycloakTokenUrl)
         .WithEnvironment("Keycloak__ServiceClientId", keycloakServiceClientId)
         .WithEnvironment("Keycloak__ServiceClientSecret", keycloakServiceClientSecret)
-        .WithDaprSidecar(DaprOptions("user-api", "./DaprComponents/user-api"))
-        .WaitFor(sqlServer)
-        .WaitFor(rabbitMq);
+        .WithDaprSidecar(DaprOptions("user-api", "./DaprComponents/user-api"));
 
     var connectorApi = builder.AddProject<Projects.connector_api>("connector-api")
         .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
@@ -320,7 +204,7 @@ if (useDapr)
         .WithEnvironment("InternalApiKey", internalApiKey)
         .WithEnvironment("MonolithUrl", "http://localhost:5280")
         .WithDaprSidecar(DaprOptions("connector-api"))
-        .WaitFor(rabbitMq);
+        .WaitFor(monolith);
 
     var reverseConnectorApi = builder.AddProject<Projects.reverse_connector_api>("reverse-connector-api")
         .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
@@ -329,7 +213,7 @@ if (useDapr)
         .WithEnvironment("InternalApiKey", internalApiKey)
         .WithEnvironment("MonolithUrl", "http://localhost:5280")
         .WithDaprSidecar(DaprOptions("reverse-connector-api"))
-        .WaitFor(rabbitMq);
+        .WaitFor(monolith);
 
     gateway.WaitFor(adminApi).WaitFor(aiService);
 
