@@ -1,0 +1,101 @@
+{
+  "uid": "find-by-trace-id",
+  "title": "Find By Trace Id",
+  "tags": ["jobboard"],
+  "timezone": "browser",
+  "editable": true,
+  "refresh": "",
+  "templating": {
+    "list": [
+      {
+        "name": "TraceId",
+        "label": "TraceId",
+        "type": "textbox",
+        "current": { "text": "", "value": "" },
+        "options": [{ "selected": true, "text": "", "value": "" }],
+        "query": "",
+        "hide": 0
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Trace",
+      "type": "traces",
+      "gridPos": { "h": 13, "w": 24, "x": 0, "y": 0 },
+      "datasource": { "type": "jaeger", "uid": "jaeger" },
+      "targets": [
+        {
+          "datasource": { "type": "jaeger", "uid": "jaeger" },
+          "query": "${TraceId}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Logs",
+      "type": "table",
+      "gridPos": { "h": 11, "w": 24, "x": 0, "y": 13 },
+      "datasource": { "type": "elasticsearch", "uid": "elasticsearch" },
+      "targets": [
+        {
+          "datasource": { "type": "elasticsearch", "uid": "elasticsearch" },
+          "metrics": [{ "id": "1", "settings": { "limit": "500" }, "type": "logs" }],
+          "query": "fields.TraceId:\"${TraceId}\"",
+          "refId": "A",
+          "timeField": "@timestamp"
+        }
+      ],
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true,
+        "sortBy": [{ "desc": false, "displayName": "Time" }]
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "align": "auto", "cellOptions": { "type": "auto" } }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Message" },
+            "properties": [{ "id": "custom.width", "value": 726 }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Time" },
+            "properties": [{ "id": "custom.width", "value": 196 }]
+          }
+        ]
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "_id": true, "_index": true, "_source": true, "_type": true,
+              "fields.@timestamp": true, "fields.ActionId": true,
+              "fields.ConnectionId": true, "fields.EventId.Id": true,
+              "fields.EventId.Name": true, "fields.ParentSpanId": true,
+              "fields.RequestId": true, "fields.SpanId": true,
+              "fields.SpanKind": true, "fields.TraceId": true,
+              "fields.parentSpanId": true, "fields.spanId": true,
+              "highlight": true, "id": true, "messageTemplate": true, "sort": true,
+              "fields.parameters": true, "fields.commandTimeout": true,
+              "fields.commandType": true, "fields.newLine": true
+            },
+            "renameByName": {
+              "@timestamp": "Time",
+              "fields.ApplicationName": "App",
+              "fields.SourceContext": "Source",
+              "fields.CommandName": "Command",
+              "level": "Level",
+              "message": "Message"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 39
+}
