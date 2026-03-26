@@ -22,6 +22,7 @@ public class ReEmbedAllJobsCommandHandlerTests
     private readonly IMonolithApiClient _monolithApiClient = Substitute.For<IMonolithApiClient>();
     private readonly IEmbeddingService _embeddingService = Substitute.For<IEmbeddingService>();
     private readonly IActivityFactory _activityFactory = Substitute.For<IActivityFactory>();
+    private readonly IMetricsService _metricsService = Substitute.For<IMetricsService>();
     private readonly ReEmbedAllJobsCommandHandler _sut;
 
     public ReEmbedAllJobsCommandHandlerTests()
@@ -33,7 +34,7 @@ public class ReEmbedAllJobsCommandHandlerTests
             .Returns((Activity?)null);
 
         _sut = new ReEmbedAllJobsCommandHandler(
-            handlerContext, _dbContext, _monolithApiClient, _embeddingService, _activityFactory);
+            handlerContext, _dbContext, _monolithApiClient, _embeddingService, _activityFactory, _metricsService);
     }
 
     [Fact]

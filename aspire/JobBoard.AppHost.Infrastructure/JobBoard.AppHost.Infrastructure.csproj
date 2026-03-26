@@ -11,5 +11,4 @@
     <PackageReference Include="Aspire.Hosting.Keycloak" Version="13.2.0-preview.1.26170.3" />
   </ItemGroup>
 
-
 </Project>

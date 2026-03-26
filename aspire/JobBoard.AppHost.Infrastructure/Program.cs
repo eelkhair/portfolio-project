@@ -1,7 +1,8 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
 // ---------------------------------------------------------------------------
-// Infrastructure (persistent containers)
+// Infrastructure (persistent containers) — start once, leave running.
+// Services AppHost (JobBoard.AppHost) assumes these are already healthy.
 // ---------------------------------------------------------------------------
 
 const string stack = "jobboard-aspire";
@@ -50,6 +51,11 @@ var rabbitMq = builder.AddContainer("rabbitmq", "rabbitmq", "4.2-management")
     .WithHttpEndpoint(15672, 15672, name: "management", isProxied: false)
     .WithEnvironment("RABBITMQ_DEFAULT_USER", "guest")
     .WithEnvironment("RABBITMQ_DEFAULT_PASS", "guest")
+    .WithContainerRuntimeArgs("--health-cmd", "rabbitmq-diagnostics -q check_port_connectivity")
+    .WithContainerRuntimeArgs("--health-interval", "3s")
+    .WithContainerRuntimeArgs("--health-timeout", "5s")
+    .WithContainerRuntimeArgs("--health-retries", "10")
+    .WithContainerRuntimeArgs("--health-start-period", "10s")
     .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
 
 var keycloakPassword = builder.AddParameter("keycloak-password", "admin");

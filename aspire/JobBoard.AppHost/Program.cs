@@ -6,7 +6,7 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 // ---------------------------------------------------------------------------
 // Infrastructure is managed by JobBoard.AppHost.Infrastructure — start it
-// first and leave it running. All containers below are persistent and should
+// first and leave it running. All containers are persistent and should
 // already be accepting connections before this AppHost launches.
 // ---------------------------------------------------------------------------
 
