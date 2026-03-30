@@ -5,7 +5,7 @@ echo "Seeding Redis config keys..."
 REDIS="redis-cli -h redis -p 6379 -n 1"
 
 # ── Global config (SET NX = only seed if key doesn't exist, preserves runtime changes) ──
-$REDIS SET "jobboard:config:global:FeatureFlags:Monolith" "false" NX
+$REDIS SET "jobboard:config:global:FeatureFlags:Monolith" "true" NX
 $REDIS SET "jobboard:config:global:FeatureFlags:DraftGeneration" "true" NX
 $REDIS SET "jobboard:config:global:FeatureFlags:ResumeParser" "true" NX
 $REDIS SET "jobboard:config:global:FeatureFlags:Chat" "true" NX

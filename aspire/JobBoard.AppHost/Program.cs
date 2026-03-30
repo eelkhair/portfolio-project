@@ -45,7 +45,7 @@ var redisSeed = builder.AddContainer("redis-seed", "redis", "8.2")
 var redisCommander = builder.AddContainer("redis-commander", "rediscommander/redis-commander")
     .WithLifetime(ContainerLifetime.Persistent)
     .WithHttpEndpoint(8081, 8081, name: "ui", isProxied: false)
-    .WithEnvironment("REDIS_HOSTS", "local:host.docker.internal:6379")
+    .WithEnvironment("REDIS_HOSTS", "main:host.docker.internal:6379:0,config:host.docker.internal:6379:1,ai:host.docker.internal:6379:2")
     .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
 
 var rabbitMq = builder.AddContainer("rabbitmq", "rabbitmq", "4.2-management")
