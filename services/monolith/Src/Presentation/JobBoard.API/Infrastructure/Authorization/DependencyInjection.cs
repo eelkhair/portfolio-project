@@ -110,7 +110,7 @@ public static class DependencyInjection
         app.UseStaticFiles();
         app.UseODataRouteDebug();
         app.UseRouting();
-      
+        app.UseCors("AllowMyFrontendApp");
         app.UseAuthorization();
         app.MapControllers();
         return app;

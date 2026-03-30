@@ -12,6 +12,7 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Nuget.Config", "."]
 COPY ["reverse-connector-api.csproj", "."]
+RUN mkdir -p /nupkgs
 RUN dotnet restore "./reverse-connector-api.csproj" --configfile "Nuget.Config"
 COPY . .
 WORKDIR "/src/."

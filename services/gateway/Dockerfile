@@ -9,6 +9,7 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Nuget.Config", "."]
 COPY ["Gateway.Api.csproj", ""]
+RUN mkdir -p /nupkgs
 RUN dotnet restore "./Gateway.Api.csproj" --configfile "Nuget.Config"
 COPY . .
 WORKDIR "/src/."

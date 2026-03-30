@@ -10,6 +10,7 @@ COPY ["Nuget.Config", "."]
 COPY ["AdminApi.Mcp/AdminApi.Mcp.csproj", "AdminApi.Mcp/"]
 COPY ["AdminApi.Core/AdminApi.Core.csproj", "AdminApi.Core/"]
 COPY ["AdminAPI.Contracts/AdminAPI.Contracts.csproj", "AdminAPI.Contracts/"]
+RUN mkdir -p /nupkgs
 RUN dotnet restore "./AdminApi.Mcp/AdminApi.Mcp.csproj" --configfile "Nuget.Config"
 COPY . .
 WORKDIR "/src/AdminApi.Mcp"

@@ -16,6 +16,7 @@ COPY ["Src/Infrastructure/JobBoard.AI.Infrastructure.Persistence/JobBoard.AI.Inf
 COPY ["Src/Infrastructure/JobBoard.AI.Infrastructure.Dapr/JobBoard.AI.Infrastructure.Dapr.csproj", "Src/Infrastructure/JobBoard.AI.Infrastructure.Dapr/"]
 COPY ["Src/Infrastructure/JobBoard.AI.Infrastructure.Diagnostics/JobBoard.AI.Infrastructure.Diagnostics.csproj", "Src/Infrastructure/JobBoard.AI.Infrastructure.Diagnostics/"]
 COPY ["Src/Infrastructure/JobBoard.AI.Infrastructure.AI/JobBoard.AI.Infrastructure.AI.csproj", "Src/Infrastructure/JobBoard.AI.Infrastructure.AI/"]
+RUN mkdir -p /nupkgs
 RUN dotnet restore "./Src/Presentation/JobBoard.AI.API/JobBoard.AI.API.csproj" --configfile "Nuget.Config"
 COPY . .
 WORKDIR "/src/Src/Presentation/JobBoard.AI.API"

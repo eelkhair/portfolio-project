@@ -169,7 +169,6 @@ public static class DependencyInjection
 
     public static WebApplication UseConfiguredSwagger(this WebApplication app, IConfiguration configuration)
     {
-        app.UseCors("AllowMyFrontendApp");
         app.UseSwagger();
         app.UseSwaggerUI(options =>
         {

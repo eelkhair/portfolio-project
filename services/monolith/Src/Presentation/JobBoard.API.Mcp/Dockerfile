@@ -22,6 +22,7 @@ COPY ["Src/Infrastructure/JobBoard.Infrastructure.Persistence/JobBoard.Infrastru
 COPY ["Src/Infrastructure/JobBoard.Infrastructure.RedisConfig/JobBoard.Infrastructure.RedisConfig.csproj", "Src/Infrastructure/JobBoard.Infrastructure.RedisConfig/"]
 COPY ["Src/Infrastructure/JobBoard.Infrastructure.Smtp/JobBoard.Infrastructure.Smtp.csproj", "Src/Infrastructure/JobBoard.Infrastructure.Smtp/"]
 COPY ["Src/Infrastructure/JobBoard.Infrastructure.Vault/JobBoard.Infrastructure.Vault.csproj", "Src/Infrastructure/JobBoard.Infrastructure.Vault/"]
+RUN mkdir -p /nupkgs
 RUN dotnet restore "./Src/Presentation/JobBoard.API.Mcp/JobBoard.API.Mcp.csproj" --configfile "Nuget.Config"
 COPY . .
 WORKDIR "/src/Src/Presentation/JobBoard.API.Mcp"

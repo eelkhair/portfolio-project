@@ -15,6 +15,7 @@ WORKDIR /src
 COPY ["Nuget.Config", "."]
 COPY ["CompanyApi.Service/CompanyApi.Service.csproj", "CompanyApi.Service/"]
 COPY ["CompanyAPI.Contracts/CompanyAPI.Contracts.csproj", "CompanyAPI.Contracts/"]
+RUN mkdir -p /nupkgs
 RUN dotnet restore "./CompanyApi.Service/CompanyApi.Service.csproj" --configfile "Nuget.Config"
 COPY . .
 WORKDIR "/src/CompanyApi.Service"

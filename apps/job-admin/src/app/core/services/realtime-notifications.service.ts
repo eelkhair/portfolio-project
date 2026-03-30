@@ -136,6 +136,7 @@ export class RealtimeNotificationsService {
       console.log('[SignalR] Connected successfully');
     } catch (err) {
       this.connected.set(false);
+      this.hub = undefined; // allow retry on next start() call
       this.notify.warn('Realtime offline', 'Could not connect to notifications hub.');
       console.error('[SignalR] Connection failed:', err);
     } finally {

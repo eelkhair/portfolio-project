@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
-using JobBoard.Application.Interfaces.Configurations;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Configuration;
 
 namespace JobBoard.API.Infrastructure.SignalR;
 
@@ -29,15 +29,18 @@ public class NotificationsHub(ActivitySource activitySource, IServiceProvider se
         if (!string.IsNullOrWhiteSpace(userId))
             await Groups.AddToGroupAsync(Context.ConnectionId, userId);
 
-        // Send current feature flags to the connecting client (if service is registered)
+        // Send current feature flags to the connecting client.
+        // Read directly from IConfiguration (pre-loaded from Redis at startup by RedisConfigurationLoader)
+        // so that Redis-backed flags like "Monolith" are included alongside IFeatureManager flags.
         try
         {
-            var featureFlagService = serviceProvider.GetService<IFeatureFlagService>();
-            if (featureFlagService is not null)
-            {
-                var flags = await featureFlagService.GetAllFeaturesAsync();
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            var flags = configuration.GetSection("FeatureFlags")
+                .GetChildren()
+                .ToDictionary(c => c.Key, c => bool.TryParse(c.Value, out var b) && b);
+
+            if (flags.Count > 0)
                 await Clients.Caller.SendAsync("featureFlagsUpdated", new { flags });
-            }
         }
         catch (Exception)
         {
