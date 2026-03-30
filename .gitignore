@@ -8,3 +8,4 @@ coveragereport
 secrets/*
 docs/plans/
 .claude/
+CLAUDE.md
