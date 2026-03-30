@@ -66,6 +66,8 @@ public static class DependencyInjection
         builder.Logging.SetMinimumLevel(LogLevel.Warning);
         builder.Logging.AddFilters();
 
+        var configuration = builder.Configuration;
+
         Log.Logger = new LoggerConfiguration()
             .Enrich.WithProperty("@timestamp", DateTime.UtcNow)
             // FINAL: Remove all health, http ping, and authentication noise
@@ -75,7 +77,9 @@ public static class DependencyInjection
                     (
                         ctx.ToString().Contains("HttpClient.health-checks") ||
                         ctx.ToString().Contains("HealthCheck") ||
-                        ctx.ToString().Contains("HealthReportCollector")
+                        ctx.ToString().Contains("HealthReportCollector") ||
+                        (configuration.GetValue<bool>("FeatureFlags:SuppressEfCommandLogs") &&
+                         ctx.ToString().Contains("EntityFrameworkCore.Database.Command"))
                     )
                 )
                 ||
@@ -90,7 +94,9 @@ public static class DependencyInjection
                     log.MessageTemplate.Text.Contains("Bearer was not authenticated") ||
                     log.MessageTemplate.Text.Contains("does not match a supported file type") ||
                     log.MessageTemplate.Text.Contains("POST requests are not supported") ||
-                    log.MessageTemplate.Text.Contains("OPTIONS requests are not supported")
+                    log.MessageTemplate.Text.Contains("OPTIONS requests are not supported") ||
+                    log.MessageTemplate.Text.Contains("Outbox iteration complete") ||
+                    log.MessageTemplate.Text.Contains("Failed to determine the https port")
                 )
             )
             .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)

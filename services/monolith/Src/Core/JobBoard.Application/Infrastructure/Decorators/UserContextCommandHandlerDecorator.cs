@@ -18,15 +18,18 @@ public class UserContextCommandHandlerDecorator<TRequest, TResult>(
         if (request is IAnonymousRequest)
             return await decorated.HandleAsync(request, cancellationToken);
 
-        using (var activity = activityFactory.StartActivity(
-                   $"{typeof(TRequest).Name}.user_context",
-                   ActivityKind.Internal))
+        // Outbox processor: internal system user, skip DB sync and tracing
+        if (typeof(TRequest).Name == "ProcessOutboxMessageCommand")
+        {
+            request.UserId = userAccessor.UserId;
+            return await decorated.HandleAsync(request, cancellationToken);
+        }
+
+        using (var activity = activityFactory.StartActivity($"{typeof(TRequest).Name}.user_context", ActivityKind.Internal))
         {
             var authenticatedUserId = userAccessor.UserId;
             if (string.IsNullOrEmpty(authenticatedUserId))
-            {
                 throw new UnauthorizedAccessException("User is not authenticated for this request.");
-            }
 
             await userSyncService.EnsureUserExistsAsync(authenticatedUserId, cancellationToken);
             request.UserId = authenticatedUserId;

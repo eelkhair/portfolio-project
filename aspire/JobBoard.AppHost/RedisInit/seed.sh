@@ -9,6 +9,7 @@ $REDIS SET "jobboard:config:global:FeatureFlags:Monolith" "true" NX
 $REDIS SET "jobboard:config:global:FeatureFlags:DraftGeneration" "true" NX
 $REDIS SET "jobboard:config:global:FeatureFlags:ResumeParser" "true" NX
 $REDIS SET "jobboard:config:global:FeatureFlags:Chat" "true" NX
+$REDIS SET "jobboard:config:global:FeatureFlags:SuppressEfCommandLogs" "true" NX
 
 
 # SMTP (Mailpit)

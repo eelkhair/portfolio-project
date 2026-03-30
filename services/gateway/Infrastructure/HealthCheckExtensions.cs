@@ -5,9 +5,9 @@ namespace Gateway.Api.Infrastructure;
 
 internal static class HealthCheckExtensions
 {
-    public static WebApplicationBuilder AddCustomHealthChecks(this WebApplicationBuilder builder)
+    public static WebApplicationBuilder AddCustomHealthChecks(this WebApplicationBuilder builder, bool isAspire = false)
     {
-        builder.Services
+        var checks = builder.Services
             .AddHealthChecks()
 
             // -- Liveness --
@@ -18,10 +18,11 @@ internal static class HealthCheckExtensions
                 builder.Configuration.GetConnectionString("Redis")
                 ?? "192.168.1.160:6379",
                 name: "Redis Config Store",
-                tags: ["infrastructure"])
+                tags: ["infrastructure"]);
 
-            // -- Vault (secrets) --
-            .AddVaultHealthCheck(tags: ["infrastructure"]);
+        // -- Vault (secrets) — skip in Aspire (no Vault locally) --
+        if (!isAspire)
+            checks.AddVaultHealthCheck(tags: ["infrastructure"]);
 
         return builder;
     }

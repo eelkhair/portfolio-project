@@ -42,7 +42,10 @@ public sealed class TransactionCommandHandlerDecorator<TCommand, TResult>(
                     typeof(TCommand).Name);
             }
 
-            return await innerHandler.HandleAsync(request, cancellationToken);
+            var noTxResult = await innerHandler.HandleAsync(request, cancellationToken);
+            if (noTxResult is false && activity != null)
+                activity.ActivityTraceFlags &= ~ActivityTraceFlags.Recorded;
+            return noTxResult;
         }
 
         logger.LogInformation(

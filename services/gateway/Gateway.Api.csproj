@@ -12,7 +12,7 @@
         <PackageReference Include="AspNetCore.HealthChecks.UI" Version="9.0.0" />
         <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
         <PackageReference Include="AspNetCore.HealthChecks.UI.InMemory.Storage" Version="9.0.0" />
-        <PackageReference Include="Elkhair.Common.Observability" Version="1.0.7" />
+        <PackageReference Include="Elkhair.Common.Observability" Version="1.0.14" />
         <PackageReference Include="JobBoard.HealthChecks" Version="1.0.8" />
         <PackageReference Include="JobBoard.Infrastructure.RedisConfig" Version="1.0.0" />
         <PackageReference Include="JobBoard.Infrastructure.Vault" Version="1.0.0" />

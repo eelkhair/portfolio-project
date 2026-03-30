@@ -26,7 +26,10 @@ processors:
         - 'IsMatch(name, "/v1\\.0/publish/.*/healthCheckTopic")'
         - 'attributes["url.full"] != nil and attributes["url.full"] == "http://localhost:3500/v1.0/healthz"'
         - 'attributes["user_agent.original"] != nil and IsMatch(attributes["user_agent.original"], "Uptime-Kuma.*")'
-        - 'attributes["server.port"] != nil and attributes["server.port"] == 9200'
+        - 'attributes["url.full"] != nil and IsMatch(attributes["url.full"], ".*localhost:9200.*")'
+        - 'attributes["url.path"] != nil and attributes["url.path"] == "/dapr/config"'
+        - 'attributes["user_agent.original"] != nil and attributes["user_agent.original"] == "Go-http-client/1.1"'
+        - 'attributes["url.full"] != nil and IsMatch(attributes["url.full"], ".*/v1/sys/health")'
   batch:
 exporters:
   otlp/jaeger:

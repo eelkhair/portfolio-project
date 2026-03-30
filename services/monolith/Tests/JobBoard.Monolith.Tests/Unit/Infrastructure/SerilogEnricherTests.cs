@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using JobBoard.Infrastructure.Diagnostics.Observability;
+using Elkhair.Common.Observability.Observability;
 using Serilog.Core;
 using Serilog.Events;
 using Shouldly;

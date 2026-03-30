@@ -228,6 +228,7 @@ var monolithMcp = builder.AddProject<Projects.JobBoard_API_Mcp>("monolith-mcp")
 // ---------------------------------------------------------------------------
 
 var gateway = builder.AddProject<Projects.Gateway_Api>("gateway")
+    .WithEnvironment("ASPIRE_MODE", "true")
     .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
     .WithEnvironment("ConnectionStrings__Redis", redisConn)
     .WaitFor(monolith);

@@ -1,4 +1,4 @@
-using JobBoard.Infrastructure.Diagnostics.Observability;
+using Elkhair.Common.Observability.Observability;
 using Microsoft.AspNetCore.SignalR;
 
 #pragma warning disable CS1591

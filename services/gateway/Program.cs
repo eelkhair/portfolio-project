@@ -6,10 +6,11 @@ using JobBoard.Infrastructure.Vault;
 const string CorsPolicy = "AllowJobAdmin";
 
 var builder = WebApplication.CreateBuilder(args);
-builder.AddVaultSecrets("gateway");
+var isAspire = builder.Configuration["ASPIRE_MODE"] == "true";
+if (!isAspire) builder.AddVaultSecrets("gateway");
 (await builder.AddRedisConfiguration("gateway", TimeSpan.FromSeconds(8)))
     .ConfigureLogging("gateway")
-    .AddCustomHealthChecks()
+    .AddCustomHealthChecks(isAspire)
     .Services
     .AddOpenTelemetryServices(builder.Configuration, "gateway")
     .AddApplicationServices()

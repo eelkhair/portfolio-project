@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Elkhair.Common.Observability" Version="1.0.14" />
         <PackageReference Include="Elkhair.Dev.Common" Version="1.0.22" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />

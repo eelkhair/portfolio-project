@@ -1,6 +1,6 @@
 using System.Diagnostics.Metrics;
 
-namespace JobBoard.Infrastructure.Diagnostics.Observability;
+namespace JobBoard.AI.Infrastructure.Diagnostics.Observability;
 
 public static class AppMetrics
 {

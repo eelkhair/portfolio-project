@@ -1,19 +1,11 @@
-using System.Reflection;
 using JobBoard.Application.Interfaces.Observability;
 using JobBoard.Infrastructure.Diagnostics.Observability;
-using Microsoft.AspNetCore.Builder;
+using Elkhair.Common.Observability.Observability;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using Serilog;
-using Serilog.Enrichers.OpenTelemetry;
-using Serilog.Events;
-using Serilog.Exceptions;
-using Serilog.Sinks.Elasticsearch;
 
 namespace JobBoard.Infrastructure.Diagnostics;
 
@@ -22,12 +14,12 @@ public static class DependencyInjection
     // ------------------------------------------------------------
     // OPENTELEMETRY
     // ------------------------------------------------------------
-    public static IServiceCollection AddOpenTelemetryServices(
+    public static IServiceCollection AddDiagnosticsServices(
         this IServiceCollection services,
         IConfiguration configuration,
         string serviceName = "JobBoard")
     {
-        services.AddSingleton<IActivityFactory, ActivitySourceFactory>();
+        services.AddSingleton<IActivityFactory, Elkhair.Common.Observability.Observability.ActivitySourceFactory>();
         services.AddSingleton<IMetricsService, MetricsService>();
         services.AddScoped<IUnitOfWorkEvents, UnitOfWorkEvents>();
 
@@ -43,7 +35,9 @@ public static class DependencyInjection
 
         otel.WithTracing(t =>
         {
-            t.AddSource(TracingFilters.Source.Name)
+            t.SetSampler(new DaprConfigSampler())
+             .AddSource(TracingFilters.Source.Name)
+             .AddProcessor(new DaprInternalSpanFilter())
              .AddAspNetCoreInstrumentation(o => o.AddFilters())
              .AddEntityFrameworkCoreInstrumentation(o => o.AddFilters())
              .AddHttpClientInstrumentation(o => o.AddFilters())
@@ -101,93 +95,4 @@ public static class DependencyInjection
         return services;
     }
 
-    // ------------------------------------------------------------
-    // LOGGING (SERILOG + FILTERS)
-    // ------------------------------------------------------------
-    public static WebApplicationBuilder ConfigureLogging(
-        this WebApplicationBuilder builder,
-        string appTag)
-    {
-        builder.Logging.SetMinimumLevel(LogLevel.Warning);
-        builder.Logging.AddFilters();
-
-        Log.Logger = new LoggerConfiguration()
-            .Enrich.WithProperty("@timestamp", DateTime.UtcNow)
-            // FINAL: Remove all health, http ping, and authentication noise
-            .Filter.ByExcluding(log =>
-                (
-                    log.Properties.TryGetValue("SourceContext", out var ctx) &&
-                    (
-                        ctx.ToString().Contains("HttpClient.health-checks") ||
-                        ctx.ToString().Contains("HealthCheck") ||
-                        ctx.ToString().Contains("HealthReportCollector")
-                    )
-                )
-                ||
-                (
-                    log.Properties.TryGetValue("Uri", out var uri) &&
-                    uri.ToString().Contains("health")
-                )
-                ||
-                (
-                    log.MessageTemplate.Text.Contains("health-results") ||
-                    log.MessageTemplate.Text.Contains("/health") ||
-                    log.MessageTemplate.Text.Contains("Bearer was not authenticated") ||
-                    log.MessageTemplate.Text.Contains("does not match a supported file type") ||
-                    log.MessageTemplate.Text.Contains("POST requests are not supported") ||
-                    log.MessageTemplate.Text.Contains("OPTIONS requests are not supported")
-                )
-            )
-            .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-            .MinimumLevel.Override("System", LogEventLevel.Warning)
-            .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
-            .MinimumLevel.Override("Microsoft.AspNetCore.DataProtection", LogEventLevel.Error)
-            .MinimumLevel.Override("Microsoft.AspNetCore.Server.Kestrel", LogEventLevel.Error)
-            .ReadFrom.Configuration(builder.Configuration)
-            .Enrich.With<ElasticTimestampEnricher>()  
-            .Enrich.FromLogContext()
-            .Enrich.WithExceptionDetails()
-            .Enrich.WithProperty("ApplicationName", appTag)
-            .Enrich.WithOpenTelemetryTraceId()
-            .Enrich.WithOpenTelemetrySpanId()
-            .Enrich.With(new OpenTelemetryActivityEnricher())
-            .Enrich.With<OtelLinkEnricher>()
-            .ApplyStandardFilters(builder.Environment)
-            .WriteTo.Console()
-            .WriteTo.Seq("http://seq")
-            .WriteTo.Elasticsearch(
-                ConfigureElasticSink(builder.Configuration, builder.Environment.EnvironmentName))
-            .WriteTo.OpenTelemetry(options =>
-            {
-                var endpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT");
-                if (!string.IsNullOrEmpty(endpoint))
-                {
-                    options.Endpoint = endpoint;
-                    options.Protocol = Serilog.Sinks.OpenTelemetry.OtlpProtocol.Grpc;
-                }
-            })
-            .CreateLogger();
-
-        builder.Host.UseSerilog();
-        builder.Logging.SetMinimumLevel(LogLevel.Warning);
-        return builder;
-    }
-
-    private static ElasticsearchSinkOptions ConfigureElasticSink(
-        IConfiguration configuration,
-        string environment)
-    {
-        var elasticUri = configuration["ElasticConfiguration:Uri"];
-        if (string.IsNullOrWhiteSpace(elasticUri) || !Uri.TryCreate(elasticUri, UriKind.Absolute, out _))
-            elasticUri = "http://localhost:9200";
-
-        return new ElasticsearchSinkOptions(new Uri(elasticUri))
-        {
-            AutoRegisterTemplate = true,
-            IndexFormat =
-                $"{Assembly.GetEntryAssembly()?.GetName().Name?.ToLower().Replace('.', '-')}-" +
-                $"{environment.ToLower().Replace('.', '-')}-" +
-                $"{DateTime.UtcNow:yyyy-MM}"
-        };
-    }
 }

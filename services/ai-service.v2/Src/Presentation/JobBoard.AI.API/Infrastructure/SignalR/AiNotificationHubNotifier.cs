@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using JobBoard.AI.Application.Interfaces.Notifications;
-using JobBoard.AI.Application.Interfaces.Observability;
+using Elkhair.Common.Observability.Observability;
 using Microsoft.AspNetCore.SignalR;
 
 #pragma warning disable CS1591
