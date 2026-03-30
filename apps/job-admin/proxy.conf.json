@@ -5,6 +5,13 @@
     "changeOrigin": true,
     "logLevel": "debug"
   },
+  "/aspire/v1/traces": {
+    "target": "http://localhost:19148",
+    "pathRewrite": {"^/aspire": ""},
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
   "/api": {
     "target": "http://localhost:5238",
     "secure": false,

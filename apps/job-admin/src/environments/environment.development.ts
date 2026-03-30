@@ -7,6 +7,7 @@ export const environment = {
   microserviceUrl: 'https://job-admin-api-dev.eelkhair.net/',
   aiServiceUrl: 'https://job-ai-v2-dev.eelkhair.net/',
   otel: 'https://otel.eelkhair.net/v1/traces',
+  otelAspire: undefined as string | undefined,
   otelZipkin: 'https://otel.eelkhair.net/api/v2/spans',
   grafanaUrl: 'https://grafana.eelkhair.net/d/bf5m5dwukfncwd/find-by-trace-id?orgId=1&var-TraceId=',
   jaegerUrl: 'https://jaeger.eelkhair.net/trace/',

@@ -7,15 +7,20 @@ import { SemanticResourceAttributes as SRA } from '@opentelemetry/semantic-conve
 import {environment} from './environments/environment';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
 
-const exporter = new OTLPTraceExporter({ url: environment.otel });
+const processors: BatchSpanProcessor[] = [
+  new BatchSpanProcessor(new OTLPTraceExporter({ url: environment.otel })),
+];
+
+if (environment.otelAspire) {
+  processors.push(new BatchSpanProcessor(new OTLPTraceExporter({ url: environment.otelAspire })));
+}
+
 const provider = new WebTracerProvider({
   resource: new Resource({
     [SRA.SERVICE_NAME]: 'admin-fe',
     [SRA.DEPLOYMENT_ENVIRONMENT]: 'dev',
   }),
-  spanProcessors: [
-    new BatchSpanProcessor(exporter),
-  ],
+  spanProcessors: processors,
 });
 
 provider.register({
