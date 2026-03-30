@@ -9,3 +9,6 @@ secrets/*
 docs/plans/
 .claude/
 CLAUDE.md
+PLAN.md
+devserver
+devserver.pub
