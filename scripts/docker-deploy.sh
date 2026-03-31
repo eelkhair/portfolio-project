@@ -41,6 +41,57 @@ esac
 
 echo "Will deploy to: ${DEPLOY_TARGETS[*]}"
 
+# ===== CATEGORY SELECTION =====
+echo ""
+echo "Select categories to build (comma or space separated, e.g. 1,3,5):"
+echo "  1) FE         — job-admin, job-public"
+echo "  2) Monolith   — gateway, monolith-api, monolith-mcp"
+echo "  3) Micro      — gateway, admin-api, admin-api-mcp, company-api, job-api, user-api"
+echo "  4) Infra      — health-check, keycloak"
+echo "  5) AI         — ai-service-v2"
+echo "  6) Strangler  — connector-api, reverse-connector-api"
+echo "  7) All"
+read -p "Enter choices: " CATEGORY_INPUT
+
+# Normalize: replace commas with spaces, deduplicate
+CATEGORY_INPUT="${CATEGORY_INPUT//,/ }"
+
+BUILD_FE=false
+BUILD_MONOLITH=false
+BUILD_MICRO=false
+BUILD_INFRA=false
+BUILD_AI=false
+BUILD_STRANGLER=false
+
+for choice in $CATEGORY_INPUT; do
+  case "$choice" in
+    1) BUILD_FE=true ;;
+    2) BUILD_MONOLITH=true ;;
+    3) BUILD_MICRO=true ;;
+    4) BUILD_INFRA=true ;;
+    5) BUILD_AI=true ;;
+    6) BUILD_STRANGLER=true ;;
+    7) BUILD_FE=true; BUILD_MONOLITH=true; BUILD_MICRO=true; BUILD_INFRA=true; BUILD_AI=true; BUILD_STRANGLER=true ;;
+    *) echo "Unknown category: $choice (skipping)" ;;
+  esac
+done
+
+# Print selected categories
+SELECTED=()
+$BUILD_FE && SELECTED+=("FE")
+$BUILD_MONOLITH && SELECTED+=("Monolith")
+$BUILD_MICRO && SELECTED+=("Micro")
+$BUILD_INFRA && SELECTED+=("Infra")
+$BUILD_AI && SELECTED+=("AI")
+$BUILD_STRANGLER && SELECTED+=("Strangler")
+
+if [ ${#SELECTED[@]} -eq 0 ]; then
+  echo "No categories selected. Exiting."
+  exit 1
+fi
+
+echo "Will build: ${SELECTED[*]}"
+
 # ===== ONE PASSWORD FOR EVERYTHING =====
 read -s -p "🔐 Enter password (used for Docker registry): " PASSWORD
 echo
@@ -48,28 +99,45 @@ echo
 echo "🔐 Logging into registry.eelkhair.net..."
 printf '%s\n' "$PASSWORD" | docker login registry.eelkhair.net --username eelkhair --password-stdin
 
-# ===== SERVICE DEFINITIONS (ordered array for deterministic builds) =====
+# ===== SERVICE DEFINITIONS BY CATEGORY =====
 # Each entry: "name|context|dockerfile_flag"
 #   dockerfile_flag: "default" = Dockerfile in context root
 #                    path     = custom Dockerfile relative to context
-BACKEND_SERVICES=(
+
+MONOLITH_SERVICES=(
   "gateway|../services/gateway|default"
   "monolith-api|../services/monolith|Src/Presentation/JobBoard.API/Dockerfile"
   "monolith-mcp|../services/monolith|Src/Presentation/JobBoard.API.Mcp/Dockerfile"
-  "ai-service-v2|../services/ai-service.v2|Src/Presentation/JobBoard.AI.API/Dockerfile"
+)
+
+MICRO_SERVICES=(
+  "gateway|../services/gateway|default"
   "admin-api|../services/micro-services/admin-api|default"
   "admin-api-mcp|../services/micro-services/admin-api|AdminApi.Mcp/Dockerfile"
   "company-api|../services/micro-services/company-api|default"
   "job-api|../services/micro-services/job-api|default"
   "user-api|../services/micro-services/user-api|default"
-  "connector-api|../services/connector-api|default"
-  "reverse-connector-api|../services/reverse-connector-api|default"
+)
+
+INFRA_SERVICES=(
   "health-check|../services/micro-services/HealthChecks|default"
   "keycloak|../infrastructure/keycloak|default"
 )
 
+AI_SERVICES=(
+  "ai-service-v2|../services/ai-service.v2|Src/Presentation/JobBoard.AI.API/Dockerfile"
+)
+
+STRANGLER_SERVICES=(
+  "connector-api|../services/connector-api|default"
+  "reverse-connector-api|../services/reverse-connector-api|default"
+)
+
 FAILED_BUILDS=()
 SUCCESSFUL_BUILDS=()
+
+# Track already-built services to avoid duplicates (e.g. gateway in both Monolith + Micro)
+declare -A BUILT_SERVICES
 
 # ===== HELPER: resolve env-specific vars =====
 env_vars() {
@@ -94,6 +162,13 @@ build_one() {
   local context="$2"
   local dockerfile_flag="$3"
   local image="registry.eelkhair.net/${name}:latest"
+
+  # Skip if already built this run
+  if [[ -n "${BUILT_SERVICES[$name]+x}" ]]; then
+    echo "⏭️  Skipping $name (already built)"
+    return 0
+  fi
+  BUILT_SERVICES[$name]=1
 
   echo ""
   echo "🔨 Building $name..."
@@ -124,9 +199,18 @@ build_one() {
   echo "-----------------------------"
 }
 
-# ===== HELPER: build & push backend services =====
-build_and_push_backends() {
-  for entry in "${BACKEND_SERVICES[@]}"; do
+# ===== HELPER: build a category's services =====
+build_category() {
+  local label="$1"
+  shift
+  local services=("$@")
+
+  echo ""
+  echo "=========================================="
+  echo "🔨 Building $label..."
+  echo "=========================================="
+
+  for entry in "${services[@]}"; do
     IFS='|' read -r name context dockerfile_flag <<< "$entry"
     build_one "$name" "$context" "$dockerfile_flag" || true
   done
@@ -137,6 +221,11 @@ build_and_push_frontends() {
   local admin_config="$1"
   local public_config="$2"
   local env_tag="$3"  # "dev" or "prod"
+
+  echo ""
+  echo "=========================================="
+  echo "🔨 Building frontends for $env_tag..."
+  echo "=========================================="
 
   for name in "job-admin" "job-public"; do
     local image="registry.eelkhair.net/${name}:${env_tag}"
@@ -244,23 +333,21 @@ EOF
 
 # ===== MAIN =====
 
-# 1. Build backend services once (identical across environments)
-echo ""
-echo "=========================================="
-echo "🔨 Building backend services (shared)..."
-echo "=========================================="
-build_and_push_backends
+# 1. Build selected backend categories (shared across environments)
+$BUILD_MONOLITH && build_category "Monolith" "${MONOLITH_SERVICES[@]}"
+$BUILD_MICRO && build_category "Microservices" "${MICRO_SERVICES[@]}"
+$BUILD_INFRA && build_category "Infrastructure" "${INFRA_SERVICES[@]}"
+$BUILD_AI && build_category "AI" "${AI_SERVICES[@]}"
+$BUILD_STRANGLER && build_category "Strangler Fig" "${STRANGLER_SERVICES[@]}"
 
-# 2. Per-environment: build frontends, push, deploy
+# 2. Per-environment: build frontends (if selected), then deploy
 for target in "${DEPLOY_TARGETS[@]}"; do
   env_vars "$target"
 
-  echo ""
-  echo "=========================================="
-  echo "🔨 Building frontends for $target..."
-  echo "=========================================="
+  if $BUILD_FE; then
+    build_and_push_frontends "$ADMIN_BUILD_CONFIG" "$PUBLIC_BUILD_CONFIG" "$target"
+  fi
 
-  build_and_push_frontends "$ADMIN_BUILD_CONFIG" "$PUBLIC_BUILD_CONFIG" "$target"
   deploy_remote "$REMOTE_HOST" "$target" || true
 done
 

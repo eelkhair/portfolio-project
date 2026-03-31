@@ -31,36 +31,6 @@ services:
       - ai-job-board-net
 
   # -- AI Services ------------------------------------------
-  ai-service:
-    image: registry.eelkhair.net/ai-service:latest
-    container_name: ai-service
-    ports:
-      - "6082:6082"
-    environment:
-      PORT: "6082"
-      NODE_ENV: prod
-    networks:
-      - ai-job-board-net
-
-  ai-service-sidecar:
-    image: "daprio/daprd:1.15.8"
-    container_name: ai-service-sidecar
-    network_mode: "service:ai-service"
-    depends_on:
-      - ai-service
-    volumes:
-      - "/home/eelkhair/Dapr/shared/Components:/Components"
-      - "/home/eelkhair/Dapr/job-ai/:/Dapr"
-    command: [
-      "./daprd",
-      "--app-id", "ai-service",
-      "--app-port", "6082",
-      "--resources-path", "./Components",
-      "--resources-path", "./Dapr/Components",
-      "--resources-path", "./Dapr/Components/Secrets",
-      "-config", "./Dapr/Config/config.yaml"
-    ]
-
   ai-service-v2:
     image: registry.eelkhair.net/ai-service-v2:latest
     ports:
@@ -370,28 +340,26 @@ services:
     environment:
       - HealthChecksUI__HealthChecks__0__Name=Gateway
       - HealthChecksUI__HealthChecks__0__Uri=https://job-gateway.eelkhair.net/healthzEndpoint
-      - HealthChecksUI__HealthChecks__1__Name=AI Service
-      - HealthChecksUI__HealthChecks__1__Uri=https://job-ai.eelkhair.net/healthzEndpoint
-      - HealthChecksUI__HealthChecks__2__Name=AI Service V2
-      - HealthChecksUI__HealthChecks__2__Uri=https://job-ai-v2.eelkhair.net/healthzEndpoint
-      - HealthChecksUI__HealthChecks__3__Name=Monolith API
-      - HealthChecksUI__HealthChecks__3__Uri=https://job-monolith.eelkhair.net/healthzEndpoint
-      - HealthChecksUI__HealthChecks__4__Name=Monolith MCP
-      - HealthChecksUI__HealthChecks__4__Uri=https://mono-mcp.eelkhair.net/healthzEndpoint
-      - HealthChecksUI__HealthChecks__5__Name=Admin API
-      - HealthChecksUI__HealthChecks__5__Uri=https://job-admin-api.eelkhair.net/healthzEndpoint
-      - HealthChecksUI__HealthChecks__6__Name=Admin API MCP
-      - HealthChecksUI__HealthChecks__6__Uri=https://micro-mcp.eelkhair.net/healthzEndpoint
-      - HealthChecksUI__HealthChecks__7__Name=Company API
-      - HealthChecksUI__HealthChecks__7__Uri=https://job-company-api.eelkhair.net/healthzEndpoint
-      - HealthChecksUI__HealthChecks__8__Name=Job API
-      - HealthChecksUI__HealthChecks__8__Uri=https://job-api.eelkhair.net/healthzEndpoint
-      - HealthChecksUI__HealthChecks__9__Name=User API
-      - HealthChecksUI__HealthChecks__9__Uri=https://job-users-api.eelkhair.net/healthzEndpoint
-      - HealthChecksUI__HealthChecks__10__Name=Connector API
-      - HealthChecksUI__HealthChecks__10__Uri=https://job-connector.eelkhair.net/healthzEndpoint
-      - HealthChecksUI__HealthChecks__11__Name=Reverse Connector API
-      - HealthChecksUI__HealthChecks__11__Uri=https://job-reverse-connector.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__1__Name=AI Service V2
+      - HealthChecksUI__HealthChecks__1__Uri=https://job-ai-v2.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__2__Name=Monolith API
+      - HealthChecksUI__HealthChecks__2__Uri=https://job-monolith.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__3__Name=Monolith MCP
+      - HealthChecksUI__HealthChecks__3__Uri=https://mono-mcp.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__4__Name=Admin API
+      - HealthChecksUI__HealthChecks__4__Uri=https://job-admin-api.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__5__Name=Admin API MCP
+      - HealthChecksUI__HealthChecks__5__Uri=https://micro-mcp.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__6__Name=Company API
+      - HealthChecksUI__HealthChecks__6__Uri=https://job-company-api.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__7__Name=Job API
+      - HealthChecksUI__HealthChecks__7__Uri=https://job-api.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__8__Name=User API
+      - HealthChecksUI__HealthChecks__8__Uri=https://job-users-api.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__9__Name=Connector API
+      - HealthChecksUI__HealthChecks__9__Uri=https://job-connector.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__10__Name=Reverse Connector API
+      - HealthChecksUI__HealthChecks__10__Uri=https://job-reverse-connector.eelkhair.net/healthzEndpoint
     ports:
       - "5107:8080"
 
