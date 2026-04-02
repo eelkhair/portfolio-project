@@ -39,7 +39,7 @@ public class DraftTools(HandlerDispatcher dispatcher)
             d.JobType,
             d.SalaryRange
         });
-        return JsonSerializer.Serialize(slim);
+        return JsonSerializer.Serialize(slim, Json.Opts);
     }
 
     [McpServerTool(Name = "draft_detail"),
@@ -52,11 +52,11 @@ public class DraftTools(HandlerDispatcher dispatcher)
         {
             var query = new GetDraftByIdQuery { DraftId = draftId };
             var draft = await dispatcher.DispatchAsync<GetDraftByIdQuery, DraftResponse>(query, ct);
-            return JsonSerializer.Serialize(draft);
+            return JsonSerializer.Serialize(draft, Json.Opts);
         }
         catch
         {
-            return JsonSerializer.Serialize(new { error = $"Draft '{draftId}' not found." });
+            return JsonSerializer.Serialize(new { error = $"Draft '{draftId}' not found." }, Json.Opts);
         }
     }
 
@@ -93,7 +93,7 @@ public class DraftTools(HandlerDispatcher dispatcher)
         };
 
         var result = await dispatcher.DispatchAsync<SaveDraftCommand, DraftResponse>(command, ct);
-        return JsonSerializer.Serialize(new { result.Id, result.Title, status = "saved" });
+        return JsonSerializer.Serialize(new { result.Id, result.Title, status = "saved" }, Json.Opts);
     }
 
     [McpServerTool(Name = "delete_draft"), Description("Deletes a draft. Requires both companyId and draftId.")]
@@ -104,7 +104,7 @@ public class DraftTools(HandlerDispatcher dispatcher)
     {
         var command = new DeleteDraftCommand { CompanyId = companyId, DraftId = draftId };
         await dispatcher.DispatchAsync<DeleteDraftCommand, bool>(command, ct);
-        return JsonSerializer.Serialize(new { success = true, draftId });
+        return JsonSerializer.Serialize(new { success = true, draftId }, Json.Opts);
     }
 
     [McpServerTool(Name = "drafts_by_company"),
@@ -126,7 +126,7 @@ public class DraftTools(HandlerDispatcher dispatcher)
                     d.JobType
                 })
             });
-        return JsonSerializer.Serialize(slim);
+        return JsonSerializer.Serialize(slim, Json.Opts);
     }
 
     private static List<object> FilterByLocation(List<(string? Location, object Item)> items, string location)

@@ -23,7 +23,7 @@ public class JobTools(
         CancellationToken ct)
     {
         var response = await queryService.ListAsync(companyId, ct);
-        return JsonSerializer.Serialize(response.Data);
+        return JsonSerializer.Serialize(response.Data, Json.Opts);
     }
 
     [McpServerTool(Name = "job_detail"),
@@ -37,9 +37,9 @@ public class JobTools(
         var job = response.Data?.FirstOrDefault(j => j.UId == jobId);
 
         if (job is null)
-            return JsonSerializer.Serialize(new { error = $"Job '{jobId}' not found." });
+            return JsonSerializer.Serialize(new { error = $"Job '{jobId}' not found." }, Json.Opts);
 
-        return JsonSerializer.Serialize(job);
+        return JsonSerializer.Serialize(job, Json.Opts);
     }
 
     [McpServerTool(Name = "company_job_summaries"),
@@ -50,7 +50,7 @@ public class JobTools(
     public async Task<string> ListCompanyJobSummaries(CancellationToken ct)
     {
         var response = await queryService.ListCompanyJobSummariesAsync(ct);
-        return JsonSerializer.Serialize(response.Data);
+        return JsonSerializer.Serialize(response.Data, Json.Opts);
     }
 
     [McpServerTool(Name = "create_job"),
@@ -67,12 +67,12 @@ public class JobTools(
         if (!Guid.TryParse(draftId, out var id))
         {
             logger.LogWarning("Invalid draftId format: {DraftId}", draftId);
-            return JsonSerializer.Serialize(new { error = "Invalid draftId format. Must be a valid GUID." });
+            return JsonSerializer.Serialize(new { error = "Invalid draftId format. Must be a valid GUID." }, Json.Opts);
         }
 
         var draftResponse = await queryService.GetDraft(id, ct);
         if (!draftResponse.Success || draftResponse.Data is null)
-            return JsonSerializer.Serialize(new { error = $"Draft '{draftId}' not found." });
+            return JsonSerializer.Serialize(new { error = $"Draft '{draftId}' not found." }, Json.Opts);
 
         var content = draftResponse.Data;
         var request = new JobCreateRequest
@@ -93,6 +93,6 @@ public class JobTools(
 
         logger.LogInformation("Job created from draft {DraftId}", draftId);
 
-        return JsonSerializer.Serialize(new { result.Data?.UId, result.Data?.Title, result.Data?.CompanyName, status = "published" });
+        return JsonSerializer.Serialize(new { result.Data?.UId, result.Data?.Title, result.Data?.CompanyName, status = "published" }, Json.Opts);
     }
 }

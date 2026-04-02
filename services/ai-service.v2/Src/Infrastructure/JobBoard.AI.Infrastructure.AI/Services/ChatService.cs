@@ -175,7 +175,7 @@ public class ChatService(
                     return new ChatResponse
                     {
                         Response = "",
-                        Data = directData,
+                        ToolResults = directData,
                         ConversationId = conversationContext.ConversationId.Value,
                         TraceId = Activity.Current?.TraceId.ToString() ?? string.Empty
                     };

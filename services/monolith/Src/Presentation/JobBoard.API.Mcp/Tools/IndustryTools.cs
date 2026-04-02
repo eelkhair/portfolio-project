@@ -17,6 +17,6 @@ public class IndustryTools(HandlerDispatcher dispatcher)
         var query = new GetIndustriesQuery();
         var result = await dispatcher.DispatchAsync<GetIndustriesQuery, IQueryable<IndustryDto>>(query, ct);
         var industries = await result.Select(i => new { i.Id, i.Name }).ToListAsync(ct);
-        return JsonSerializer.Serialize(industries);
+        return JsonSerializer.Serialize(industries, Json.Opts);
     }
 }

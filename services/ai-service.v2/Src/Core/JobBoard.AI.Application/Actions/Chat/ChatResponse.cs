@@ -13,7 +13,7 @@ public class ChatResponse
     /// Null when the LLM generated a text response.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public List<ToolData>? Data { get; set; }
+    public List<ToolData>? ToolResults { get; set; }
 }
 
 public class ToolData

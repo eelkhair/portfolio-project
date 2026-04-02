@@ -16,7 +16,7 @@ public class CompanyTools(
     {
         var response = await queryService.ListAsync(ct);
         var slim = response.Data?.Select(c => new { c.UId, c.Name, c.Email }) ?? [];
-        return JsonSerializer.Serialize(slim);
+        return JsonSerializer.Serialize(slim, Json.Opts);
     }
 
     [McpServerTool(Name = "company_detail"),
@@ -29,21 +29,14 @@ public class CompanyTools(
         var company = response.Data?.FirstOrDefault(c => c.UId == companyId);
 
         if (company is null)
-            return JsonSerializer.Serialize(new { error = "Company not found." });
+            return JsonSerializer.Serialize(new { error = "Company not found." }, Json.Opts);
 
         return JsonSerializer.Serialize(new
         {
-            company.UId,
-            company.Name,
-            company.Email,
-            company.Description,
-            company.About,
-            company.Website,
-            company.Phone,
-            company.Founded,
-            company.Size,
-            company.EEO
-        });
+            company.UId, company.Name, company.Email, company.Description,
+            company.About, company.Website, company.Phone, company.Founded,
+            company.Size, company.EEO
+        }, Json.Opts);
     }
 
     [McpServerTool(Name = "create_company"), Description("Creates a company with an admin user.")]
@@ -70,7 +63,7 @@ public class CompanyTools(
 
         var response = await commandService.CreateAsync(request, ct);
         var data = response.Data;
-        return JsonSerializer.Serialize(new { data?.UId, data?.Name, status = "created" });
+        return JsonSerializer.Serialize(new { data?.UId, data?.Name, status = "created" }, Json.Opts);
     }
 
     [McpServerTool(Name = "update_company"),
@@ -110,6 +103,6 @@ public class CompanyTools(
 
         var response = await commandService.UpdateAsync(companyId, request, ct);
         var data = response.Data;
-        return JsonSerializer.Serialize(new { data?.UId, data?.Name, status = "updated" });
+        return JsonSerializer.Serialize(new { data?.UId, data?.Name, status = "updated" }, Json.Opts);
     }
 }

@@ -25,7 +25,7 @@ public class CompanyTools(HandlerDispatcher dispatcher)
             c.Email,
             Industry = c.Industry != null ? c.Industry.Name : null
         }).ToListAsync(ct);
-        return JsonSerializer.Serialize(companies);
+        return JsonSerializer.Serialize(companies, Json.Opts);
     }
 
     [McpServerTool(Name = "company_detail"),
@@ -52,8 +52,8 @@ public class CompanyTools(HandlerDispatcher dispatcher)
         }).FirstOrDefaultAsync(ct);
 
         return company is not null
-            ? JsonSerializer.Serialize(company)
-            : JsonSerializer.Serialize(new { error = "Company not found." });
+            ? JsonSerializer.Serialize(company, Json.Opts)
+            : JsonSerializer.Serialize(new { error = "Company not found." }, Json.Opts);
     }
 
     [McpServerTool(Name = "create_company"), Description("Creates a company with an admin user.")]
@@ -79,7 +79,7 @@ public class CompanyTools(HandlerDispatcher dispatcher)
         };
 
         var result = await dispatcher.DispatchAsync<CreateCompanyCommand, CompanyDto>(command, ct);
-        return JsonSerializer.Serialize(new { result.Id, result.Name, status = "created" });
+        return JsonSerializer.Serialize(new { result.Id, result.Name, status = "created" }, Json.Opts);
     }
 
     [McpServerTool(Name = "update_company"),
@@ -119,6 +119,6 @@ public class CompanyTools(HandlerDispatcher dispatcher)
         };
 
         var result = await dispatcher.DispatchAsync<UpdateCompanyCommand, CompanyDto>(command, ct);
-        return JsonSerializer.Serialize(new { result.Id, result.Name, status = "updated" });
+        return JsonSerializer.Serialize(new { result.Id, result.Name, status = "updated" }, Json.Opts);
     }
 }

@@ -19,7 +19,7 @@ export interface ChatResponse {
   response: string;
   conversationId: string;
   traceId?: string;
-  data?: ToolData[];
+  toolResults?: ToolData[];
 }
 
 @Injectable({providedIn: 'root'})

@@ -28,7 +28,7 @@ public class JobTools(HandlerDispatcher dispatcher, ILogger<JobTools> logger)
         var query = new ListJobsQuery(companyId);
         var result = await dispatcher.DispatchAsync<ListJobsQuery, IQueryable<JobResponse>>(query, ct);
         var jobs = await result.ToListAsync(ct);
-        return JsonSerializer.Serialize(jobs);
+        return JsonSerializer.Serialize(jobs, Json.Opts);
     }
 
     [McpServerTool(Name = "job_detail"),
@@ -41,11 +41,11 @@ public class JobTools(HandlerDispatcher dispatcher, ILogger<JobTools> logger)
         {
             var query = new GetPublicJobByIdQuery(jobId);
             var job = await dispatcher.DispatchAsync<GetPublicJobByIdQuery, JobResponse>(query, ct);
-            return JsonSerializer.Serialize(job);
+            return JsonSerializer.Serialize(job, Json.Opts);
         }
         catch
         {
-            return JsonSerializer.Serialize(new { error = $"Job '{jobId}' not found." });
+            return JsonSerializer.Serialize(new { error = $"Job '{jobId}' not found." }, Json.Opts);
         }
     }
 
@@ -59,7 +59,7 @@ public class JobTools(HandlerDispatcher dispatcher, ILogger<JobTools> logger)
         var query = new GetCompanyJobSummariesQuery();
         var result = await dispatcher.DispatchAsync<GetCompanyJobSummariesQuery, IQueryable<CompanyJobSummaryDto>>(query, ct);
         var summaries = await result.ToListAsync(ct);
-        return JsonSerializer.Serialize(summaries);
+        return JsonSerializer.Serialize(summaries, Json.Opts);
     }
 
     [McpServerTool(Name = "create_job"),
@@ -76,7 +76,7 @@ public class JobTools(HandlerDispatcher dispatcher, ILogger<JobTools> logger)
         if (!Guid.TryParse(draftId, out var id))
         {
             logger.LogWarning("Invalid draftId format: {DraftId}", draftId);
-            return JsonSerializer.Serialize(new { error = "Invalid draftId format. Must be a valid GUID." });
+            return JsonSerializer.Serialize(new { error = "Invalid draftId format. Must be a valid GUID." }, Json.Opts);
         }
 
         // Fetch the draft first
@@ -88,7 +88,7 @@ public class JobTools(HandlerDispatcher dispatcher, ILogger<JobTools> logger)
         }
         catch
         {
-            return JsonSerializer.Serialize(new { error = $"Draft '{draftId}' not found." });
+            return JsonSerializer.Serialize(new { error = $"Draft '{draftId}' not found." }, Json.Opts);
         }
 
         var request = new CreateJobRequest
@@ -112,6 +112,6 @@ public class JobTools(HandlerDispatcher dispatcher, ILogger<JobTools> logger)
 
         logger.LogInformation("Job created from draft {DraftId}", draftId);
 
-        return JsonSerializer.Serialize(new { result.Id, result.Title, result.CompanyName, status = "published" });
+        return JsonSerializer.Serialize(new { result.Id, result.Title, result.CompanyName, status = "published" }, Json.Opts);
     }
 }

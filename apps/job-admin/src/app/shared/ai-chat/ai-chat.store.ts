@@ -47,13 +47,13 @@ export class ChatStore {
           if (res.success && res.data) {
             this.conversationId.set(res.data.conversationId);
 
-            if (res.data.data?.length) {
-              // Direct return — structured tool data, render as markdown table
-              const content = this.renderToolData(res.data.data);
+            if (res.data.toolResults?.length) {
+              // Direct return — structured tool data, render as markdown list
+              const content = this.renderToolData(res.data.toolResults);
               this.messages.update(msgs => [...msgs, {
                 role: 'assistant', content, html: this.renderMarkdown(content),
                 traceId: res.data!.traceId, duration, time: this.formatTime(),
-                toolData: res.data!.data
+                toolData: res.data!.toolResults
               }]);
             } else {
               // Normal LLM text response

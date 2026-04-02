@@ -13,6 +13,6 @@ public class IndustryTools(IIndustryQueryService queryService)
     {
         var response = await queryService.ListAsync(ct);
         var slim = response.Data?.Select(i => new { i.UId, i.Name }) ?? [];
-        return JsonSerializer.Serialize(slim);
+        return JsonSerializer.Serialize(slim, Json.Opts);
     }
 }

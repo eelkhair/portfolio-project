@@ -30,7 +30,7 @@ public class DraftTools(
         }
 
         var slim = drafts.Select(d => new { d.Id, d.Title, d.Location, d.JobType, d.SalaryRange });
-        return JsonSerializer.Serialize(slim);
+        return JsonSerializer.Serialize(slim, Json.Opts);
     }
 
     [McpServerTool(Name = "draft_detail"),
@@ -41,9 +41,9 @@ public class DraftTools(
     {
         var response = await queryService.GetDraft(draftId, ct);
         if (!response.Success || response.Data is null)
-            return JsonSerializer.Serialize(new { error = $"Draft '{draftId}' not found." });
+            return JsonSerializer.Serialize(new { error = $"Draft '{draftId}' not found." }, Json.Opts);
 
-        return JsonSerializer.Serialize(response.Data);
+        return JsonSerializer.Serialize(response.Data, Json.Opts);
     }
 
     [McpServerTool(Name = "save_draft"),
@@ -76,7 +76,7 @@ public class DraftTools(
 
         var response = await commandService.CreateDraft(companyId.ToString(), request, ct);
         var data = response.Data;
-        return JsonSerializer.Serialize(new { data?.Id, data?.Title, status = "saved" });
+        return JsonSerializer.Serialize(new { data?.Id, data?.Title, status = "saved" }, Json.Opts);
     }
 
     [McpServerTool(Name = "delete_draft"), Description("Deletes a draft. Requires both companyId and draftId.")]
@@ -86,7 +86,7 @@ public class DraftTools(
         CancellationToken ct)
     {
         await commandService.DeleteDraft(companyId.ToString(), draftId, ct);
-        return JsonSerializer.Serialize(new { success = true, draftId });
+        return JsonSerializer.Serialize(new { success = true, draftId }, Json.Opts);
     }
 
     private static List<object> FilterByLocation(List<(string? Location, object Item)> items, string location)
