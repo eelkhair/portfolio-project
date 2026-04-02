@@ -27,12 +27,14 @@ public sealed class ChatOptionsFactory(
     {
         // Company group
         ["company_list"] = "company",
+        ["company_detail"] = "company",
         ["create_company"] = "company",
         ["update_company"] = "company",
         ["industry_list"] = "company",
 
         // Draft group
         ["draft_list"] = "draft",
+        ["draft_detail"] = "draft",
         ["save_draft"] = "draft",
         ["delete_draft"] = "draft",
         ["drafts_by_company"] = "draft",
@@ -40,6 +42,7 @@ public sealed class ChatOptionsFactory(
 
         // Job group
         ["job_list"] = "job",
+        ["job_detail"] = "job",
         ["company_job_summaries"] = "job",
         ["create_job"] = "job",
 

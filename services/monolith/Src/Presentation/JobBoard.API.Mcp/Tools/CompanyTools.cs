@@ -28,6 +28,34 @@ public class CompanyTools(HandlerDispatcher dispatcher)
         return JsonSerializer.Serialize(companies);
     }
 
+    [McpServerTool(Name = "company_detail"),
+     Description("Returns full details for a single company by ID. Use after company_list to get description, about, website, phone, size, etc.")]
+    public async Task<string> GetCompany(
+        [Description("The company's unique identifier")] Guid companyId,
+        CancellationToken ct)
+    {
+        var query = new GetCompaniesQuery();
+        var result = await dispatcher.DispatchAsync<GetCompaniesQuery, IQueryable<CompanyDto>>(query, ct);
+        var company = await result.Where(c => c.Id == companyId).Select(c => new
+        {
+            c.Id,
+            c.Name,
+            c.Email,
+            c.Description,
+            c.About,
+            c.Website,
+            c.Phone,
+            c.Founded,
+            c.Size,
+            c.EEO,
+            Industry = c.Industry != null ? c.Industry.Name : null
+        }).FirstOrDefaultAsync(ct);
+
+        return company is not null
+            ? JsonSerializer.Serialize(company)
+            : JsonSerializer.Serialize(new { error = "Company not found." });
+    }
+
     [McpServerTool(Name = "create_company"), Description("Creates a company with an admin user.")]
     public async Task<string> CreateCompany(
         [Description("Company name (required)")] string name,

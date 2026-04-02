@@ -10,10 +10,16 @@ export interface ChatRequest {
   conversationId?: string;
 }
 
+export interface ToolData {
+  tool: string;
+  result: unknown;
+}
+
 export interface ChatResponse {
   response: string;
   conversationId: string;
   traceId?: string;
+  data?: ToolData[];
 }
 
 @Injectable({providedIn: 'root'})

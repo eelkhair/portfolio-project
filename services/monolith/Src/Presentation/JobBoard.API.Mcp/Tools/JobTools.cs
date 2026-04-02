@@ -5,6 +5,7 @@ using JobBoard.Application.Actions.Companies.Get;
 using JobBoard.Application.Actions.Drafts.Get;
 using JobBoard.Application.Actions.Jobs.Create;
 using JobBoard.Application.Actions.Jobs.List;
+using JobBoard.Application.Actions.Public;
 using JobBoard.Monolith.Contracts.Drafts;
 using JobBoard.Monolith.Contracts.Jobs;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +29,24 @@ public class JobTools(HandlerDispatcher dispatcher, ILogger<JobTools> logger)
         var result = await dispatcher.DispatchAsync<ListJobsQuery, IQueryable<JobResponse>>(query, ct);
         var jobs = await result.ToListAsync(ct);
         return JsonSerializer.Serialize(jobs);
+    }
+
+    [McpServerTool(Name = "job_detail"),
+     Description("Returns full details for a single job by ID including aboutRole, responsibilities, and qualifications.")]
+    public async Task<string> GetJob(
+        [Description("The job's unique identifier")] Guid jobId,
+        CancellationToken ct)
+    {
+        try
+        {
+            var query = new GetPublicJobByIdQuery(jobId);
+            var job = await dispatcher.DispatchAsync<GetPublicJobByIdQuery, JobResponse>(query, ct);
+            return JsonSerializer.Serialize(job);
+        }
+        catch
+        {
+            return JsonSerializer.Serialize(new { error = $"Job '{jobId}' not found." });
+        }
     }
 
     [McpServerTool(Name = "company_job_summaries"),

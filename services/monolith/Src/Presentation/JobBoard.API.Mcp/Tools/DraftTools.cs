@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Text.Json;
 using JobBoard.API.Mcp.Infrastructure;
 using JobBoard.Application.Actions.Drafts.Delete;
+using JobBoard.Application.Actions.Drafts.Get;
 using JobBoard.Application.Actions.Drafts.List;
 using JobBoard.Application.Actions.Drafts.ListByCompany;
 using JobBoard.Application.Actions.Drafts.Save;
@@ -39,6 +40,24 @@ public class DraftTools(HandlerDispatcher dispatcher)
             d.SalaryRange
         });
         return JsonSerializer.Serialize(slim);
+    }
+
+    [McpServerTool(Name = "draft_detail"),
+     Description("Returns full details for a single draft by ID including aboutRole, responsibilities, qualifications, and notes.")]
+    public async Task<string> GetDraft(
+        [Description("The draft's unique identifier")] Guid draftId,
+        CancellationToken ct)
+    {
+        try
+        {
+            var query = new GetDraftByIdQuery { DraftId = draftId };
+            var draft = await dispatcher.DispatchAsync<GetDraftByIdQuery, DraftResponse>(query, ct);
+            return JsonSerializer.Serialize(draft);
+        }
+        catch
+        {
+            return JsonSerializer.Serialize(new { error = $"Draft '{draftId}' not found." });
+        }
     }
 
     [McpServerTool(Name = "save_draft"),
