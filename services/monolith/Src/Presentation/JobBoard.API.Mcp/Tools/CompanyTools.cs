@@ -13,12 +13,18 @@ namespace JobBoard.API.Mcp.Tools;
 [McpServerToolType]
 public class CompanyTools(HandlerDispatcher dispatcher)
 {
-    [McpServerTool(Name = "company_list"), Description("Returns a list of all companies in the system.")]
+    [McpServerTool(Name = "company_list"), Description("Returns a list of all companies (id, name, email, industry).")]
     public async Task<string> ListCompanies(CancellationToken ct)
     {
         var query = new GetCompaniesQuery();
         var result = await dispatcher.DispatchAsync<GetCompaniesQuery, IQueryable<CompanyDto>>(query, ct);
-        var companies = await result.ToListAsync(ct);
+        var companies = await result.Select(c => new
+        {
+            c.Id,
+            c.Name,
+            c.Email,
+            Industry = c.Industry != null ? c.Industry.Name : null
+        }).ToListAsync(ct);
         return JsonSerializer.Serialize(companies);
     }
 
@@ -45,14 +51,14 @@ public class CompanyTools(HandlerDispatcher dispatcher)
         };
 
         var result = await dispatcher.DispatchAsync<CreateCompanyCommand, CompanyDto>(command, ct);
-        return JsonSerializer.Serialize(result);
+        return JsonSerializer.Serialize(new { result.Id, result.Name, status = "created" });
     }
 
     [McpServerTool(Name = "update_company"),
      Description(
-         "Updates an existing company. This is a full replacement — you MUST provide ALL fields, not just the ones being changed. " +
-         "ALWAYS call company_list first to get the current values, then include every field (companyId, name, companyEmail, industryUId are required). " +
-         "Omitted fields will be set to null/empty.")]
+         "Updates an existing company (full replacement). " +
+         "ALWAYS call company_list first to get current values, then include every field. " +
+         "Omitted optional fields will be set to null/empty.")]
     public async Task<string> UpdateCompany(
         [Description("The company's unique identifier (required)")] Guid companyId,
         [Description("Company name (required)")] string name,
@@ -85,6 +91,6 @@ public class CompanyTools(HandlerDispatcher dispatcher)
         };
 
         var result = await dispatcher.DispatchAsync<UpdateCompanyCommand, CompanyDto>(command, ct);
-        return JsonSerializer.Serialize(result);
+        return JsonSerializer.Serialize(new { result.Id, result.Name, status = "updated" });
     }
 }

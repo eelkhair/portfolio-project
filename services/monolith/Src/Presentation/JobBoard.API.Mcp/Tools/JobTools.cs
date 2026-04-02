@@ -93,6 +93,6 @@ public class JobTools(HandlerDispatcher dispatcher, ILogger<JobTools> logger)
 
         logger.LogInformation("Job created from draft {DraftId}", draftId);
 
-        return JsonSerializer.Serialize(result);
+        return JsonSerializer.Serialize(new { result.Id, result.Title, result.CompanyName, status = "published" });
     }
 }

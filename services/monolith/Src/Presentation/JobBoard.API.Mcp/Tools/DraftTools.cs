@@ -13,18 +13,36 @@ namespace JobBoard.API.Mcp.Tools;
 [McpServerToolType]
 public class DraftTools(HandlerDispatcher dispatcher)
 {
-    [McpServerTool(Name = "draft_list"), Description("Returns a list of drafts for a company.")]
+    [McpServerTool(Name = "draft_list"),
+     Description("Returns drafts for a company. Optionally filter by location (2-letter state code e.g. CA, NY).")]
     public async Task<string> ListDrafts(
         [Description("The company's unique identifier")] Guid companyId,
-        CancellationToken ct)
+        [Description("Optional location filter (2-letter state code e.g. CA, NY)")] string? location = null,
+        CancellationToken ct = default)
     {
         var query = new ListDraftsQuery { CompanyId = companyId };
-        var result = await dispatcher.DispatchAsync<ListDraftsQuery, List<DraftResponse>>(query, ct);
-        return JsonSerializer.Serialize(result);
+        var drafts = await dispatcher.DispatchAsync<ListDraftsQuery, List<DraftResponse>>(query, ct);
+
+        if (!string.IsNullOrWhiteSpace(location))
+        {
+            drafts = FilterByLocation(
+                    drafts.Select(d => (d.Location, (object)d)).ToList(), location)
+                .Cast<DraftResponse>().ToList();
+        }
+
+        var slim = drafts.Select(d => new
+        {
+            d.Id,
+            d.Title,
+            d.Location,
+            d.JobType,
+            d.SalaryRange
+        });
+        return JsonSerializer.Serialize(slim);
     }
 
     [McpServerTool(Name = "save_draft"),
-     Description("Saves a draft for a company. companyId is required. Ensure CompanyId is populated.")]
+     Description("Saves a draft for a company. companyId is required.")]
     public async Task<string> SaveDraft(
         [Description("The company's unique identifier (required)")] Guid companyId,
         [Description("Job title (required)")] string title,
@@ -56,25 +74,7 @@ public class DraftTools(HandlerDispatcher dispatcher)
         };
 
         var result = await dispatcher.DispatchAsync<SaveDraftCommand, DraftResponse>(command, ct);
-        return JsonSerializer.Serialize(result);
-    }
-
-    [McpServerTool(Name = "draft_list_by_location"),
-     Description(
-         "Returns the list of drafts by location for a company. " +
-         "State must be normalized to 2 letter code (eg. CA, NY, IA, TX). " +
-         "Remove any drafts that are not in the specified location after the tool is done processing.")]
-    public async Task<string> ListDraftsByLocation(
-        [Description("The company's unique identifier")] Guid companyId,
-        [Description("State or city filter (use 2-letter state code e.g. CA, NY)")] string location,
-        CancellationToken ct)
-    {
-        var query = new ListDraftsQuery { CompanyId = companyId };
-        var drafts = await dispatcher.DispatchAsync<ListDraftsQuery, List<DraftResponse>>(query, ct);
-        var filtered = FilterByLocation(
-            drafts.Select(d => (d.Location, (object)d)).ToList(), location)
-            .Cast<DraftResponse>().ToList();
-        return JsonSerializer.Serialize(filtered);
+        return JsonSerializer.Serialize(new { result.Id, result.Title, status = "saved" });
     }
 
     [McpServerTool(Name = "delete_draft"), Description("Deletes a draft. Requires both companyId and draftId.")]
@@ -89,12 +89,25 @@ public class DraftTools(HandlerDispatcher dispatcher)
     }
 
     [McpServerTool(Name = "drafts_by_company"),
-     Description("Returns job drafts grouped by company. Each company entry contains a list of drafts and a count.")]
+     Description("Returns draft counts and titles grouped by company.")]
     public async Task<string> DraftsByCompany(CancellationToken ct)
     {
         var query = new ListAllDraftsByCompanyQuery();
         var result = await dispatcher.DispatchAsync<ListAllDraftsByCompanyQuery, Dictionary<Guid, DraftsByCompanyItemResponse>>(query, ct);
-        return JsonSerializer.Serialize(result);
+        var slim = result.ToDictionary(
+            kv => kv.Key,
+            kv => new
+            {
+                kv.Value.Count,
+                Drafts = kv.Value.Drafts.Select(d => new
+                {
+                    d.Id,
+                    d.Title,
+                    d.Location,
+                    d.JobType
+                })
+            });
+        return JsonSerializer.Serialize(slim);
     }
 
     private static List<object> FilterByLocation(List<(string? Location, object Item)> items, string location)

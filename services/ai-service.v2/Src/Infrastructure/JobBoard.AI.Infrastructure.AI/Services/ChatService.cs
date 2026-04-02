@@ -20,12 +20,16 @@ public class ChatService(
     IChatOptionsFactory chatOptionsFactory,
     IConversationStore conversationStore,
     IConversationContext conversationContext,
+    IConversationSummarizer conversationSummarizer,
+    IToolResultCompressor toolResultCompressor,
     IUserAccessor userAccessor,
     IConfiguration configuration,
     IServiceProvider serviceProvider,
     IMetricsService metricsService)
     : IChatService
 {
+    private const int SummarizeThreshold = 20;
+    private const int KeepRecentCount = 6;
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -47,10 +51,20 @@ public class ChatService(
             new(ChatRole.System, systemPrompt)
         };
 
-        var savedMessages = await conversationStore.GetChatMessages(conversationContext.ConversationId!.Value, userAccessor.UserId!);
-        messages.AddRange(savedMessages);
+        var snapshot = await conversationStore.GetConversation(
+            conversationContext.ConversationId!.Value, userAccessor.UserId!);
 
-        var options = chatOptionsFactory.Create(serviceProvider, scope);
+        if (!string.IsNullOrWhiteSpace(snapshot.Summary))
+        {
+            messages.Add(new(ChatRole.User,
+                $"[Previous conversation summary]\n{snapshot.Summary}"));
+            messages.Add(new(ChatRole.Assistant,
+                "Understood, I have the context from our previous conversation."));
+        }
+
+        messages.AddRange(snapshot.Messages);
+
+        var options = chatOptionsFactory.Create(serviceProvider, scope, userMessage, snapshot.Summary);
 
         messages.Add(new(ChatRole.User, userMessage));
 
@@ -97,6 +111,10 @@ public class ChatService(
         }
 
         messages.AddMessages(response);
+
+        // Compress large tool results before persisting (current turn already saw full data)
+        toolResultCompressor.CompressToolResults(messages);
+
         messages = messages.TakeLast(40).ToList();
         if (messages.Count > 0 &&
             messages[0].Contents is { Count: > 0 } &&
@@ -105,15 +123,36 @@ public class ChatService(
             messages.RemoveAt(0);
         }
 
-        await conversationStore.SaveChatMessages(
+        var nonSystemMessages = messages
+            .Where(m => m.Role != ChatRole.System)
+            .ToList();
+
+        // Remove injected summary context messages before saving
+        if (nonSystemMessages.Count >= 2
+            && nonSystemMessages[0].Role == ChatRole.User
+            && nonSystemMessages[0].Text?.StartsWith("[Previous conversation summary]") == true)
+        {
+            nonSystemMessages.RemoveRange(0, 2);
+        }
+
+        var summary = snapshot.Summary;
+
+        if (nonSystemMessages.Count > SummarizeThreshold)
+        {
+            var older = nonSystemMessages.SkipLast(KeepRecentCount).ToList();
+            var recent = nonSystemMessages.TakeLast(KeepRecentCount).ToList();
+
+            summary = await conversationSummarizer.SummarizeAsync(
+                snapshot.Summary, older, cancellationToken);
+
+            nonSystemMessages = recent;
+        }
+
+        await conversationStore.SaveConversation(
             conversationContext.ConversationId.Value,
             userAccessor.UserId!,
-            messages
-                .Where(m =>
-                    m.Role != ChatRole.System
-                )
-                .ToList()
-
+            nonSystemMessages,
+            summary
         );
          
         return new ChatResponse
@@ -135,7 +174,7 @@ public class ChatService(
         };
         try
         {
-            var chatOptions = chatOptionsFactory.Create(serviceProvider, ChatScope.Public);
+            var chatOptions = chatOptionsFactory.Create(serviceProvider, ChatScope.Public, userPrompt, null);
             var response = await client.GetResponseAsync(
                 messages, chatOptions,
                 cancellationToken: cancellationToken);
@@ -167,7 +206,7 @@ public class ChatService(
         try
         {
             var chatOptions = allowTools
-                ? chatOptionsFactory.Create(serviceProvider, ChatScope.Admin)
+                ? chatOptionsFactory.Create(serviceProvider, ChatScope.Admin, userPrompt, null)
                 : new ChatOptions
                 {
                     MaxOutputTokens = 5000,

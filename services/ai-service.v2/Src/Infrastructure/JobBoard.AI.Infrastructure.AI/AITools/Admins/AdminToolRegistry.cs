@@ -24,11 +24,9 @@ public class AdminToolRegistry(
 {
     public IEnumerable<AITool> GetTools()
     {
-        yield return TraceIdTool.Get(activityFactory, redisStore, userAccessor, conversationContext, conversationStore);
-        yield return ConversationIdTool.Get(activityFactory, conversationContext);
-        yield return ProviderRetrievalTool.Get(activityFactory, toolResolver, logger);
+        yield return SystemInfoTool.Get(activityFactory, toolResolver, redisStore, userAccessor,
+            conversationContext, conversationStore, settingsService, logger);
         yield return GenerateDraftTool.Get(activityFactory, toolResolver, draftPersistence, notificationHub, userAccessor, logger);
-        yield return IsMonolithTool.Get(activityFactory, settingsService);
         yield return SetModeTool.Get(activityFactory, settingsService, logger);
     }
 }
