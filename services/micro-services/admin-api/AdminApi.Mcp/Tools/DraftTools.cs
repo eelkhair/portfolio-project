@@ -12,17 +12,42 @@ public class DraftTools(
     IJobCommandService commandService,
     IJobQueryService queryService)
 {
-    [McpServerTool(Name = "draft_list"), Description("Returns a list of drafts for a company.")]
+    [McpServerTool(Name = "draft_list"),
+     Description("Returns drafts for a company. Optionally filter by location (2-letter state code e.g. CA, NY).")]
     public async Task<string> ListDrafts(
         [Description("The company's unique identifier")] Guid companyId,
-        CancellationToken ct)
+        [Description("Optional location filter (2-letter state code e.g. CA, NY)")] string? location = null,
+        CancellationToken ct = default)
     {
         var response = await queryService.ListDrafts(companyId.ToString(), ct);
+        var drafts = response.Data ?? [];
+
+        if (!string.IsNullOrWhiteSpace(location))
+        {
+            drafts = FilterByLocation(
+                    drafts.Select(d => (d.Location, (object)d)).ToList(), location)
+                .Cast<JobDraftResponse>().ToList();
+        }
+
+        var slim = drafts.Select(d => new { d.Id, d.Title, d.Location, d.JobType, d.SalaryRange });
+        return JsonSerializer.Serialize(slim);
+    }
+
+    [McpServerTool(Name = "draft_detail"),
+     Description("Returns full details for a single draft by ID including aboutRole, responsibilities, qualifications, and notes.")]
+    public async Task<string> GetDraft(
+        [Description("The draft's unique identifier")] Guid draftId,
+        CancellationToken ct)
+    {
+        var response = await queryService.GetDraft(draftId, ct);
+        if (!response.Success || response.Data is null)
+            return JsonSerializer.Serialize(new { error = $"Draft '{draftId}' not found." });
+
         return JsonSerializer.Serialize(response.Data);
     }
 
     [McpServerTool(Name = "save_draft"),
-     Description("Saves a draft for a company. companyId is required. Ensure CompanyId is populated.")]
+     Description("Saves a draft for a company. companyId is required.")]
     public async Task<string> SaveDraft(
         [Description("The company's unique identifier (required)")] Guid companyId,
         [Description("Job title (required)")] string title,
@@ -50,25 +75,8 @@ public class DraftTools(
         };
 
         var response = await commandService.CreateDraft(companyId.ToString(), request, ct);
-        return JsonSerializer.Serialize(response.Data);
-    }
-
-    [McpServerTool(Name = "draft_list_by_location"),
-     Description(
-         "Returns the list of drafts by location for a company. " +
-         "State must be normalized to 2 letter code (eg. CA, NY, IA, TX). " +
-         "Remove any drafts that are not in the specified location after the tool is done processing.")]
-    public async Task<string> ListDraftsByLocation(
-        [Description("The company's unique identifier")] Guid companyId,
-        [Description("State or city filter (use 2-letter state code e.g. CA, NY)")] string location,
-        CancellationToken ct)
-    {
-        var response = await queryService.ListDrafts(companyId.ToString(), ct);
-        var drafts = response.Data ?? [];
-        var filtered = FilterByLocation(
-            drafts.Select(d => (d.Location, (object)d)).ToList(), location)
-            .Cast<JobDraftResponse>().ToList();
-        return JsonSerializer.Serialize(filtered);
+        var data = response.Data;
+        return JsonSerializer.Serialize(new { data?.Id, data?.Title, status = "saved" });
     }
 
     [McpServerTool(Name = "delete_draft"), Description("Deletes a draft. Requires both companyId and draftId.")]

@@ -8,10 +8,11 @@ namespace AdminApi.Mcp.Tools;
 [McpServerToolType]
 public class IndustryTools(IIndustryQueryService queryService)
 {
-    [McpServerTool(Name = "industry_list"), Description("Returns a list of all industries in the system.")]
+    [McpServerTool(Name = "industry_list"), Description("Returns all industries (id + name).")]
     public async Task<string> ListIndustries(CancellationToken ct)
     {
         var response = await queryService.ListAsync(ct);
-        return JsonSerializer.Serialize(response.Data);
+        var slim = response.Data?.Select(i => new { i.UId, i.Name }) ?? [];
+        return JsonSerializer.Serialize(slim);
     }
 }

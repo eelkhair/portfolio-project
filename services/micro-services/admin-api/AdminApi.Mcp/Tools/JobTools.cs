@@ -26,6 +26,22 @@ public class JobTools(
         return JsonSerializer.Serialize(response.Data);
     }
 
+    [McpServerTool(Name = "job_detail"),
+     Description("Returns full details for a single job by ID including aboutRole, responsibilities, and qualifications.")]
+    public async Task<string> GetJob(
+        [Description("The job's unique identifier")] Guid jobId,
+        [Description("The company's unique identifier")] Guid companyId,
+        CancellationToken ct)
+    {
+        var response = await queryService.ListAsync(companyId, ct);
+        var job = response.Data?.FirstOrDefault(j => j.UId == jobId);
+
+        if (job is null)
+            return JsonSerializer.Serialize(new { error = $"Job '{jobId}' not found." });
+
+        return JsonSerializer.Serialize(job);
+    }
+
     [McpServerTool(Name = "company_job_summaries"),
      Description(
          "Returns all companies with their published jobs (title, location, type, salary range, date) and job count in a single call. " +
@@ -77,6 +93,6 @@ public class JobTools(
 
         logger.LogInformation("Job created from draft {DraftId}", draftId);
 
-        return JsonSerializer.Serialize(result);
+        return JsonSerializer.Serialize(new { result.Data?.UId, result.Data?.Title, result.Data?.CompanyName, status = "published" });
     }
 }

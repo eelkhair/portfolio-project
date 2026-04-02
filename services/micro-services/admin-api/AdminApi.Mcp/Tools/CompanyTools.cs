@@ -11,11 +11,39 @@ public class CompanyTools(
     ICompanyCommandService commandService,
     ICompanyQueryService queryService)
 {
-    [McpServerTool(Name = "company_list"), Description("Returns a list of all companies in the system.")]
+    [McpServerTool(Name = "company_list"), Description("Returns a list of all companies (id, name, email).")]
     public async Task<string> ListCompanies(CancellationToken ct)
     {
         var response = await queryService.ListAsync(ct);
-        return JsonSerializer.Serialize(response.Data);
+        var slim = response.Data?.Select(c => new { c.UId, c.Name, c.Email }) ?? [];
+        return JsonSerializer.Serialize(slim);
+    }
+
+    [McpServerTool(Name = "company_detail"),
+     Description("Returns full details for a single company by ID. Use after company_list to get description, about, website, phone, size, etc.")]
+    public async Task<string> GetCompany(
+        [Description("The company's unique identifier")] Guid companyId,
+        CancellationToken ct)
+    {
+        var response = await queryService.ListAsync(ct);
+        var company = response.Data?.FirstOrDefault(c => c.UId == companyId);
+
+        if (company is null)
+            return JsonSerializer.Serialize(new { error = "Company not found." });
+
+        return JsonSerializer.Serialize(new
+        {
+            company.UId,
+            company.Name,
+            company.Email,
+            company.Description,
+            company.About,
+            company.Website,
+            company.Phone,
+            company.Founded,
+            company.Size,
+            company.EEO
+        });
     }
 
     [McpServerTool(Name = "create_company"), Description("Creates a company with an admin user.")]
@@ -41,14 +69,15 @@ public class CompanyTools(
         };
 
         var response = await commandService.CreateAsync(request, ct);
-        return JsonSerializer.Serialize(response.Data);
+        var data = response.Data;
+        return JsonSerializer.Serialize(new { data?.UId, data?.Name, status = "created" });
     }
 
     [McpServerTool(Name = "update_company"),
      Description(
-         "Updates an existing company. This is a full replacement — you MUST provide ALL fields, not just the ones being changed. " +
-         "ALWAYS call company_list first to get the current values, then include every field (companyId, name, companyEmail, industryUId are required). " +
-         "Omitted fields will be set to null/empty.")]
+         "Updates an existing company (full replacement). " +
+         "ALWAYS call company_list first to get current values, then include every field. " +
+         "Omitted optional fields will be set to null/empty.")]
     public async Task<string> UpdateCompany(
         [Description("The company's unique identifier (required)")] Guid companyId,
         [Description("Company name (required)")] string name,
@@ -80,6 +109,7 @@ public class CompanyTools(
         };
 
         var response = await commandService.UpdateAsync(companyId, request, ct);
-        return JsonSerializer.Serialize(response.Data);
+        var data = response.Data;
+        return JsonSerializer.Serialize(new { data?.UId, data?.Name, status = "updated" });
     }
 }
