@@ -145,7 +145,7 @@ public class ChatService(
                 // No tool calls — LLM produced a text response, we're done
                 if (toolCalls.Count == 0)
                 {
-                    RecordMetrics(scopeName, provider, totalUsage, toolCalls, sw);
+                    RecordMetrics(scopeName, provider, totalUsage, sw);
                     await SaveHistory(messages, snapshot, cancellationToken);
 
                     return new ChatResponse
@@ -181,7 +181,7 @@ public class ChatService(
                     var indexedSummary = BuildIndexedSummary(directData);
                     messages.Add(new ChatMessage(ChatRole.Assistant, indexedSummary));
 
-                    RecordMetrics(scopeName, provider, totalUsage, toolCalls, sw);
+                    RecordMetrics(scopeName, provider, totalUsage, sw, directReturn: true);
                     await SaveHistory(messages, snapshot, cancellationToken);
 
                     return new ChatResponse
@@ -197,7 +197,7 @@ public class ChatService(
             }
 
             // Fallback: max iterations reached
-            RecordMetrics(scopeName, provider, totalUsage, [], sw);
+            RecordMetrics(scopeName, provider, totalUsage, sw);
             await SaveHistory(messages, snapshot, cancellationToken);
 
             return new ChatResponse
@@ -277,7 +277,7 @@ public class ChatService(
     }
 
     private void RecordMetrics(string scopeName, string provider, UsageDetails usage,
-        List<FunctionCallContent> toolCalls, Stopwatch sw)
+        Stopwatch sw, bool directReturn = false)
     {
         sw.Stop();
         metricsService.RecordChatRequestDuration(scopeName, provider, sw.Elapsed.TotalMilliseconds);
@@ -286,7 +286,7 @@ public class ChatService(
         Activity.Current?.SetTag("ai.tokens.input", usage.InputTokenCount ?? 0);
         Activity.Current?.SetTag("ai.tokens.output", usage.OutputTokenCount ?? 0);
         Activity.Current?.SetTag("ai.conversationId", conversationContext.ConversationId);
-        Activity.Current?.SetTag("ai.direct_return", toolCalls.All(tc => DirectReturnTools.Contains(tc.Name ?? "")));
+        Activity.Current?.SetTag("ai.direct_return", directReturn);
 
         metricsService.RecordTokenUsage(scopeName, provider,
             usage.InputTokenCount ?? 0,
