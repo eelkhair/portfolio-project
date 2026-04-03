@@ -16,6 +16,7 @@ var sqlServer = builder.AddContainer("sqlserver", "mcr.microsoft.com/mssql/serve
     .WithEnvironment("ACCEPT_EULA", "Y")
     .WithEnvironment("MSSQL_SA_PASSWORD", "YourStrong!Passw0rd")
     .WithVolume("aspire-sqlserver-data", "/var/opt/mssql")
+    .WithBindMount("./SqlServerInit/backups", "/seed-backups", isReadOnly: true)
     .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
 
 var postgres = builder.AddContainer("postgres", "ankane/pgvector", "latest")
@@ -40,6 +41,21 @@ var redisSeed = builder.AddContainer("redis-seed", "redis", "8.2")
     .WithEntrypoint("/bin/sh")
     .WithArgs("/seed.sh")
     .WaitFor(redis)
+    .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
+
+var sqlServerSeed = builder.AddContainer("sqlserver-seed", "mcr.microsoft.com/mssql-tools", "latest")
+    .WithBindMount("./SqlServerInit/seed-sqlserver.sh", "/seed.sh", isReadOnly: true)
+    .WithEntrypoint("/bin/bash")
+    .WithArgs("/seed.sh")
+    .WaitFor(sqlServer)
+    .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
+
+var postgresSeed = builder.AddContainer("postgres-seed", "ankane/pgvector", "latest")
+    .WithBindMount("./PostgresInit/seed-postgres.sh", "/seed.sh", isReadOnly: true)
+    .WithBindMount("./PostgresInit/backups", "/seed-backups", isReadOnly: true)
+    .WithEntrypoint("/bin/bash")
+    .WithArgs("/seed.sh")
+    .WaitFor(postgres)
     .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
 
 var redisCommander = builder.AddContainer("redis-commander", "rediscommander/redis-commander")

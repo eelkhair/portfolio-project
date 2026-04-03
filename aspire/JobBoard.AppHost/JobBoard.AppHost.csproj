@@ -50,6 +50,8 @@
     <Content Include="KeycloakRealm\**\*" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="OtelCollector\**\*" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="RedisInit\**\*" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="SqlServerInit\**\*" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="PostgresInit\**\*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
