@@ -63,11 +63,11 @@ var rabbitMq = builder.AddContainer("rabbitmq", "rabbitmq", "4.2-management")
     .WithHttpEndpoint(15672, 15672, name: "management", isProxied: false)
     .WithEnvironment("RABBITMQ_DEFAULT_USER", "guest")
     .WithEnvironment("RABBITMQ_DEFAULT_PASS", "guest")
-    .WithContainerRuntimeArgs("--health-cmd", "rabbitmq-diagnostics -q ping")
+    .WithContainerRuntimeArgs("--health-cmd", "rabbitmq-diagnostics -q check_running && rabbitmq-diagnostics -q check_local_alarms")
     .WithContainerRuntimeArgs("--health-interval", "3s")
     .WithContainerRuntimeArgs("--health-timeout", "5s")
-    .WithContainerRuntimeArgs("--health-retries", "10")
-    .WithContainerRuntimeArgs("--health-start-period", "10s")
+    .WithContainerRuntimeArgs("--health-retries", "15")
+    .WithContainerRuntimeArgs("--health-start-period", "15s")
     .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
 
 var keycloakPassword = builder.AddParameter("keycloak-password", "admin");
@@ -303,6 +303,7 @@ if (useDapr)
         .WithEnvironment("Keycloak__Authority", keycloakAuthority)
         .WithEnvironment("Keycloak__Audience", keycloakAudience)
         .WithDaprSidecar(DaprOptions("admin-api"))
+        .WaitFor(seedRunner)
         .WaitFor(rabbitMq);
 
     var adminMcp = builder.AddProject<Projects.AdminApi_Mcp>("admin-api-mcp")
@@ -349,7 +350,8 @@ if (useDapr)
         .WithEnvironment("Keycloak__ServiceClientSecret", keycloakServiceClientSecret)
         .WithDaprSidecar(DaprOptions("user-api", "./DaprComponents/user-api"))
         .WaitFor(seedRunner)
-        .WaitFor(rabbitMq);
+        .WaitFor(rabbitMq)
+        .WaitFor(keycloak);
 
     var connectorApi = builder.AddProject<Projects.connector_api>("connector-api")
         .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
@@ -359,6 +361,7 @@ if (useDapr)
         .WithEnvironment("InternalApiKey", internalApiKey)
         .WithEnvironment("MonolithUrl", "http://localhost:5280")
         .WithDaprSidecar(DaprOptions("connector-api"))
+        .WaitFor(seedRunner)
         .WaitFor(rabbitMq);
 
     var reverseConnectorApi = builder.AddProject<Projects.reverse_connector_api>("reverse-connector-api")
@@ -369,6 +372,7 @@ if (useDapr)
         .WithEnvironment("InternalApiKey", internalApiKey)
         .WithEnvironment("MonolithUrl", "http://localhost:5280")
         .WithDaprSidecar(DaprOptions("reverse-connector-api"))
+        .WaitFor(seedRunner)
         .WaitFor(rabbitMq);
 
     gateway.WaitFor(adminApi).WaitFor(aiService);
