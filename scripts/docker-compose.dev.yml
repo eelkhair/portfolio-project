@@ -27,7 +27,7 @@ services:
       - VAULT_TOKEN=${VAULT_TOKEN}
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
-      - SEQ_URL=https://seq-dev.eelkhair.net
+      - SEQ_URL=https://seq.eelkhair.net
     networks:
       - ai-job-board-net
 
@@ -42,7 +42,7 @@ services:
       - McpServer__MicroUrl=http://admin-api-mcp:3334
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
-      - SEQ_URL=https://seq-dev.eelkhair.net
+      - SEQ_URL=https://seq.eelkhair.net
     networks:
       - ai-job-board-net
 
@@ -77,7 +77,7 @@ services:
       - VAULT_TOKEN=${VAULT_TOKEN}
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
-      - SEQ_URL=https://seq-dev.eelkhair.net
+      - SEQ_URL=https://seq.eelkhair.net
     networks:
       - ai-job-board-net
 
@@ -92,7 +92,7 @@ services:
       - VAULT_TOKEN=${VAULT_TOKEN}
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
-      - SEQ_URL=https://seq-dev.eelkhair.net
+      - SEQ_URL=https://seq.eelkhair.net
     networks:
       - ai-job-board-net
 
@@ -107,7 +107,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
-      - SEQ_URL=https://seq-dev.eelkhair.net
+      - SEQ_URL=https://seq.eelkhair.net
     networks:
       - ai-job-board-net
 
@@ -139,7 +139,7 @@ services:
       - ASPNETCORE_URLS=http://+:3334
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
-      - SEQ_URL=https://seq-dev.eelkhair.net
+      - SEQ_URL=https://seq.eelkhair.net
     networks:
       - ai-job-board-net
 
@@ -172,7 +172,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
-      - SEQ_URL=https://seq-dev.eelkhair.net
+      - SEQ_URL=https://seq.eelkhair.net
     networks:
       - ai-job-board-net
 
@@ -204,7 +204,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
-      - SEQ_URL=https://seq-dev.eelkhair.net
+      - SEQ_URL=https://seq.eelkhair.net
     networks:
       - ai-job-board-net
 
@@ -237,7 +237,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
-      - SEQ_URL=https://seq-dev.eelkhair.net
+      - SEQ_URL=https://seq.eelkhair.net
     networks:
       - ai-job-board-net
 
@@ -270,7 +270,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
-      - SEQ_URL=https://seq-dev.eelkhair.net
+      - SEQ_URL=https://seq.eelkhair.net
     networks:
       - ai-job-board-net
 
@@ -302,7 +302,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
-      - SEQ_URL=https://seq-dev.eelkhair.net
+      - SEQ_URL=https://seq.eelkhair.net
     networks:
       - ai-job-board-net
 

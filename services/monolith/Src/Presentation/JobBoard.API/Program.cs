@@ -70,6 +70,7 @@ var app = builder.Build();
 
 if (!isTesting)
 {
+    if (isAspire) await Task.Delay(TimeSpan.FromSeconds(10));
     await app.MigrateDatabase<JobBoardDbContext>();
     await app.SeedIndustriesAsync();
 }
