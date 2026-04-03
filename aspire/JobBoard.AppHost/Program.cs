@@ -231,7 +231,8 @@ var monolith = builder.AddProject<Projects.JobBoard_API>("monolith-api")
     .WithEnvironment("Keycloak__Audience", keycloakAudience)
     .WithEnvironment("Keycloak__SwaggerClientId", keycloakSwaggerClientId)
     .WaitFor(seedRunner)
-    .WaitFor(rabbitMq);
+    .WaitFor(rabbitMq)
+    .WaitFor(keycloak);
 
 var monolithMcp = builder.AddProject<Projects.JobBoard_API_Mcp>("monolith-mcp")
     .WithEnvironment("ASPIRE_MODE", "true")
@@ -294,6 +295,7 @@ if (useDapr)
         .WithDaprSidecar(DaprOptions("ai-service-v2", "./DaprComponents/ai-service-v2"))
         .WaitFor(seedRunner)
         .WaitFor(rabbitMq)
+        .WaitFor(keycloak)
         .WaitFor(monolithMcp);
 
     var adminApi = builder.AddProject<Projects.AdminApi_Service>("admin-api")
@@ -304,7 +306,8 @@ if (useDapr)
         .WithEnvironment("Keycloak__Audience", keycloakAudience)
         .WithDaprSidecar(DaprOptions("admin-api"))
         .WaitFor(seedRunner)
-        .WaitFor(rabbitMq);
+        .WaitFor(rabbitMq)
+        .WaitFor(keycloak);
 
     var adminMcp = builder.AddProject<Projects.AdminApi_Mcp>("admin-api-mcp")
         .WithEnvironment("ASPIRE_MODE", "true")
@@ -327,7 +330,8 @@ if (useDapr)
         .WithEnvironment("Keycloak__Audience", keycloakAudience)
         .WithDaprSidecar(DaprOptions("company-api"))
         .WaitFor(seedRunner)
-        .WaitFor(rabbitMq);
+        .WaitFor(rabbitMq)
+        .WaitFor(keycloak);
 
     var jobApi = builder.AddProject<Projects.JobApi_Service>("job-api")
         .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
@@ -337,7 +341,8 @@ if (useDapr)
         .WithEnvironment("Keycloak__Audience", keycloakAudience)
         .WithDaprSidecar(DaprOptions("job-api"))
         .WaitFor(seedRunner)
-        .WaitFor(rabbitMq);
+        .WaitFor(rabbitMq)
+        .WaitFor(keycloak);
 
     var userApi = builder.AddProject<Projects.UserApi_Service>("user-api")
         .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
@@ -362,7 +367,8 @@ if (useDapr)
         .WithEnvironment("MonolithUrl", "http://localhost:5280")
         .WithDaprSidecar(DaprOptions("connector-api"))
         .WaitFor(seedRunner)
-        .WaitFor(rabbitMq);
+        .WaitFor(rabbitMq)
+        .WaitFor(keycloak);
 
     var reverseConnectorApi = builder.AddProject<Projects.reverse_connector_api>("reverse-connector-api")
         .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
@@ -373,7 +379,8 @@ if (useDapr)
         .WithEnvironment("MonolithUrl", "http://localhost:5280")
         .WithDaprSidecar(DaprOptions("reverse-connector-api"))
         .WaitFor(seedRunner)
-        .WaitFor(rabbitMq);
+        .WaitFor(rabbitMq)
+        .WaitFor(keycloak);
 
     gateway.WaitFor(adminApi).WaitFor(aiService);
 
