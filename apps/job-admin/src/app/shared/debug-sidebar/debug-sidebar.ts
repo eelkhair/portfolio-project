@@ -27,13 +27,8 @@ export class DebugSidebar {
     return 'status-ok';
   }
 
-  timeAgo(date: Date): string {
-    const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-    if (seconds < 5) return 'just now';
-    if (seconds < 60) return `${seconds}s ago`;
-    const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes}m ago`;
-    return `${Math.floor(minutes / 60)}h ago`;
+  formatTime(date: Date): string {
+    return date.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
   }
 
   truncatePath(path: string): string {
