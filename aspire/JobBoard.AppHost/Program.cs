@@ -261,6 +261,7 @@ var gateway = builder.AddProject<Projects.Gateway_Api>("gateway")
     .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)
     .WithEnvironment("SEQ_URL", seqUrl)
     .WithEnvironment("ConnectionStrings__Redis", redisConn)
+    .WithEnvironment("AdminApiUrl", "http://localhost:5262")
     .WaitFor(monolith);
 
 // ---------------------------------------------------------------------------

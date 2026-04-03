@@ -8,7 +8,7 @@ const string CorsPolicy = "AllowJobAdmin";
 var builder = WebApplication.CreateBuilder(args);
 var isAspire = builder.Configuration["ASPIRE_MODE"] == "true";
 if (!isAspire) builder.AddVaultSecrets("gateway");
-(await builder.AddRedisConfiguration("gateway", TimeSpan.FromSeconds(8)))
+(await builder.AddRedisConfiguration("gateway", TimeSpan.FromSeconds(1)))
     .ConfigureLogging("gateway")
     .AddCustomHealthChecks(isAspire)
     .Services

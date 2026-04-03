@@ -16,7 +16,7 @@
         <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
         <PackageReference Include="AspNetCore.HealthChecks.UI.InMemory.Storage" Version="9.0.0" />
         <PackageReference Include="Azure.Monitor.OpenTelemetry.Exporter" Version="1.4.0" />
-        <PackageReference Include="Elkhair.Common.Observability" Version="1.0.15" />
+        <PackageReference Include="Elkhair.Common.Observability" Version="1.0.16" />
         <PackageReference Include="Microsoft.AspNetCore.Diagnostics.HealthChecks" Version="2.2.0" />
         <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.13.1" />
         <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.13.1" />

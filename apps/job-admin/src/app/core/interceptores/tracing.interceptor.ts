@@ -9,6 +9,7 @@ import { trace, SpanKind, SpanStatusCode, Span } from '@opentelemetry/api';
 import { tap, finalize } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { DebugService } from '../services/debug.service';
+import { FeatureFlagsService } from '../services/feature-flags.service';
 
 // Extract host from OIDC authority to exclude from tracing (avoids CORS issues with Keycloak)
 const oidcHost = (() => {
@@ -33,6 +34,7 @@ export const tracingInterceptor: HttpInterceptorFn = (req, next) => {
   }
 
   const debugService = inject(DebugService);
+  const featureFlags = inject(FeatureFlagsService);
   const tracer = trace.getTracer('admin-fe');
   const span: Span = tracer.startSpan(`HTTP ${req.method} ${path(urlStr)}`, {
     kind: SpanKind.CLIENT,
@@ -44,7 +46,8 @@ export const tracingInterceptor: HttpInterceptorFn = (req, next) => {
 
   const headers: Record<string, string> = {};
   if (!req.headers.has('traceparent')) headers['traceparent'] = toTraceparent(span);
-  const tracedReq = Object.keys(headers).length ? req.clone({ setHeaders: headers }) : req;
+  headers['x-mode'] = featureFlags.isMonolith() ? 'monolith' : 'admin';
+  const tracedReq = req.clone({ setHeaders: headers });
 
   const t0 = performance.now();
 
@@ -56,7 +59,7 @@ export const tracingInterceptor: HttpInterceptorFn = (req, next) => {
           if (evt.status >= 400) {
             span.setStatus({ code: SpanStatusCode.ERROR });
           }
-          const traceId = evt.headers.get('x-trace-id');
+          const traceId = evt.headers.get('x-trace-id') || evt.headers.get('trace-id');
           if (traceId) {
             debugService.push({
               method: req.method,

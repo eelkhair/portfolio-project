@@ -22,10 +22,10 @@ public class RoutingMiddleware(RequestDelegate next, IConfiguration configuratio
             return;
         }
 
-        var isMonolith = configuration.GetValue<bool>("FeatureFlags:Monolith");
-
-
-        var mode =  isMonolith ? "monolith" : "admin";
+        var clientMode = context.Request.Headers["x-mode"].FirstOrDefault();
+        var mode = clientMode is "monolith" or "admin"
+            ? clientMode
+            : configuration.GetValue<bool>("FeatureFlags:Monolith") ? "monolith" : "admin";
         context.Request.Headers["x-mode"] = mode;
         Activity.Current?.SetTag("service", mode == "monolith" ? "Monolith" : "Admin");
 

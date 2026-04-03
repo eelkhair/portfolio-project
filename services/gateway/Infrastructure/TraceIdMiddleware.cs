@@ -14,6 +14,10 @@ public class TraceIdMiddleware(RequestDelegate next)
             {
                 context.Response.Headers["x-trace-id"] = traceId;
             }
+            else if (System.Diagnostics.Activity.Current is { } activity)
+            {
+                context.Response.Headers["x-trace-id"] = activity.TraceId.ToString();
+            }
             return Task.CompletedTask;
         });
 

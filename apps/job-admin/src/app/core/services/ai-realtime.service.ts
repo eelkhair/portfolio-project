@@ -36,6 +36,8 @@ export class AiRealtimeService {
       .withUrl(hubUrl, {
         accessTokenFactory: async () =>
           await firstValueFrom(this.account.getAccessToken()),
+        skipNegotiation: true,
+        transport: signalR.HttpTransportType.WebSockets,
       })
       .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
       .configureLogging(signalR.LogLevel.Warning)
