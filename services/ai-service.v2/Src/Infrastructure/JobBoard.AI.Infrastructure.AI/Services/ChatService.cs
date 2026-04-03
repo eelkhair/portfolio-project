@@ -72,6 +72,13 @@ public class ChatService(
             return false;
         }
 
+        // Scoped queries like "list jobs for nexus analytics" need LLM filtering
+        if (msg.Contains(" for ") || msg.Contains(" of ") || msg.Contains(" at ") ||
+            msg.Contains(" from ") || msg.Contains(" by ") || msg.Contains(" named "))
+        {
+            return false;
+        }
+
         // Short imperative commands like "list companies", "show jobs", "get drafts"
         return msg.StartsWith("list") || msg.StartsWith("show") || msg.StartsWith("get") ||
                msg.StartsWith("fetch") || msg.StartsWith("display") ||
@@ -168,6 +175,11 @@ public class ChatService(
                             Result = ParseJsonOrRaw(r.Content.Result?.ToString())
                         })
                         .ToList();
+
+                    // Add a compact assistant summary to history so the LLM can reference
+                    // items by number on follow-up turns (e.g. "more details on number 16")
+                    var indexedSummary = BuildIndexedSummary(directData);
+                    messages.Add(new ChatMessage(ChatRole.Assistant, indexedSummary));
 
                     RecordMetrics(scopeName, provider, totalUsage, toolCalls, sw);
                     await SaveHistory(messages, snapshot, cancellationToken);
@@ -414,6 +426,53 @@ public class ChatService(
                        ?? throw new InvalidOperationException("AI Provider not configured");
 
         return serviceProvider.GetRequiredKeyedService<IChatClient>(provider);
+    }
+
+    /// <summary>
+    /// Builds a compact numbered summary of direct-return results for conversation history.
+    /// Includes IDs so the LLM can look up items by number on follow-up turns.
+    /// Example: "Showed the user a list from company_list:\n1. Acme Corp (id: 019c...)\n2. ..."
+    /// </summary>
+    private static string BuildIndexedSummary(List<ToolData> data)
+    {
+        var sb = new System.Text.StringBuilder();
+
+        foreach (var td in data)
+        {
+            sb.AppendLine($"[Displayed results from {td.Tool}]");
+
+            if (td.Result is JsonElement el && el.ValueKind == JsonValueKind.Array)
+            {
+                var idx = 1;
+                foreach (var item in el.EnumerateArray())
+                {
+                    var name = TryGetField(item, "name")
+                               ?? TryGetField(item, "title")
+                               ?? TryGetField(item, "companyName")
+                               ?? $"item {idx}";
+
+                    var id = TryGetField(item, "id")
+                             ?? TryGetField(item, "uId")
+                             ?? "";
+
+                    var idSuffix = !string.IsNullOrEmpty(id) ? $" (id: {id})" : "";
+                    sb.AppendLine($"{idx}. {name}{idSuffix}");
+                    idx++;
+                }
+            }
+            else
+            {
+                sb.AppendLine(td.Result?.ToString()?[..Math.Min(td.Result.ToString()!.Length, 500)] ?? "");
+            }
+        }
+
+        return sb.ToString();
+    }
+
+    private static string? TryGetField(JsonElement item, string fieldName)
+    {
+        if (item.ValueKind != JsonValueKind.Object) return null;
+        return item.TryGetProperty(fieldName, out var val) ? val.GetString() : null;
     }
 
     private static string NormalizeJson(string text)

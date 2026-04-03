@@ -184,8 +184,8 @@ DaprSidecarOptions DaprOptions(string appId, params string[] extraPaths)
 const string collectorEndpoint = "http://localhost:4327";
 
 // Connection strings — passed as env vars so they're available before Dapr sidecar starts
-const string sqlServerConn = "Server=127.0.0.1,11433;Database=JobBoard;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=true";
-const string microSqlConn = "Server=127.0.0.1,11433;Database=local-job-board;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=true";
+const string sqlServerConn = "Server=127.0.0.1,11433;Database=job-board-monolith;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=true";
+const string microSqlConn = "Server=127.0.0.1,11433;Database=job-board;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=true";
 const string postgresConn = "Host=127.0.0.1;Port=5432;Database=AiEmbeddings;Username=postgres;Password=postgres";
 const string redisConn = "localhost:6379";
 const string rabbitMqConn = "amqp://guest:guest@localhost:5672";
