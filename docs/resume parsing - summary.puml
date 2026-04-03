@@ -1,0 +1,35 @@
+@startuml
+title Public Resume Flow — Executive View (AI Owns Real-Time)
+autonumber
+
+actor "Candidate UI" as FE
+participant "Monolith API" as MON
+participant "AI Service\n(Parse + Stream)" as AI
+participant "Embeddings + Matching" as EMB
+
+== Upload ==
+FE -> MON: Upload resume
+MON --> FE: Accepted
+
+note right of MON
+Atomic write:
+Resume + Outbox
+end note
+
+== Async Processing ==
+MON -> AI: resume.uploaded
+
+AI -> AI: Parse resume progressively
+AI -> FE: SignalR (sections stream)
+
+note right of FE
+UI updates live as resume is parsed
+end note
+
+== Enrichment ==
+AI -> EMB: Generate embeddings
+EMB -> AI: Matches + explanations
+
+AI -> FE: SignalR (final results)
+
+@enduml

@@ -1,71 +1,230 @@
-﻿@startuml
-title Company Create & Admin Provisioning (RabbitMQ topics after company provisioning)
+@startuml
+title Company Creation — AI Chat to Provisioning Saga
+autonumber
 
-actor Client
-participant "Admin API\n(Orchestrator)" as Admin
-participant "Company API" as Company
-participant "User API" as User
-participant "Auth0 Mgmt API" as Auth0
-queue "RabbitMQ\n(topic exchange)" as MQ
-database "Company DB" as CDB
-database "User DB" as UDB
+skinparam responseMessageBelowArrow true
+skinparam noteBackgroundColor #FDF6E3
+skinparam noteBorderColor #657B83
+skinparam sequenceArrowThickness 2
+skinparam participantPadding 10
+skinparam BoxPadding 10
 
-== Request & Company provisioning (sync) ==
-Client -> Admin: POST /companies (CreateCompanyRequest)\n+ correlationId
-activate Admin
+actor "Admin FE\n(Angular)" as FE
+participant "Gateway\n(YARP)" as GW
+participant "AI Service v2" as AI
+participant "OpenAI API" as OAI
+participant "Monolith MCP" as MCP
+database "Monolith DB\n(SQL Server)" as MODB
+participant "Monolith API\n(Core System of Record)" as MON
+participant "Outbox Processor" as OBX
+participant "Provisioning Connector\n(Saga Orchestrator)" as CON
+participant "User API" as USR
+participant "Company API" as CMP
+participant "Job API" as JOB
+participant "Keycloak" as KC
 
-Admin -> Company: POST /companies\nIdempotency-Key: correlationId
-activate Company
-Company -> CDB: Insert Company { Status=Provisioning }
-Company --> Admin: 201 { companyId, status=Provisioning }
-deactivate Company
-
-== From here on: async via RabbitMQ topics ==
-Admin -> MQ: publish(topic=\"admin.provision.request\",\n headers={correlationId, idempotencyKey},\n payload={ companyId, companyName,\n adminFirst/Last/Email })
-deactivate Admin
-
-MQ --> User: consume(topic=\"admin.provision.request\")\n(dedup by idempotencyKey)
-activate User
-
-User -> UDB: Inbox dedupe check (idempotencyKey)
-User -> Auth0: Ensure Org(companyName→slug)
-activate Auth0
-Auth0 --> User: orgId
-User -> Auth0: Create/Ensure Invitation(adminEmail)
-Auth0 --> User: inviteId
-deactivate Auth0
-
-User -> UDB: Upsert IdentityLink\n{ companyId, orgId, adminEmail, inviteId }
-User -> MQ: publish(topic=\"admin.provision.succeeded\",\n headers={correlationId},\n payload={ companyId, orgId, adminEmail, inviteId })
-deactivate User
-
-MQ --> Company: consume(topic=\"admin.provision.succeeded\")
-activate Company
-Company -> CDB: Update Company.Status = Active\n+ (optional) persist Auth0OrgId
-Company -> MQ: publish(topic=\"company.activated\",\n headers={correlationId}, payload={ companyId })
-deactivate Company
-
-== Client UX (optional) ==
-Client -> Admin: GET /operations/{correlationId}
-Admin --> Client: { status: Provisioning | Active | Failed }
-
-== Error paths & retries ==
-alt Transient failure in User/Auth0
-  User -> MQ: publish(topic=\"admin.provision.retry\",\n headers={correlationId}, payload={ companyId, reason })\n(handled by retry consumer / delayed exchange)
-end
-
-alt Permanent failure (4xx fatal or retries exceeded)
-  User -> MQ: publish(topic=\"admin.provision.failed\",\n headers={correlationId}, payload={ companyId, reason })
-  MQ --> Company: consume(topic=\"admin.provision.failed\")
-  Company -> CDB: Update Company.Status = Failed
-  Company -> MQ: publish(topic=\"company.provisioning.failed\",\n headers={correlationId}, payload={ companyId, reason })
-end
-
-== Notes ==
-note over Admin,User
-All messages carry correlationId and idempotencyKey in headers.
-Inbox/Outbox patterns recommended for dedupe & reliability.
-Use delayed exchange / DLQ for backoff retries.
+note over FE,KC
+**Scenario:** Admin says "Create a company called Acme Corp"
+AI selects create_company tool, provisions across 7 services in ~5.5s
 end note
+
+== Phase 1 — Chat request and tool selection ==
+
+FE -> GW: POST /ai/v2/chat
+activate GW
+GW -> AI: proxy -> ai-service-v2
+activate AI
+
+AI -> OAI: POST /v1/chat/completions
+activate OAI
+note right of OAI
+Tool selection
+~1,601ms
+end note
+OAI --> AI: tool_call: create_company
+deactivate OAI
+
+== Phase 2 — MCP tool execution + CQRS command pipeline ==
+
+AI -> MCP: tools/call -> create_company
+activate MCP
+
+MCP -> MODB: Validate (~60ms)
+note right of MODB
+Company name uniqueness
+Company email uniqueness
+Admin email uniqueness
+Industry existence
+end note
+MODB --> MCP: valid
+
+MCP -> MODB: Atomic transaction (~234ms)
+note right of MODB
+INSERT Company
+INSERT User
+INSERT Outbox message
+Single commit
+end note
+MODB --> MCP: committed
+
+note right of MCP
+Monolith MCP shares the monolith
+codebase and DB connection.
+No HTTP call to Monolith API.
+end note
+
+MCP --> AI: tool result (success, ~531ms)
+deactivate MCP
+
+AI -> OAI: POST /v1/chat/completions
+activate OAI
+note right of OAI
+Response generation
+~1,292ms
+end note
+OAI --> AI: "Company created..."
+deactivate OAI
+
+AI --> GW: 200 OK (streamed)
+note right of GW
+User-facing response completes here.
+Provisioning continues asynchronously.
+end note
+deactivate AI
+
+GW --> FE: chat response
+deactivate GW
+
+== Phase 4 — Outbox to pub/sub ==
+
+OBX -> MODB: Poll outbox
+MODB --> OBX: message #790 (company.created.v1)
+
+OBX -> CON: Dapr pub/sub\ncompany.created.v1 (CloudEvent)
+
+OBX -> MODB: Mark processed
+
+== Phase 5 — Provisioning saga fetches source-of-truth data ==
+
+activate CON
+note over CON: Idempotency check (~3ms)
+
+CON -> MON: GET /odata/companies({id})
+activate MON
+MON --> CON: 200 company data
+deactivate MON
+
+CON -> MON: GET /odata/users({id})
+activate MON
+MON --> CON: 200 admin data
+deactivate MON
+
+note over CON
+Saga fetch phase complete
+~232ms
+end note
+
+== Phase 6 — Parallel fan-out via Dapr service invocation ==
+
+par Dapr -> user-api (~1,440ms)
+  CON -> USR: POST /api/companies\n(Dapr invoke)
+  activate USR
+
+  == Phase 7 — Identity provisioning in Keycloak (~1,389ms) ==
+
+  USR -> KC: GET /groups
+  activate KC
+  KC --> USR: 200 (12ms)
+  deactivate KC
+
+  USR -> KC: POST /groups/.../children\n(company group)
+  activate KC
+  KC --> USR: 201 (19ms)
+  deactivate KC
+
+  USR -> KC: POST /groups/.../children\n(CompanyAdmins)
+  activate KC
+  KC --> USR: 201 (14ms)
+  deactivate KC
+
+  USR -> KC: POST /groups/.../children\n(Recruiters)
+  activate KC
+  KC --> USR: 201 (9ms)
+  deactivate KC
+
+  USR -> KC: GET /users (check existing)
+  activate KC
+  KC --> USR: 200 (10ms)
+  deactivate KC
+
+  USR -> KC: POST /users (create user)
+  activate KC
+  KC --> USR: 201 (269ms)
+  deactivate KC
+
+  USR -> KC: PUT /users/{id}/groups/{gid}
+  activate KC
+  KC --> USR: 204 (12ms)
+  deactivate KC
+
+  USR -> KC: PUT /users/{id}/send-verify-email
+  activate KC
+  KC --> USR: 204 (36ms)
+  deactivate KC
+
+  note over USR
+Persist user + company records
+~987ms
+end note
+
+  USR --> CON: 200 OK
+  deactivate USR
+
+else Dapr -> company-api (~1,133ms)
+  CON -> CMP: POST /api/companies\n(Dapr invoke)
+  activate CMP
+  note over CMP: Create company projection
+  CMP --> CON: 200 OK
+  deactivate CMP
+
+else Dapr -> job-api (~268ms)
+  CON -> JOB: POST /api/companies\n(Dapr invoke)
+  activate JOB
+  note over JOB: Create company projection
+  JOB --> CON: 204 No Content
+  deactivate JOB
+end
+
+== Phase 8 — Company activation ==
+
+USR ->> CON: pub/sub\nprovision.user.success
+
+CON -> MON: POST /api/companies/company-created-success
+activate MON
+MON -> MODB: ActivateCompanyCommand (~128ms)
+note right of MODB
+UPDATE Company.Status = Active
+UPDATE User.ExternalId
+end note
+MODB --> MON: committed
+MON --> CON: 200 OK
+
+== Phase 9 — Real-time notification ==
+
+MON ->> FE: SignalR: CompanyActivated\n(~3ms send + receive)
+deactivate MON
+
+note over FE
+UI updates in real time:
+company.name = "Acme Corp"
+end note
+
+== Phase 10 — Saga complete ==
+
+note over CON
+Saga finalized
+Company fully provisioned
+end note
+deactivate CON
 
 @enduml

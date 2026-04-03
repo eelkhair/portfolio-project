@@ -1,102 +1,188 @@
 @startuml
-title Resume Upload → Async AI Parsing (Trace-Backed)
+title Public Resume Processing — AI-Orchestrated, Event-Driven, Real-Time UX
+autonumber
 
-actor User
-participant "Public FE\n(public-fe)" as FE
-participant "Monolith API\n(monolith-api)" as MONO
-database "SQL Server\n(Job-board-Monolith)" as SQL
-participant "Outbox Processor" as OUTBOX
-participant "Dapr PubSub" as BUS
-participant "AI Service v2\n(ai-service-v2)" as AI
+skinparam responseMessageBelowArrow true
+skinparam noteBackgroundColor #FDF6E3
+skinparam noteBorderColor #657B83
+skinparam sequenceArrowThickness 2
+skinparam participantPadding 12
+skinparam BoxPadding 10
+
+actor "Candidate FE\n(Public Angular)" as FE
+participant "Gateway\n(YARP)" as GW
+participant "Monolith API\n(System of Record)" as MON
+database "Monolith DB\n(SQL Server)" as MSQL
+participant "Outbox Processor" as OBX
+participant "AI Service v2\n(Orchestrator + SignalR)" as AI
 participant "OpenAI API" as OAI
-database "Postgres\n(Embeddings)" as PG
-participant "SignalR Hub" as SR
+database "Embeddings DB\n(PostgreSQL + pgvector)" as PG
 
-== Upload Resume (HTTP request path) ==
-User -> FE : Upload resume
-FE -> MONO : POST /api/resumes
-note right of MONO
-  Span:
-  POST api/resumes
-  UploadResumeCommand.handle
+== SYNCHRONOUS PATH — Fast User Acknowledgment ==
+
+FE -> GW: Upload resume
+activate GW
+GW -> MON: POST /api/resumes
+activate MON
+
+MON -> MSQL: INSERT Resume + INSERT Outbox
+activate MSQL
+note right of MSQL
+Atomic transaction boundary:
+- Persist resume metadata
+- Write outbox event
+Single commit ensures consistency
+end note
+MSQL --> MON: committed
+deactivate MSQL
+
+MON --> GW: 202 Accepted
+deactivate MON
+GW --> FE: Upload accepted
+deactivate GW
+
+note over FE
+User receives immediate response.
+System prioritizes UX latency over full processing.
 end note
 
-MONO -> SQL : Insert Resume (ParseStatus=Pending)
-note right
-  EF Core spans:
-  INSERT User.Resumes
+== ASYNCHRONOUS PATH — Event-Driven Processing ==
+
+OBX -> AI: resume.uploaded (event)
+activate AI
+
+note over AI
+End-to-end pipeline (~17–18s):
+- Parsing
+- Progressive updates
+- Embeddings
+- Matching + explanations
 end note
 
-MONO -> SQL : Insert Outbox(resume.uploaded.v1)
-note right
-  outbox.message.eventType=resume.uploaded.v1
-end note
+== Phase 1 — Progressive Resume Parsing ==
 
-MONO -> FE : 201 Created (~768ms)
-FE -> FE : Show "Processing resume..." toast
-
-== Outbox → PubSub ==
-OUTBOX -> BUS : Publish resume.uploaded.v1
-note right
-  Dapr PublishEvent
-  messaging.destination=monolith.resume-uploaded.v1
-end note
-
-BUS -> AI : POST /Resumes/parse-event
-note right
-  Span:
-  POST Resumes/parse-event (202)
-end note
-
-== AI Parsing (Async, slow path) ==
-AI -> AI : parseResumeEvent.IdempotencyCheck
-note right
-  idempotency.new=true
-end note
-
-AI -> OAI : POST /v1/chat/completions
+AI -> OAI: Parse resume (LLM)
+activate OAI
 note right of OAI
-  🔥 Dominant latency
-  ~22s
-  tokens.total=3216
+~4.9s
+Structured extraction
+~2.6k tokens
+end note
+OAI --> AI: structured resume
+deactivate OAI
+
+AI -> MON: Save parsed section
+activate MON
+MON -> MSQL: UPDATE resume content
+activate MSQL
+MSQL --> MON: committed
+deactivate MSQL
+MON --> AI: OK
+deactivate MON
+
+AI -> FE: SignalR ResumeSectionParsed ("quick")
+
+note over FE
+First section appears immediately.
+UX becomes responsive early.
 end note
 
-OAI --> AI : Parsed resume text
+AI -> MON: Save additional section
+activate MON
+MON -> MSQL: UPDATE resume content
+activate MSQL
+MSQL --> MON: committed
+deactivate MSQL
+MON --> AI: OK
+deactivate MON
 
-AI -> PG : Store embeddings
-note right
-  Embedding persistence
+AI -> FE: SignalR ResumeSectionParsed ("workHistory")
+
+note over FE
+UI progressively hydrates
+as parsing continues.
 end note
 
-== Result Fan-Out ==
-AI -> BUS : Publish resume.parsed.v1
-note right
-  messaging.destination=monolith.resume-parsed.v1
+== Phase 2 — Embeddings Generation ==
+
+AI -> OAI: Generate embeddings
+activate OAI
+note right of OAI
+Batch embeddings (~1.06s)
+~11k characters processed
+end note
+OAI --> AI: vectors
+deactivate OAI
+
+AI -> PG: Upsert embeddings
+activate PG
+PG --> AI: stored
+deactivate PG
+
+== Phase 3 — Match Resolution + Explanation Generation ==
+
+note over AI,FE
+SignalR-driven orchestration (push model):
+
+AI emits events → UI reacts →
+triggers downstream enrichment pipeline.
+
+No polling required.
+System is event-driven and reactive.
 end note
 
-AI -> SR : SignalR ResumeParsed
-note right
-  messaging.system=signalr
-  resume.id=...
+FE -> GW: Request matches
+activate GW
+GW -> MON: GET /resumes/{id}/matching
+activate MON
+
+MON -> AI: Resolve matches + explanations
+activate AI
+
+AI -> PG: Check cached explanations
+activate PG
+note right of PG: cache miss
+PG --> AI: none
+deactivate PG
+
+AI -> OAI: Generate explanations
+activate OAI
+note right of OAI
+~24s total
+10 explanations
+~3.9k tokens
+expensive, uncached path
+end note
+OAI --> AI: explanations
+deactivate OAI
+
+AI -> PG: Persist explanations
+activate PG
+PG --> AI: saved
+deactivate PG
+
+AI --> MON: matches + explanations
+deactivate AI
+
+MON --> GW: 200 OK
+deactivate MON
+GW --> FE: results
+deactivate GW
+
+== Phase 4 — Final Real-Time UX ==
+
+AI -> FE: SignalR FinalUpdates
+
+note over FE
+Final user experience:
+- Resume parsed progressively
+- Matches computed via embeddings
+- AI explanations generated
+- UI updated in real time
+
+No blocking. No polling.
 end note
 
-== Monolith Completion ==
-BUS -> MONO : resume.parsed.v1
-MONO -> MONO : CompleteResumeParseCommand.handle
-note right
-  ParseStatus=Completed
-  ParsedContent updated
-end note
-
-MONO -> SQL : UPDATE User.Resumes
-MONO -> SQL : Insert Outbox(resume.parsed.v1)
-
-== Frontend UX ==
-SR -> FE : signalr.message.received
-alt User still on page
-    FE -> FE : Show "Fill form using AI?" popup
-else User navigated away
-    FE -> FE : Defer prompt / badge
-end
+deactivate AI
 
 @enduml

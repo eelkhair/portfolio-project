@@ -30,7 +30,7 @@ Adopt .NET Aspire as the local orchestration layer. A single `aspire/JobBoard.Ap
 - Elasticsearch (9200) — log aggregation
 - Azurite (10000-10002) — blob storage emulator
 - Mailpit (8025/1025) — email testing
-- Redis seed container — populates config keys on startup
+- Seed Runner (`ghcr.io/eelkhair/seed-runner:1.0`) — single persistent container that seeds Redis, SQL Server, and PostgreSQL in parallel on startup, then idles with an HTTP health endpoint
 
 **Observability:**
 - Jaeger (16686) — distributed tracing
@@ -61,29 +61,33 @@ MCP servers (monolith-mcp, admin-api-mcp) previously hardcoded their ports (`htt
 
 Solution: MCP servers skip hardcoded port binding under Aspire mode and let Aspire assign ports. The AI service receives MCP URLs dynamically via environment variables (`McpServer__IntegrationUrl`, `McpServer__MicroUrl`) using `GetEndpoint("http")`.
 
-### Redis Seed Script
+### Seed Runner
 
-A Docker container runs `RedisInit/seed.sh` on startup to populate Redis DB 1 with:
-- Feature flags (`SET ... NX` to preserve runtime changes across restarts)
-- SMTP config (Mailpit)
-- Health check UI settings
-- AI service provider/model defaults (`SET ... NX`)
+A single persistent container (`ghcr.io/eelkhair/seed-runner:1.0`, built from `SeedRunner/Dockerfile` using Ubuntu 22.04 with redis-tools, postgresql-client, and mssql-tools18) replaces the previous three separate seed containers (redis-seed, sqlserver-seed, postgres-seed). The entrypoint (`SeedRunner/entrypoint.sh`) runs all three seed scripts in parallel:
 
-The `NX` flag ensures that runtime configuration changes (e.g., switching AI provider from OpenAI to Claude) survive Aspire restarts.
+- **Redis** (`RedisInit/seed.sh`): Populates config keys in DB 1 with `SET ... NX` to preserve runtime changes
+- **SQL Server** (`SqlServerInit/seed-sqlserver.sh`): Restores `job-board-monolith` and `job-board` databases from `.bak` backups if tables don't exist
+- **PostgreSQL** (`PostgresInit/seed-postgres.sh`): Restores `AiEmbeddings` database from `.dump` backup if tables don't exist
+
+After all seeds complete, the container opens an HTTP health endpoint on port 8080. Services use `.WaitFor(seedRunner)` which blocks until this endpoint responds, eliminating race conditions where services start before databases are seeded.
+
+To rebuild the image: `docker build -t ghcr.io/eelkhair/seed-runner:1.0 ./SeedRunner`
 
 ### Dependency Ordering
 
 `WaitFor()` ensures services start only after their dependencies are healthy:
-- All services wait for infrastructure (SQL Server, Redis, RabbitMQ)
+- Seed runner waits for infrastructure (SQL Server, Redis, PostgreSQL)
+- All services wait for seed runner (ensures databases are seeded before startup)
+- All services wait for RabbitMQ and Keycloak
 - AI service waits for MCP servers
-- Gateway waits for monolith
+- Gateway waits for seed runner and monolith
 
 ## Consequences
 
 ### Positive
 
 - **Single-command startup**: `dotnet run --project aspire/JobBoard.AppHost` launches 36 resources
-- **Dependency ordering**: Services start in correct order, eliminating race conditions
+- **Dependency ordering**: Services start in correct order with deterministic seeding — no race conditions or hardcoded delays
 - **Unified dashboard**: Logs, traces, and health for all resources in one UI
 - **Debugger-friendly**: .NET projects run as native processes, not containers
 - **Persistent containers**: Infrastructure survives AppHost restarts via `ContainerLifetime.Persistent`
@@ -93,12 +97,13 @@ The `NX` flag ensures that runtime configuration changes (e.g., switching AI pro
 
 - **DCP proxy layer**: Aspire's proxy can interfere with non-HTTP protocols (MCP Streamable HTTP, WebSockets). Required workarounds for MCP port management.
 - **Config surface area**: Three config sources (env vars, Dapr vault, Redis seed) instead of one. Each new service needs entries in all three.
-- **Alpine shell limitations**: Redis seed container uses Alpine's `/bin/sh` which doesn't support `set -e`. Script must be POSIX-compatible.
+- **Seed runner image**: The `ghcr.io/eelkhair/seed-runner:1.0` image must be pre-built and pushed to GHCR. The `SeedRunner/Dockerfile` is in the repo for rebuilding. Using `AddDockerfile` instead of `AddContainer` is possible but may timeout on first build.
 - **URL values in Redis**: Dapr config store key parsing can mangle URLs containing `://`. Infrastructure URLs (Elasticsearch, Seq) should come from env vars or vault, not Redis config.
 
 ## Implementation Notes
 
 - AppHost project: `aspire/JobBoard.AppHost/JobBoard.AppHost.csproj`
 - Dapr components: `aspire/JobBoard.AppHost/DaprComponents/` (shared, secrets, per-service)
-- Redis seed: `aspire/JobBoard.AppHost/RedisInit/seed.sh`
+- Seed runner: `aspire/JobBoard.AppHost/SeedRunner/` (Dockerfile + entrypoint)
+- Seed scripts: `aspire/JobBoard.AppHost/RedisInit/`, `SqlServerInit/`, `PostgresInit/`
 - Docker compose (non-Aspire): `scripts/docker-compose.dev.yml`, `scripts/docker-compose.prod.yml`

@@ -6,7 +6,7 @@ participant FE as Admin FE<br/>(Angular)
 participant GW as Gateway<br/>(YARP)
 participant AI as AI Service v2
 participant OAI as OpenAI API
-participant MCP as MCP Integration
+participant MCP as Monolith MCP
 participant MON as Monolith API
 participant OBX as Outbox Processor
 participant CON as Connector API<br/>(Saga)
@@ -14,6 +14,8 @@ participant USR as User API
 participant CMP as Company API
 participant JOB as Job API
 participant KC as Keycloak
+
+Note over FE,KC: Scenario: Admin says "Create a company called Acme Corp"<br/>AI selects create_company tool, provisions across 7 services in ~5.5s
 
 Note over FE,KC: Phase 1 — Chat request + tool selection (0ms → 2,327ms)
 
@@ -23,22 +25,17 @@ AI->>+OAI: POST /v1/chat/completions
 Note right of OAI: Tool selection<br/>1,601ms
 OAI-->>-AI: tool_call: create_company
 
-Note over FE,KC: Phase 2 — MCP tool execution (2,328ms → 2,683ms)
+Note over FE,KC: Phase 2 — MCP tool execution + CQRS command pipeline
 
 AI->>+MCP: tools/call → create_company
-Note right of MCP: MCP client invocation<br/>377ms
-MCP->>+MON: POST /api/companies
-
-Note over FE,KC: Phase 3 — CQRS command pipeline (2,343ms → 2,673ms)
-
-Note over MON: Validate (60ms)<br/>• Company name uniqueness<br/>• Company email uniqueness<br/>• Admin email uniqueness<br/>• Industry existence
-Note over MON: Handle + commit (234ms)<br/>• Create company entity<br/>• Create admin user<br/>• Write outbox message #790<br/>• Commit transaction
-MON-->>-MCP: 201 Created
-MCP-->>-AI: tool result (success)
+Note over MCP: Validate (~60ms)<br/>Direct DB queries (job-board-monolith)<br/>• Company name uniqueness<br/>• Company email uniqueness<br/>• Admin email uniqueness<br/>• Industry existence
+Note over MCP: Atomic transaction (~234ms)<br/>• Create company entity<br/>• Create admin user<br/>• Write outbox message<br/>• Commit once
+Note right of MCP: Monolith MCP shares codebase + DB.<br/>No HTTP call to Monolith API.
+MCP-->>-AI: tool result (success, ~531ms)
 
 AI->>+OAI: POST /v1/chat/completions
 Note right of OAI: Response generation<br/>1,292ms
-OAI-->>-AI: "Company Hashmab created..."
+OAI-->>-AI: "Company Acme Corp created..."
 AI-->>-GW: 200 OK (streamed)
 GW-->>-FE: chat response
 
@@ -100,10 +97,16 @@ Note over FE,KC: Phase 8 — Company activation (5,484ms → 5,537ms)
 USR-)CMP: Dapr pub/sub<br/>provision.user.success
 
 CON->>+MON: POST /api/companies/<br/>company-created-success
-Note over MON: ActivateCompanyCommand<br/>52ms
+Note over MON: ActivateCompanyCommand<br/>(128ms)
+
+Note over FE,KC: Phase 9 — Real-time notification
+
+MON--)FE: SignalR: CompanyActivated<br/>(3ms send + receive)
 MON-->>-CON: 200 OK
 
-Note over FE,KC: Phase 9 — Saga complete (5,555ms)
+Note over FE: UI updates in real-time<br/>company.name = "Acme Corp"
+
+Note over FE,KC: Phase 10 — Saga complete (5,555ms)
 
 Note over CON: Saga finalized ✓<br/>Company provisioned
 deactivate CON

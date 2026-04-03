@@ -300,12 +300,7 @@ public class ChatService(
         toolResultCompressor.CompressToolResults(messages);
 
         messages = messages.TakeLast(40).ToList();
-        if (messages.Count > 0 &&
-            messages[0].Contents is { Count: > 0 } &&
-            messages[0].Contents[0] is FunctionResultContent)
-        {
-            messages.RemoveAt(0);
-        }
+        StripOrphanedToolMessages(messages);
 
         var nonSystemMessages = messages
             .Where(m => m.Role != ChatRole.System)
@@ -330,6 +325,7 @@ public class ChatService(
                 snapshot.Summary, older, ct);
 
             nonSystemMessages = recent;
+            StripOrphanedToolMessages(nonSystemMessages);
         }
 
         await conversationStore.SaveConversation(
@@ -338,6 +334,12 @@ public class ChatService(
             nonSystemMessages,
             summary
         );
+    }
+
+    private static void StripOrphanedToolMessages(List<ChatMessage> messages)
+    {
+        while (messages.Count > 0 && messages[0].Contents.Any(c => c is FunctionResultContent))
+            messages.RemoveAt(0);
     }
 
     public async Task<string> GetTextResponseAsync(string systemPrompt, string userPrompt,
