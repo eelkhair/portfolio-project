@@ -8,6 +8,7 @@ import {ToastModule} from 'primeng/toast';
 import {RealtimeNotificationsService} from './core/services/realtime-notifications.service';
 import {AiRealtimeService} from './core/services/ai-realtime.service';
 import {AiChat} from './shared/ai-chat/ai-chat';
+import {DebugSidebar} from './shared/debug-sidebar/debug-sidebar';
 import {OidcSecurityService} from 'angular-auth-oidc-client';
 
 @Component({
@@ -18,7 +19,8 @@ import {OidcSecurityService} from 'angular-auth-oidc-client';
     RouterOutlet,
     ToastModule,
     Nav,
-    AiChat
+    AiChat,
+    DebugSidebar
   ],
   templateUrl: './app.html',
   styleUrl: './app.css'

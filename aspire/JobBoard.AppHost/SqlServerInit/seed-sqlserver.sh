@@ -55,6 +55,13 @@ restore_db() {
   fi
 
   echo "  ${DB_NAME}: restoring from ${BAK_FILE}..."
+
+  # Kill any existing connections before restoring
+  $SQLCMD -Q "
+    IF DB_ID('${DB_NAME}') IS NOT NULL
+      ALTER DATABASE [${DB_NAME}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+  " 2>/dev/null || true
+
   $SQLCMD -Q "
     RESTORE DATABASE [${DB_NAME}]
     FROM DISK = '${BAK_FILE}'
@@ -62,6 +69,10 @@ restore_db() {
          MOVE '${LOG_LOGICAL}'  TO '${LDF_PATH}',
          REPLACE
   "
+
+  # Restore multi-user access
+  $SQLCMD -Q "ALTER DATABASE [${DB_NAME}] SET MULTI_USER;" 2>/dev/null || true
+
   echo "  ${DB_NAME}: restore complete."
 }
 

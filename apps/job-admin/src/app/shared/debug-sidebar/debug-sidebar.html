@@ -1,0 +1,71 @@
+<!-- Floating toggle button -->
+<button
+  class="debug-fab"
+  (click)="debug.toggle()"
+  [class.debug-fab-open]="debug.isOpen()">
+  @if (debug.isOpen()) {
+    <i class="pi pi-times"></i>
+  } @else {
+    <i class="pi pi-bolt"></i>
+    @if (debug.entries().length) {
+      <span class="debug-fab-badge">{{ debug.entries().length }}</span>
+    }
+  }
+</button>
+
+<!-- Sidebar panel -->
+@if (debug.isOpen()) {
+  <aside class="debug-panel">
+    <div class="debug-header">
+      <div class="debug-header-left">
+        <i class="pi pi-bolt"></i>
+        <span>Activity</span>
+        <span class="debug-count">{{ debug.entries().length }}</span>
+      </div>
+      <button class="debug-clear" (click)="debug.clear()" title="Clear all">
+        <i class="pi pi-trash"></i>
+      </button>
+    </div>
+
+    <div class="debug-entries">
+      @for (entry of debug.entries(); track entry.traceId + entry.timestamp.getTime()) {
+        <div class="debug-entry" [class.entry-error]="entry.status >= 400">
+          <div class="entry-top">
+            <span class="entry-method" [class]="methodClass(entry.method)">{{ entry.method }}</span>
+            <span class="entry-path" [title]="entry.path">{{ truncatePath(entry.path) }}</span>
+          </div>
+          <div class="entry-meta">
+            <span class="entry-status" [class]="statusClass(entry.status)">{{ entry.status }}</span>
+            <span class="entry-duration">{{ entry.duration }}ms</span>
+            <span class="entry-time">{{ timeAgo(entry.timestamp) }}</span>
+          </div>
+          <div class="entry-links">
+            <a [href]="debug.jaegerLink(entry.traceId)"
+               target="_blank" rel="noopener"
+               class="trace-link jaeger"
+               title="View distributed trace in Jaeger">
+              <i class="pi pi-external-link"></i> Jaeger
+            </a>
+            <a [href]="debug.seqLink(entry.traceId)"
+               target="_blank" rel="noopener"
+               class="trace-link seq"
+               title="View correlated logs in Seq">
+              <i class="pi pi-external-link"></i> Seq
+            </a>
+            <a [href]="debug.grafanaLink(entry.traceId)"
+               target="_blank" rel="noopener"
+               class="trace-link grafana"
+               title="View trace in Grafana">
+              <i class="pi pi-external-link"></i> Grafana
+            </a>
+          </div>
+        </div>
+      } @empty {
+        <div class="debug-empty">
+          <i class="pi pi-inbox"></i>
+          <span>No activity yet</span>
+        </div>
+      }
+    </div>
+  </aside>
+}

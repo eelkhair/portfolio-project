@@ -115,7 +115,7 @@ public static class DependencyInjection
             .Enrich.With<OtelLinkEnricher>()
             .ApplyStandardFilters(builder.Environment)
             .WriteTo.Console()
-            .WriteTo.Seq("http://seq")
+            .WriteTo.Seq(Environment.GetEnvironmentVariable("SEQ_URL") ?? "http://seq")
             .WriteTo.Elasticsearch(
                 ConfigureElasticSink(builder.Configuration, builder.Environment.EnvironmentName))
             .WriteTo.OpenTelemetry(options =>

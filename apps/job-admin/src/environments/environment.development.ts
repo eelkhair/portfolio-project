@@ -11,6 +11,7 @@ export const environment = {
   otelZipkin: 'https://otel.eelkhair.net/api/v2/spans',
   grafanaUrl: 'https://grafana.eelkhair.net/d/bf5m5dwukfncwd/find-by-trace-id?orgId=1&var-TraceId=',
   jaegerUrl: 'https://jaeger.eelkhair.net/trace/',
+  seqUrl: 'https://seq.eelkhair.net/#/events?filter=TraceId%3D%22{traceId}%22',
   oidc: {
     authority: 'https://auth.eelkhair.net/realms/job-board-dev',
     redirectUrl: 'https://job-admin-dev.eelkhair.net',

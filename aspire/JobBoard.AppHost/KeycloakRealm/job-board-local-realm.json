@@ -335,7 +335,15 @@
         "attributes" : { }
       } ],
       "angular-public" : [ ],
-      "dapr-service-client" : [ ]
+      "dapr-service-client" : [ {
+        "id" : "d499a82c-895c-480b-bfa5-dc68813aa75e",
+        "name" : "realm-admin",
+        "description" : "${role_realm-admin}",
+        "composite" : true,
+        "clientRole" : true,
+        "containerId" : "8576d99f-84bf-486a-9113-101bae8559b2",
+        "attributes" : { }
+      } ]
     }
   },
   "groups" : [ {
