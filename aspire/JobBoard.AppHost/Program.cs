@@ -36,25 +36,18 @@ var redis = builder.AddContainer("redis", "redis", "8.2")
     .WithContainerRuntimeArgs("--health-retries", "5")
     .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
 
-var redisSeed = builder.AddContainer("redis-seed", "redis", "8.2")
-    .WithBindMount("./RedisInit/seed.sh", "/seed.sh", isReadOnly: true)
-    .WithEntrypoint("/bin/sh")
-    .WithArgs("/seed.sh")
-    .WaitFor(redis)
-    .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
-
-var sqlServerSeed = builder.AddContainer("sqlserver-seed", "mcr.microsoft.com/mssql-tools", "latest")
-    .WithBindMount("./SqlServerInit/seed-sqlserver.sh", "/seed.sh", isReadOnly: true)
-    .WithEntrypoint("/bin/bash")
-    .WithArgs("/seed.sh")
-    .WaitFor(sqlServer)
-    .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
-
-var postgresSeed = builder.AddContainer("postgres-seed", "ankane/pgvector", "latest")
-    .WithBindMount("./PostgresInit/seed-postgres.sh", "/seed.sh", isReadOnly: true)
+var seedRunner = builder.AddContainer("seed-runner", "ghcr.io/eelkhair/seed-runner", "1.0")
+    .WithLifetime(ContainerLifetime.Persistent)
+    .WithBindMount("./SeedRunner/entrypoint.sh", "/entrypoint.sh", isReadOnly: true)
+    .WithBindMount("./RedisInit/seed.sh", "/seeds/seed-redis.sh", isReadOnly: true)
+    .WithBindMount("./SqlServerInit/seed-sqlserver.sh", "/seeds/seed-sqlserver.sh", isReadOnly: true)
+    .WithBindMount("./PostgresInit/seed-postgres.sh", "/seeds/seed-postgres.sh", isReadOnly: true)
     .WithBindMount("./PostgresInit/backups", "/seed-backups", isReadOnly: true)
     .WithEntrypoint("/bin/bash")
-    .WithArgs("/seed.sh")
+    .WithArgs("/entrypoint.sh")
+    .WithHttpEndpoint(18080, 8080, name: "health", isProxied: false)
+    .WaitFor(redis)
+    .WaitFor(sqlServer)
     .WaitFor(postgres)
     .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
 
@@ -70,7 +63,7 @@ var rabbitMq = builder.AddContainer("rabbitmq", "rabbitmq", "4.2-management")
     .WithHttpEndpoint(15672, 15672, name: "management", isProxied: false)
     .WithEnvironment("RABBITMQ_DEFAULT_USER", "guest")
     .WithEnvironment("RABBITMQ_DEFAULT_PASS", "guest")
-    .WithContainerRuntimeArgs("--health-cmd", "rabbitmq-diagnostics -q check_port_connectivity")
+    .WithContainerRuntimeArgs("--health-cmd", "rabbitmq-diagnostics -q ping")
     .WithContainerRuntimeArgs("--health-interval", "3s")
     .WithContainerRuntimeArgs("--health-timeout", "5s")
     .WithContainerRuntimeArgs("--health-retries", "10")
@@ -237,8 +230,7 @@ var monolith = builder.AddProject<Projects.JobBoard_API>("monolith-api")
     .WithEnvironment("Keycloak__Authority", keycloakAuthority)
     .WithEnvironment("Keycloak__Audience", keycloakAudience)
     .WithEnvironment("Keycloak__SwaggerClientId", keycloakSwaggerClientId)
-    .WaitFor(sqlServer)
-    .WaitFor(redis)
+    .WaitFor(seedRunner)
     .WaitFor(rabbitMq);
 
 var monolithMcp = builder.AddProject<Projects.JobBoard_API_Mcp>("monolith-mcp")
@@ -262,6 +254,7 @@ var gateway = builder.AddProject<Projects.Gateway_Api>("gateway")
     .WithEnvironment("SEQ_URL", seqUrl)
     .WithEnvironment("ConnectionStrings__Redis", redisConn)
     .WithEnvironment("AdminApiUrl", "http://localhost:5262")
+    .WaitFor(seedRunner)
     .WaitFor(monolith);
 
 // ---------------------------------------------------------------------------
@@ -299,8 +292,7 @@ if (useDapr)
         .WithEnvironment("AI__CLAUDE_API_KEY", builder.Configuration["AI:CLAUDE_API_KEY"] ?? "")
         .WithEnvironment("OpenAI__ApiKey", builder.Configuration["OpenAI:ApiKey"] ?? "")
         .WithDaprSidecar(DaprOptions("ai-service-v2", "./DaprComponents/ai-service-v2"))
-        .WaitFor(postgres)
-        .WaitFor(redis)
+        .WaitFor(seedRunner)
         .WaitFor(rabbitMq)
         .WaitFor(monolithMcp);
 
@@ -333,7 +325,7 @@ if (useDapr)
         .WithEnvironment("Keycloak__Authority", keycloakAuthority)
         .WithEnvironment("Keycloak__Audience", keycloakAudience)
         .WithDaprSidecar(DaprOptions("company-api"))
-        .WaitFor(sqlServer)
+        .WaitFor(seedRunner)
         .WaitFor(rabbitMq);
 
     var jobApi = builder.AddProject<Projects.JobApi_Service>("job-api")
@@ -343,7 +335,7 @@ if (useDapr)
         .WithEnvironment("Keycloak__Authority", keycloakAuthority)
         .WithEnvironment("Keycloak__Audience", keycloakAudience)
         .WithDaprSidecar(DaprOptions("job-api"))
-        .WaitFor(sqlServer)
+        .WaitFor(seedRunner)
         .WaitFor(rabbitMq);
 
     var userApi = builder.AddProject<Projects.UserApi_Service>("user-api")
@@ -356,7 +348,7 @@ if (useDapr)
         .WithEnvironment("Keycloak__ServiceClientId", keycloakServiceClientId)
         .WithEnvironment("Keycloak__ServiceClientSecret", keycloakServiceClientSecret)
         .WithDaprSidecar(DaprOptions("user-api", "./DaprComponents/user-api"))
-        .WaitFor(sqlServer)
+        .WaitFor(seedRunner)
         .WaitFor(rabbitMq);
 
     var connectorApi = builder.AddProject<Projects.connector_api>("connector-api")
