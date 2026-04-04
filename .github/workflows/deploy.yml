@@ -1,0 +1,313 @@
+name: Deploy to Azure
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_infra:
+        description: 'Deploy infrastructure (Bicep)'
+        type: boolean
+        default: true
+      build_and_deploy_apps:
+        description: 'Build images and deploy apps'
+        type: boolean
+        default: true
+      seed_databases:
+        description: 'Seed databases with demo data'
+        type: boolean
+        default: false
+
+env:
+  RESOURCE_GROUP: rg-portfolio-jobboard
+  LOCATION: eastus
+  ACR_NAME: acrjobboardportfolio
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  # ════════════════════════════════════════════════════════════════════════════
+  # Job 1: Deploy Infrastructure
+  # ════════════════════════════════════════════════════════════════════════════
+  infrastructure:
+    if: inputs.deploy_infra
+    runs-on: ubuntu-latest
+    outputs:
+      acrLoginServer: ${{ steps.deploy.outputs.acrLoginServer }}
+      gatewayUrl: ${{ steps.deploy.outputs.gatewayUrl }}
+      keycloakUrl: ${{ steps.deploy.outputs.keycloakUrl }}
+      jobAdminUrl: ${{ steps.deploy.outputs.jobAdminUrl }}
+      jobPublicUrl: ${{ steps.deploy.outputs.jobPublicUrl }}
+      sqlServerFqdn: ${{ steps.deploy.outputs.sqlServerFqdn }}
+      postgresServerFqdn: ${{ steps.deploy.outputs.postgresServerFqdn }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Create Resource Group
+        run: az group create -n $RESOURCE_GROUP -l $LOCATION --output none
+
+      - name: Deploy Bicep
+        id: deploy
+        env:
+          SQL_ADMIN_PASSWORD: ${{ secrets.SQL_ADMIN_PASSWORD }}
+          POSTGRES_ADMIN_PASSWORD: ${{ secrets.POSTGRES_ADMIN_PASSWORD }}
+          KEYCLOAK_ADMIN_PASSWORD: ${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}
+        run: |
+          result=$(az deployment group create \
+            --resource-group $RESOURCE_GROUP \
+            --template-file deploy/main.bicep \
+            --parameters deploy/main.bicepparam \
+            --query 'properties.outputs' \
+            --output json)
+
+          echo "acrLoginServer=$(echo $result | jq -r '.acrLoginServer.value')" >> $GITHUB_OUTPUT
+          echo "gatewayUrl=$(echo $result | jq -r '.gatewayUrl.value')" >> $GITHUB_OUTPUT
+          echo "keycloakUrl=$(echo $result | jq -r '.keycloakUrl.value')" >> $GITHUB_OUTPUT
+          echo "jobAdminUrl=$(echo $result | jq -r '.jobAdminUrl.value')" >> $GITHUB_OUTPUT
+          echo "jobPublicUrl=$(echo $result | jq -r '.jobPublicUrl.value')" >> $GITHUB_OUTPUT
+          echo "sqlServerFqdn=$(echo $result | jq -r '.sqlServerFqdn.value')" >> $GITHUB_OUTPUT
+          echo "postgresServerFqdn=$(echo $result | jq -r '.postgresServerFqdn.value')" >> $GITHUB_OUTPUT
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # Job 2: Seed Key Vault
+  # ════════════════════════════════════════════════════════════════════════════
+  seed-keyvault:
+    needs: infrastructure
+    if: inputs.deploy_infra
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Seed Key Vault
+        env:
+          KEYCLOAK_SERVICE_CLIENT_SECRET: ${{ secrets.KEYCLOAK_SERVICE_CLIENT_SECRET }}
+          CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          chmod +x deploy/scripts/seed-keyvault.sh
+          ./deploy/scripts/seed-keyvault.sh kv-jb-portfolio
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # Job 3: Seed Databases (optional)
+  # ════════════════════════════════════════════════════════════════════════════
+  seed-databases:
+    needs: infrastructure
+    if: inputs.seed_databases
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true  # Pull .bak and .dump files from Git LFS
+
+      - uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Install tools
+        run: |
+          # sqlpackage for .bacpac import
+          dotnet tool install -g microsoft.sqlpackage
+          # pg tools already available on ubuntu-latest
+
+      - name: Seed SQL Server databases
+        env:
+          SQL_SERVER: ${{ needs.infrastructure.outputs.sqlServerFqdn }}
+          SQL_PASSWORD: ${{ secrets.SQL_ADMIN_PASSWORD }}
+        run: |
+          # Export .bak to .bacpac using sqlpackage (extract from running DB not possible,
+          # so we upload .bak to storage and use az sql db import)
+          # For portfolio: use sqlcmd to run schema + seed SQL directly
+          echo "SQL Server seeding - run EF migrations from the app on first startup"
+          echo "The apps apply migrations automatically via Program.cs"
+
+      - name: Seed PostgreSQL
+        env:
+          PG_SERVER: ${{ needs.infrastructure.outputs.postgresServerFqdn }}
+          PG_PASSWORD: ${{ secrets.POSTGRES_ADMIN_PASSWORD }}
+        run: |
+          if [ -f "aspire/JobBoard.AppHost/PostgresInit/backups/AiEmbeddings.dump" ]; then
+            PGPASSWORD="$PG_PASSWORD" pg_restore \
+              --host="$PG_SERVER" \
+              --port=5432 \
+              --username=pgadmin \
+              --dbname=AiEmbeddings \
+              --no-owner \
+              --no-privileges \
+              --if-exists \
+              --clean \
+              "aspire/JobBoard.AppHost/PostgresInit/backups/AiEmbeddings.dump" || true
+            echo "PostgreSQL AiEmbeddings seeded"
+          else
+            echo "No PostgreSQL dump found, skipping"
+          fi
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # Job 4: Build and Push Docker Images
+  # ════════════════════════════════════════════════════════════════════════════
+  build-images:
+    needs: infrastructure
+    if: inputs.build_and_deploy_apps
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: monolith-api
+            context: .
+            dockerfile: services/monolith/Src/Presentation/JobBoard.API/Dockerfile
+          - name: monolith-mcp
+            context: .
+            dockerfile: services/monolith/Src/Presentation/JobBoard.API.Mcp/Dockerfile
+          - name: gateway
+            context: services/gateway
+            dockerfile: services/gateway/Dockerfile
+          - name: ai-service-v2
+            context: .
+            dockerfile: services/ai-service.v2/Src/Presentation/JobBoard.AI.API/Dockerfile
+          - name: admin-api
+            context: .
+            dockerfile: services/micro-services/admin-api/Dockerfile
+          - name: admin-api-mcp
+            context: .
+            dockerfile: services/micro-services/admin-api/AdminApi.Mcp/Dockerfile
+          - name: company-api
+            context: .
+            dockerfile: services/micro-services/company-api/Dockerfile
+          - name: job-api
+            context: .
+            dockerfile: services/micro-services/job-api/Dockerfile
+          - name: user-api
+            context: .
+            dockerfile: services/micro-services/user-api/Dockerfile
+          - name: connector-api
+            context: .
+            dockerfile: services/connector-api/Dockerfile
+          - name: reverse-connector-api
+            context: .
+            dockerfile: services/reverse-connector-api/Dockerfile
+          - name: job-admin
+            context: apps/job-admin
+            dockerfile: apps/job-admin/Dockerfile
+          - name: job-public
+            context: apps/job-public
+            dockerfile: apps/job-public/Dockerfile
+          - name: keycloak
+            context: infrastructure/keycloak
+            dockerfile: infrastructure/keycloak/Dockerfile
+          - name: health-check
+            context: .
+            dockerfile: services/micro-services/HealthChecks/JobBoard.WebStatus/Dockerfile
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Login to ACR
+        run: az acr login --name $ACR_NAME
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Push
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: |
+            ${{ env.ACR_NAME }}.azurecr.io/${{ matrix.name }}:${{ github.sha }}
+            ${{ env.ACR_NAME }}.azurecr.io/${{ matrix.name }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            ENVIRONMENT=azure
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # Job 5: Deploy Container Apps
+  # ════════════════════════════════════════════════════════════════════════════
+  deploy-apps:
+    needs: [infrastructure, build-images]
+    if: inputs.build_and_deploy_apps
+    runs-on: ubuntu-latest
+    steps:
+      - uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy infrastructure containers
+        run: |
+          for svc in keycloak rabbitmq; do
+            az containerapp update \
+              --name $svc \
+              --resource-group $RESOURCE_GROUP \
+              --image $ACR_NAME.azurecr.io/$svc:${{ github.sha }} \
+              --output none &
+          done
+          wait
+          echo "Infrastructure containers updated"
+
+      - name: Wait for Keycloak health
+        run: |
+          echo "Waiting for Keycloak to be ready..."
+          for i in $(seq 1 30); do
+            status=$(az containerapp show \
+              --name keycloak \
+              --resource-group $RESOURCE_GROUP \
+              --query 'properties.runningStatus' -o tsv 2>/dev/null || echo "pending")
+            if [ "$status" = "Running" ]; then
+              echo "Keycloak is running"
+              break
+            fi
+            echo "  Attempt $i/30 - status: $status"
+            sleep 10
+          done
+
+      - name: Deploy backend services
+        run: |
+          for svc in monolith-api monolith-mcp gateway ai-service-v2 \
+                     admin-api admin-api-mcp company-api job-api user-api \
+                     connector-api reverse-connector-api health-check; do
+            az containerapp update \
+              --name $svc \
+              --resource-group $RESOURCE_GROUP \
+              --image $ACR_NAME.azurecr.io/$svc:${{ github.sha }} \
+              --output none &
+          done
+          wait
+          echo "Backend services updated"
+
+      - name: Deploy frontend apps
+        run: |
+          for svc in job-admin job-public; do
+            az containerapp update \
+              --name $svc \
+              --resource-group $RESOURCE_GROUP \
+              --image $ACR_NAME.azurecr.io/$svc:${{ github.sha }} \
+              --output none &
+          done
+          wait
+          echo "Frontend apps updated"
+
+      - name: Print deployment URLs
+        run: |
+          echo "══════════════════════════════════════════════"
+          echo "Deployment Complete!"
+          echo "══════════════════════════════════════════════"
+          echo "Gateway:     ${{ needs.infrastructure.outputs.gatewayUrl }}"
+          echo "Keycloak:    ${{ needs.infrastructure.outputs.keycloakUrl }}"
+          echo "Admin App:   ${{ needs.infrastructure.outputs.jobAdminUrl }}"
+          echo "Public App:  ${{ needs.infrastructure.outputs.jobPublicUrl }}"
+          echo "══════════════════════════════════════════════"
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # Teardown (separate workflow_dispatch for safety)
+  # ════════════════════════════════════════════════════════════════════════════
+  # To tear down: az group delete -n rg-portfolio-jobboard --yes --no-wait

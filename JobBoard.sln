@@ -397,6 +397,33 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobBoard.AI.Tests", "servic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elkhair.Dev.Common.Tests", "services\micro-services\Elkhair.Dev.Common\Elkhair.Dev.Common.Tests\Elkhair.Dev.Common.Tests.csproj", "{1CE63983-C24B-41FE-8A4A-CA38C37D92D4}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{EC1A684E-B6DE-4658-905A-B27E295A541C}"
+	ProjectSection(SolutionItems) = preProject
+		deploy\main.json = deploy\main.json
+		deploy\main.bicep = deploy\main.bicep
+		deploy\main.bicepparam = deploy\main.bicepparam
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "modules", "modules", "{A9DCBCCA-F5B3-4860-B654-DC3637E569DE}"
+	ProjectSection(SolutionItems) = preProject
+		deploy\modules\redis.bicep = deploy\modules\redis.bicep
+		deploy\modules\keycloak.bicep = deploy\modules\keycloak.bicep
+		deploy\modules\key-vault.bicep = deploy\modules\key-vault.bicep
+		deploy\modules\postgresql.bicep = deploy\modules\postgresql.bicep
+		deploy\modules\sql-server.bicep = deploy\modules\sql-server.bicep
+		deploy\modules\container-app.bicep = deploy\modules\container-app.bicep
+		deploy\modules\log-analytics.bicep = deploy\modules\log-analytics.bicep
+		deploy\modules\storage-account.bicep = deploy\modules\storage-account.bicep
+		deploy\modules\managed-identity.bicep = deploy\modules\managed-identity.bicep
+		deploy\modules\container-apps-env.bicep = deploy\modules\container-apps-env.bicep
+		deploy\modules\container-registry.bicep = deploy\modules\container-registry.bicep
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{1E697A79-C3AE-4121-86F4-177F8797B255}"
+	ProjectSection(SolutionItems) = preProject
+		deploy\scripts\seed-keyvault.sh = deploy\scripts\seed-keyvault.sh
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1147,6 +1174,8 @@ Global
 		{FFF3B366-FA40-6A63-7444-BD1E5A508463} = {D1513088-2D81-4516-A90E-0CC565FE9D97}
 		{404D60C9-3DC1-4314-8459-CB717A19C18E} = {FFF3B366-FA40-6A63-7444-BD1E5A508463}
 		{1CE63983-C24B-41FE-8A4A-CA38C37D92D4} = {55EFE0A8-3F4A-46E2-BD74-39D3D74D8B5E}
+		{A9DCBCCA-F5B3-4860-B654-DC3637E569DE} = {EC1A684E-B6DE-4658-905A-B27E295A541C}
+		{1E697A79-C3AE-4121-86F4-177F8797B255} = {EC1A684E-B6DE-4658-905A-B27E295A541C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A1C2D3E4-F5A6-47B8-9C0D-E1F2A3B4C5D6}
