@@ -1,6 +1,6 @@
 using './main.bicep'
 
-param location = 'eastus'
+param location = 'centralus'
 param prefix = 'jb'
 param acrName = 'acrjobboardportfolio'
 param keyVaultName = 'kv-jb-portfolio'

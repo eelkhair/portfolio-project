@@ -18,7 +18,7 @@ on:
 
 env:
   RESOURCE_GROUP: rg-portfolio-jobboard
-  LOCATION: eastus
+  LOCATION: centralus
   ACR_NAME: acrjobboardportfolio
 
 permissions:
