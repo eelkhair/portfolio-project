@@ -54,7 +54,7 @@ ADR Index: [`docs/ADRs`](./ADRs)
 
 **Frontends**
 - **Admin UI** (Angular 20) -- SPA calling either the Monolith API or Admin API via mode toggle
-- **Public UI** (Angular 21 + SSR + Tailwind v4) -- Job-seeker facing application with Auth0 authentication
+- **Public UI** (Angular 21 + SSR + Tailwind v4) -- Job-seeker facing application with Keycloak authentication
 
 **APIs**
 - **Monolith API** -- primary application for the monolith path
@@ -217,7 +217,7 @@ Rationale: [ADR-017](./ADRs/ADR-017-IntegrationEvents-Shared-NuGet-Package.md)
 
 - **Keycloak** with group-based RBAC: `/Admins`, `/Companies/{uid}/CompanyAdmins`, `/Companies/{uid}/Recruiters`, `/Applicants`
 - Admin app uses **angular-auth-oidc-client** with PKCE
-- Public app uses **Auth0** (SSR-safe with optional inject pattern)
+- Public app uses **angular-auth-oidc-client** with Keycloak (SSR-safe with optional inject pattern)
 - Microservice endpoints are `AllowAnonymous()` -- auth enforced at the Gateway
 - Service-to-service calls use `InternalApiKey` fallback
 - User provisioning creates Keycloak groups, sub-groups, and sends verification emails
