@@ -14,5 +14,11 @@
     { "hostname": "job-dapr.eelkhair.net", "service": "http://192.168.1.112:8080" },
     { "hostname": "mono-mcp.eelkhair.net", "service": "http://192.168.1.112:3333" },
     { "hostname": "micro-mcp.eelkhair.net", "service": "http://192.168.1.112:3334" }
+  ],
+  "block_rules": [
+    {
+      "description": "Block Keycloak admin console",
+      "expression": "(http.host eq \"auth.eelkhair.net\" and starts_with(http.request.uri.path, \"/admin\"))"
+    }
   ]
 }

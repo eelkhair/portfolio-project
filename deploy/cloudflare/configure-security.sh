@@ -35,7 +35,7 @@ echo "════════════════════════�
 # 1. Set Security Level to "essentially_off"
 # ──────────────────────────────────────────────────────────────────────
 echo ""
-echo "[1/4] Setting Security Level to 'essentially_off'..."
+echo "[1/5] Setting Security Level to 'essentially_off'..."
 RESPONSE=$(curl -s -X PATCH \
   "$CF_API_BASE/zones/$ZONE_ID/settings/security_level" \
   -H "$AUTH_HEADER" \
@@ -53,7 +53,7 @@ fi
 # 2. Disable Bot Fight Mode
 # ──────────────────────────────────────────────────────────────────────
 echo ""
-echo "[2/4] Disabling Bot Fight Mode..."
+echo "[2/5] Disabling Bot Fight Mode..."
 RESPONSE=$(curl -s -X PUT \
   "$CF_API_BASE/zones/$ZONE_ID/bot_management" \
   -H "$AUTH_HEADER" \
@@ -71,7 +71,7 @@ fi
 # 3. Disable Browser Integrity Check
 # ──────────────────────────────────────────────────────────────────────
 echo ""
-echo "[3/4] Disabling Browser Integrity Check..."
+echo "[3/5] Disabling Browser Integrity Check..."
 RESPONSE=$(curl -s -X PATCH \
   "$CF_API_BASE/zones/$ZONE_ID/settings/browser_check" \
   -H "$AUTH_HEADER" \
@@ -89,7 +89,7 @@ fi
 # 4. Disable Email Address Obfuscation (can interfere with SPAs)
 # ──────────────────────────────────────────────────────────────────────
 echo ""
-echo "[4/4] Disabling Email Address Obfuscation..."
+echo "[4/5] Disabling Email Address Obfuscation..."
 RESPONSE=$(curl -s -X PATCH \
   "$CF_API_BASE/zones/$ZONE_ID/settings/email_obfuscation" \
   -H "$AUTH_HEADER" \
@@ -101,6 +101,76 @@ if [ "$SUCCESS" = "true" ]; then
   echo "  Done: Email Obfuscation disabled"
 else
   echo "  Warning: $(echo "$RESPONSE" | jq -r '.errors[0].message // "Unknown error"')"
+fi
+
+# ──────────────────────────────────────────────────────────────────────
+# 5. Block Keycloak admin console publicly
+#    Allows OIDC endpoints (/realms/...) but blocks /admin and /master
+# ──────────────────────────────────────────────────────────────────────
+echo ""
+echo "[5/5] Creating WAF rule to block Keycloak admin console..."
+
+# Check if rule already exists
+EXISTING_RULE=$(curl -s \
+  "$CF_API_BASE/zones/$ZONE_ID/rulesets" \
+  -H "$AUTH_HEADER" \
+  | jq -r '.result[] | select(.phase == "http_request_firewall_custom") | .id')
+
+if [ -n "$EXISTING_RULE" ]; then
+  # Get existing rules to avoid overwriting them
+  EXISTING_RULES=$(curl -s \
+    "$CF_API_BASE/zones/$ZONE_ID/rulesets/$EXISTING_RULE" \
+    -H "$AUTH_HEADER")
+
+  # Check if our rule already exists
+  HAS_RULE=$(echo "$EXISTING_RULES" | jq '[.result.rules[] | select(.description == "Block Keycloak admin console")] | length')
+
+  if [ "$HAS_RULE" -gt 0 ]; then
+    echo "  Rule already exists, skipping"
+  else
+    # Add our rule to the existing ruleset
+    RESPONSE=$(curl -s -X POST \
+      "$CF_API_BASE/zones/$ZONE_ID/rulesets/$EXISTING_RULE/rules" \
+      -H "$AUTH_HEADER" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "description": "Block Keycloak admin console",
+        "expression": "(http.host eq \"auth.eelkhair.net\" and starts_with(http.request.uri.path, \"/admin\"))",
+        "action": "block"
+      }')
+
+    SUCCESS=$(echo "$RESPONSE" | jq -r '.success')
+    if [ "$SUCCESS" = "true" ]; then
+      echo "  Done: Keycloak /admin blocked publicly"
+    else
+      echo "  Warning: $(echo "$RESPONSE" | jq -r '.errors[0].message // "Unknown error"')"
+    fi
+  fi
+else
+  # Create new custom ruleset with our rule
+  RESPONSE=$(curl -s -X POST \
+    "$CF_API_BASE/zones/$ZONE_ID/rulesets" \
+    -H "$AUTH_HEADER" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "name": "Portfolio security rules",
+      "kind": "zone",
+      "phase": "http_request_firewall_custom",
+      "rules": [
+        {
+          "description": "Block Keycloak admin console",
+          "expression": "(http.host eq \"auth.eelkhair.net\" and starts_with(http.request.uri.path, \"/admin\"))",
+          "action": "block"
+        }
+      ]
+    }')
+
+  SUCCESS=$(echo "$RESPONSE" | jq -r '.success')
+  if [ "$SUCCESS" = "true" ]; then
+    echo "  Done: Keycloak /admin blocked publicly"
+  else
+    echo "  Warning: $(echo "$RESPONSE" | jq -r '.errors[0].message // "Unknown error"')"
+  fi
 fi
 
 # ──────────────────────────────────────────────────────────────────────
