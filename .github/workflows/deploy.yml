@@ -34,10 +34,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       acrLoginServer: ${{ steps.deploy.outputs.acrLoginServer }}
-      gatewayUrl: ${{ steps.deploy.outputs.gatewayUrl }}
-      keycloakUrl: ${{ steps.deploy.outputs.keycloakUrl }}
-      jobAdminUrl: ${{ steps.deploy.outputs.jobAdminUrl }}
-      jobPublicUrl: ${{ steps.deploy.outputs.jobPublicUrl }}
       sqlServerFqdn: ${{ steps.deploy.outputs.sqlServerFqdn }}
       postgresServerFqdn: ${{ steps.deploy.outputs.postgresServerFqdn }}
     steps:
@@ -50,7 +46,7 @@ jobs:
       - name: Create Resource Group
         run: az group create -n $RESOURCE_GROUP -l $LOCATION --output none
 
-      - name: Deploy Bicep
+      - name: Deploy Infrastructure (no Container Apps)
         id: deploy
         env:
           SQL_ADMIN_PASSWORD: ${{ secrets.SQL_ADMIN_PASSWORD }}
@@ -61,14 +57,11 @@ jobs:
             --resource-group $RESOURCE_GROUP \
             --template-file deploy/main.bicep \
             --parameters deploy/main.bicepparam \
+            --parameters deployApps=false \
             --query 'properties.outputs' \
             --output json)
 
           echo "acrLoginServer=$(echo $result | jq -r '.acrLoginServer.value')" >> $GITHUB_OUTPUT
-          echo "gatewayUrl=$(echo $result | jq -r '.gatewayUrl.value')" >> $GITHUB_OUTPUT
-          echo "keycloakUrl=$(echo $result | jq -r '.keycloakUrl.value')" >> $GITHUB_OUTPUT
-          echo "jobAdminUrl=$(echo $result | jq -r '.jobAdminUrl.value')" >> $GITHUB_OUTPUT
-          echo "jobPublicUrl=$(echo $result | jq -r '.jobPublicUrl.value')" >> $GITHUB_OUTPUT
           echo "sqlServerFqdn=$(echo $result | jq -r '.sqlServerFqdn.value')" >> $GITHUB_OUTPUT
           echo "postgresServerFqdn=$(echo $result | jq -r '.postgresServerFqdn.value')" >> $GITHUB_OUTPUT
 
@@ -238,73 +231,41 @@ jobs:
     if: inputs.build_and_deploy_apps
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Deploy infrastructure containers
+      - name: Deploy Container Apps via Bicep
+        id: deploy-apps
+        env:
+          SQL_ADMIN_PASSWORD: ${{ secrets.SQL_ADMIN_PASSWORD }}
+          POSTGRES_ADMIN_PASSWORD: ${{ secrets.POSTGRES_ADMIN_PASSWORD }}
+          KEYCLOAK_ADMIN_PASSWORD: ${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}
         run: |
-          for svc in keycloak rabbitmq; do
-            az containerapp update \
-              --name $svc \
-              --resource-group $RESOURCE_GROUP \
-              --image $ACR_NAME.azurecr.io/$svc:${{ github.sha }} \
-              --output none &
-          done
-          wait
-          echo "Infrastructure containers updated"
+          result=$(az deployment group create \
+            --resource-group $RESOURCE_GROUP \
+            --template-file deploy/main.bicep \
+            --parameters deploy/main.bicepparam \
+            --parameters deployApps=true imageTag=${{ github.sha }} \
+            --query 'properties.outputs' \
+            --output json)
 
-      - name: Wait for Keycloak health
-        run: |
-          echo "Waiting for Keycloak to be ready..."
-          for i in $(seq 1 30); do
-            status=$(az containerapp show \
-              --name keycloak \
-              --resource-group $RESOURCE_GROUP \
-              --query 'properties.runningStatus' -o tsv 2>/dev/null || echo "pending")
-            if [ "$status" = "Running" ]; then
-              echo "Keycloak is running"
-              break
-            fi
-            echo "  Attempt $i/30 - status: $status"
-            sleep 10
-          done
-
-      - name: Deploy backend services
-        run: |
-          for svc in monolith-api monolith-mcp gateway ai-service-v2 \
-                     admin-api admin-api-mcp company-api job-api user-api \
-                     connector-api reverse-connector-api health-check; do
-            az containerapp update \
-              --name $svc \
-              --resource-group $RESOURCE_GROUP \
-              --image $ACR_NAME.azurecr.io/$svc:${{ github.sha }} \
-              --output none &
-          done
-          wait
-          echo "Backend services updated"
-
-      - name: Deploy frontend apps
-        run: |
-          for svc in job-admin job-public; do
-            az containerapp update \
-              --name $svc \
-              --resource-group $RESOURCE_GROUP \
-              --image $ACR_NAME.azurecr.io/$svc:${{ github.sha }} \
-              --output none &
-          done
-          wait
-          echo "Frontend apps updated"
+          echo "gatewayUrl=$(echo $result | jq -r '.gatewayUrl.value')" >> $GITHUB_OUTPUT
+          echo "keycloakUrl=$(echo $result | jq -r '.keycloakUrl.value')" >> $GITHUB_OUTPUT
+          echo "jobAdminUrl=$(echo $result | jq -r '.jobAdminUrl.value')" >> $GITHUB_OUTPUT
+          echo "jobPublicUrl=$(echo $result | jq -r '.jobPublicUrl.value')" >> $GITHUB_OUTPUT
 
       - name: Print deployment URLs
         run: |
           echo "══════════════════════════════════════════════"
           echo "Deployment Complete!"
           echo "══════════════════════════════════════════════"
-          echo "Gateway:     ${{ needs.infrastructure.outputs.gatewayUrl }}"
-          echo "Keycloak:    ${{ needs.infrastructure.outputs.keycloakUrl }}"
-          echo "Admin App:   ${{ needs.infrastructure.outputs.jobAdminUrl }}"
-          echo "Public App:  ${{ needs.infrastructure.outputs.jobPublicUrl }}"
+          echo "Gateway:     ${{ steps.deploy-apps.outputs.gatewayUrl }}"
+          echo "Keycloak:    ${{ steps.deploy-apps.outputs.keycloakUrl }}"
+          echo "Admin App:   ${{ steps.deploy-apps.outputs.jobAdminUrl }}"
+          echo "Public App:  ${{ steps.deploy-apps.outputs.jobPublicUrl }}"
           echo "══════════════════════════════════════════════"
 
   # ════════════════════════════════════════════════════════════════════════════

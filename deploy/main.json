@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.42.1.51946",
-      "templateHash": "3018703386610785060"
+      "templateHash": "15166292893165608619"
     }
   },
   "parameters": {
@@ -65,13 +65,21 @@
       "metadata": {
         "description": "Container image tag (defaults to latest)"
       }
+    },
+    "deployApps": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Deploy Container Apps (set false for infra-only first run)"
+      }
     }
   },
   "variables": {
+    "placeholderImage": "mcr.microsoft.com/k8se/quickstart:latest",
     "appConfigName": "[format('{0}-appconfig', parameters('prefix'))]",
     "sqlServerName": "[format('{0}-sql', parameters('prefix'))]",
     "postgresServerName": "[format('{0}-pg', parameters('prefix'))]",
-    "redisName": "[format('{0}-redis', parameters('prefix'))]",
+    "redisName": "[format('{0}-redis-portfolio', parameters('prefix'))]",
     "logAnalyticsName": "[format('{0}-logs', parameters('prefix'))]",
     "environmentName": "[format('{0}-env', parameters('prefix'))]",
     "identityName": "[format('{0}-identity', parameters('prefix'))]",
@@ -186,7 +194,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.42.1.51946",
-              "templateHash": "7775357510888408842"
+              "templateHash": "57893116797803748"
             }
           },
           "parameters": {
@@ -222,9 +230,7 @@
                 },
                 "tenantId": "[parameters('tenantId')]",
                 "enableRbacAuthorization": true,
-                "enableSoftDelete": true,
-                "softDeleteRetentionInDays": 7,
-                "enablePurgeProtection": false
+                "enableSoftDelete": false
               }
             }
           ],
@@ -1476,6 +1482,7 @@
       ]
     },
     {
+      "condition": "[parameters('deployApps')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
       "name": "rabbitmq",
@@ -1725,6 +1732,7 @@
       ]
     },
     {
+      "condition": "[parameters('deployApps')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
       "name": "keycloak",
@@ -1938,6 +1946,7 @@
       ]
     },
     {
+      "condition": "[parameters('deployApps')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
       "name": "gateway",
@@ -2180,6 +2189,7 @@
       ]
     },
     {
+      "condition": "[parameters('deployApps')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
       "name": "monolith-api",
@@ -2433,6 +2443,7 @@
       ]
     },
     {
+      "condition": "[parameters('deployApps')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
       "name": "monolith-mcp",
@@ -2669,6 +2680,7 @@
       ]
     },
     {
+      "condition": "[parameters('deployApps')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
       "name": "ai-service-v2",
@@ -2923,6 +2935,7 @@
       ]
     },
     {
+      "condition": "[parameters('deployApps')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
       "name": "admin-api",
@@ -3168,6 +3181,7 @@
       ]
     },
     {
+      "condition": "[parameters('deployApps')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
       "name": "admin-api-mcp",
@@ -3413,6 +3427,7 @@
       ]
     },
     {
+      "condition": "[parameters('deployApps')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
       "name": "company-api",
@@ -3658,6 +3673,7 @@
       ]
     },
     {
+      "condition": "[parameters('deployApps')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
       "name": "job-api",
@@ -3903,6 +3919,7 @@
       ]
     },
     {
+      "condition": "[parameters('deployApps')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
       "name": "user-api",
@@ -4154,6 +4171,7 @@
       ]
     },
     {
+      "condition": "[parameters('deployApps')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
       "name": "connector-api",
@@ -4398,6 +4416,7 @@
       ]
     },
     {
+      "condition": "[parameters('deployApps')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
       "name": "reverse-connector-api",
@@ -4642,6 +4661,7 @@
       ]
     },
     {
+      "condition": "[parameters('deployApps')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
       "name": "job-admin",
@@ -4873,6 +4893,7 @@
       ]
     },
     {
+      "condition": "[parameters('deployApps')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
       "name": "job-public",
@@ -5104,6 +5125,7 @@
       ]
     },
     {
+      "condition": "[parameters('deployApps')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
       "name": "health-check",
@@ -5339,26 +5361,6 @@
     }
   ],
   "outputs": {
-    "gatewayUrl": {
-      "type": "string",
-      "value": "[format('https://{0}', reference(resourceId('Microsoft.Resources/deployments', 'gateway'), '2025-04-01').outputs.appFqdn.value)]"
-    },
-    "keycloakUrl": {
-      "type": "string",
-      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'keycloak'), '2025-04-01').outputs.keycloakUrl.value]"
-    },
-    "jobAdminUrl": {
-      "type": "string",
-      "value": "[format('https://{0}', reference(resourceId('Microsoft.Resources/deployments', 'job-admin'), '2025-04-01').outputs.appFqdn.value)]"
-    },
-    "jobPublicUrl": {
-      "type": "string",
-      "value": "[format('https://{0}', reference(resourceId('Microsoft.Resources/deployments', 'job-public'), '2025-04-01').outputs.appFqdn.value)]"
-    },
-    "healthCheckUrl": {
-      "type": "string",
-      "value": "[format('https://{0}', reference(resourceId('Microsoft.Resources/deployments', 'health-check'), '2025-04-01').outputs.appFqdn.value)]"
-    },
     "acrLoginServer": {
       "type": "string",
       "value": "[reference(resourceId('Microsoft.Resources/deployments', 'container-registry'), '2025-04-01').outputs.acrLoginServer.value]"
@@ -5374,6 +5376,30 @@
     "appConfigEndpoint": {
       "type": "string",
       "value": "[reference(resourceId('Microsoft.Resources/deployments', 'app-configuration'), '2025-04-01').outputs.appConfigEndpoint.value]"
+    },
+    "environmentId": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'container-apps-env'), '2025-04-01').outputs.environmentId.value]"
+    },
+    "gatewayUrl": {
+      "type": "string",
+      "value": "[if(parameters('deployApps'), format('https://{0}', reference(resourceId('Microsoft.Resources/deployments', 'gateway'), '2025-04-01').outputs.appFqdn.value), '')]"
+    },
+    "keycloakUrl": {
+      "type": "string",
+      "value": "[if(parameters('deployApps'), reference(resourceId('Microsoft.Resources/deployments', 'keycloak'), '2025-04-01').outputs.keycloakUrl.value, '')]"
+    },
+    "jobAdminUrl": {
+      "type": "string",
+      "value": "[if(parameters('deployApps'), format('https://{0}', reference(resourceId('Microsoft.Resources/deployments', 'job-admin'), '2025-04-01').outputs.appFqdn.value), '')]"
+    },
+    "jobPublicUrl": {
+      "type": "string",
+      "value": "[if(parameters('deployApps'), format('https://{0}', reference(resourceId('Microsoft.Resources/deployments', 'job-public'), '2025-04-01').outputs.appFqdn.value), '')]"
+    },
+    "healthCheckUrl": {
+      "type": "string",
+      "value": "[if(parameters('deployApps'), format('https://{0}', reference(resourceId('Microsoft.Resources/deployments', 'health-check'), '2025-04-01').outputs.appFqdn.value), '')]"
     }
   }
 }

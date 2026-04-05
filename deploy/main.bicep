@@ -38,7 +38,13 @@ param keycloakAdminPassword string
 @description('Container image tag (defaults to latest)')
 param imageTag string = 'latest'
 
+@description('Deploy Container Apps (set false for infra-only first run)')
+param deployApps bool = false
+
 // ── Variables ──
+
+// Placeholder image for initial deployment before real images are pushed to ACR
+var placeholderImage = 'mcr.microsoft.com/k8se/quickstart:latest'
 
 var appConfigName = '${prefix}-appconfig'
 var sqlServerName = '${prefix}-sql'
@@ -163,7 +169,7 @@ module containerEnv 'modules/container-apps-env.bicep' = {
 // Phase 4: RabbitMQ + Keycloak (infrastructure containers, deploy first)
 // ══════════════════════════════════════════════════════════════════════════════
 
-module rabbitmq 'modules/container-app.bicep' = {
+module rabbitmq 'modules/container-app.bicep' = if (deployApps) {
   name: 'rabbitmq'
   params: {
     name: 'rabbitmq'
@@ -185,7 +191,7 @@ module rabbitmq 'modules/container-app.bicep' = {
   }
 }
 
-module keycloak 'modules/keycloak.bicep' = {
+module keycloak 'modules/keycloak.bicep' = if (deployApps) {
   name: 'keycloak'
   params: {
     location: location
@@ -216,7 +222,7 @@ var keycloakEnvVars = [
 ]
 
 // Gateway (external-facing, routes to all services)
-module gateway 'modules/container-app.bicep' = {
+module gateway 'modules/container-app.bicep' = if (deployApps) {
   name: 'gateway'
   params: {
     name: 'gateway'
@@ -241,7 +247,7 @@ module gateway 'modules/container-app.bicep' = {
 }
 
 // Monolith API
-module monolithApi 'modules/container-app.bicep' = {
+module monolithApi 'modules/container-app.bicep' = if (deployApps) {
   name: 'monolith-api'
   params: {
     name: 'monolith-api'
@@ -269,7 +275,7 @@ module monolithApi 'modules/container-app.bicep' = {
 }
 
 // Monolith MCP
-module monolithMcp 'modules/container-app.bicep' = {
+module monolithMcp 'modules/container-app.bicep' = if (deployApps) {
   name: 'monolith-mcp'
   params: {
     name: 'monolith-mcp'
@@ -289,7 +295,7 @@ module monolithMcp 'modules/container-app.bicep' = {
 }
 
 // AI Service v2
-module aiService 'modules/container-app.bicep' = {
+module aiService 'modules/container-app.bicep' = if (deployApps) {
   name: 'ai-service-v2'
   params: {
     name: 'ai-service-v2'
@@ -319,7 +325,7 @@ module aiService 'modules/container-app.bicep' = {
 }
 
 // Admin API
-module adminApi 'modules/container-app.bicep' = {
+module adminApi 'modules/container-app.bicep' = if (deployApps) {
   name: 'admin-api'
   params: {
     name: 'admin-api'
@@ -342,7 +348,7 @@ module adminApi 'modules/container-app.bicep' = {
 }
 
 // Admin API MCP
-module adminApiMcp 'modules/container-app.bicep' = {
+module adminApiMcp 'modules/container-app.bicep' = if (deployApps) {
   name: 'admin-api-mcp'
   params: {
     name: 'admin-api-mcp'
@@ -365,7 +371,7 @@ module adminApiMcp 'modules/container-app.bicep' = {
 }
 
 // Company API
-module companyApi 'modules/container-app.bicep' = {
+module companyApi 'modules/container-app.bicep' = if (deployApps) {
   name: 'company-api'
   params: {
     name: 'company-api'
@@ -388,7 +394,7 @@ module companyApi 'modules/container-app.bicep' = {
 }
 
 // Job API
-module jobApi 'modules/container-app.bicep' = {
+module jobApi 'modules/container-app.bicep' = if (deployApps) {
   name: 'job-api'
   params: {
     name: 'job-api'
@@ -411,7 +417,7 @@ module jobApi 'modules/container-app.bicep' = {
 }
 
 // User API
-module userApi 'modules/container-app.bicep' = {
+module userApi 'modules/container-app.bicep' = if (deployApps) {
   name: 'user-api'
   params: {
     name: 'user-api'
@@ -438,7 +444,7 @@ module userApi 'modules/container-app.bicep' = {
 }
 
 // Connector API
-module connectorApi 'modules/container-app.bicep' = {
+module connectorApi 'modules/container-app.bicep' = if (deployApps) {
   name: 'connector-api'
   params: {
     name: 'connector-api'
@@ -459,7 +465,7 @@ module connectorApi 'modules/container-app.bicep' = {
 }
 
 // Reverse Connector API
-module reverseConnectorApi 'modules/container-app.bicep' = {
+module reverseConnectorApi 'modules/container-app.bicep' = if (deployApps) {
   name: 'reverse-connector-api'
   params: {
     name: 'reverse-connector-api'
@@ -483,7 +489,7 @@ module reverseConnectorApi 'modules/container-app.bicep' = {
 // Phase 6: Frontend Apps
 // ══════════════════════════════════════════════════════════════════════════════
 
-module jobAdmin 'modules/container-app.bicep' = {
+module jobAdmin 'modules/container-app.bicep' = if (deployApps) {
   name: 'job-admin'
   params: {
     name: 'job-admin'
@@ -499,7 +505,7 @@ module jobAdmin 'modules/container-app.bicep' = {
   }
 }
 
-module jobPublic 'modules/container-app.bicep' = {
+module jobPublic 'modules/container-app.bicep' = if (deployApps) {
   name: 'job-public'
   params: {
     name: 'job-public'
@@ -516,7 +522,7 @@ module jobPublic 'modules/container-app.bicep' = {
 }
 
 // Health Check Dashboard
-module healthCheck 'modules/container-app.bicep' = {
+module healthCheck 'modules/container-app.bicep' = if (deployApps) {
   name: 'health-check'
   params: {
     name: 'health-check'
@@ -537,12 +543,13 @@ module healthCheck 'modules/container-app.bicep' = {
 // Outputs
 // ══════════════════════════════════════════════════════════════════════════════
 
-output gatewayUrl string = 'https://${gateway.outputs.appFqdn}'
-output keycloakUrl string = keycloak.outputs.keycloakUrl
-output jobAdminUrl string = 'https://${jobAdmin.outputs.appFqdn}'
-output jobPublicUrl string = 'https://${jobPublic.outputs.appFqdn}'
-output healthCheckUrl string = 'https://${healthCheck.outputs.appFqdn}'
 output acrLoginServer string = acr.outputs.acrLoginServer
 output sqlServerFqdn string = sqlServer.outputs.sqlServerFqdn
 output postgresServerFqdn string = postgresql.outputs.pgServerFqdn
 output appConfigEndpoint string = appConfig.outputs.appConfigEndpoint
+output environmentId string = containerEnv.outputs.environmentId
+output gatewayUrl string = deployApps ? 'https://${gateway.outputs.appFqdn}' : ''
+output keycloakUrl string = deployApps ? keycloak.outputs.keycloakUrl : ''
+output jobAdminUrl string = deployApps ? 'https://${jobAdmin.outputs.appFqdn}' : ''
+output jobPublicUrl string = deployApps ? 'https://${jobPublic.outputs.appFqdn}' : ''
+output healthCheckUrl string = deployApps ? 'https://${healthCheck.outputs.appFqdn}' : ''
