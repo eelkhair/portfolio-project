@@ -16,6 +16,16 @@ receivers:
         endpoint: 0.0.0.0:4317
       http:
         endpoint: 0.0.0.0:4318
+        cors:
+          allowed_origins:
+            - "https://job-admin.eelkhair.net"
+            - "https://job-admin-dev.eelkhair.net"
+            - "https://job--dev.eelkhair.net"
+            - "https://jobs.eelkhair.net"
+            - "https://job.eelkhair.net"
+            - "http://localhost:*"
+          allowed_headers:
+            - "*"
 
 processors:
   batch:
