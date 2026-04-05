@@ -152,37 +152,37 @@ jobs:
       matrix:
         include:
           - name: monolith-api
-            context: .
+            context: services/monolith
             dockerfile: services/monolith/Src/Presentation/JobBoard.API/Dockerfile
           - name: monolith-mcp
-            context: .
+            context: services/monolith
             dockerfile: services/monolith/Src/Presentation/JobBoard.API.Mcp/Dockerfile
           - name: gateway
             context: services/gateway
             dockerfile: services/gateway/Dockerfile
           - name: ai-service-v2
-            context: .
+            context: services/ai-service.v2
             dockerfile: services/ai-service.v2/Src/Presentation/JobBoard.AI.API/Dockerfile
           - name: admin-api
-            context: .
+            context: services/micro-services/admin-api
             dockerfile: services/micro-services/admin-api/Dockerfile
           - name: admin-api-mcp
-            context: .
+            context: services/micro-services/admin-api
             dockerfile: services/micro-services/admin-api/AdminApi.Mcp/Dockerfile
           - name: company-api
-            context: .
+            context: services/micro-services/company-api
             dockerfile: services/micro-services/company-api/Dockerfile
           - name: job-api
-            context: .
+            context: services/micro-services/job-api
             dockerfile: services/micro-services/job-api/Dockerfile
           - name: user-api
-            context: .
+            context: services/micro-services/user-api
             dockerfile: services/micro-services/user-api/Dockerfile
           - name: connector-api
-            context: .
+            context: services/connector-api
             dockerfile: services/connector-api/Dockerfile
           - name: reverse-connector-api
-            context: .
+            context: services/reverse-connector-api
             dockerfile: services/reverse-connector-api/Dockerfile
           - name: job-admin
             context: apps/job-admin
@@ -194,8 +194,8 @@ jobs:
             context: infrastructure/keycloak
             dockerfile: infrastructure/keycloak/Dockerfile
           - name: health-check
-            context: .
-            dockerfile: services/micro-services/HealthChecks/JobBoard.WebStatus/Dockerfile
+            context: services/micro-services/HealthChecks
+            dockerfile: services/micro-services/HealthChecks/Dockerfile
     steps:
       - uses: actions/checkout@v4
 
