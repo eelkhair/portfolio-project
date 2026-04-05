@@ -228,12 +228,18 @@ jobs:
             sed -i 's|RUN mkdir -p /nupkgs|COPY nupkgs/ /nupkgs/\nRUN mkdir -p /nupkgs|' "$df"
           done
 
-          # Patch NuGet configs: replace any relative nupkgs path with /nupkgs and remove private feed
+          # Replace NuGet configs with a simple version that uses /nupkgs and nuget.org (no mapping, no private feed)
           find services -name "Nuget.Config" -not -path "*/bin/*" -not -path "*/obj/*" | while read nc; do
-            # Replace any relative ../nupkgs path with /nupkgs
-            sed -i -E 's|value="[./]*nupkgs"|value="/nupkgs"|' "$nc"
-            # Remove the private feed (not reachable from GitHub Actions)
-            sed -i '/nuget\.eelkhair\.net/d' "$nc"
+            cat > "$nc" << 'NUGETEOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <configuration>
+            <packageSources>
+              <clear />
+              <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
+              <add key="local" value="/nupkgs" />
+            </packageSources>
+          </configuration>
+          NUGETEOF
           done
 
       - name: Set up Docker Buildx

@@ -417,6 +417,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "modules", "modules", "{A9DC
 		deploy\modules\managed-identity.bicep = deploy\modules\managed-identity.bicep
 		deploy\modules\container-apps-env.bicep = deploy\modules\container-apps-env.bicep
 		deploy\modules\container-registry.bicep = deploy\modules\container-registry.bicep
+		deploy\modules\app-configuration.bicep = deploy\modules\app-configuration.bicep
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{1E697A79-C3AE-4121-86F4-177F8797B255}"
