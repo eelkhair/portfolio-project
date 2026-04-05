@@ -315,6 +315,14 @@ services:
       "-config", "./Dapr/Config/config.yaml"
     ]
 
+  # -- Cloudflare Tunnel ------------------------------------
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    networks:
+      - ai-job-board-net
+
   # -- Infrastructure ---------------------------------------
   dapr-dashboard:
     image: "daprio/dashboard:latest"

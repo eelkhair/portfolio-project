@@ -1,0 +1,171 @@
+name: Update Cloudflare Tunnel
+
+on:
+  workflow_dispatch:
+
+env:
+  CF_API_BASE: https://api.cloudflare.com/client/v4
+
+permissions:
+  contents: read
+
+jobs:
+  update-tunnel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read tunnel config
+        id: config
+        run: |
+          CONFIG_FILE="deploy/cloudflare/tunnel-config.json"
+          if [ ! -f "$CONFIG_FILE" ]; then
+            echo "::error::Config file not found: $CONFIG_FILE"
+            exit 1
+          fi
+          echo "config=$(cat $CONFIG_FILE | jq -c .)" >> $GITHUB_OUTPUT
+
+      # ──────────────────────────────────────────────────────────────────────
+      # Step 1: Update tunnel ingress configuration
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Update tunnel ingress rules
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CF_TUNNEL_ID: ${{ secrets.CLOUDFLARE_TUNNEL_ID }}
+        run: |
+          echo "Building ingress rules from tunnel-config.json..."
+
+          # Build ingress array from config + catch-all 404
+          INGRESS=$(echo '${{ steps.config.outputs.config }}' | jq -c '[
+            .services[] | { hostname: .hostname, service: .service, originRequest: {} }
+          ] + [{ service: "http_status:404" }]')
+
+          BODY=$(jq -n --argjson ingress "$INGRESS" '{ config: { ingress: $ingress } }')
+
+          echo "Pushing $(echo "$INGRESS" | jq length) ingress rules to Cloudflare..."
+
+          RESPONSE=$(curl -s -w "\n%{http_code}" \
+            -X PUT \
+            "$CF_API_BASE/accounts/$CF_ACCOUNT_ID/cfd_tunnel/$CF_TUNNEL_ID/configurations" \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "$BODY")
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          RESPONSE_BODY=$(echo "$RESPONSE" | sed '$d')
+
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+            echo "Tunnel ingress updated successfully"
+          else
+            echo "::error::Failed to update tunnel ingress (HTTP $HTTP_CODE)"
+            echo "$RESPONSE_BODY" | jq .
+            exit 1
+          fi
+
+      # ──────────────────────────────────────────────────────────────────────
+      # Step 2: Sync DNS CNAME records
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Sync DNS CNAME records
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          CF_TUNNEL_ID: ${{ secrets.CLOUDFLARE_TUNNEL_ID }}
+        run: |
+          TUNNEL_TARGET="${CF_TUNNEL_ID}.cfargotunnel.com"
+
+          # Get desired hostnames from config
+          DESIRED_HOSTNAMES=$(echo '${{ steps.config.outputs.config }}' | jq -r '.services[].hostname')
+
+          # Get existing tunnel CNAME records (those pointing to *.cfargotunnel.com)
+          echo "Fetching existing DNS records..."
+          EXISTING_RECORDS=$(curl -s \
+            "$CF_API_BASE/zones/$CF_ZONE_ID/dns_records?type=CNAME&per_page=100" \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            | jq -c '[.result[] | select(.content | endswith(".cfargotunnel.com"))]')
+
+          echo "Found $(echo "$EXISTING_RECORDS" | jq length) existing tunnel CNAME records"
+
+          # Create missing CNAME records
+          for HOSTNAME in $DESIRED_HOSTNAMES; do
+            EXISTS=$(echo "$EXISTING_RECORDS" | jq -r --arg h "$HOSTNAME" '[.[] | select(.name == $h)] | length')
+            if [ "$EXISTS" -eq 0 ]; then
+              echo "Creating CNAME: $HOSTNAME -> $TUNNEL_TARGET"
+              CREATE_RESPONSE=$(curl -s -w "\n%{http_code}" \
+                -X POST \
+                "$CF_API_BASE/zones/$CF_ZONE_ID/dns_records" \
+                -H "Authorization: Bearer $CF_API_TOKEN" \
+                -H "Content-Type: application/json" \
+                -d "{
+                  \"type\": \"CNAME\",
+                  \"name\": \"$HOSTNAME\",
+                  \"content\": \"$TUNNEL_TARGET\",
+                  \"proxied\": true,
+                  \"comment\": \"Managed by GitHub Actions - Cloudflare Tunnel\"
+                }")
+
+              HTTP_CODE=$(echo "$CREATE_RESPONSE" | tail -1)
+              if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+                echo "  Created successfully"
+              else
+                echo "::warning::Failed to create CNAME for $HOSTNAME (HTTP $HTTP_CODE)"
+                echo "$CREATE_RESPONSE" | sed '$d' | jq .errors 2>/dev/null || true
+              fi
+            else
+              echo "CNAME exists: $HOSTNAME"
+            fi
+          done
+
+          # Delete stale tunnel CNAME records (exist in Cloudflare but not in config)
+          echo ""
+          echo "Checking for stale records..."
+          STALE_RECORDS=$(echo "$EXISTING_RECORDS" | jq -c --arg desired "$(echo "$DESIRED_HOSTNAMES" | tr '\n' '|' | sed 's/|$//')" \
+            '[.[] | select(.name as $n | ($desired | split("|") | map(select(. == $n))) | length == 0)]')
+
+          STALE_COUNT=$(echo "$STALE_RECORDS" | jq length)
+          if [ "$STALE_COUNT" -gt 0 ]; then
+            echo "Removing $STALE_COUNT stale tunnel CNAME records..."
+            echo "$STALE_RECORDS" | jq -r '.[].id' | while read RECORD_ID; do
+              RECORD_NAME=$(echo "$STALE_RECORDS" | jq -r --arg id "$RECORD_ID" '.[] | select(.id == $id) | .name')
+              echo "  Deleting: $RECORD_NAME ($RECORD_ID)"
+              curl -s -X DELETE \
+                "$CF_API_BASE/zones/$CF_ZONE_ID/dns_records/$RECORD_ID" \
+                -H "Authorization: Bearer $CF_API_TOKEN" > /dev/null
+            done
+          else
+            echo "No stale records to clean up"
+          fi
+
+      # ──────────────────────────────────────────────────────────────────────
+      # Step 3: Verify tunnel health
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Verify tunnel status
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CF_TUNNEL_ID: ${{ secrets.CLOUDFLARE_TUNNEL_ID }}
+        run: |
+          TUNNEL_INFO=$(curl -s \
+            "$CF_API_BASE/accounts/$CF_ACCOUNT_ID/cfd_tunnel/$CF_TUNNEL_ID" \
+            -H "Authorization: Bearer $CF_API_TOKEN")
+
+          STATUS=$(echo "$TUNNEL_INFO" | jq -r '.result.status')
+          NAME=$(echo "$TUNNEL_INFO" | jq -r '.result.name')
+          CONNECTIONS=$(echo "$TUNNEL_INFO" | jq -r '.result.connections | length')
+
+          echo "══════════════════════════════════════════════"
+          echo "Tunnel: $NAME"
+          echo "Status: $STATUS"
+          echo "Active connections: $CONNECTIONS"
+          echo "══════════════════════════════════════════════"
+
+          SERVICE_COUNT=$(echo '${{ steps.config.outputs.config }}' | jq '.services | length')
+          echo "Exposed services: $SERVICE_COUNT"
+          echo '${{ steps.config.outputs.config }}' | jq -r '.services[].hostname' | while read h; do
+            echo "  https://$h"
+          done
+          echo "══════════════════════════════════════════════"
+
+          if [ "$STATUS" != "healthy" ] && [ "$CONNECTIONS" -eq 0 ]; then
+            echo "::warning::Tunnel is not connected. Make sure cloudflared is running on your Proxmox host."
+          fi

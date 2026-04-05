@@ -411,7 +411,9 @@ Re-deployment recreates the entire infrastructure from scratch in ~10 minutes.
 The same codebase runs on both **Azure** and **Proxmox homelab** without code changes:
 - **Azure**: Dapr components use Azure App Configuration, Key Vault, and Azure Redis
 - **Homelab**: Dapr components use Redis config stores, HashiCorp Vault, and local Redis
-- **Cloudflare DNS** switches between environments by flipping CNAME records
+- **Cloudflare Tunnel** exposes the homelab to the internet -- a `cloudflared` container creates an outbound-only encrypted connection to Cloudflare's edge, with no open ports or port forwarding required
+- A **declarative config file** (`deploy/cloudflare/tunnel-config.json`) controls which services are publicly accessible
+- A **GitHub Action** (`cloudflare-tunnel.yml`) syncs tunnel ingress rules and DNS CNAME records from the config file via the Cloudflare API
 
 ### IaC Structure
 
@@ -434,9 +436,11 @@ deploy/
     keycloak.bicep           # Keycloak with PostgreSQL backend
   scripts/
     seed-keyvault.sh        # Populate secrets
+  cloudflare/
+    tunnel-config.json      # Declarative list of public hostnames
 ```
 
-See: `.github/workflows/deploy.yml`
+See: `.github/workflows/deploy.yml` | `.github/workflows/cloudflare-tunnel.yml`
 
 ---
 
@@ -444,7 +448,7 @@ See: `.github/workflows/deploy.yml`
 
 - Add C4-style architecture diagrams
 - Improve DLQ tooling and replay utilities
-- Automate Cloudflare DNS updates in CI/CD pipeline
+- ~~Automate Cloudflare DNS updates in CI/CD pipeline~~ (done -- `cloudflare-tunnel.yml`)
 - Expand integration and unit test coverage
 - Add load testing (k6 / NBomber)
 - Public app: job search, application flow, resume management UI
