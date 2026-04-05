@@ -284,8 +284,6 @@ This orchestrates all 36 resources — services, Dapr sidecars, infrastructure c
 
 ![Aspire Dashboard — topology graph](./Images/Aspire/aspire-dashboard-graph.png)
 
-> **Known issue — cold start:** On the very first launch (when persistent containers don't exist yet), Dapr sidecars may fail because Redis/RabbitMQ containers aren't fully accepting connections before the sidecar tries to connect. Health checks on Redis and RabbitMQ mitigate this, but may not fully eliminate the race on cold start. **Workaround:** restart the AppHost — persistent containers are already running on the second launch and subsequent starts are instant.
-
 See also: [`local-environment.md`](./local-environment.md) | [ADR-020](./ADRs/ADR-020-Aspire-Local-Orchestration.md)
 
 ### With Docker Compose
@@ -378,11 +376,75 @@ See: [`screenshots.md`](./screenshots.md)
 
 ---
 
+## Azure Deployment
+
+The platform deploys to **Azure Container Apps** via **Bicep IaC** and **GitHub Actions CI/CD**.
+
+### Azure Resources
+
+| Resource | Service |
+|----------|---------|
+| Azure Container Apps (Consumption) | 16 containerized services, scale-to-zero |
+| Azure SQL Database (Serverless) | 2 databases with auto-pause |
+| Azure Database for PostgreSQL | pgvector for embeddings |
+| Azure Cache for Redis | State store + caching |
+| Azure App Configuration (Free) | Feature flags + per-service config |
+| Azure Key Vault | Secrets management |
+| Azure Container Registry | Docker image storage |
+| Azure Monitor + Log Analytics | Observability |
+| RabbitMQ (Container App) | Pub/sub messaging |
+| Keycloak (Container App) | Identity provider |
+
+### Deploy / Teardown
+
+Deploy is fully automated via GitHub Actions (`workflow_dispatch`):
+
+```bash
+# Teardown (deletes everything)
+az group delete -n rg-portfolio-jobboard --yes --no-wait
+```
+
+Re-deployment recreates the entire infrastructure from scratch in ~10 minutes.
+
+### Dual Environment
+
+The same codebase runs on both **Azure** and **Proxmox homelab** without code changes:
+- **Azure**: Dapr components use Azure App Configuration, Key Vault, and Azure Redis
+- **Homelab**: Dapr components use Redis config stores, HashiCorp Vault, and local Redis
+- **Cloudflare DNS** switches between environments by flipping CNAME records
+
+### IaC Structure
+
+```
+deploy/
+  main.bicep               # Orchestrator (phased deployment)
+  main.bicepparam           # Environment parameters
+  modules/
+    log-analytics.bicep     # Azure Monitor workspace
+    key-vault.bicep         # Secrets
+    container-registry.bicep
+    storage-account.bicep   # Blob storage (resumes)
+    managed-identity.bicep  # RBAC role assignments
+    sql-server.bicep        # Serverless SQL (2 DBs, auto-pause)
+    postgresql.bicep        # pgvector + Keycloak DB
+    redis.bicep             # State + cache
+    app-configuration.bicep # Feature flags
+    container-apps-env.bicep # ACA Environment + 17 Dapr components
+    container-app.bicep     # Reusable Container App module
+    keycloak.bicep           # Keycloak with PostgreSQL backend
+  scripts/
+    seed-keyvault.sh        # Populate secrets
+```
+
+See: `.github/workflows/deploy.yml`
+
+---
+
 ## Roadmap
 
 - Add C4-style architecture diagrams
 - Improve DLQ tooling and replay utilities
-- Add IaC (Bicep / Terraform) for Azure deployment
+- Automate Cloudflare DNS updates in CI/CD pipeline
 - Expand integration and unit test coverage
 - Add load testing (k6 / NBomber)
 - Public app: job search, application flow, resume management UI
