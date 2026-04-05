@@ -24,9 +24,9 @@ set_secret() {
 set_secret "Keycloak--ServiceClientId" "dapr-service-client"
 set_secret "Keycloak--ServiceClientSecret" "${KEYCLOAK_SERVICE_CLIENT_SECRET:?Set KEYCLOAK_SERVICE_CLIENT_SECRET}"
 
-# ── AI API Keys ──
-set_secret "AI--CLAUDE-API-KEY" "${CLAUDE_API_KEY:-}"
-set_secret "OpenAI--ApiKey" "${OPENAI_API_KEY:-}"
+# ── AI API Keys (optional — only set if provided) ──
+[ -n "${CLAUDE_API_KEY:-}" ] && set_secret "AI--CLAUDE-API-KEY" "$CLAUDE_API_KEY"
+[ -n "${OPENAI_API_KEY:-}" ] && set_secret "OpenAI--ApiKey" "$OPENAI_API_KEY"
 
 # ── RabbitMQ (used by monolith's direct CloudEventsPublisher) ──
 # Not needed — monolith connects to RabbitMQ Container App via env var in Bicep
