@@ -425,6 +425,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{1E69
 		deploy\scripts\seed-keyvault.sh = deploy\scripts\seed-keyvault.sh
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cloudflare", "cloudflare", "{49DBFA77-FC78-4C32-8684-EBB33B85728A}"
+	ProjectSection(SolutionItems) = preProject
+		deploy\cloudflare\tunnel-config.json = deploy\cloudflare\tunnel-config.json
+		deploy\cloudflare\configure-security.sh = deploy\cloudflare\configure-security.sh
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1177,6 +1183,7 @@ Global
 		{1CE63983-C24B-41FE-8A4A-CA38C37D92D4} = {55EFE0A8-3F4A-46E2-BD74-39D3D74D8B5E}
 		{A9DCBCCA-F5B3-4860-B654-DC3637E569DE} = {EC1A684E-B6DE-4658-905A-B27E295A541C}
 		{1E697A79-C3AE-4121-86F4-177F8797B255} = {EC1A684E-B6DE-4658-905A-B27E295A541C}
+		{49DBFA77-FC78-4C32-8684-EBB33B85728A} = {EC1A684E-B6DE-4658-905A-B27E295A541C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A1C2D3E4-F5A6-47B8-9C0D-E1F2A3B4C5D6}

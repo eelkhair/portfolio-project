@@ -2,24 +2,17 @@
   "tunnel_name": "proxmox-homelab",
   "services": [
     { "hostname": "job-admin.eelkhair.net", "service": "http://192.168.1.112:6080" },
-    { "hostname": "job.eelkhair.net", "service": "http://192.168.1.112:6081" },
     { "hostname": "jobs.eelkhair.net", "service": "http://192.168.1.112:6081" },
     { "hostname": "job-gateway.eelkhair.net", "service": "http://192.168.1.112:5238" },
-    { "hostname": "job-ai-v2.eelkhair.net", "service": "http://192.168.1.112:5200" },
-    { "hostname": "job-monolith.eelkhair.net", "service": "http://192.168.1.112:5280" },
-    { "hostname": "mono-mcp.eelkhair.net", "service": "http://192.168.1.112:3333" },
-    { "hostname": "job-admin-api.eelkhair.net", "service": "http://192.168.1.112:6062" },
-    { "hostname": "micro-mcp.eelkhair.net", "service": "http://192.168.1.112:3334" },
-    { "hostname": "job-company-api.eelkhair.net", "service": "http://192.168.1.112:6072" },
-    { "hostname": "job-api.eelkhair.net", "service": "http://192.168.1.112:6084" },
-    { "hostname": "job-users-api.eelkhair.net", "service": "http://192.168.1.112:6092" },
-    { "hostname": "job-connector.eelkhair.net", "service": "http://192.168.1.112:5284" },
-    { "hostname": "job-reverse-connector.eelkhair.net", "service": "http://192.168.1.112:5285" },
     { "hostname": "job-health.eelkhair.net", "service": "http://192.168.1.112:5107" },
-    { "hostname": "job-dapr.eelkhair.net", "service": "http://192.168.1.112:8080" },
     { "hostname": "auth.eelkhair.net", "service": "http://192.168.1.112:9090" },
     { "hostname": "grafana.eelkhair.net", "service": "http://192.168.1.115:3000" },
     { "hostname": "jaeger.eelkhair.net", "service": "http://192.168.1.160:16686" },
-    { "hostname": "seq.eelkhair.net", "service": "http://192.168.1.112:5341" }
+    { "hostname": "seq.eelkhair.net", "service": "http://192.168.1.112:5341" },
+    { "hostname": "inspector.eelkhair.net", "service": "http://192.168.1.115:6274" },
+    { "hostname": "mail.eelkhair.net", "service": "http://192.168.1.115:8025" },
+    { "hostname": "job-dapr.eelkhair.net", "service": "http://192.168.1.112:8080" },
+    { "hostname": "mono-mcp.eelkhair.net", "service": "http://192.168.1.112:3333" },
+    { "hostname": "micro-mcp.eelkhair.net", "service": "http://192.168.1.112:3334" }
   ]
 }
