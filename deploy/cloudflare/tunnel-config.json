@@ -27,7 +27,7 @@
     },
     {
       "description": "Block Swagger UI",
-      "expression": "(starts_with(http.request.uri.path, \"/swagger\"))"
+      "expression": "(http.request.uri.path contains \"/swagger\")"
     }
   ]
 }
