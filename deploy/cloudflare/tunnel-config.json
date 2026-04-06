@@ -24,6 +24,10 @@
     {
       "description": "Block Keycloak admin console",
       "expression": "(http.host eq \"auth.eelkhair.net\" and starts_with(http.request.uri.path, \"/admin/\"))"
+    },
+    {
+      "description": "Block Swagger UI",
+      "expression": "(starts_with(http.request.uri.path, \"/swagger\"))"
     }
   ]
 }
