@@ -122,6 +122,7 @@ MICRO_SERVICES=(
 INFRA_SERVICES=(
   "health-check|../services/micro-services/HealthChecks|default"
   "keycloak|../infrastructure/keycloak|default"
+  "landing|../apps/landing|default"
 )
 
 AI_SERVICES=(

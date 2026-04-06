@@ -196,6 +196,9 @@ jobs:
           - name: health-check
             context: services/micro-services/HealthChecks
             dockerfile: services/micro-services/HealthChecks/Dockerfile
+          - name: landing
+            context: apps/landing
+            dockerfile: apps/landing/Dockerfile
     steps:
       - uses: actions/checkout@v4
 

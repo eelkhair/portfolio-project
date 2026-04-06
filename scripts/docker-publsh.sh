@@ -66,6 +66,7 @@ BACKEND_SERVICES=(
   "reverse-connector-api|../services/reverse-connector-api|default"
   "health-check|../services/micro-services/HealthChecks|default"
   "keycloak|../infrastructure/keycloak|default"
+  "landing|../apps/landing|default"
 )
 
 FAILED_BUILDS=()

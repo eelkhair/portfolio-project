@@ -1,4 +1,13 @@
 services:
+  # -- Landing Page -------------------------------------------
+  landing:
+    image: registry.eelkhair.net/landing:latest
+    ports:
+      - "6090:80"
+    restart: unless-stopped
+    networks:
+      - ai-job-board-net
+
   # -- Frontend ----------------------------------------------
   job-admin:
     image: registry.eelkhair.net/job-admin:prod

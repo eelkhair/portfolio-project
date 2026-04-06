@@ -1,6 +1,8 @@
 {
   "tunnel_name": "proxmox-homelab",
   "services": [
+    { "hostname": "eelkhair.net", "service": "http://192.168.1.112:6090" },
+    { "hostname": "www.eelkhair.net", "service": "http://192.168.1.112:6090" },
     { "hostname": "job-admin.eelkhair.net", "service": "http://192.168.1.112:6080" },
     { "hostname": "jobs.eelkhair.net", "service": "http://192.168.1.112:6081" },
     { "hostname": "job-gateway.eelkhair.net", "service": "http://192.168.1.112:5238" },

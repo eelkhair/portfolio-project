@@ -20,12 +20,7 @@ if [ -z "${CLOUDFLARE_API_TOKEN:-}" ]; then
   echo "Error: CLOUDFLARE_API_TOKEN is not set"
   exit 1
 fi
-if [ -z "${CLOUDFLARE_ZONE_ID:-}" ]; then
-  echo "Error: CLOUDFLARE_ZONE_ID is not set"
-  exit 1
-fi
-
-ZONE_ID="$CLOUDFLARE_ZONE_ID"
+ZONE_ID="${CLOUDFLARE_ZONE_ID:-fd8cabfeb7708e503bdacccb209fe126}"
 AUTH_HEADER="Authorization: Bearer $CLOUDFLARE_API_TOKEN"
 
 echo "Configuring Cloudflare security for zone: $ZONE_ID"
@@ -35,7 +30,7 @@ echo "════════════════════════�
 # 1. Set Security Level to "essentially_off"
 # ──────────────────────────────────────────────────────────────────────
 echo ""
-echo "[1/5] Setting Security Level to 'essentially_off'..."
+echo "[1/7] Setting Security Level to 'essentially_off'..."
 RESPONSE=$(curl -s -X PATCH \
   "$CF_API_BASE/zones/$ZONE_ID/settings/security_level" \
   -H "$AUTH_HEADER" \
@@ -53,7 +48,7 @@ fi
 # 2. Disable Bot Fight Mode
 # ──────────────────────────────────────────────────────────────────────
 echo ""
-echo "[2/5] Disabling Bot Fight Mode..."
+echo "[2/7] Disabling Bot Fight Mode..."
 RESPONSE=$(curl -s -X PUT \
   "$CF_API_BASE/zones/$ZONE_ID/bot_management" \
   -H "$AUTH_HEADER" \
@@ -71,7 +66,7 @@ fi
 # 3. Disable Browser Integrity Check
 # ──────────────────────────────────────────────────────────────────────
 echo ""
-echo "[3/5] Disabling Browser Integrity Check..."
+echo "[3/7] Disabling Browser Integrity Check..."
 RESPONSE=$(curl -s -X PATCH \
   "$CF_API_BASE/zones/$ZONE_ID/settings/browser_check" \
   -H "$AUTH_HEADER" \
@@ -89,7 +84,7 @@ fi
 # 4. Disable Email Address Obfuscation (can interfere with SPAs)
 # ──────────────────────────────────────────────────────────────────────
 echo ""
-echo "[4/5] Disabling Email Address Obfuscation..."
+echo "[4/7] Disabling Email Address Obfuscation..."
 RESPONSE=$(curl -s -X PATCH \
   "$CF_API_BASE/zones/$ZONE_ID/settings/email_obfuscation" \
   -H "$AUTH_HEADER" \
@@ -108,7 +103,7 @@ fi
 #    Allows OIDC endpoints (/realms/...) but blocks /admin and /master
 # ──────────────────────────────────────────────────────────────────────
 echo ""
-echo "[5/5] Creating WAF rule to block Keycloak admin console..."
+echo "[5/7] Creating WAF rule to block Keycloak admin console..."
 
 # Check if rule already exists
 EXISTING_RULE=$(curl -s \
@@ -174,6 +169,51 @@ else
 fi
 
 # ──────────────────────────────────────────────────────────────────────
+# 6. Enable Always Use HTTPS
+# ──────────────────────────────────────────────────────────────────────
+echo ""
+echo "[6/7] Enabling Always Use HTTPS..."
+RESPONSE=$(curl -s -X PATCH \
+  "$CF_API_BASE/zones/$ZONE_ID/settings/always_use_https" \
+  -H "$AUTH_HEADER" \
+  -H "Content-Type: application/json" \
+  -d '{"value": "on"}')
+
+SUCCESS=$(echo "$RESPONSE" | jq -r '.success')
+if [ "$SUCCESS" = "true" ]; then
+  echo "  Done: Always Use HTTPS enabled"
+else
+  echo "  Warning: $(echo "$RESPONSE" | jq -r '.errors[0].message // "Unknown error"')"
+fi
+
+# ──────────────────────────────────────────────────────────────────────
+# 7. Enable HSTS (Strict-Transport-Security)
+# ──────────────────────────────────────────────────────────────────────
+echo ""
+echo "[7/7] Enabling HSTS..."
+RESPONSE=$(curl -s -X PATCH \
+  "$CF_API_BASE/zones/$ZONE_ID/settings/security_header" \
+  -H "$AUTH_HEADER" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "value": {
+      "strict_transport_security": {
+        "enabled": true,
+        "max_age": 31536000,
+        "include_subdomains": true,
+        "nosniff": true
+      }
+    }
+  }')
+
+SUCCESS=$(echo "$RESPONSE" | jq -r '.success')
+if [ "$SUCCESS" = "true" ]; then
+  echo "  Done: HSTS enabled (max-age=31536000, includeSubDomains, nosniff)"
+else
+  echo "  Warning: $(echo "$RESPONSE" | jq -r '.errors[0].message // "Unknown error"')"
+fi
+
+# ──────────────────────────────────────────────────────────────────────
 # Verify current settings
 # ──────────────────────────────────────────────────────────────────────
 echo ""
@@ -181,7 +221,7 @@ echo "════════════════════════�
 echo "Verifying settings..."
 echo ""
 
-for SETTING in security_level browser_check email_obfuscation; do
+for SETTING in security_level browser_check email_obfuscation always_use_https; do
   VALUE=$(curl -s "$CF_API_BASE/zones/$ZONE_ID/settings/$SETTING" \
     -H "$AUTH_HEADER" | jq -r '.result.value')
   echo "  $SETTING = $VALUE"
