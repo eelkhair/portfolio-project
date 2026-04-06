@@ -180,10 +180,110 @@
     }
     .service-card:hover .service-tooltip { opacity: 1; }
 
+    /* ── Architecture Diagram ─────────────────────── */
+    .arch-diagram { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
+    .arch-row { display: flex; align-items: center; gap: 1rem; width: 100%; }
+    .arch-label {
+      font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--text-muted); width: 90px; flex-shrink: 0; text-align: right;
+    }
+    .arch-nodes { display: flex; flex-wrap: wrap; gap: 0.5rem; flex: 1; }
+    .arch-node {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+      padding: 0.5rem 0.85rem; font-size: 0.8rem; font-weight: 500; color: var(--text-primary);
+      display: flex; flex-direction: column; gap: 0.15rem;
+    }
+    .arch-node span { font-size: 0.65rem; font-weight: 400; color: var(--text-muted); }
+    .arch-node.arch-accent { border-color: var(--accent); background: rgba(14, 165, 233, 0.08); }
+    .arch-node.arch-mcp { border-color: #a78bfa; background: rgba(167, 139, 250, 0.08); }
+    .arch-node.arch-mcp span { color: #a78bfa; }
+    .arch-node.arch-infra { border-color: var(--border); background: var(--bg-secondary); }
+    .arch-node.arch-obs { border-color: #22c55e; background: rgba(34, 197, 94, 0.06); }
+    .arch-arrow { color: var(--accent); font-size: 1.2rem; padding: 0.15rem 0; margin-left: 90px; padding-left: 1rem; }
+    .arch-arrow-split {
+      display: flex; gap: 2rem; width: 100%; padding-left: calc(90px + 1rem);
+    }
+    .arch-branch { flex: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 0.35rem; }
+    .arch-arrow-label { font-size: 0.7rem; color: var(--accent-light); font-weight: 500; }
+    .arch-row-compact { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    @media (max-width: 768px) {
+      .arch-label { width: auto; text-align: left; }
+      .arch-row { flex-direction: column; align-items: flex-start; }
+      .arch-arrow { margin-left: 0; padding-left: 0; }
+      .arch-arrow-split { flex-direction: column; padding-left: 0; gap: 1rem; }
+    }
+
+    /* ── ADRs ──────────────────────────────────────── */
+    .adr-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .adr-item {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+      transition: all 0.2s;
+    }
+    .adr-item[open] { border-color: var(--accent); }
+    .adr-item summary {
+      display: flex; gap: 0.75rem; align-items: flex-start;
+      padding: 1rem 1.15rem; cursor: pointer; list-style: none;
+    }
+    .adr-item summary::-webkit-details-marker { display: none; }
+    .adr-item summary::after {
+      content: '+'; margin-left: auto; color: var(--text-muted); font-size: 1.1rem;
+      font-weight: 300; flex-shrink: 0; transition: transform 0.2s;
+    }
+    .adr-item[open] summary::after { content: '-'; }
+    .adr-item summary:hover { background: var(--bg-card-hover); border-radius: var(--radius); }
+    .adr-number {
+      font-size: 0.7rem; font-weight: 700; color: var(--accent-light);
+      background: var(--accent-glow); border: 1px solid rgba(14, 165, 233, 0.2);
+      padding: 0.2rem 0.45rem; border-radius: 4px; flex-shrink: 0; white-space: nowrap;
+      margin-top: 0.1rem;
+    }
+    .adr-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.2rem; }
+    .adr-summary { font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; }
+    .adr-content {
+      padding: 0 1.15rem 1.25rem 1.15rem; border-top: 1px solid var(--border);
+      margin: 0 1.15rem; padding-top: 1rem;
+    }
+    .adr-content h3 { font-size: 0.9rem; color: var(--accent-light); margin: 1.25rem 0 0.5rem; }
+    .adr-content h3:first-child { margin-top: 0; }
+    .adr-content p { font-size: 0.825rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.75rem; }
+    .adr-content ul { list-style: none; padding: 0; margin-bottom: 0.75rem; }
+    .adr-content li {
+      font-size: 0.825rem; color: var(--text-secondary); line-height: 1.7;
+      padding: 0.15rem 0 0.15rem 1rem; position: relative;
+    }
+    .adr-content li::before {
+      content: ''; position: absolute; left: 0; top: 0.65rem;
+      width: 4px; height: 4px; border-radius: 50%; background: var(--text-muted);
+    }
+    .adr-content table { width: 100%; border-collapse: collapse; margin-bottom: 0.75rem; font-size: 0.8rem; }
+    .adr-content th { text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border); color: var(--accent-light); font-weight: 600; }
+    .adr-content td { padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+    .adr-content code {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+      background: var(--bg-primary); padding: 0.1rem 0.35rem; border-radius: 3px; color: var(--accent-light);
+    }
+    .adr-content .adr-status {
+      display: inline-block; font-size: 0.7rem; font-weight: 600; color: var(--green);
+      background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2);
+      padding: 0.15rem 0.5rem; border-radius: 4px; margin-bottom: 0.75rem;
+    }
+
     /* ── Education ─────────────────────────────────── */
     .edu-item { margin-bottom: 0.75rem; }
     .edu-degree { font-weight: 600; }
     .edu-school { font-size: 0.875rem; color: var(--text-secondary); }
+
+    /* ── Screenshots Preview ─────────────────────── */
+    .screenshot-preview {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 0.75rem; margin-bottom: 1.5rem;
+    }
+    .screenshot-preview-item {
+      border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+    .screenshot-preview-item:hover { border-color: var(--accent); }
+    .screenshot-preview-item img { width: 100%; height: auto; display: block; }
 
     /* ── Footer ────────────────────────────────────── */
     footer {
@@ -215,13 +315,13 @@
 <!-- ── Navigation ──────────────────────────────────────────── -->
 <nav>
   <div class="nav-inner">
-    <a href="#" class="logo">EE</a>
+    <a href="/" class="logo">EE</a>
     <ul class="nav-links">
       <li><a href="#about">About</a></li>
       <li><a href="#experience">Experience</a></li>
-      <li><a href="#portfolio">Portfolio</a></li>
       <li><a href="#skills">Skills</a></li>
-      <li><a href="#services">Live Demo</a></li>
+      <li><a href="#education">Education</a></li>
+      <li><a href="/portfolio.html">Portfolio</a></li>
     </ul>
   </div>
 </nav>
@@ -239,8 +339,7 @@
       Builder of distributed systems, AI-powered platforms, and enterprise-grade architectures.
     </p>
     <div class="hero-links">
-      <a href="#portfolio" class="btn btn-primary"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> View Portfolio Project</a>
-      <a href="#services" class="btn btn-outline"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg> Live Demo</a>
+      <a href="/portfolio.html" class="btn btn-primary"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> View Portfolio Project</a>
       <a href="https://github.com/eelkhair/portfolio-project" target="_blank" class="btn btn-outline"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg> GitHub</a>
       <a href="https://www.linkedin.com/in/elkhair-elkhair/" target="_blank" class="btn btn-outline"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg> LinkedIn</a>
     </div>
@@ -361,87 +460,6 @@
   </div>
 </section>
 
-<!-- ── Portfolio Project ───────────────────────────────────── -->
-<section id="portfolio" style="background: var(--bg-secondary); margin: 0; max-width: 100%; padding: 4rem 1.5rem;">
-  <div style="max-width: var(--max-width); margin: 0 auto;">
-    <p class="section-title">Portfolio Project</p>
-    <h2>JobBoard &mdash; Distributed Systems Platform</h2>
-    <p style="color: var(--text-secondary); max-width: 800px; margin-bottom: 2rem; line-height: 1.8;">
-      A full-stack, multi-tenant platform demonstrating real-world legacy-to-cloud migration with
-      enterprise architecture patterns, AI integration, and production-grade observability.
-      Three architectural paths running side-by-side with 20 Architecture Decision Records documenting every trade-off.
-    </p>
-
-    <h3 style="margin-bottom: 1rem; color: var(--text-primary);">Architecture Highlights</h3>
-    <div class="card-grid" style="margin-bottom: 2.5rem;">
-      <div class="card">
-        <div class="card-icon">&#127959;</div>
-        <h3>Clean Architecture + DDD</h3>
-        <p>Domain model with factory methods, value objects returning Result&lt;T&gt;, and strict dependency flow.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">&#9889;</div>
-        <h3>CQRS + Decorator Pipeline</h3>
-        <p>Custom decorator chain (not MediatR) with auth, observability, validation, and transaction decorators.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">&#128257;</div>
-        <h3>Strangler-Fig Migration</h3>
-        <p>Bidirectional sync between monolith and microservices with live runtime switching via feature flags.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">&#129302;</div>
-        <h3>AI Multi-Provider</h3>
-        <p>OpenAI, Claude, and Gemini with scoped tool registries, MCP servers, and function calling.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">&#128269;</div>
-        <h3>Resume RAG Pipeline</h3>
-        <p>Event-driven parsing, pgvector embeddings (1536-dim), and cosine similarity matching.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">&#128200;</div>
-        <h3>Distributed Tracing</h3>
-        <p>End-to-end OpenTelemetry spans from browser through APIs, messaging, and background processors.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">&#128230;</div>
-        <h3>Transactional Outbox</h3>
-        <p>Events written atomically with state changes. UPDLOCK/READPAST locking, retries, and dead-letter handling.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">&#9729;&#65039;</div>
-        <h3>Azure + Homelab</h3>
-        <p>Bicep IaC for Azure Container Apps. Same codebase runs on Proxmox homelab via Cloudflare Tunnel.</p>
-      </div>
-    </div>
-
-    <h3 style="margin-bottom: 1rem; color: var(--text-primary);">Tech Stack</h3>
-    <div class="skill-tags" style="margin-bottom: 1rem;">
-      <span class="skill-tag">.NET 9/10</span>
-      <span class="skill-tag">Angular 20/21</span>
-      <span class="skill-tag">TypeScript</span>
-      <span class="skill-tag">Dapr</span>
-      <span class="skill-tag">RabbitMQ</span>
-      <span class="skill-tag">PostgreSQL + pgvector</span>
-      <span class="skill-tag">SQL Server</span>
-      <span class="skill-tag">Redis</span>
-      <span class="skill-tag">Keycloak</span>
-      <span class="skill-tag">OpenTelemetry</span>
-      <span class="skill-tag">Docker</span>
-      <span class="skill-tag">Bicep / Azure</span>
-      <span class="skill-tag">Cloudflare Tunnel</span>
-      <span class="skill-tag">Grafana</span>
-      <span class="skill-tag">Jaeger</span>
-      <span class="skill-tag">HashiCorp Vault</span>
-      <span class="skill-tag">OpenAI / Claude / Gemini</span>
-      <span class="skill-tag">SignalR</span>
-      <span class="skill-tag">MCP Protocol</span>
-      <span class="skill-tag">.NET Aspire</span>
-    </div>
-  </div>
-</section>
-
 <!-- ── Skills ──────────────────────────────────────────────── -->
 <section id="skills">
   <p class="section-title">Skills</p>
@@ -508,94 +526,12 @@
   </div>
 </section>
 
-<!-- ── Live Services ───────────────────────────────────────── -->
-<section id="services" style="background: var(--bg-secondary); margin: 0; max-width: 100%; padding: 4rem 1.5rem;">
-  <div style="max-width: var(--max-width); margin: 0 auto;">
-    <p class="section-title">Live Demo</p>
-    <h2>Running Services</h2>
-    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
-      All services are running on a self-hosted Proxmox homelab, exposed via Cloudflare Tunnel.
-    </p>
-    <div style="background: var(--bg-card); border: 1px solid var(--accent); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-      <span style="font-size: 1.25rem;">&#128679;</span>
-      <div>
-        <div style="font-weight: 600; color: var(--accent-light); margin-bottom: 0.2rem;">Live Demo Coming Soon</div>
-        <div style="font-size: 0.85rem; color: var(--text-secondary);">Public demo access is being configured. Check back shortly.</div>
-      </div>
-    </div>
-    <div class="service-grid" style="opacity: 0.4; pointer-events: none;">
-      <a href="https://job-admin.eelkhair.net" target="_blank" class="service-card">
-        <span class="service-dot"></span>
-        <div>
-          <div class="service-name">Admin App</div>
-          <div class="service-url">job-admin.eelkhair.net</div>
-        </div>
-        <div class="service-tooltip">Angular 20 SPA for managing companies, jobs, and users. Toggle between Monolith and Microservices mode. Includes AI Chat with function calling.</div>
-      </a>
-      <a href="https://jobs.eelkhair.net" target="_blank" class="service-card">
-        <span class="service-dot"></span>
-        <div>
-          <div class="service-name">Public App</div>
-          <div class="service-url">jobs.eelkhair.net</div>
-        </div>
-        <div class="service-tooltip">Angular 21 SSR job-seeker app with Tailwind v4. Browse jobs, upload resumes (parsed by AI), and track applications.</div>
-      </a>
-      <a href="https://job-health.eelkhair.net" target="_blank" class="service-card">
-        <span class="service-dot"></span>
-        <div>
-          <div class="service-name">Health Dashboard</div>
-          <div class="service-url">job-health.eelkhair.net</div>
-        </div>
-        <div class="service-tooltip">Centralized health checks for all 11 services plus dependencies (databases, messaging, config stores, LLM providers, Keycloak).</div>
-      </a>
-      <a href="https://grafana.eelkhair.net" target="_blank" class="service-card">
-        <span class="service-dot"></span>
-        <div>
-          <div class="service-name">Grafana</div>
-          <div class="service-url">grafana.eelkhair.net</div>
-        </div>
-        <div class="service-tooltip" style="width: 300px; text-align: left;">Metrics dashboards for AI Service and Monolith. Includes "Find by TraceId" workflow.<br><br><strong style="color: var(--text-primary);">Login:</strong> username <strong>demo</strong> / password <strong>demo</strong></div>
-      </a>
-      <a href="https://jaeger.eelkhair.net" target="_blank" class="service-card">
-        <span class="service-dot"></span>
-        <div>
-          <div class="service-name">Jaeger Tracing</div>
-          <div class="service-url">jaeger.eelkhair.net</div>
-        </div>
-        <div class="service-tooltip">Distributed trace visualization. Search traces by service, operation, or TraceId. See end-to-end request flow across all services.</div>
-      </a>
-      <a href="https://seq.eelkhair.net" target="_blank" class="service-card">
-        <span class="service-dot"></span>
-        <div>
-          <div class="service-name">Seq Logs</div>
-          <div class="service-url">seq.eelkhair.net</div>
-        </div>
-        <div class="service-tooltip">Structured log aggregation. Filter by TraceId, service, log level, or any property. Correlated with OpenTelemetry spans.</div>
-      </a>
-      <a href="https://job-dapr.eelkhair.net" target="_blank" class="service-card">
-        <span class="service-dot"></span>
-        <div>
-          <div class="service-name">Dapr Dashboard</div>
-          <div class="service-url">job-dapr.eelkhair.net</div>
-        </div>
-        <div class="service-tooltip">Dapr service mesh overview. See all running services, their sidecars, pub/sub components, state stores, and config sources.</div>
-      </a>
-      <a href="https://inspector.eelkhair.net" target="_blank" class="service-card">
-        <span class="service-dot"></span>
-        <div>
-          <div class="service-name">MCP Inspector</div>
-          <div class="service-url">inspector.eelkhair.net</div>
-        </div>
-        <div class="service-tooltip" style="width: 320px; text-align: left;">
-          <strong style="color: var(--text-primary);">How to connect:</strong><br>
-          1. Transport: <strong>Streamable HTTP</strong><br>
-          2. URL: <strong>https://mono-mcp.eelkhair.net</strong><br>
-          3. Connection Type: <strong>Direct</strong><br>
-          4. Click <strong>Connect</strong><br>
-          5. Go to the <strong>Tools</strong> tab to browse AI tools
-        </div>
-      </a>
-    </div>
+<!-- ── Portfolio CTA ───────────────────────────────────────── -->
+<section id="portfolio" style="background: var(--bg-secondary); margin: 0; max-width: 100%; padding: 3rem 1.5rem;">
+  <div style="max-width: var(--max-width); margin: 0 auto; text-align: center;">
+    <h2 style="margin-bottom: 0.75rem;">Want to see the architecture?</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">20 ADRs, system architecture diagrams, live running services, and full source code.</p>
+    <a href="/portfolio.html" class="btn btn-primary" style="font-size: 1rem; padding: 0.75rem 2rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> View Portfolio Project</a>
   </div>
 </section>
 
