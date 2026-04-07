@@ -39,6 +39,10 @@
             <span class="entry-duration">{{ entry.duration }}ms</span>
             <span class="entry-time">{{ formatTime(entry.timestamp) }}</span>
           </div>
+          <div class="entry-trace" (click)="copyTraceId(entry.traceId)" title="Click to copy">
+            <i class="pi pi-copy"></i>
+            <span class="trace-id-text">{{ entry.traceId }}</span>
+          </div>
           <div class="entry-links">
             <a [href]="debug.jaegerLink(entry.traceId)"
                target="_blank" rel="noopener"

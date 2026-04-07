@@ -34,4 +34,8 @@ export class DebugSidebar {
   truncatePath(path: string): string {
     return path.length > 35 ? path.slice(0, 35) + '...' : path;
   }
+
+  copyTraceId(traceId: string): void {
+    navigator.clipboard.writeText(traceId);
+  }
 }
