@@ -39,6 +39,26 @@ public static class YarpProvider
         },
         new RouteConfig
         {
+            RouteId = "resumes-api",
+            ClusterId = "monolith",
+            Match = new RouteMatch
+            {
+                Path = "/api/resumes/{**catch-all}"
+            },
+            Order = 0
+        },
+        new RouteConfig
+        {
+            RouteId = "applicant-api",
+            ClusterId = "monolith",
+            Match = new RouteMatch
+            {
+                Path = "/api/applicant/{**catch-all}"
+            },
+            Order = 0
+        },
+        new RouteConfig
+        {
             RouteId = "admin-api",
             ClusterId = "admin",
             Match = new RouteMatch

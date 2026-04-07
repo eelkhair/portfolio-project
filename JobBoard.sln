@@ -217,6 +217,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ADRs", "ADRs", "{97769D49-1
 		docs\ADRs\ADR-009-AI-Service-Multi-Provider-Function-Calling.md = docs\ADRs\ADR-009-AI-Service-Multi-Provider-Function-Calling.md
 		docs\ADRs\ADR-010-Real-Time-AI-Notifications-SignalR.md = docs\ADRs\ADR-010-Real-Time-AI-Notifications-SignalR.md
 		docs\ADRs\ADR-011-Strangler-Fig-Connector-API-Provisioning-Sagas.md = docs\ADRs\ADR-011-Strangler-Fig-Connector-API-Provisioning-Sagas.md
+		docs\ADRs\ADR-016-Multi-Scope-AI-Chat.md = docs\ADRs\ADR-016-Multi-Scope-AI-Chat.md
+		docs\ADRs\ADR-015-MCP-Server-Integration.md = docs\ADRs\ADR-015-MCP-Server-Integration.md
+		docs\ADRs\ADR-018-Docker-Deployment-Topology.md = docs\ADRs\ADR-018-Docker-Deployment-Topology.md
+		docs\ADRs\ADR-020-Aspire-Local-Orchestration.md = docs\ADRs\ADR-020-Aspire-Local-Orchestration.md
+		docs\ADRs\ADR-014-Resume-Embedding-Pipeline-RAG.md = docs\ADRs\ADR-014-Resume-Embedding-Pipeline-RAG.md
+		docs\ADRs\ADR-013-Keycloak-Migration-Auth-Strategy.md = docs\ADRs\ADR-013-Keycloak-Migration-Auth-Strategy.md
+		docs\ADRs\ADR-019-EF-Core-Dual-ID-Sequence-Generation.md = docs\ADRs\ADR-019-EF-Core-Dual-ID-Sequence-Generation.md
+		docs\ADRs\ADR-017-IntegrationEvents-Shared-NuGet-Package.md = docs\ADRs\ADR-017-IntegrationEvents-Shared-NuGet-Package.md
+		docs\ADRs\ADR-012-Reverse-Connector-Bidirectional-Strangler-Fig.md = docs\ADRs\ADR-012-Reverse-Connector-Bidirectional-Strangler-Fig.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{5206DCD5-98FA-4BD9-BF78-26DBDCA37EF0}"
