@@ -21,7 +21,7 @@
     </p-button>
     <p-menu #userMenu [model]="menuItems()" [popup]="true"></p-menu>
     <p-button
-      [label]="'Welcome, ' + (displayName() | titlecase)"
+      [label]="(displayName() | titlecase) + ' (' + roleName() + ')'"
       icon="pi pi-user"
       iconPos="left"
       styleClass="btn-welcome"

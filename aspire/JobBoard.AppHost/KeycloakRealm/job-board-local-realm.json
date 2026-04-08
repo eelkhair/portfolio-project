@@ -29,7 +29,7 @@
   "oauth2DevicePollingInterval": 5,
   "enabled": true,
   "sslRequired": "none",
-  "registrationAllowed": true,
+  "registrationAllowed": false,
   "registrationEmailAsUsername": false,
   "rememberMe": true,
   "verifyEmail": false,
@@ -1212,16 +1212,38 @@
     },
     {
       "id": "7214ed11-7eff-4b73-8bb5-ac37f0e29320",
-      "username": "admin",
-      "firstName": "Elkhair",
-      "lastName": "Elkhair",
-      "email": "admin@eelkhair.net",
+      "username": "demo",
+      "firstName": "Demo",
+      "lastName": "User",
+      "email": "demo@eelkhair.net",
       "emailVerified": true,
       "enabled": true,
       "credentials": [
         {
           "type": "password",
-          "value": "admin",
+          "value": "Welcome1!",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "default-roles-job-board-local"
+      ],
+      "groups": [
+        "/Admins"
+      ]
+    },
+    {
+      "id": "b3c4d5e6-f7a8-9012-bcde-f34567890abc",
+      "username": "systemadmin",
+      "firstName": "System",
+      "lastName": "Admin",
+      "email": "systemadmin@eelkhair.net",
+      "emailVerified": true,
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Welcome1!",
           "temporary": false
         }
       ],
@@ -1259,13 +1281,13 @@
       "clientId": "account",
       "name": "${client_account}",
       "rootUrl": "${authBaseUrl}",
-      "baseUrl": "/realms/job-board-dev/account/",
+      "baseUrl": "/realms/job-board-local/account/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
-        "/realms/job-board-dev/account/*"
+        "/realms/job-board-local/account/*"
       ],
       "webOrigins": [],
       "notBefore": 0,
@@ -1303,13 +1325,13 @@
       "clientId": "account-console",
       "name": "${client_account-console}",
       "rootUrl": "${authBaseUrl}",
-      "baseUrl": "/realms/job-board-dev/account/",
+      "baseUrl": "/realms/job-board-local/account/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
-        "/realms/job-board-dev/account/*"
+        "/realms/job-board-local/account/*"
       ],
       "webOrigins": [],
       "notBefore": 0,
@@ -1398,7 +1420,7 @@
       "description": "",
       "rootUrl": "http://localhost:4200",
       "adminUrl": "http://localhost:4200",
-      "baseUrl": "https://job-admin-dev.eelkhair.net",
+      "baseUrl": "http://localhost:4200",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
@@ -1422,7 +1444,7 @@
       "attributes": {
         "oidc.ciba.grant.enabled": "false",
         "backchannel.logout.session.required": "true",
-        "post.logout.redirect.uris": "https://job-admin-dev.eelkhair.net/*",
+        "post.logout.redirect.uris": "http://localhost:4200/*",
         "oauth2.device.authorization.grant.enabled": "false",
         "display.on.consent.screen": "false",
         "backchannel.logout.revoke.offline.tokens": "false"
@@ -1477,7 +1499,7 @@
       "description": "",
       "rootUrl": "http://localhost:3000",
       "adminUrl": "http://localhost:3000",
-      "baseUrl": "https://jobs-dev.eelkhair.net",
+      "baseUrl": "http://localhost:3000",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": true,
@@ -1501,7 +1523,7 @@
       "attributes": {
         "oidc.ciba.grant.enabled": "false",
         "backchannel.logout.session.required": "true",
-        "post.logout.redirect.uris": "https://jobs-dev.eelkhair.net/*",
+        "post.logout.redirect.uris": "http://localhost:3000/*",
         "oauth2.device.authorization.grant.enabled": "false",
         "display.on.consent.screen": "false",
         "backchannel.logout.revoke.offline.tokens": "false"
@@ -1745,13 +1767,13 @@
       "clientId": "security-admin-console",
       "name": "${client_security-admin-console}",
       "rootUrl": "${authAdminUrl}",
-      "baseUrl": "/admin/job-board-dev/console/",
+      "baseUrl": "/admin/job-board-local/console/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
-        "/admin/job-board-dev/console/*"
+        "/admin/job-board-local/console/*"
       ],
       "webOrigins": [
         "+"
@@ -1818,12 +1840,10 @@
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
-        "https:/job-admin-dev.eelkhair.net/*",
-        "https://job-monolith-dev.eelkhair.net/*"
+        "http://localhost:5280/*"
       ],
       "webOrigins": [
-        "https://job-monolith-dev.eelkhair.net",
-        "https:/job-admin-dev.eelkhair.net/"
+        "http://localhost:5280"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -1836,7 +1856,7 @@
       "frontchannelLogout": true,
       "protocol": "openid-connect",
       "attributes": {
-        "post.logout.redirect.uris": "https://job-monolith-dev.eelkhair.net/*##https:/job-admin-dev.eelkhair.net/*",
+        "post.logout.redirect.uris": "http://localhost:5280/*",
         "oauth2.device.authorization.grant.enabled": "false",
         "backchannel.logout.revoke.offline.tokens": "false",
         "use.refresh.tokens": "false",

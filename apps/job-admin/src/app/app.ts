@@ -10,6 +10,7 @@ import {AiRealtimeService} from './core/services/ai-realtime.service';
 import {AiChat} from './shared/ai-chat/ai-chat';
 import {DebugSidebar} from './shared/debug-sidebar/debug-sidebar';
 import {OidcSecurityService} from 'angular-auth-oidc-client';
+import {GettingStarted} from './layout/getting-started/getting-started';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +21,8 @@ import {OidcSecurityService} from 'angular-auth-oidc-client';
     ToastModule,
     Nav,
     AiChat,
-    DebugSidebar
+    DebugSidebar,
+    GettingStarted
   ],
   templateUrl: './app.html',
   styleUrl: './app.css'

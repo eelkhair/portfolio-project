@@ -46,7 +46,7 @@ ADR Index: [`docs/ADRs`](./ADRs)
 - Use **AI Chat** with scoped tool access (Admin, Company Admin, Public) powered by MCP servers
 - Generate and rewrite job descriptions using multi-provider LLM support (OpenAI, Azure OpenAI, Claude, Gemini)
 - Trigger asynchronous workflows via pub/sub and trace them **end-to-end** across all services
-- Switch between monolith and microservices mode at runtime via feature flags
+- Switch between monolith and microservices mode **per-session** via a toolbar toggle -- each visitor independently experiences both architectures and compares traces
 
 ---
 
@@ -181,11 +181,14 @@ Rationale: [ADR-019](./ADRs/ADR-019-EF-Core-Dual-ID-Sequence-Generation.md)
 
 The AI service supports **OpenAI, Azure OpenAI, Claude, and Gemini** with a unified interface. Tool registries are scoped per chat context:
 
-- **Admin** -- full access to monolith + admin-api MCP tools
+- **System Admin** -- full access including global mode switching (`SetModeTool`)
+- **Admin** -- monolith + admin-api MCP tools, system info, draft generation
 - **Company Admin** -- company-scoped operations
 - **Public** -- job-seeker facing tools
 
 LLM tools are exposed via **MCP (Model Context Protocol)** servers, enabling the AI service to call monolith and admin-api operations as function calls.
+
+The AI service reads the `x-mode` header from each request to resolve the correct MCP tool registry per session -- so each user's chat interacts with whichever architecture (monolith or microservices) they've selected in the toolbar.
 
 Rationale:
 - Multi-provider function calling: [ADR-009](./ADRs/ADR-009-AI-Service-Multi-Provider-Function-Calling.md)
@@ -215,7 +218,8 @@ Rationale: [ADR-017](./ADRs/ADR-017-IntegrationEvents-Shared-NuGet-Package.md)
 
 ## Authentication
 
-- **Keycloak** with group-based RBAC: `/Admins`, `/Companies/{uid}/CompanyAdmins`, `/Companies/{uid}/Recruiters`, `/Applicants`
+- **Keycloak** with group-based RBAC: `/SystemAdmins`, `/Admins`, `/Companies/{uid}/CompanyAdmins`, `/Companies/{uid}/Recruiters`, `/Applicants`
+- **SystemAdmin** role separates platform owner from portfolio visitors -- visitors log in as Admins but cannot change AI provider, global mode, or trigger re-embedding
 - Admin app uses **angular-auth-oidc-client** with PKCE
 - Public app uses **angular-auth-oidc-client** with Keycloak (SSR-safe with optional inject pattern)
 - Microservice endpoints are `AllowAnonymous()` -- auth enforced at the Gateway
@@ -449,6 +453,7 @@ See: `.github/workflows/deploy.yml` | `.github/workflows/cloudflare-tunnel.yml`
 - Add C4-style architecture diagrams
 - Improve DLQ tooling and replay utilities
 - ~~Automate Cloudflare DNS updates in CI/CD pipeline~~ (done -- `cloudflare-tunnel.yml`)
+- Health-aware gateway fallback -- YARP passive health checks + SignalR notification when a backend is unavailable
 - Expand integration and unit test coverage
 - Add load testing (k6 / NBomber)
 - Public app: job search, application flow, resume management UI

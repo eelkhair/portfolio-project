@@ -66,7 +66,7 @@ public static class SystemInfoTool
             {
                 Name = "system_info",
                 Description =
-                    "Returns system state: conversation ID, trace IDs, AI provider/model, and monolith/microservices mode. Use when the user asks about system configuration or debugging info."
+                    "Returns system state: conversation ID, trace IDs, AI provider/model, and monolith/microservices mode. MUST be called when the user asks about mode, provider, system configuration, or debugging info. Never answer mode questions without calling this tool first."
             });
     }
 }

@@ -28,6 +28,7 @@ export class Header implements OnInit {
   themeService = inject(ThemeService);
   menuItems = signal<MenuItem[]>([]);
   displayName = signal('');
+  roleName = signal('');
   envName = environment.envName;
 
   ngOnInit() {
@@ -35,6 +36,13 @@ export class Header implements OnInit {
     if (u) {
       this.displayName.set((u['given_name'] ?? u['name']) || u['name'] || u['preferred_username'] || u['email'] || 'User');
     }
+    const groups = this.accountService.groups().map(g => g.replace(/^\//, ''));
+    if (groups.includes('SystemAdmins')) this.roleName.set('System Admin');
+    else if (groups.includes('Admins')) this.roleName.set('Admin');
+    else if (groups.some(g => g.includes('CompanyAdmins'))) this.roleName.set('Company Admin');
+    else if (groups.some(g => g.includes('Recruiters'))) this.roleName.set('Recruiter');
+    else if (groups.includes('Applicants')) this.roleName.set('Applicant');
+    else this.roleName.set('User');
     this.menuItems.set([
       {
         label: 'Profile',

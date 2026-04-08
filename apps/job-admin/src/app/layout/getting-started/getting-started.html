@@ -1,0 +1,96 @@
+<p-dialog header="Welcome to the Job Board Platform" [modal]="true"
+          [visible]="visible()"
+          (visibleChange)="visible.set($event)"
+          [style]="{width: '780px'}"
+          [closable]="true"
+          (onHide)="close()">
+
+  <div class="flex flex-col gap-4">
+    <p class="text-color-secondary">
+      This is a distributed systems portfolio project. Explore the architecture by trying these:
+    </p>
+
+    <div class="grid grid-cols-2 gap-6">
+      <div class="flex flex-col gap-3">
+        <div class="font-semibold text-color-secondary text-sm uppercase tracking-wide">Architecture</div>
+
+        <div class="flex items-start gap-3">
+          <i class="pi pi-arrows-h text-primary text-xl mt-1"></i>
+          <div>
+            <div class="font-semibold">Toggle Mode</div>
+            <div class="text-sm text-color-secondary">Switch between Monolith and Microservices in the toolbar to compare architectures.</div>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3">
+          <i class="pi pi-building text-primary text-xl mt-1"></i>
+          <div>
+            <div class="font-semibold">Create a Company</div>
+            <div class="text-sm text-color-secondary">Try the full CRUD flow through the gateway and see it in traces.</div>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3">
+          <i class="pi pi-microchip-ai text-primary text-xl mt-1"></i>
+          <div>
+            <div class="font-semibold">Ask the AI</div>
+            <div class="text-sm text-color-secondary">Open the chat and try "list companies", "mode", or "system config".</div>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3">
+          <i class="pi pi-wave-pulse text-primary text-xl mt-1"></i>
+          <div>
+            <div class="font-semibold">Check Traces</div>
+            <div class="text-sm text-color-secondary">Open the debug bar (bottom-left) and click "View in Jaeger" to see distributed traces.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <div class="font-semibold text-color-secondary text-sm uppercase tracking-wide">Jobs & Drafts</div>
+
+        <div class="flex items-start gap-3">
+          <i class="pi pi-briefcase text-primary text-xl mt-1"></i>
+          <div>
+            <div class="font-semibold">Create a Job</div>
+            <div class="text-sm text-color-secondary">Fill out the job form and publish it. Watch the event flow through the outbox pipeline.</div>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3">
+          <i class="pi pi-file text-primary text-xl mt-1"></i>
+          <div>
+            <div class="font-semibold">AI Drafts</div>
+            <div class="text-sm text-color-secondary">Ask the AI to "generate a draft for a software engineer" and review it in the Drafts page.</div>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3">
+          <i class="pi pi-pencil text-primary text-xl mt-1"></i>
+          <div>
+            <div class="font-semibold">Rewrite with AI</div>
+            <div class="text-sm text-color-secondary">Edit a job and use the AI rewrite button to enhance descriptions, requirements, or benefits.</div>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3">
+          <i class="pi pi-list text-primary text-xl mt-1"></i>
+          <div>
+            <div class="font-semibold">Browse Jobs</div>
+            <div class="text-sm text-color-secondary">View all jobs with filtering and sorting. Each action generates traceable API calls.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2 pt-2 border-t border-surface">
+      <span class="text-sm text-color-secondary">Logged in as: <strong>{{ displayName() }}</strong></span>
+    </div>
+  </div>
+
+  <ng-template #footer>
+    <p-button label="Get Started" icon="pi pi-arrow-right" (onClick)="close()" />
+  </ng-template>
+
+</p-dialog>
