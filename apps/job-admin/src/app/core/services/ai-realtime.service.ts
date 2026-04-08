@@ -122,6 +122,7 @@ export class AiRealtimeService {
 
   private async handleJobPublished(msg: AiNotificationDto, span: Span) {
     const companyId = msg.metadata?.['companyId']?.toString();
+    const jobId = msg.entityId;
 
     this.notify.success('Job Published', `"${msg.title}" has been published`);
 
@@ -132,12 +133,12 @@ export class AiRealtimeService {
 
       this.companySelectionStore.selectedCompany.set(company);
       this.jobsStore.loadJobs();
+    }
 
-      if (this.router.url !== '/jobs') {
-        span.setAttribute('ui.action', 'navigate');
-        span.setAttribute('ui.route', '/jobs');
-        await this.router.navigate(['/jobs']);
-      }
+    if (jobId) {
+      span.setAttribute('ui.action', 'navigate');
+      span.setAttribute('ui.route', `/jobs/${jobId}`);
+      await this.router.navigate(['/jobs', jobId]);
     }
   }
 

@@ -64,6 +64,11 @@ export class JobUpsert implements OnInit, OnDestroy{
   });
 
   jobTypes = Object.entries(JOB_TYPE_LABELS).map(([value, label]) => ({ label, value: value as JobType }));
+
+  back() {
+    this.router.navigate(['/jobs/drafts']);
+  }
+
   ngOnInit() {
     const draftId = this.draftId()
 

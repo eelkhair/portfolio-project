@@ -1,6 +1,9 @@
 @if (store.selectedCompany(); as company) {
   <div class="flex items-center justify-between mb-6">
-    <h1 class="text-3xl font-bold">{{ company.name }}</h1>
+    <div class="flex items-center gap-3">
+      <p-button icon="pi pi-arrow-left" [rounded]="true" [text]="true" (onClick)="back()" />
+      <h1 class="text-3xl font-bold">{{ company.name }}</h1>
+    </div>
     <span class="px-3 py-1 rounded-full text-sm font-medium"
           [class]="company.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'">
       {{ company.status }}

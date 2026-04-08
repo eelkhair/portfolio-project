@@ -47,17 +47,15 @@ export class NavItems{
         ]
       },
       {
-        label: 'Settings', icon: 'pi pi-cog',
+        label: 'Settings', icon: 'pi pi-cog', visible: isSystemAdmin,
         items: [
-          { label: 'Profile', icon: 'pi pi-id-card', routerLink: '/settings/profile' },
-          { label: 'AI Provider', icon: 'pi pi-microchip-ai', routerLink: '/settings/ai-provider', visible: isSystemAdmin },
-          { label: 'Application Mode', icon: 'pi pi-arrows-h', routerLink: '/settings/application-mode', visible: isSystemAdmin },
-          { label: 'Embedding Management', icon: 'pi pi-database', routerLink: '/settings/embedding-management', visible: isSystemAdmin },
+          { label: 'AI Provider', icon: 'pi pi-microchip-ai', routerLink: '/settings/ai-provider' },
+          { label: 'Application Mode', icon: 'pi pi-arrows-h', routerLink: '/settings/application-mode' },
+          { label: 'Embedding Management', icon: 'pi pi-database', routerLink: '/settings/embedding-management' },
         ]
       },
 
       { label: 'Audit Logs', icon: 'pi pi-history', routerLink: '/audit', visible: false },
-      { label: 'Support', icon: 'pi pi-question-circle', routerLink: '/support' },
     ];
     return NAV_ITEMS;
   }

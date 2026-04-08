@@ -5,9 +5,10 @@ import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/
 import {InputText} from 'primeng/inputtext';
 import {Textarea} from 'primeng/textarea';
 import {Select} from 'primeng/select';
-import {ButtonDirective} from 'primeng/button';
+import {Button, ButtonDirective} from 'primeng/button';
 import {Divider} from 'primeng/divider';
 import {ApiError} from '../../../core/types/Dtos/ApiResponse';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-details',
@@ -16,6 +17,7 @@ import {ApiError} from '../../../core/types/Dtos/ApiResponse';
     InputText,
     Textarea,
     Select,
+    Button,
     ButtonDirective,
     Divider,
     DatePipe,
@@ -25,6 +27,7 @@ import {ApiError} from '../../../core/types/Dtos/ApiResponse';
 })
 export class CompanyDetails implements OnInit {
   store = inject(CompanyStore);
+  private router = inject(Router);
   id = input.required<string>();
   errors = signal<Record<string, string[]> | undefined>(undefined);
   industries = this.store.industries;
@@ -66,6 +69,10 @@ export class CompanyDetails implements OnInit {
 
   ngOnInit(): void {
     this.store.loadCompany(this.id());
+  }
+
+  back() {
+    this.router.navigate(['/companies']);
   }
 
   saveForm() {

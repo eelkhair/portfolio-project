@@ -16,6 +16,7 @@ export class JobsStore {
   private jobService = inject(JobService);
   jobs = signal<Job[]>([])
   drafts= signal<Draft[]>([])
+  selectedJob = signal<Job | undefined>(undefined);
   showGenerate = signal(false);
   aiResponse = signal<JobGenResponse|undefined>(undefined)
   skillSuggestions: string[] = [];
@@ -23,6 +24,24 @@ export class JobsStore {
   citySuggestions: string[] = [];
   notificationService = inject(NotificationService);
 
+
+  selectJob(id: string) {
+    const job = this.jobs().find(j => j.uId === id);
+    if (job) {
+      this.selectedJob.set(job);
+      return;
+    }
+    // If not in cache, load all jobs for the selected company and find it
+    const companyId = this.selectedCompany()?.uId;
+    if (companyId) {
+      this.jobService.list(companyId).subscribe({
+        next: response => {
+          this.jobs.set(response.data ?? []);
+          this.selectedJob.set(response.data?.find(j => j.uId === id));
+        }
+      });
+    }
+  }
 
   loadJobs(){
     const selectedCompany = this.selectedCompany();

@@ -5,7 +5,7 @@ import {ColDef} from 'ag-grid-community';
 import {AgGridAngular} from 'ag-grid-angular';
 import {AgButton} from '../../shared/ag-button/ag-button';
 import {Button} from 'primeng/button';
-import {RouterLink} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {ThemeService} from '../../core/services/theme.service';
 
 @Component({
@@ -22,6 +22,7 @@ import {ThemeService} from '../../core/services/theme.service';
 export class Jobs {
   store = inject(JobsStore);
   themeService = inject(ThemeService);
+  private router = inject(Router);
 
   defaultColDef: ColDef = { filter: true };
   colDefs: ColDef[] = [
@@ -32,7 +33,7 @@ export class Jobs {
       cellRendererParams: (e: any) => {
         return {
           click: () => {
-            alert(e.value);
+            this.router.navigate(['/jobs', e.value]);
           }
         }
       }
