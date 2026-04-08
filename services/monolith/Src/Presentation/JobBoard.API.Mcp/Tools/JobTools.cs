@@ -22,7 +22,7 @@ public class JobTools(HandlerDispatcher dispatcher, ILogger<JobTools> logger)
          "Returns detailed published jobs for a single company including responsibilities, qualifications, and about role. " +
          "Use only when you need these extra details beyond what company_job_summaries already provides.")]
     public async Task<string> ListJobs(
-        [Description("The company's unique identifier")] Guid companyId,
+        [Description("The company's GUID from company_list Id field. Never pass a name.")] Guid companyId,
         CancellationToken ct)
     {
         var query = new ListJobsQuery(companyId);
@@ -68,7 +68,7 @@ public class JobTools(HandlerDispatcher dispatcher, ILogger<JobTools> logger)
          "Before calling this tool, you MUST ask the user whether they want to delete the draft after publishing " +
          "and use their answer for the deleteDraft parameter.")]
     public async Task<string> CreateJob(
-        [Description("The company's unique identifier")] Guid companyId,
+        [Description("The company's GUID from company_list Id field. Never pass a name.")] Guid companyId,
         [Description("The draft GUID to publish as a job")] string draftId,
         [Description("Whether to delete the draft after publishing")] bool deleteDraft,
         CancellationToken ct)

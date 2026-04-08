@@ -24,7 +24,7 @@ public static class GenerateDraftTool
     {
         return AIFunctionFactory.Create(
             async (
-                [Description("The company's unique identifier (required)")] Guid companyId,
+                [Description("The company's unique identifier as a GUID (e.g. '019c7737-134b-74d1-8716-5af9de9793a3'). Get this from company_list UId field. Never pass a company name.")] Guid companyId,
                 [Description("Brief description of the role to generate a draft for (required)")] string brief,
                 [Description("Company name for context in the generated draft")] string? companyName,
                 [Description("Team or department name")] string? teamName,
@@ -94,8 +94,8 @@ public static class GenerateDraftTool
                 Name = "generate_draft",
                 Description =
                     "Generates a job draft for a company using AI and automatically saves it to the database. " +
-                    "Required fields: companyId, brief. " +
-                    "Only call this function when all required fields are available."
+                    "DO NOT call this tool until you have collected all fields via the wizard flow described in the system prompt. " +
+                    "You must have at minimum: companyId, brief, location, and techStackCsv before calling."
             });
     }
 }

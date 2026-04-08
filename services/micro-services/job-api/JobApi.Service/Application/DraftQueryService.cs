@@ -17,7 +17,10 @@ public class DraftQueryService(IJobDbContext context) : IDraftQueryService
 
     public async Task<List<DraftResponse>> ListDraftsAsync(Guid companyUId, CancellationToken ct)
     {
-        var company = await context.Companies.FirstAsync(c => c.UId == companyUId, ct);
+        if (companyUId == Guid.Empty) return [];
+
+        var company = await context.Companies.FirstOrDefaultAsync(c => c.UId == companyUId, ct);
+        if (company is null) return [];
 
         var drafts = await context.Drafts
             .Where(d => d.CompanyId == company.Id)

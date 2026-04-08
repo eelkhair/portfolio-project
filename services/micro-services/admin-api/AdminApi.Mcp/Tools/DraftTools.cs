@@ -15,11 +15,14 @@ public class DraftTools(
     [McpServerTool(Name = "draft_list"),
      Description("Returns drafts for a company. Optionally filter by location (2-letter state code e.g. CA, NY).")]
     public async Task<string> ListDrafts(
-        [Description("The company's unique identifier")] Guid companyId,
+        [Description("The company's GUID from company_list Id field. Never pass a name.")] string companyId,
         [Description("Optional location filter (2-letter state code e.g. CA, NY)")] string? location = null,
         CancellationToken ct = default)
     {
-        var response = await queryService.ListDrafts(companyId.ToString(), ct);
+        var (ok, id, err) = Json.ParseGuid(companyId, "companyId");
+        if (!ok) return err!;
+
+        var response = await queryService.ListDrafts(id.ToString(), ct);
         var drafts = response.Data ?? [];
 
         if (!string.IsNullOrWhiteSpace(location))
@@ -36,10 +39,13 @@ public class DraftTools(
     [McpServerTool(Name = "draft_detail"),
      Description("Returns full details for a single draft by ID including aboutRole, responsibilities, qualifications, and notes.")]
     public async Task<string> GetDraft(
-        [Description("The draft's unique identifier")] Guid draftId,
+        [Description("The draft's unique identifier (GUID)")] string draftId,
         CancellationToken ct)
     {
-        var response = await queryService.GetDraft(draftId, ct);
+        var (ok, id, err) = Json.ParseGuid(draftId, "draftId");
+        if (!ok) return err!;
+
+        var response = await queryService.GetDraft(id, ct);
         if (!response.Success || response.Data is null)
             return JsonSerializer.Serialize(new { error = $"Draft '{draftId}' not found." }, Json.Opts);
 
@@ -49,7 +55,7 @@ public class DraftTools(
     [McpServerTool(Name = "save_draft"),
      Description("Saves a draft for a company. companyId is required.")]
     public async Task<string> SaveDraft(
-        [Description("The company's unique identifier (required)")] Guid companyId,
+        [Description("The company's GUID from company_list Id field. Never pass a name.")] string companyId,
         [Description("Job title (required)")] string title,
         [Description("Description of the role (required)")] string aboutRole,
         [Description("List of job responsibilities (required)")] List<string> responsibilities,
@@ -61,6 +67,9 @@ public class DraftTools(
         [Description("Draft ID — provide to update an existing draft (optional)")] string? id = null,
         CancellationToken ct = default)
     {
+        var (ok, cId, err) = Json.ParseGuid(companyId, "companyId");
+        if (!ok) return err!;
+
         var request = new JobDraftRequest
         {
             Title = title,
@@ -74,19 +83,24 @@ public class DraftTools(
             Id = id
         };
 
-        var response = await commandService.CreateDraft(companyId.ToString(), request, ct);
+        var response = await commandService.CreateDraft(cId.ToString(), request, ct);
         var data = response.Data;
         return JsonSerializer.Serialize(new { data?.Id, data?.Title, status = "saved" }, Json.Opts);
     }
 
     [McpServerTool(Name = "delete_draft"), Description("Deletes a draft. Requires both companyId and draftId.")]
     public async Task<string> DeleteDraft(
-        [Description("The company's unique identifier")] Guid companyId,
-        [Description("The draft's unique identifier")] Guid draftId,
+        [Description("The company's GUID from company_list Id field. Never pass a name.")] string companyId,
+        [Description("The draft's unique identifier (GUID)")] string draftId,
         CancellationToken ct)
     {
-        await commandService.DeleteDraft(companyId.ToString(), draftId, ct);
-        return JsonSerializer.Serialize(new { success = true, draftId }, Json.Opts);
+        var (ok1, cId, err1) = Json.ParseGuid(companyId, "companyId");
+        if (!ok1) return err1!;
+        var (ok2, dId, err2) = Json.ParseGuid(draftId, "draftId");
+        if (!ok2) return err2!;
+
+        await commandService.DeleteDraft(cId.ToString(), dId, ct);
+        return JsonSerializer.Serialize(new { success = true, draftId = dId }, Json.Opts);
     }
 
     private static List<object> FilterByLocation(List<(string? Location, object Item)> items, string location)

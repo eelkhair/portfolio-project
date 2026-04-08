@@ -31,7 +31,7 @@ public class CompanyTools(HandlerDispatcher dispatcher)
     [McpServerTool(Name = "company_detail"),
      Description("Returns full details for a single company by ID. Use after company_list to get description, about, website, phone, size, etc.")]
     public async Task<string> GetCompany(
-        [Description("The company's unique identifier")] Guid companyId,
+        [Description("The company's GUID from company_list Id field. Never pass a name.")] Guid companyId,
         CancellationToken ct)
     {
         var query = new GetCompaniesQuery();

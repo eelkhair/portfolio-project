@@ -37,7 +37,20 @@ public static class DependencyInjection
              .AddProcessor(new DaprInternalSpanFilter())
              .AddAspNetCoreInstrumentation(o => o.AddFilters())
              .AddEntityFrameworkCoreInstrumentation(o => o.AddFilters())
-             .AddHttpClientInstrumentation(o => o.AddFilters())
+             .AddHttpClientInstrumentation(o =>
+             {
+                 o.AddFilters();
+                 var baseFilter = o.FilterHttpRequestMessage;
+                 o.FilterHttpRequestMessage = msg =>
+                 {
+                     // Suppress MCP SSE probe (GET / to MCP server ports)
+                     if (msg.Method == HttpMethod.Get &&
+                         msg.RequestUri?.AbsolutePath == "/" &&
+                         msg.RequestUri?.Port is 3333 or 3334)
+                         return false;
+                     return baseFilter?.Invoke(msg) ?? true;
+                 };
+             })
              .AddOtlpExporter("primary", exporter =>
              {
                  exporter.Endpoint = new Uri(primaryEndpoint);

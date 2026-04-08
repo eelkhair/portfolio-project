@@ -31,7 +31,7 @@ export class AiProvider implements OnInit {
 
   providers: ProviderOption[] = [
     {value: 'azure', label: 'Azure', model: 'gpt-4o-mini'},
-    {value: 'openai', label: 'OpenAI', model: 'gpt-4.1-mini'},
+    {value: 'openai', label: 'OpenAI', model: 'gpt-4.1'},
     {value: 'gemini', label: 'Gemini', model: 'gemini-2.0-flash-lite'},
     {value: 'claude', label: 'Claude', model: 'claude-haiku-4-5'},
   ];

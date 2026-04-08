@@ -7,6 +7,7 @@ using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Infrastructure.Dapr.ApiClients;
 using JobBoard.AI.Infrastructure.Dapr.Services;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -31,7 +32,13 @@ public static class DependencyInjection
         builder.Services.AddScoped<MicroDraftPersistence>();
         builder.Services.AddScoped<IDraftPersistence>(sp =>
         {
-            var isMonolith = sp.GetRequiredService<IConfiguration>().GetValue<bool>("FeatureFlags:Monolith");
+            var xMode = sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.Request.Headers["x-mode"].FirstOrDefault();
+            var isMonolith = xMode switch
+            {
+                "monolith" => true,
+                "admin" => false,
+                _ => sp.GetRequiredService<IConfiguration>().GetValue<bool>("FeatureFlags:Monolith")
+            };
             return isMonolith
                 ? sp.GetRequiredService<MonolithDraftPersistence>()
                 : sp.GetRequiredService<MicroDraftPersistence>();

@@ -17,7 +17,7 @@ public class DraftTools(HandlerDispatcher dispatcher)
     [McpServerTool(Name = "draft_list"),
      Description("Returns drafts for a company. Optionally filter by location (2-letter state code e.g. CA, NY).")]
     public async Task<string> ListDrafts(
-        [Description("The company's unique identifier")] Guid companyId,
+        [Description("The company's GUID from company_list Id field. Never pass a name.")] Guid companyId,
         [Description("Optional location filter (2-letter state code e.g. CA, NY)")] string? location = null,
         CancellationToken ct = default)
     {
@@ -98,7 +98,7 @@ public class DraftTools(HandlerDispatcher dispatcher)
 
     [McpServerTool(Name = "delete_draft"), Description("Deletes a draft. Requires both companyId and draftId.")]
     public async Task<string> DeleteDraft(
-        [Description("The company's unique identifier")] Guid companyId,
+        [Description("The company's GUID from company_list Id field. Never pass a name.")] Guid companyId,
         [Description("The draft's unique identifier")] Guid draftId,
         CancellationToken ct)
     {

@@ -19,22 +19,30 @@ public class JobTools(
          "Returns detailed published jobs for a single company including responsibilities, qualifications, and about role. " +
          "Use only when you need these extra details beyond what company_job_summaries already provides.")]
     public async Task<string> ListJobs(
-        [Description("The company's unique identifier")] Guid companyId,
+        [Description("The company's GUID from company_list Id field. Never pass a name.")] string companyId,
         CancellationToken ct)
     {
-        var response = await queryService.ListAsync(companyId, ct);
+        var (ok, id, err) = Json.ParseGuid(companyId, "companyId");
+        if (!ok) return err!;
+
+        var response = await queryService.ListAsync(id, ct);
         return JsonSerializer.Serialize(response.Data, Json.Opts);
     }
 
     [McpServerTool(Name = "job_detail"),
      Description("Returns full details for a single job by ID including aboutRole, responsibilities, and qualifications.")]
     public async Task<string> GetJob(
-        [Description("The job's unique identifier")] Guid jobId,
-        [Description("The company's unique identifier")] Guid companyId,
+        [Description("The job's unique identifier (GUID)")] string jobId,
+        [Description("The company's GUID from company_list Id field. Never pass a name.")] string companyId,
         CancellationToken ct)
     {
-        var response = await queryService.ListAsync(companyId, ct);
-        var job = response.Data?.FirstOrDefault(j => j.UId == jobId);
+        var (ok1, cId, err1) = Json.ParseGuid(companyId, "companyId");
+        if (!ok1) return err1!;
+        var (ok2, jId, err2) = Json.ParseGuid(jobId, "jobId");
+        if (!ok2) return err2!;
+
+        var response = await queryService.ListAsync(cId, ct);
+        var job = response.Data?.FirstOrDefault(j => j.UId == jId);
 
         if (job is null)
             return JsonSerializer.Serialize(new { error = $"Job '{jobId}' not found." }, Json.Opts);
@@ -59,18 +67,17 @@ public class JobTools(
          "Before calling this tool, you MUST ask the user whether they want to delete the draft after publishing " +
          "and use their answer for the deleteDraft parameter.")]
     public async Task<string> CreateJob(
-        [Description("The company's unique identifier")] Guid companyId,
+        [Description("The company's GUID from company_list Id field. Never pass a name.")] string companyId,
         [Description("The draft GUID to publish as a job")] string draftId,
         [Description("Whether to delete the draft after publishing")] bool deleteDraft,
         CancellationToken ct)
     {
-        if (!Guid.TryParse(draftId, out var id))
-        {
-            logger.LogWarning("Invalid draftId format: {DraftId}", draftId);
-            return JsonSerializer.Serialize(new { error = "Invalid draftId format. Must be a valid GUID." }, Json.Opts);
-        }
+        var (ok1, cId, err1) = Json.ParseGuid(companyId, "companyId");
+        if (!ok1) return err1!;
+        var (ok2, dId, err2) = Json.ParseGuid(draftId, "draftId");
+        if (!ok2) return err2!;
 
-        var draftResponse = await queryService.GetDraft(id, ct);
+        var draftResponse = await queryService.GetDraft(dId, ct);
         if (!draftResponse.Success || draftResponse.Data is null)
             return JsonSerializer.Serialize(new { error = $"Draft '{draftId}' not found." }, Json.Opts);
 
@@ -84,7 +91,7 @@ public class JobTools(
             SalaryRange = content.SalaryRange,
             Responsibilities = content.Responsibilities,
             Qualifications = content.Qualifications,
-            CompanyUId = companyId,
+            CompanyUId = cId,
             DraftId = draftId,
             DeleteDraft = deleteDraft
         };
@@ -93,6 +100,6 @@ public class JobTools(
 
         logger.LogInformation("Job created from draft {DraftId}", draftId);
 
-        return JsonSerializer.Serialize(new { result.Data?.UId, result.Data?.Title, result.Data?.CompanyName, status = "published" }, Json.Opts);
+        return JsonSerializer.Serialize(new { Id = result.Data?.UId, result.Data?.Title, result.Data?.CompanyName, status = "published" }, Json.Opts);
     }
 }

@@ -39,7 +39,7 @@ $REDIS SET "jobboard:config:connector-api:HealthChecksUI:HealthChecks:0:Name" "C
 $REDIS SET "jobboard:config:reverse-connector-api:placeholder" "placeholder"
 
 # AI service v2 (NX = preserve runtime changes to provider/model)
-$REDIS SET "jobboard:config:ai-service-v2:AIModel" "gpt-4.1-mini" NX
+$REDIS SET "jobboard:config:ai-service-v2:AIModel" "gpt-4.1" NX
 $REDIS SET "jobboard:config:ai-service-v2:AIProvider" "openai" NX
 $REDIS SET "jobboard:config:ai-service-v2:ai-source" "ai-service" NX
 

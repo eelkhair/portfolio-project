@@ -48,9 +48,9 @@ public sealed class ChatOptionsFactory(
         ["company_job_summaries"] = "job",
         ["create_job"] = "job",
 
-        // Core (explicit for clarity — tools not in map also default to core)
-        ["system_info"] = "core",
-        ["set_mode"] = "core"
+        // System group — only activated by system/mode/config keywords
+        ["system_info"] = "system",
+        ["set_mode"] = "system"
     };
 
     public ChatOptions Create(IServiceProvider sp, ChatScope scope, string userMessage,

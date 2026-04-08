@@ -8,7 +8,8 @@ public class KeywordToolGroupSelector : IToolGroupSelector
     {
         ["company"] = ["company", "companies", "industry", "industries"],
         ["draft"] = ["draft", "drafts", "generate"],
-        ["job"] = ["job", "jobs", "publish", "posting", "hire", "hiring", "vacancy", "vacancies"]
+        ["job"] = ["job", "jobs", "publish", "posting", "hire", "hiring", "vacancy", "vacancies"],
+        ["system"] = ["mode", "system", "config", "provider", "model", "trace", "debug"]
     };
 
     public static readonly HashSet<string> AllGroups = [..GroupKeywords.Keys.Append("core")];
@@ -28,6 +29,10 @@ public class KeywordToolGroupSelector : IToolGroupSelector
                 matched.Add(group);
             }
         }
+
+        // Draft and job operations always need company tools (for ID resolution)
+        if (matched.Contains("draft") || matched.Contains("job"))
+            matched.Add("company");
 
         // Fallback: if only "core" matched, send everything (ambiguous intent)
         return matched.Count == 1 ? AllGroups : matched;
