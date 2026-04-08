@@ -18,6 +18,7 @@
     { "hostname": "mail.eelkhair.net", "service": "http://192.168.1.115:8025" },
     { "hostname": "job-dapr.eelkhair.net", "service": "http://192.168.1.112:8080" },
     { "hostname": "mono-mcp.eelkhair.net", "service": "http://192.168.1.112:3333" },
+    { "hostname": "job-admin-api.eelkhair.net", "service": "http://192.168.1.112:6062" },
     { "hostname": "micro-mcp.eelkhair.net", "service": "http://192.168.1.112:3334" }
   ],
   "block_rules": [
