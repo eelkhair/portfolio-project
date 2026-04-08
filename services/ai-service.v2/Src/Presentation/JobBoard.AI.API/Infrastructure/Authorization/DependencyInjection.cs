@@ -149,6 +149,15 @@ public static class DependencyInjection
             {
                 policy.RequireAuthenticatedUser();
                 policy.RequireClaim("groups", "Admins", "CompanyAdmins", "Applicants");
+            })
+
+            // -----------------------------------------------------------------
+            // System Admin Policy (global settings, mode switching)
+            // -----------------------------------------------------------------
+            .AddPolicy("SystemAdmin", policy =>
+            {
+                policy.RequireAuthenticatedUser();
+                policy.RequireClaim("groups", "SystemAdmins");
             });
 
         return services;

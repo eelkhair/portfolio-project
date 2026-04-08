@@ -8,6 +8,7 @@ export class NavItems{
   getNavItems(){
     const groups = this.accountService.groups();
     const isAdmin = groups.some(g => g.replace(/^\//, '') === 'Admins');
+    const isSystemAdmin = groups.some(g => g.replace(/^\//, '') === 'SystemAdmins');
     const NAV_ITEMS: MenuItem[] = [
       {
         label: 'Dashboard', icon: 'pi pi-chart-bar', routerLink: '/dashboard'
@@ -49,9 +50,9 @@ export class NavItems{
         label: 'Settings', icon: 'pi pi-cog',
         items: [
           { label: 'Profile', icon: 'pi pi-id-card', routerLink: '/settings/profile' },
-          { label: 'AI Provider', icon: 'pi pi-microchip-ai', routerLink: '/settings/ai-provider', visible: isAdmin },
-          { label: 'Application Mode', icon: 'pi pi-arrows-h', routerLink: '/settings/application-mode', visible: isAdmin },
-          { label: 'Embedding Management', icon: 'pi pi-database', routerLink: '/settings/embedding-management', visible: isAdmin },
+          { label: 'AI Provider', icon: 'pi pi-microchip-ai', routerLink: '/settings/ai-provider', visible: isSystemAdmin },
+          { label: 'Application Mode', icon: 'pi pi-arrows-h', routerLink: '/settings/application-mode', visible: isSystemAdmin },
+          { label: 'Embedding Management', icon: 'pi pi-database', routerLink: '/settings/embedding-management', visible: isSystemAdmin },
         ]
       },
 

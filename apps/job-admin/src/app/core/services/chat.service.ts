@@ -3,6 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {ApiResponse} from '../types/Dtos/ApiResponse';
 import {environment} from '../../../environments/environment';
 import {map} from 'rxjs';
+import {AccountService} from './account.service';
 
 export interface ChatRequest {
   message: string;
@@ -25,11 +26,18 @@ export interface ChatResponse {
 @Injectable({providedIn: 'root'})
 export class ChatService {
   private http = inject(HttpClient);
+  private accountService = inject(AccountService);
   private baseUrl = `${environment.gatewayUrl}ai/v2/`;
+
+  private get chatEndpoint(): string {
+    const isSystemAdmin = this.accountService.groups()
+      .some(g => g.replace(/^\//, '') === 'SystemAdmins');
+    return isSystemAdmin ? 'chat/system' : 'chat';
+  }
 
   chat(request: ChatRequest) {
     return this.http.post<ApiResponse<ChatResponse>>(
-      `${this.baseUrl}chat`,
+      `${this.baseUrl}${this.chatEndpoint}`,
       request,
       {observe: 'response'}
     ).pipe(

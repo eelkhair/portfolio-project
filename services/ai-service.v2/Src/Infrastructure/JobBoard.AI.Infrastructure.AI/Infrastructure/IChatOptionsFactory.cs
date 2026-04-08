@@ -3,6 +3,7 @@ using JobBoard.AI.Application.Actions.Chat;
 using JobBoard.AI.Application.Interfaces.AI;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +18,8 @@ public interface IChatOptionsFactory
 public sealed class ChatOptionsFactory(
     IConfiguration configuration,
     IActivityFactory activityFactory,
-    IToolGroupSelector toolGroupSelector)
+    IToolGroupSelector toolGroupSelector,
+    IHttpContextAccessor httpContextAccessor)
     : IChatOptionsFactory
 {
     /// <summary>
@@ -79,13 +81,62 @@ public sealed class ChatOptionsFactory(
     private static string GetToolGroup(string toolName)
         => ToolGroupMap.GetValueOrDefault(toolName, "core");
 
+    /// <summary>
+    /// Resolves monolith mode from the client x-mode header (per-session),
+    /// falling back to the global FeatureFlags:Monolith config.
+    /// </summary>
+    private bool IsMonolith()
+    {
+        var xMode = httpContextAccessor.HttpContext?.Request.Headers["x-mode"].FirstOrDefault();
+        return xMode switch
+        {
+            "monolith" => true,
+            "admin" => false,
+            _ => configuration.GetValue<bool>("FeatureFlags:Monolith")
+        };
+    }
+
     private List<AITool> ResolveTools(IServiceProvider sp, ChatScope scope)
     {
         switch (scope)
         {
+            case ChatScope.SystemAdmin:
+            {
+                var isMonolith = IsMonolith();
+
+                var topologyTools =
+                    sp.GetRequiredKeyedService<IAiTools>(isMonolith ? "admin-monolith" : "admin-micro")
+                        .GetTools()
+                        .ToList();
+
+                var aiTools =
+                    sp.GetRequiredKeyedService<IAiTools>("admin-ai")
+                        .GetTools()
+                        .ToList();
+
+                var systemTools =
+                    sp.GetRequiredKeyedService<IAiTools>("system-admin-ai")
+                        .GetTools()
+                        .ToList();
+
+                var allTools = topologyTools.Concat(aiTools).Concat(systemTools).ToList();
+
+                var duplicates = allTools
+                    .GroupBy(t => t.Name)
+                    .Where(g => g.Count() > 1)
+                    .Select(g => g.Key)
+                    .ToList();
+
+                if (duplicates.Any())
+                    throw new InvalidOperationException(
+                        $"Duplicate AI tools detected: {string.Join(", ", duplicates)}");
+
+                return allTools;
+            }
+
             case ChatScope.Admin:
             {
-                var isMonolith = configuration.GetValue<bool>("FeatureFlags:Monolith");
+                var isMonolith = IsMonolith();
 
                 var topologyTools =
                     sp.GetRequiredKeyedService<IAiTools>(isMonolith ? "admin-monolith" : "admin-micro")
@@ -119,7 +170,7 @@ public sealed class ChatOptionsFactory(
 
             case ChatScope.Public:
             {
-                var isMonolith = configuration.GetValue<bool>("FeatureFlags:Monolith");
+                var isMonolith = IsMonolith();
 
                 var topologyTools =
                     sp.GetRequiredKeyedService<IAiTools>(isMonolith ? "public-monolith" : "public-micro")

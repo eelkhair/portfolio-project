@@ -3,6 +3,7 @@ using JobBoard.AI.Application.Actions.Settings.Provider;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Infrastructure.AI.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
 
@@ -18,6 +19,7 @@ public static class SystemInfoTool
         IConversationContext conversationContext,
         IConversationStore conversationStore,
         ISettingsService settingsService,
+        IHttpContextAccessor httpContextAccessor,
         ILogger logger)
     {
         return AIFunctionFactory.Create(
@@ -40,8 +42,14 @@ public static class SystemInfoTool
                 var providerQuery = toolResolver.Resolve<GetProviderQuery, GetProviderResponse>();
                 var provider = await providerQuery.HandleAsync(new GetProviderQuery(), ct);
 
-                // Application mode
-                var mode = await settingsService.GetApplicationModeAsync();
+                // Application mode — respect per-session x-mode header
+                var xMode = httpContextAccessor.HttpContext?.Request.Headers["x-mode"].FirstOrDefault();
+                var isMonolith = xMode switch
+                {
+                    "monolith" => true,
+                    "admin" => false,
+                    _ => (await settingsService.GetApplicationModeAsync()).IsMonolith
+                };
 
                 return new
                 {
@@ -51,7 +59,7 @@ public static class SystemInfoTool
                     CurrentTraceId = Activity.Current?.TraceId.ToString(),
                     Provider = provider.Provider,
                     Model = provider.Model,
-                    IsMonolith = mode.IsMonolith
+                    IsMonolith = isMonolith
                 };
             },
             new AIFunctionFactoryOptions

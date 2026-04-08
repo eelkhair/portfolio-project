@@ -1,0 +1,21 @@
+<div class="flex items-center gap-1">
+  <p-selectButton
+    [options]="modeOptions"
+    [ngModel]="featureFlags.isMonolith()"
+    (ngModelChange)="onToggle($event)"
+    optionLabel="label"
+    optionValue="value"
+    [allowEmpty]="false"
+    styleClass="p-selectbutton-sm" />
+  @if (featureFlags.hasLocalOverride()) {
+    <p-button
+      icon="pi pi-refresh"
+      [rounded]="true"
+      [text]="true"
+      severity="secondary"
+      size="small"
+      (onClick)="reset()"
+      pTooltip="Reset to global default"
+      tooltipPosition="bottom" />
+  }
+</div>

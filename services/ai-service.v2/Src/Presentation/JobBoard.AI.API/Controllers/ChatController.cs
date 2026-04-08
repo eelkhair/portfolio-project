@@ -14,6 +14,18 @@ namespace JobBoard.AI.API.Controllers;
 public class ChatController : BaseApiController
 {
     /// <summary>
+    /// System admin chat — full tool access including system mode switching.
+    /// </summary>
+    [HttpPost("system")]
+    [Authorize(Policy = "SystemAdmin")]
+    [StandardApiResponses]
+    public async Task<IActionResult> SystemChat([FromBody] ChatRequest request)
+        => await ExecuteCommandAsync(
+            new ChatCommand(request.Message, request.CompanyId, request.ConversationId,
+                scope: ChatScope.SystemAdmin),
+            Ok);
+
+    /// <summary>
     /// Admin chat — full tool access (companies, jobs, system).
     /// </summary>
     [HttpPost]

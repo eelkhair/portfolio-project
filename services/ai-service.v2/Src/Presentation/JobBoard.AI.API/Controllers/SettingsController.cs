@@ -30,6 +30,7 @@ public class SettingsController : BaseApiController
     /// <param name="request"></param>
     /// <returns></returns>
     [HttpPut("update-provider")]
+    [Authorize(Policy = "SystemAdmin")]
     [StandardApiResponses]
     public async Task<IActionResult> UpdateProvider(UpdateProviderRequest request)
         => await ExecuteCommandAsync(new UpdateProviderCommand(request), Ok);
@@ -49,6 +50,7 @@ public class SettingsController : BaseApiController
     /// </summary>
     /// <returns></returns>
     [HttpPut("mode")]
+    [Authorize(Policy = "SystemAdmin")]
     [StandardApiResponses]
     public async Task<IActionResult> UpdateApplicationMode(ApplicationModeDto request)
         => await ExecuteCommandAsync(new UpdateApplicationModeCommand(request), Ok);
@@ -57,6 +59,7 @@ public class SettingsController : BaseApiController
     /// Re-embed all jobs — fetches all jobs from monolith and regenerates embeddings
     /// </summary>
     [HttpPost("re-embed-jobs")]
+    [Authorize(Policy = "SystemAdmin")]
     [StandardApiResponses]
     public async Task<IActionResult> ReEmbedAllJobs()
         => await ExecuteCommandAsync(new ReEmbedAllJobsCommand(), Ok);
@@ -66,6 +69,7 @@ public class SettingsController : BaseApiController
     /// Pre-computes "why this job matches" explanations using LLM for each resume's top matching jobs.
     /// </summary>
     [HttpPost("generate-match-explanations")]
+    [Authorize(Policy = "SystemAdmin")]
     [StandardApiResponses]
     public async Task<IActionResult> GenerateAllMatchExplanations()
         => await ExecuteCommandAsync(new GenerateAllMatchExplanationsCommand(), Ok);

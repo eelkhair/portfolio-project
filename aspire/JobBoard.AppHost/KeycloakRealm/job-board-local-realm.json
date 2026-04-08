@@ -456,6 +456,15 @@
       "clientRoles": {}
     },
     {
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "SystemAdmins",
+      "path": "/SystemAdmins",
+      "subGroups": [],
+      "attributes": {},
+      "realmRoles": [],
+      "clientRoles": {}
+    },
+    {
       "id": "586b0ac4-0d41-46c0-a060-660e8dfd4e29",
       "name": "Applicants",
       "path": "/Applicants",
@@ -1220,7 +1229,8 @@
         "default-roles-job-board-local"
       ],
       "groups": [
-        "/Admins"
+        "/Admins",
+        "/SystemAdmins"
       ]
     }
   ],

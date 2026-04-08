@@ -8,6 +8,7 @@ import {MenuItem} from 'primeng/api';
 import {Router} from '@angular/router';
 import {ThemeService} from '../../core/services/theme.service';
 import {environment} from '../../../environments/environment';
+import {ModeToggle} from './mode-toggle';
 
 @Component({
   selector: 'app-header',
@@ -15,7 +16,8 @@ import {environment} from '../../../environments/environment';
     Button,
     Menu,
     TitleCasePipe,
-    Tooltip
+    Tooltip,
+    ModeToggle
   ],
   templateUrl: './header.html',
   styleUrl: './header.css'
