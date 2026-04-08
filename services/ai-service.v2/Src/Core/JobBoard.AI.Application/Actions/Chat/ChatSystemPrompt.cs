@@ -40,11 +40,12 @@ public sealed class AdminSystemPrompt : IChatSystemPrompt
                            "Let's create a job draft! I'll walk you through these fields:
                            1. Company
                            2. Role / Title
-                           3. Location
-                           4. Tech Stack
-                           5. Must-have qualifications (optional)
-                           6. Nice-to-have qualifications (optional)
-                           7. Benefits (optional)
+                           3. Brief description of the role
+                           4. Location
+                           5. Tech Stack
+                           6. Must-have qualifications (optional)
+                           7. Nice-to-have qualifications (optional)
+                           8. Benefits (optional)
 
                            Let's start — which company is this for?"
 

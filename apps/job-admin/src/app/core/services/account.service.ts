@@ -52,6 +52,7 @@ export class AccountService {
   }
 
   logout() {
+    sessionStorage.removeItem('job-admin-getting-started-shown');
     this.oidc.logoff().subscribe();
   }
 }

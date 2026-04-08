@@ -4,12 +4,14 @@ using System.Text.Json.Serialization;
 using JobBoard.AI.Application.Actions.Chat;
 using JobBoard.AI.Application.Interfaces.AI;
 using JobBoard.AI.Application.Interfaces.Configurations;
+using JobBoard.AI.Application.Interfaces.Notifications;
 using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Infrastructure.AI.Infrastructure;
 using Microsoft.Extensions.AI;
 using McpCtx = JobBoard.AI.Infrastructure.AI.Infrastructure.McpRequestContext;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using ChatMessage = Microsoft.Extensions.AI.ChatMessage;
 using ChatResponse = JobBoard.AI.Application.Actions.Chat.ChatResponse;
 
@@ -25,7 +27,9 @@ public class ChatService(
     IUserAccessor userAccessor,
     IConfiguration configuration,
     IServiceProvider serviceProvider,
-    IMetricsService metricsService)
+    IMetricsService metricsService,
+    IAiNotificationHub notificationHub,
+    ILogger<ChatService> logger)
     : IChatService
 {
     private const int SummarizeThreshold = 20;
@@ -161,6 +165,9 @@ public class ChatService(
                 var toolResultMessage = new ChatMessage(ChatRole.Tool, toolResults.Select(r => r.Content).ToList<AIContent>());
                 messages.Add(toolResultMessage);
 
+                // Post-tool notifications for MCP mutations
+                await SendToolNotificationsAsync(toolResults, cancellationToken);
+
                 // Check: are ALL tool calls direct-return AND does the user want a list?
                 var allDirect = IsListIntent(userMessage)
                                 && toolCalls.All(tc => DirectReturnTools.Contains(tc.Name ?? ""));
@@ -247,6 +254,66 @@ public class ChatService(
         }
 
         return results;
+    }
+
+    /// <summary>
+    /// Sends SignalR notifications for MCP tool mutations (create_job, etc.)
+    /// so the frontend can refresh and navigate consistently.
+    /// </summary>
+    private async Task SendToolNotificationsAsync(
+        List<(string ToolName, FunctionResultContent Content)> toolResults,
+        CancellationToken ct)
+    {
+        var userId = userAccessor.UserId;
+        if (userId is null) return;
+
+        // Build a lookup of tool call arguments for metadata extraction
+        var toolCallArgs = toolResults
+            .Select(r => r.Content)
+            .OfType<FunctionResultContent>()
+            .ToDictionary(r => r.CallId, _ => (IDictionary<string, object?>?)null);
+
+        foreach (var (toolName, content) in toolResults)
+        {
+            try
+            {
+                var resultJson = content.Result?.ToString();
+                if (string.IsNullOrEmpty(resultJson)) continue;
+
+                var result = JsonSerializer.Deserialize<JsonElement>(resultJson);
+
+                if (toolName == "create_job" &&
+                    result.TryGetProperty("status", out var status) &&
+                    status.GetString() == "published")
+                {
+                    var title = result.TryGetProperty("title", out var t) ? t.GetString() : null;
+                    var companyName = result.TryGetProperty("companyName", out var cn) ? cn.GetString() : null;
+                    var jobId = result.TryGetProperty("id", out var id) ? id.GetString() : null;
+
+                    await notificationHub.SendToUserAsync(
+                        userId,
+                        AiNotificationMethods.Notification,
+                        new AiNotificationDto(
+                            Type: "job.published",
+                            Title: title ?? "Job",
+                            EntityId: jobId,
+                            EntityType: "job",
+                            TraceParent: null,
+                            TraceState: null,
+                            CorrelationId: null,
+                            Timestamp: DateTimeOffset.UtcNow,
+                            Metadata: new Dictionary<string, object>
+                            {
+                                { "companyName", companyName ?? string.Empty }
+                            }
+                        ), ct);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Failed to send notification for tool {Tool}", toolName);
+            }
+        }
     }
 
     private static Dictionary<string, AITool> BuildToolMap(IList<AITool>? tools)
