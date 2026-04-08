@@ -11,12 +11,13 @@ import {AccountService} from '../../core/services/account.service';
 export class GettingStarted implements OnInit {
   private accountService = inject(AccountService);
 
-  visible = signal(true);
+  visible = signal(false);
   displayName = signal('');
 
   ngOnInit() {
     const u = this.accountService.user();
     this.displayName.set(u?.['preferred_username'] ?? u?.['given_name'] ?? 'demo');
+    setTimeout(() => this.visible.set(true), 7000);
   }
 
   close() {
