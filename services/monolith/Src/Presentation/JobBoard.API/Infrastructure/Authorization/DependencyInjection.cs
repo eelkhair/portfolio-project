@@ -92,6 +92,9 @@ public static class DependencyInjection
             .AddPolicy(AuthorizationPolicies.AllUsers, policy =>
                 policy.RequireClaim("groups", UserRoles.Admin, UserRoles.Recruiter))
 
+            .AddPolicy(AuthorizationPolicies.Dashboard, policy =>
+                policy.RequireClaim("groups", UserRoles.Admin, UserRoles.CompanyAdmin))
+
             .AddPolicy(AuthorizationPolicies.InternalOrJwt, policy =>
                 policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme, "InternalApiKey")
                     .RequireAuthenticatedUser());

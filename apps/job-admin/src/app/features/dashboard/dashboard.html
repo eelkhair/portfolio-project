@@ -2,33 +2,94 @@
   <h1 class="text-3xl pl-2">Dashboard</h1>
 </div>
 
-<div class="flex flex-col items-center justify-center py-16 gap-6">
-  <i class="pi pi-chart-bar text-6xl text-color-secondary"></i>
-  <h2 class="text-2xl font-semibold">Coming Soon</h2>
-  <p class="text-color-secondary text-center max-w-lg">
-    Real-time analytics and insights across your hiring platform.
-  </p>
-
-  <div class="grid grid-cols-4 gap-4 mt-4 opacity-50 w-full max-w-3xl">
-    <div class="flex flex-col items-center p-4 rounded-lg surface-ground">
-      <i class="pi pi-briefcase text-2xl text-primary mb-2"></i>
-      <div class="text-2xl font-bold">--</div>
-      <div class="text-sm text-color-secondary">Active Jobs</div>
-    </div>
-    <div class="flex flex-col items-center p-4 rounded-lg surface-ground">
-      <i class="pi pi-building text-2xl text-primary mb-2"></i>
-      <div class="text-2xl font-bold">--</div>
-      <div class="text-sm text-color-secondary">Companies</div>
-    </div>
-    <div class="flex flex-col items-center p-4 rounded-lg surface-ground">
-      <i class="pi pi-users text-2xl text-primary mb-2"></i>
-      <div class="text-2xl font-bold">--</div>
-      <div class="text-sm text-color-secondary">Applicants</div>
-    </div>
-    <div class="flex flex-col items-center p-4 rounded-lg surface-ground">
-      <i class="pi pi-file text-2xl text-primary mb-2"></i>
-      <div class="text-2xl font-bold">--</div>
-      <div class="text-sm text-color-secondary">Drafts</div>
-    </div>
+@if (loading()) {
+  <div class="grid grid-cols-3 gap-4 mb-6">
+    @for (_ of [1,2,3]; track $index) {
+      <p-card>
+        <p-skeleton height="4rem" />
+      </p-card>
+    }
   </div>
-</div>
+  <div class="grid grid-cols-2 gap-4">
+    <p-card><p-skeleton height="18rem" /></p-card>
+    <p-card><p-skeleton height="18rem" /></p-card>
+  </div>
+} @else if (error()) {
+  <p-card>
+    <div class="flex flex-col items-center justify-center py-12 gap-4">
+      <i class="pi pi-exclamation-triangle text-4xl text-orange-400"></i>
+      <p class="text-color-secondary">{{ error() }}</p>
+      <button class="p-button p-button-outlined" (click)="loadDashboard()">
+        <i class="pi pi-refresh mr-2"></i> Retry
+      </button>
+    </div>
+  </p-card>
+} @else {
+  <!-- Stat Cards -->
+  <div class="grid grid-cols-3 gap-4 mb-6">
+    <p-card>
+      <div class="flex flex-col items-center py-2">
+        <i class="pi pi-briefcase text-2xl text-primary mb-2"></i>
+        <div class="text-3xl font-bold">{{ dashboard()?.jobCount ?? 0 }}</div>
+        <div class="text-sm text-color-secondary mt-1">Active Jobs</div>
+      </div>
+    </p-card>
+    <p-card>
+      <div class="flex flex-col items-center py-2">
+        <i class="pi pi-building text-2xl text-primary mb-2"></i>
+        <div class="text-3xl font-bold">{{ dashboard()?.companyCount ?? 0 }}</div>
+        <div class="text-sm text-color-secondary mt-1">Companies</div>
+      </div>
+    </p-card>
+    <p-card>
+      <div class="flex flex-col items-center py-2">
+        <i class="pi pi-file text-2xl text-primary mb-2"></i>
+        <div class="text-3xl font-bold">{{ dashboard()?.draftCount ?? 0 }}</div>
+        <div class="text-sm text-color-secondary mt-1">Drafts</div>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- Carousel: All Charts + Recent Jobs -->
+  @if (carouselCards().length) {
+    <p-carousel
+      [value]="carouselCards()"
+      [numVisible]="2"
+      [numScroll]="1"
+      [circular]="true"
+      [autoplayInterval]="6000"
+      [showNavigators]="false"
+      [responsiveOptions]="responsiveCarouselOptions">
+      <ng-template #item let-card>
+        <div class="px-2">
+          <p-card>
+            <ng-template #header>
+              <div class="px-5 pt-4">
+                <h3 class="text-lg font-semibold">{{ card.title }}</h3>
+              </div>
+            </ng-template>
+            @if (card.kind === 'chart') {
+              <div class="chart-container">
+                <p-chart [type]="card.chartType" [data]="card.data" [options]="card.options" />
+              </div>
+            } @else if (card.kind === 'recentJobs') {
+              <div class="flex flex-col gap-2 recent-jobs-container">
+                @for (job of card.recentJobs; track job.title) {
+                  <div class="flex justify-between items-start p-3 rounded-md surface-hover">
+                    <div>
+                      <div class="font-medium">{{ job.title }}</div>
+                      <div class="text-sm text-color-secondary">{{ job.companyName }}</div>
+                    </div>
+                    <div class="text-xs text-color-secondary whitespace-nowrap ml-4">
+                      {{ job.createdAt | date:'mediumDate' }}
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </p-card>
+        </div>
+      </ng-template>
+    </p-carousel>
+  }
+}

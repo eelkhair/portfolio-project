@@ -40,6 +40,7 @@
     "ag-grid-angular": "^34.1.2",
     "ag-grid-community": "^34.1.2",
     "angular-auth-oidc-client": "^21.0.1",
+    "chart.js": "^4.5.1",
     "marked": "^17.0.2",
     "primeicons": "^7.0.0",
     "primeng": "^20.0.1",

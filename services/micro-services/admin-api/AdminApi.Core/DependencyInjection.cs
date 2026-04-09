@@ -16,6 +16,7 @@ public static class DependencyInjection
         services.AddScoped<IOpenAICommandService, OpenAICommandService>();
         services.AddScoped<IJobCommandService, JobCommandService>();
         services.AddScoped<ISettingsCommandService, SettingsCommandService>();
+        services.AddScoped<IDashboardQueryService, DashboardQueryService>();
         return services;
     }
 }

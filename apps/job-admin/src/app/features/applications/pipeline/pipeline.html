@@ -1,0 +1,35 @@
+<div class="flex w-full justify-between mb-5">
+  <h1 class="text-3xl pl-2">Application Pipeline</h1>
+</div>
+
+<div class="flex items-center gap-3 mb-6 px-3 py-3 rounded-lg surface-ground border-1 border-yellow-500/30">
+  <i class="pi pi-wrench text-yellow-400"></i>
+  <span class="text-sm text-color-secondary">
+    <span class="font-semibold text-yellow-400">Coming Soon</span> — Drag-and-drop pipeline with real application data. Below is a preview of the planned UI.
+  </span>
+</div>
+
+<div class="grid grid-cols-4 gap-4 items-start">
+  @for (stage of stages; track stage.name) {
+    <div class="flex flex-col gap-3">
+      <div class="flex items-center justify-between px-1">
+        <p-tag [value]="stage.name" [severity]="stage.severity" />
+        <span class="text-sm text-color-secondary font-semibold">{{ stage.candidates.length }}</span>
+      </div>
+
+      @for (candidate of stage.candidates; track candidate.name) {
+        <p-card>
+          <div class="flex gap-3 items-start">
+            <p-avatar [label]="candidate.avatar" shape="circle" size="normal" />
+            <div class="flex-1 min-w-0">
+              <div class="font-semibold text-sm truncate">{{ candidate.name }}</div>
+              <div class="text-xs text-color-secondary truncate">{{ candidate.role }}</div>
+              <div class="text-xs text-color-secondary mt-1">{{ candidate.company }}</div>
+              <div class="text-xs text-color-secondary mt-1 opacity-60">{{ candidate.daysAgo }}d ago</div>
+            </div>
+          </div>
+        </p-card>
+      }
+    </div>
+  }
+</div>

@@ -19,6 +19,7 @@ public static class AuthorizationPolicies
     public const string Admin = "Admin";
     public const string Recruiter = "Recruiter";
     public const string InternalOrJwt = "InternalOrJwt";
+    public const string Dashboard = "Dashboard";
 }
 
 public static class PubSubNames

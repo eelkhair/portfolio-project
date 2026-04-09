@@ -1,0 +1,80 @@
+@if (store.selectedJob(); as job) {
+  <div class="flex items-center gap-3 mb-6">
+    <p-button icon="pi pi-arrow-left" [rounded]="true" [text]="true" (onClick)="back()" />
+    <h1 class="text-3xl font-bold">{{ job.title }}</h1>
+    <p-tag [value]="job.jobType" severity="info" />
+  </div>
+
+  <div class="flex gap-6">
+    <!-- Left column: Job Content -->
+    <div class="flex-1">
+      <p-card header="About the Role">
+        <p class="whitespace-pre-line">{{ job.aboutRole }}</p>
+      </p-card>
+
+      @if (job.responsibilities?.length) {
+        <p-card header="Responsibilities" styleClass="mt-4">
+          <ul class="list-disc pl-6 flex flex-col gap-2">
+            @for (item of job.responsibilities; track $index) {
+              <li>{{ item }}</li>
+            }
+          </ul>
+        </p-card>
+      }
+
+      @if (job.qualifications?.length) {
+        <p-card header="Qualifications" styleClass="mt-4">
+          <ul class="list-disc pl-6 flex flex-col gap-2">
+            @for (item of job.qualifications; track $index) {
+              <li>{{ item }}</li>
+            }
+          </ul>
+        </p-card>
+      }
+    </div>
+
+    <p-divider layout="vertical" />
+
+    <!-- Right column: Metadata -->
+    <div class="w-80">
+      <p-card header="Details">
+        <div class="flex flex-col gap-4">
+          <div>
+            <div class="text-sm text-color-secondary">Company</div>
+            <div class="font-semibold">{{ job.companyName }}</div>
+          </div>
+
+          <div>
+            <div class="text-sm text-color-secondary">Location</div>
+            <div class="font-semibold">{{ job.location }}</div>
+          </div>
+
+          <div>
+            <div class="text-sm text-color-secondary">Job Type</div>
+            <div class="font-semibold">{{ job.jobType }}</div>
+          </div>
+
+          @if (job.salaryRange) {
+            <div>
+              <div class="text-sm text-color-secondary">Salary Range</div>
+              <div class="font-semibold">{{ job.salaryRange }}</div>
+            </div>
+          }
+
+          <p-divider />
+
+          <div class="text-sm text-color-secondary">
+            <p><strong>Created:</strong> {{ job.createdAt | date:'medium' }}</p>
+            @if (job.updatedAt) {
+              <p class="mt-1"><strong>Updated:</strong> {{ job.updatedAt | date:'medium' }}</p>
+            }
+          </div>
+        </div>
+      </p-card>
+    </div>
+  </div>
+} @else {
+  <div class="flex items-center justify-center h-64">
+    <span class="pi pi-spin pi-spinner text-4xl"></span>
+  </div>
+}

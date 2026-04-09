@@ -1,0 +1,18 @@
+.chart-container {
+  position: relative;
+  height: 300px;
+}
+
+.chart-container canvas {
+  width: 100% !important;
+}
+
+.recent-jobs-container {
+  height: 300px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.recent-jobs-container::-webkit-scrollbar {
+  display: none;
+}

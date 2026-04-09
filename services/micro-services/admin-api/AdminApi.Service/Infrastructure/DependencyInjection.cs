@@ -95,7 +95,11 @@ public static class DependencyInjection
             };
         });
 
-        services.AddAuthorization();
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy("Dashboard", policy =>
+                policy.RequireClaim("groups", "Admins", "CompanyAdmins"));
+        });
 
         services.ConfigureHttpJsonOptions(opts =>
         {

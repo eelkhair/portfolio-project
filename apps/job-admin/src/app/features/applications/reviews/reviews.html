@@ -1,0 +1,67 @@
+<div class="flex w-full justify-between mb-5">
+  <h1 class="text-3xl pl-2">Resume Reviews</h1>
+</div>
+
+<div class="flex items-center gap-3 mb-6 px-3 py-3 rounded-lg surface-ground border-1 border-yellow-500/30">
+  <i class="pi pi-wrench text-yellow-400"></i>
+  <span class="text-sm text-color-secondary">
+    <span class="font-semibold text-yellow-400">Coming Soon</span> — AI-powered resume matching with pgvector cosine similarity scoring. Below is a preview of the planned UI.
+  </span>
+</div>
+
+<!-- Stats -->
+<div class="grid grid-cols-3 gap-4 mb-6">
+  <p-card>
+    <div class="flex flex-col items-center py-2">
+      <i class="pi pi-clock text-2xl text-orange-400 mb-2"></i>
+      <div class="text-3xl font-bold">{{ stats.pendingReview }}</div>
+      <div class="text-sm text-color-secondary mt-1">Pending Review</div>
+    </div>
+  </p-card>
+  <p-card>
+    <div class="flex flex-col items-center py-2">
+      <i class="pi pi-percentage text-2xl text-primary mb-2"></i>
+      <div class="text-3xl font-bold">{{ stats.avgMatchScore }}%</div>
+      <div class="text-sm text-color-secondary mt-1">Avg Match Score</div>
+    </div>
+  </p-card>
+  <p-card>
+    <div class="flex flex-col items-center py-2">
+      <i class="pi pi-star text-2xl text-green-400 mb-2"></i>
+      <div class="text-3xl font-bold">{{ stats.shortlisted }}</div>
+      <div class="text-sm text-color-secondary mt-1">Shortlisted</div>
+    </div>
+  </p-card>
+</div>
+
+<!-- Candidate List -->
+<div class="flex flex-col gap-3">
+  @for (c of candidates; track c.name) {
+    <p-card>
+      <div class="flex items-center gap-4">
+        <p-avatar [label]="c.avatar" shape="circle" size="large" />
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="font-semibold">{{ c.name }}</span>
+            <p-tag [value]="c.status" [severity]="c.severity" [rounded]="true" />
+          </div>
+          <div class="text-sm text-color-secondary">{{ c.role }} · {{ c.company }}</div>
+          <div class="flex gap-1 mt-2">
+            @for (skill of c.skills; track skill) {
+              <span class="text-xs px-2 py-0.5 rounded-full surface-ground text-color-secondary">{{ skill }}</span>
+            }
+          </div>
+        </div>
+        <div class="flex flex-col items-end gap-1 min-w-32">
+          <div class="text-sm text-color-secondary">Match Score</div>
+          <div class="w-full">
+            <p-progressBar
+              [value]="c.matchScore"
+              [showValue]="true"
+              styleClass="h-2" />
+          </div>
+        </div>
+      </div>
+    </p-card>
+  }
+</div>
