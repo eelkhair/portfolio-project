@@ -255,7 +255,7 @@ The platform is instrumented **end-to-end**:
 
 Rationale: [ADR-004](./ADRs/ADR-004-Observability-First.md)
 
-See also: [`observability.md`](./observability.md)
+See also: [`observability.md`](./guides/observability.md)
 
 ---
 
@@ -268,7 +268,7 @@ A centralized health dashboard exposes:
 
 Rationale: [ADR-004](./ADRs/ADR-004-Observability-First.md)
 
-See also: [`health-checks.md`](./health-checks.md)
+See also: [`health-checks.md`](./guides/health-checks.md)
 
 ---
 
@@ -288,7 +288,7 @@ This orchestrates all 36 resources — services, Dapr sidecars, infrastructure c
 
 ![Aspire Dashboard — topology graph](./Images/Aspire/aspire-dashboard-graph.png)
 
-See also: [`local-environment.md`](./local-environment.md) | [ADR-020](./ADRs/ADR-020-Aspire-Local-Orchestration.md)
+See also: [`local-environment.md`](./guides/local-environment.md) | [ADR-020](./ADRs/ADR-020-Aspire-Local-Orchestration.md)
 
 ### With Docker Compose
 
@@ -331,12 +331,12 @@ Rationale: [ADR-002](./ADRs/ADR-002-Dapr-Usage-Boundaries.md)
 
 | Document | Description |
 |----------|-------------|
-| [`local-environment.md`](./local-environment.md) | Local development setup, Aspire orchestration, configuration sources, Azure mapping |
+| [`guides/local-environment.md`](./guides/local-environment.md) | Local development setup, Aspire orchestration, configuration sources, Azure mapping |
 | [`ai-service.md`](./ai-service.md) | AI service architecture: chat flow, multi-provider LLM, MCP integration, resume pipeline (RAG) |
-| [`observability.md`](./observability.md) | Distributed tracing, log correlation, Grafana/Jaeger workflows |
-| [`strangler-fig.md`](./strangler-fig.md) | Strangler-fig migration strategy, saga flow, stage diagrams |
-| [`health-checks.md`](./health-checks.md) | Health check dashboard, dependency monitoring |
-| [`screenshots.md`](./screenshots.md) | Curated UI and infrastructure screenshots |
+| [`guides/observability.md`](./guides/observability.md) | Distributed tracing, log correlation, Grafana/Jaeger workflows |
+| [`guides/strangler-fig.md`](./guides/strangler-fig.md) | Strangler-fig migration strategy, saga flow, stage diagrams |
+| [`guides/health-checks.md`](./guides/health-checks.md) | Health check dashboard, dependency monitoring |
+| [`guides/screenshots.md`](./guides/screenshots.md) | Curated UI and infrastructure screenshots |
 
 ---
 
@@ -376,7 +376,7 @@ Curated screenshots live under `Images/`:
 - `Images/Http/`
 - `Images/healthchecks/`
 
-See: [`screenshots.md`](./screenshots.md)
+See: [`screenshots.md`](./guides/screenshots.md)
 
 ---
 
@@ -450,13 +450,13 @@ See: `.github/workflows/deploy.yml` | `.github/workflows/cloudflare-tunnel.yml`
 
 ## Roadmap
 
-- Add C4-style architecture diagrams
-- Improve DLQ tooling and replay utilities
-- ~~Automate Cloudflare DNS updates in CI/CD pipeline~~ (done -- `cloudflare-tunnel.yml`)
-- Health-aware gateway fallback -- YARP passive health checks + SignalR notification when a backend is unavailable
-- Expand integration and unit test coverage
-- Add load testing (k6 / NBomber)
-- Public app: job search, application flow, resume management UI
+- ~~Automate Cloudflare DNS updates in CI/CD pipeline~~ (`cloudflare-tunnel.yml`)
+- ~~Public app: job search, application flow, resume management UI~~
+- ~~Feature flag management (Redis/SignalR, admin settings page, public chat toggle)~~
+- Public chat AI tools — job matching, search, resume analysis
+- Applications pipeline & reviews — real backend integration
+- Microservices observability — consistent tracing across all services
+- In-app guided tour for admin and public apps
 
 ---
 
