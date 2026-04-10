@@ -3,6 +3,7 @@ using JobBoard.AI.Application.Actions.Jobs.ReEmbedAll;
 using JobBoard.AI.Application.Actions.Resumes.MatchExplanations;
 using JobBoard.AI.Application.Actions.Settings;
 using JobBoard.AI.Application.Actions.Settings.ApplicationMode;
+using JobBoard.AI.Application.Actions.Settings.FeatureFlags;
 using JobBoard.AI.Application.Actions.Settings.Provider;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -73,4 +74,22 @@ public class SettingsController : BaseApiController
     [StandardApiResponses]
     public async Task<IActionResult> GenerateAllMatchExplanations()
         => await ExecuteCommandAsync(new GenerateAllMatchExplanationsCommand(), Ok);
+
+    /// <summary>
+    /// Get all feature flags
+    /// </summary>
+    [HttpGet("feature-flags")]
+    [Authorize(Policy = "SystemAdmin")]
+    [StandardApiResponses]
+    public async Task<IActionResult> GetFeatureFlags()
+        => await ExecuteQueryAsync(new GetFeatureFlagsQuery(), Ok);
+
+    /// <summary>
+    /// Update a feature flag
+    /// </summary>
+    [HttpPut("feature-flags")]
+    [Authorize(Policy = "SystemAdmin")]
+    [StandardApiResponses]
+    public async Task<IActionResult> UpdateFeatureFlag(UpdateFeatureFlagRequest request)
+        => await ExecuteCommandAsync(new UpdateFeatureFlagCommand(request), Ok);
 }

@@ -1,0 +1,27 @@
+<div class="flex w-full justify-between mb-5">
+  <h1 class="text-3xl pl-2">Feature Flags</h1>
+</div>
+
+<p-card>
+  @if (initialLoading()) {
+    <div class="flex justify-center p-4">
+      <p-progressSpinner strokeWidth="4" />
+    </div>
+  } @else {
+    <div class="flex flex-col gap-1">
+      @for (flag of flags(); track flag.name) {
+        <div class="flag-row">
+          <div class="flag-info">
+            <span class="font-semibold">{{ flag.name }}</span>
+          </div>
+          <p-toggleSwitch
+            [ngModel]="flag.enabled"
+            (onChange)="onToggle(flag.name, $event)"
+            [disabled]="flag.saving" />
+        </div>
+      } @empty {
+        <div class="text-color-secondary p-4 text-center">No feature flags configured.</div>
+      }
+    </div>
+  }
+</p-card>

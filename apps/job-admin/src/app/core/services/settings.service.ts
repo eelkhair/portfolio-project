@@ -70,4 +70,17 @@ export class SettingsService {
       {}
     );
   }
+
+  getFeatureFlags() {
+    return this.http.get<ApiResponse<{ name: string; enabled: boolean }[]>>(
+      `${this.aiBase}/feature-flags`
+    );
+  }
+
+  updateFeatureFlag(request: { name: string; enabled: boolean }) {
+    return this.http.put<ApiResponse<{ name: string; enabled: boolean }>>(
+      `${this.aiBase}/feature-flags`,
+      request
+    );
+  }
 }

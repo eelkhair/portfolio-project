@@ -9,6 +9,7 @@ import {
 import { isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AccountService } from '../../core/services/account.service';
+import { FeatureFlagsService } from '../../core/services/feature-flags.service';
 import { ChatStore } from './chat.store';
 
 @Component({
@@ -19,6 +20,8 @@ import { ChatStore } from './chat.store';
 export class Chat {
   readonly store = inject(ChatStore);
   readonly account = inject(AccountService);
+  private readonly featureFlags = inject(FeatureFlagsService);
+  readonly chatEnabled = this.featureFlags.chatEnabled;
   readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   isOpen = signal(false);

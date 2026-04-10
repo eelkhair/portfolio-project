@@ -6,6 +6,7 @@ import { propagation, ROOT_CONTEXT, SpanKind, SpanStatusCode, trace } from '@ope
 import { environment } from '../../../environments/environment';
 import { ApplicationStore } from '../stores/application.store';
 import { ProfileStore } from '../stores/profile.store';
+import { FeatureFlagsService } from './feature-flags.service';
 import {
   ResumeAllSectionsCompletedMsg,
   ResumeEmbeddedMsg,
@@ -22,6 +23,7 @@ export class ResumeRealtimeService {
   private readonly injector = inject(Injector);
   private readonly store = inject(ApplicationStore);
   private readonly profileStore = inject(ProfileStore);
+  private readonly featureFlagsService = inject(FeatureFlagsService);
   private readonly tracer = trace.getTracer('public-fe');
   private starting = false;
   private visibilityHandler?: () => void;
@@ -142,7 +144,12 @@ export class ResumeRealtimeService {
       );
     });
 
-    this.hub.on('featureFlagsUpdated', () => {});
+    this.hub.on('featureFlagsUpdated', (data: { flags: Record<string, boolean> }) => {
+      console.log('[FeatureFlags] Received from SignalR:', data);
+      if (data?.flags) {
+        this.featureFlagsService.setFlags(data.flags);
+      }
+    });
 
     this.hub.on('ResumeParseFailed', (msg: ResumeParseFailedMsg) => {
       const parentCtx = this.extractTraceContext(msg);

@@ -29,5 +29,12 @@ export const SETTINGS_ROUTES: Route[] = [
     canActivate: [roleGuard],
     data: {groups: ['SystemAdmins']},
     loadComponent: () => import('./embedding-management/embedding-management').then(c=>c.EmbeddingManagement)
+  },
+  {
+    path:'feature-flags',
+    title: 'Feature Flags',
+    canActivate: [roleGuard],
+    data: {groups: ['SystemAdmins']},
+    loadComponent: () => import('./feature-flags/feature-flags').then(c=>c.FeatureFlags)
   }
 ]

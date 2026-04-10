@@ -52,6 +52,7 @@ export class NavItems{
           { label: 'AI Provider', icon: 'pi pi-microchip-ai', routerLink: '/settings/ai-provider' },
           { label: 'Application Mode', icon: 'pi pi-arrows-h', routerLink: '/settings/application-mode' },
           { label: 'Embedding Management', icon: 'pi pi-database', routerLink: '/settings/embedding-management' },
+          { label: 'Feature Flags', icon: 'pi pi-flag', routerLink: '/settings/feature-flags' },
         ]
       },
 
