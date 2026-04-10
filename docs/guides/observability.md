@@ -43,7 +43,7 @@ A dedicated Grafana workflow allows pasting a **TraceId** and immediately viewin
 When a request is triggered in the Admin UI, the backend returns a `Trace-Id` response header.  
 This makes the TraceId visible immediately to frontend developers and operators.
 
-![TraceId exposed in browser response headers](Images/Observability/ui-browser-trace-id-header.png)
+![TraceId exposed in browser response headers](../Images/Observability/ui-browser-trace-id-header.png)
 
 ---
 
@@ -56,7 +56,7 @@ Pasting the TraceId into Jaeger shows the **complete distributed trace**, includ
 - Latency hotspots and slow dependencies
 
 
-![Detailed distributed trace timeline](Images/Observability/distributed-trace-end-to-end-jaeger.png)
+![Detailed distributed trace timeline](../Images/Observability/distributed-trace-end-to-end-jaeger.png)
 
 ---
 
@@ -70,9 +70,9 @@ This is especially useful when debugging:
 - Async processing delays
 
 
-![Grafana find-by-TraceId workflow](Images/Observability/grafana-find-by-trace-id.png)
+![Grafana find-by-TraceId workflow](../Images/Observability/grafana-find-by-trace-id.png)
 
-![Logs correlated by TraceId](Images/Observability/logs-trace-correlation-grafana.png)
+![Logs correlated by TraceId](../Images/Observability/logs-trace-correlation-grafana.png)
 
 ---
 
@@ -90,7 +90,7 @@ This allows answering questions like:
 - *Did retries occur?*
 - *Where did the workflow slow down or fail?*
 
-![Async saga and pub/sub visibility](Images/Observability/async-saga-and-pubsub-visibility.png)
+![Async saga and pub/sub visibility](../Images/Observability/async-saga-and-pubsub-visibility.png)
 
 ---
 

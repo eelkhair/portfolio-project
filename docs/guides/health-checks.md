@@ -17,7 +17,7 @@ The goal is not just to detect failures, but to make **partial failures visible 
 
 Each service exposes a standardized health endpoint that is aggregated into a **central health UI** built specifically for this platform.
 
-![Health Checks – All Services](Images/healthchecks/healthchecks-overview-all-services.png)
+![Health Checks – All Services](../Images/healthchecks/healthchecks-overview-all-services.png)
 
 ### What this shows
 - Monolith API
@@ -38,7 +38,7 @@ Health checks are **dependency-aware**, not just process checks.
 
 Example from the **Monolith API**:
 
-![Monolith Dependency Health](./Images/healthchecks/healthchecks-monolith-dependencies.png)
+![Monolith Dependency Health](../Images/healthchecks/healthchecks-monolith-dependencies.png)
 
 ### Validated dependencies
 - Dapr sidecar availability
@@ -62,7 +62,7 @@ Health checks validate that **the runtime infrastructure itself** is healthy—n
 
 ### Dapr Component Status
 
-![Dapr Components Status](./Images/healthchecks/dapr-components-status.png)
+![Dapr Components Status](../Images/healthchecks/dapr-components-status.png)
 
 Validated components include:
 - Redis state store
@@ -79,7 +79,7 @@ This ensures that failures in infrastructure dependencies surface immediately.
 
 Health checks verify that required pub/sub subscriptions are registered and active.
 
-![Dapr Pub/Sub Subscriptions](./Images/healthchecks/dapr-pubsub-subscriptions.png)
+![Dapr Pub/Sub Subscriptions](../Images/healthchecks/dapr-pubsub-subscriptions.png)
 
 This is critical for **outbox-driven integration events**, ensuring that events published by the monolith or services can be consumed end-to-end without silent message loss.
 
@@ -87,7 +87,7 @@ This is critical for **outbox-driven integration events**, ensuring that events 
 
 ## Dapr Application Runtime Summary
 
-![Dapr Runtime Summary](./Images/healthchecks/dapr-application-runtime-summary.png)
+![Dapr Runtime Summary](../Images/healthchecks/dapr-application-runtime-summary.png)
 
 Key runtime signals include:
 - App ID and application ports
@@ -112,7 +112,7 @@ This capability allows operators to answer:
 
 ### Dapr Dashboard – Application Overview
 
-![Dapr Applications Overview](./Images/healthchecks/dapr-applications-overview.png)
+![Dapr Applications Overview](../Images/healthchecks/dapr-applications-overview.png)
 
 **Observed applications in this environment:**
 - `monolith-api`

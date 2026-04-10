@@ -26,7 +26,7 @@ This architecture is designed to show:
 The monolith owns most behaviors and data.
 
 Screenshot:
-![Images/Strangler Fig/strangler-fig-stage-1-monolith-primary.png](Images/Strangler%20Fig/strangler-fig-stage-1-monolith-primary.png)
+![Images/Strangler Fig/strangler-fig-stage-1-monolith-primary.png](../Images/Strangler%20Fig/strangler-fig-stage-1-monolith-primary.png)
 
 ### Stage 2 — Introduce Connector API
 A Connector API becomes a controlled transition layer:
@@ -35,7 +35,7 @@ A Connector API becomes a controlled transition layer:
 - orchestrates workflows spanning both
 
 Screenshot:
-![Images/Strangler Fig/strangler-fig-stage-2-connector-introduced.png](Images/Strangler%20Fig/strangler-fig-stage-2-connector-introduced.png)
+![Images/Strangler Fig/strangler-fig-stage-2-connector-introduced.png](../Images/Strangler%20Fig/strangler-fig-stage-2-connector-introduced.png)
 
 ### Stage 3 — Extract services gradually
 Capabilities move from monolith modules/endpoints into services.
@@ -44,14 +44,14 @@ The Connector:
 - coordinates between old and new
 
 Screenshot:
-![Images/Strangler%20Fig/strangler-fig-stage-3-service-extraction.png](Images/Strangler%20Fig/strangler-fig-stage-3-service-extraction.png)
+![../Images/Strangler%20Fig/strangler-fig-stage-3-service-extraction.png](../Images/Strangler%20Fig/strangler-fig-stage-3-service-extraction.png)
 
 ### Stage 4 — Deprecate monolith paths
 After confidence is high, legacy paths are removed or disabled.
 The monolith becomes slimmer or can be retired for that slice.
 
 Screenshot:
-![Images/Strangler%20Fig/strangler-fig-stage-4-monolith-deprecated-paths.png](Images/Strangler%20Fig/strangler-fig-stage-4-monolith-deprecated-paths.png)
+![../Images/Strangler%20Fig/strangler-fig-stage-4-monolith-deprecated-paths.png](../Images/Strangler%20Fig/strangler-fig-stage-4-monolith-deprecated-paths.png)
 ---
 
 ## Connector API responsibilities
@@ -87,10 +87,10 @@ These screenshots are useful when explaining the approach to reviewers:
 
 - Centralized logs: 
 
-![Images/Strangler%20Fig/strangler-fig-centralized-logs-elastic.png](Images/Strangler%20Fig/strangler-fig-centralized-logs-elastic.png)
+![../Images/Strangler%20Fig/strangler-fig-centralized-logs-elastic.png](../Images/Strangler%20Fig/strangler-fig-centralized-logs-elastic.png)
 - Saga log sequence:
 
-![Images/Strangler%20Fig/strangler-fig-saga-log-sequence.png](Images/Strangler%20Fig/strangler-fig-saga-log-sequence.png)
+![../Images/Strangler%20Fig/strangler-fig-saga-log-sequence.png](../Images/Strangler%20Fig/strangler-fig-saga-log-sequence.png)
 
 ---
 

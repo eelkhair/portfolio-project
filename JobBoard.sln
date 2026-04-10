@@ -107,22 +107,29 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{3CE6F2
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{8F216E64-AB1B-4402-A602-B20D7B4C470F}"
 	ProjectSection(SolutionItems) = preProject
-		docs\create-company.mermaid = docs\create-company.mermaid
-		docs\create-company.puml = docs\create-company.puml
-		docs\create-job.puml = docs\create-job.puml
-		docs\health-checks.md = docs\health-checks.md
-		docs\local-environment.md = docs\local-environment.md
-		docs\observability.md = docs\observability.md
-		docs\plans\public-profile-feature-ideas.md = docs\plans\public-profile-feature-ideas.md
 		docs\README.md = docs\README.md
-		docs\resumeparse.puml = docs\resumeparse.puml
-		docs\screenshots.md = docs\screenshots.md
+		docs\ai-service.md = docs\ai-service.md
 		docs\seedjobs.json = docs\seedjobs.json
-		docs\ssh-key-auth.md = docs\ssh-key-auth.md
-		docs\strangler-fig.md = docs\strangler-fig.md
-		docs\sync.puml = docs\sync.puml
-		docs\plans\Why This Job Matches - Implementation Plan.pdf = docs\plans\Why This Job Matches - Implementation Plan.pdf
-		docs\resume parsing - summary.puml = docs\resume parsing - summary.puml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "diagrams", "diagrams", "{F1A2B3C4-D5E6-47F8-90AB-CDEF12345678}"
+	ProjectSection(SolutionItems) = preProject
+		docs\diagrams\create-company.mermaid = docs\diagrams\create-company.mermaid
+		docs\diagrams\create-company.puml = docs\diagrams\create-company.puml
+		docs\diagrams\create-job.puml = docs\diagrams\create-job.puml
+		docs\diagrams\resume parsing - summary.puml = docs\diagrams\resume parsing - summary.puml
+		docs\diagrams\resumeparse.puml = docs\diagrams\resumeparse.puml
+		docs\diagrams\sync.puml = docs\diagrams\sync.puml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "guides", "guides", "{A1B2C3D4-E5F6-4789-0ABC-DEF123456789}"
+	ProjectSection(SolutionItems) = preProject
+		docs\guides\health-checks.md = docs\guides\health-checks.md
+		docs\guides\local-environment.md = docs\guides\local-environment.md
+		docs\guides\observability.md = docs\guides\observability.md
+		docs\guides\screenshots.md = docs\guides\screenshots.md
+		docs\guides\ssh-key-auth.md = docs\guides\ssh-key-auth.md
+		docs\guides\strangler-fig.md = docs\guides\strangler-fig.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HealthChecks", "HealthChecks", "{6E111D1A-9F3E-4486-960C-57AF7DA4D809}"
@@ -1156,6 +1163,8 @@ Global
 		{EDDEDB77-8AA5-4CFA-A3EA-6C4F02BFF36A} = {5206DCD5-98FA-4BD9-BF78-26DBDCA37EF0}
 		{6D1DF1C6-414E-4FA1-8A43-96E1AC67B1AC} = {5206DCD5-98FA-4BD9-BF78-26DBDCA37EF0}
 		{72BB44CB-1474-4AC7-9661-6A0668A8D17A} = {8F216E64-AB1B-4402-A602-B20D7B4C470F}
+		{F1A2B3C4-D5E6-47F8-90AB-CDEF12345678} = {8F216E64-AB1B-4402-A602-B20D7B4C470F}
+		{A1B2C3D4-E5F6-4789-0ABC-DEF123456789} = {8F216E64-AB1B-4402-A602-B20D7B4C470F}
 		{D1513088-2D81-4516-A90E-0CC565FE9D97} = {6A994D23-9BFA-4202-9DC2-71AB66DDD0F2}
 		{BD6CB790-4075-4870-AA88-8209819A1704} = {D1513088-2D81-4516-A90E-0CC565FE9D97}
 		{BF88B5C8-F307-4228-90D1-F1AB5E2D896B} = {BD6CB790-4075-4870-AA88-8209819A1704}
