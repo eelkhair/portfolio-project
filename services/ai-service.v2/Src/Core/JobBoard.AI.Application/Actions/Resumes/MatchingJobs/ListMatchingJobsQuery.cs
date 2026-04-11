@@ -35,6 +35,37 @@ public class ListMatchingJobsQueryHandler(
         activity?.SetTag("resume.uid", request.ResumeId);
         activity?.SetTag("matching.limit", request.Limit);
 
+        // Try cached path first: if explanations with scores exist, skip vector recomputation
+        try
+        {
+            var cached = await context.MatchExplanations
+                .Where(e => e.ResumeUId == request.ResumeId && e.Similarity > 0)
+                .OrderByDescending(e => e.Similarity)
+                .Take(request.Limit)
+                .ToListAsync(cancellationToken);
+
+            if (cached.Count >= request.Limit)
+            {
+                activity?.SetTag("matching.mode", "cached");
+                activity?.SetTag("matching.count", cached.Count);
+                activity?.SetTag("matching.explanations_found", cached.Count);
+
+                return cached.Select((e, i) => new JobCandidate
+                {
+                    JobId = e.JobId,
+                    Similarity = NormalizeScore(e.Similarity),
+                    Rank = i + 1,
+                    MatchSummary = e.Summary,
+                    MatchDetails = JsonSerializer.Deserialize<List<string>>(e.DetailsJson),
+                    MatchGaps = JsonSerializer.Deserialize<List<string>>(e.GapsJson)
+                }).ToList();
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Failed to check cached explanations, falling back to vector query");
+        }
+
         var resume = await context.ResumeEmbeddings
             .FirstOrDefaultAsync(e => e.ResumeUId == request.ResumeId, cancellationToken);
 
@@ -111,35 +142,10 @@ public class ListMatchingJobsQueryHandler(
     private async Task<List<JobCandidate>> WeightedCompositeSimilarity(
         ResumeEmbedding resume, int limit, CancellationToken ct)
     {
-        var skillsW = resume.SkillsVectorData is not null ? WSkills : 0;
-        var experienceW = resume.ExperienceVectorData is not null ? WExperience : 0;
+        var (fullWeight, skillsW, experienceW) = ComputeWeights(resume);
 
-        var usedSectionWeight = skillsW + experienceW;
-        var fullWeight = WFull + (1.0 - WFull - usedSectionWeight);
-
-        var total = fullWeight + usedSectionWeight;
-        fullWeight /= total;
-        skillsW /= total;
-        experienceW /= total;
-
-        // Load all job embeddings — acceptable for portfolio scale
-        var jobEmbeddings = await context.JobEmbeddings.ToListAsync(ct);
-
-        var scored = jobEmbeddings.Select(j =>
-        {
-            var fullSim = CosineSimilarity(resume.VectorData, j.VectorData);
-            var skillsSim = resume.SkillsVectorData is not null ? CosineSimilarity(resume.SkillsVectorData, j.VectorData) : (double?)null;
-            var experienceSim = resume.ExperienceVectorData is not null ? CosineSimilarity(resume.ExperienceVectorData, j.VectorData) : (double?)null;
-
-            var score = fullWeight * fullSim
-                + skillsW * (skillsSim ?? 0)
-                + experienceW * (experienceSim ?? 0);
-
-            return (JobId: j.JobId, Score: score, fullSim, skillsSim, experienceSim);
-        })
-        .OrderByDescending(x => x.Score)
-        .Take(limit)
-        .ToList();
+        // Compute per-dimension similarities in pgvector, score and sort in DB
+        var scored = await ComputeWeightedScoresInDb(context, resume, fullWeight, skillsW, experienceW, limit, ct);
 
         var results = new List<JobCandidate>(scored.Count);
         for (var i = 0; i < scored.Count; i++)
@@ -150,12 +156,65 @@ public class ListMatchingJobsQueryHandler(
             var p = $"matching.result.{i + 1}";
             Activity.Current?.SetTag($"{p}.job_id", s.JobId);
             Activity.Current?.SetTag($"{p}.score", F(s.Score));
-            Activity.Current?.SetTag($"{p}.full", SW(s.fullSim, fullWeight));
-            if (s.skillsSim.HasValue) Activity.Current?.SetTag($"{p}.skills", SW(s.skillsSim.Value, skillsW));
-            if (s.experienceSim.HasValue) Activity.Current?.SetTag($"{p}.experience", SW(s.experienceSim.Value, experienceW));
+            Activity.Current?.SetTag($"{p}.full", SW(s.FullSim, fullWeight));
+            if (s.SkillsSim.HasValue) Activity.Current?.SetTag($"{p}.skills", SW(s.SkillsSim.Value, skillsW));
+            if (s.ExperienceSim.HasValue) Activity.Current?.SetTag($"{p}.experience", SW(s.ExperienceSim.Value, experienceW));
         }
 
         return results;
+    }
+
+    internal static (double fullWeight, double skillsW, double experienceW) ComputeWeights(ResumeEmbedding resume)
+    {
+        var skillsW = resume.SkillsVectorData is not null ? WSkills : 0.0;
+        var experienceW = resume.ExperienceVectorData is not null ? WExperience : 0.0;
+
+        var usedSectionWeight = skillsW + experienceW;
+        var fullWeight = WFull + (1.0 - WFull - usedSectionWeight);
+
+        var total = fullWeight + usedSectionWeight;
+        fullWeight /= total;
+        skillsW /= total;
+        experienceW /= total;
+
+        return (fullWeight, skillsW, experienceW);
+    }
+
+    internal record ScoredJob(Guid JobId, double Score, double FullSim, double? SkillsSim, double? ExperienceSim);
+
+    internal static async Task<List<ScoredJob>> ComputeWeightedScoresInDb(
+        IAiDbContext context,
+        ResumeEmbedding resume, double fullWeight, double skillsW, double experienceW,
+        int limit, CancellationToken ct)
+    {
+        var hasSkills = resume.SkillsVectorData is not null;
+        var hasExperience = resume.ExperienceVectorData is not null;
+
+        // Use pgvector CosineDistance in DB for each dimension, then combine with weights
+        var query = context.JobEmbeddings
+            .Select(j => new
+            {
+                j.JobId,
+                FullSim = 1 - j.VectorData.CosineDistance(resume.VectorData),
+                SkillsSim = hasSkills ? (double?)(1 - j.VectorData.CosineDistance(resume.SkillsVectorData!)) : null,
+                ExperienceSim = hasExperience ? (double?)(1 - j.VectorData.CosineDistance(resume.ExperienceVectorData!)) : null,
+            })
+            .Select(x => new
+            {
+                x.JobId,
+                x.FullSim,
+                x.SkillsSim,
+                x.ExperienceSim,
+                Score = fullWeight * x.FullSim
+                    + skillsW * (x.SkillsSim ?? 0)
+                    + experienceW * (x.ExperienceSim ?? 0)
+            })
+            .OrderByDescending(x => x.Score)
+            .Take(limit);
+
+        var raw = await query.ToListAsync(ct);
+
+        return raw.Select(x => new ScoredJob(x.JobId, x.Score, x.FullSim, x.SkillsSim, x.ExperienceSim)).ToList();
     }
 
     private static string F(double v) => v.ToString("F2");
@@ -173,18 +232,4 @@ public class ListMatchingJobsQueryHandler(
         return Math.Clamp(normalized, 0, 1);
     }
 
-    private static double CosineSimilarity(Vector a, Vector b)
-    {
-        var aVals = a.ToArray();
-        var bVals = b.ToArray();
-        double dot = 0, normA = 0, normB = 0;
-        for (var i = 0; i < aVals.Length; i++)
-        {
-            dot += aVals[i] * bVals[i];
-            normA += aVals[i] * aVals[i];
-            normB += bVals[i] * bVals[i];
-        }
-        var denom = Math.Sqrt(normA) * Math.Sqrt(normB);
-        return denom == 0 ? 0 : dot / denom;
-    }
 }

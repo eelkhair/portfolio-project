@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using JobBoard.AI.Application.Actions.Base;
 using JobBoard.AI.Application.Interfaces.Configurations;
-using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Application.Interfaces.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -37,7 +36,7 @@ public class GenerateAllMatchExplanationsCommandHandler(
             resumeUIds.Count, MaxConcurrency);
 
         var resumesProcessed = 0;
-        using var semaphore = new SemaphoreSlim(MaxConcurrency);
+        var semaphore = new SemaphoreSlim(MaxConcurrency);
 
         var tasks = resumeUIds.Select(async resumeUId =>
         {

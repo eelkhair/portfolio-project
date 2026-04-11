@@ -14,13 +14,19 @@ public class UserSyncService(
     IUnitOfWork unitOfWork
 ) : IUserSyncService
 {
+    private readonly HashSet<string> _syncedUsers = [];
+
     public async Task EnsureUserExistsAsync(string userId, CancellationToken cancellationToken)
     {
+        // Skip DB lookup if this user was already synced in the current scope (HTTP request)
+        if (!_syncedUsers.Add(userId))
+            return;
+
         var user = await userRepository.FindUserByExternalIdOrIdAsync(
             userId,
             cancellationToken
         );
-        
+
         if (user == null)
         {
             var (id, uid) = await unitOfWork.GetNextValueFromSequenceAsync(typeof(User), cancellationToken);

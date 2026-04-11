@@ -28,7 +28,7 @@ public static class DependencyInjection
         services.Decorate(typeof(IHandler<,>), typeof(ObservabilityCommandHandlerDecorator<,>));
         services.Decorate(typeof(IHandler<,>), typeof(UserContextCommandHandlerDecorator<,>));
 
-        services.AddTransient<IUserSyncService, UserSyncService>();
+        services.AddScoped<IUserSyncService, UserSyncService>();
         services.AddScoped<IHandlerContext, HandlerContext>();
         return services;
     }

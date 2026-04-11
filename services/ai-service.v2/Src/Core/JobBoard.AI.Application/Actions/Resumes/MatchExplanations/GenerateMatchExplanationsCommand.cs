@@ -11,7 +11,7 @@ using JobBoard.AI.Domain.Drafts;
 using JobBoard.IntegrationEvents.Resume;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Pgvector;
+using Pgvector.EntityFrameworkCore;
 
 namespace JobBoard.AI.Application.Actions.Resumes.MatchExplanations;
 
@@ -129,81 +129,90 @@ public class GenerateMatchExplanationsCommandHandler(
             return Unit.Value;
         }
 
-        // Sort by similarity score descending so first batch = top visible cards
+        // Sort by similarity score descending
         var orderedJobDetails = jobDetails
             .OrderByDescending(j => scoresByJobId.GetValueOrDefault(j.JobId, 0))
             .ToList();
 
-        // 6. Generate in two batches: top 4 (visible cards) first, then the rest
-        const int firstBatchSize = 4;
-        var firstBatch = orderedJobDetails.Take(firstBatchSize).ToList();
-        var secondBatch = orderedJobDetails.Skip(firstBatchSize).ToList();
+        // 6. Split into batches and generate explanations in parallel
+        const int batchSize = 3;
+        var batches = orderedJobDetails.Chunk(batchSize).ToList();
 
-        var totalGenerated = 0;
+        var sw = Stopwatch.StartNew();
+        var llmTasks = batches.Select(batch =>
+            CallLlmForBatchAsync(parsedContent, batch.ToList(), scoresByJobId, cancellationToken));
+        var llmResults = await Task.WhenAll(llmTasks);
+        sw.Stop();
 
-        totalGenerated += await GenerateBatchAsync(resumeUId, parsedContent, firstBatch, scoresByJobId, cancellationToken);
+        var allExplanations = llmResults
+            .Where(r => r is not null)
+            .SelectMany(r => r!.Explanations)
+            .ToList();
+
+        Logger.LogInformation(
+            "Generated {Count} match explanations for resume {ResumeUId} in {Duration}ms ({BatchCount} parallel batches)",
+            allExplanations.Count, resumeUId, sw.ElapsedMilliseconds, batches.Count);
+
+        // 7. Persist all results in a single DB operation
+        await PersistExplanationsAsync(resumeUId, allExplanations, scoresByJobId, cancellationToken);
         await NotifyFrontendAsync(resumeUId, request.UserId, cancellationToken);
 
-        if (secondBatch.Count > 0)
-        {
-            totalGenerated += await GenerateBatchAsync(resumeUId, parsedContent, secondBatch, scoresByJobId, cancellationToken);
-            await NotifyFrontendAsync(resumeUId, request.UserId, cancellationToken);
-        }
-
-        activity?.SetTag("explanation.generated_count", totalGenerated);
+        activity?.SetTag("explanation.generated_count", allExplanations.Count);
 
         return Unit.Value;
     }
 
-    private async Task<int> GenerateBatchAsync(
-        Guid resumeUId,
+    private async Task<MatchExplanationLlmResponse?> CallLlmForBatchAsync(
         ResumeParsedContentResponse parsedContent,
         List<JobBatchDetailDto> jobs,
         Dictionary<Guid, double> scoresByJobId,
         CancellationToken ct)
     {
         var userPrompt = BuildUserPrompt(parsedContent, jobs, scoresByJobId);
-
-        var sw = Stopwatch.StartNew();
-        MatchExplanationLlmResponse llmResponse;
         try
         {
-            llmResponse = await chatService.GetResponseAsync<MatchExplanationLlmResponse>(
+            return await chatService.GetResponseAsync<MatchExplanationLlmResponse>(
                 SystemPrompt, userPrompt, allowTools: false, ct);
         }
         catch (Exception ex)
         {
-            Logger.LogWarning(ex, "LLM batch call failed for {Count} jobs (resume {ResumeUId})", jobs.Count, resumeUId);
-            return 0;
+            Logger.LogWarning(ex, "LLM batch call failed for {Count} jobs", jobs.Count);
+            return null;
         }
+    }
 
-        sw.Stop();
-        Logger.LogInformation(
-            "Generated {Count} match explanations for resume {ResumeUId} in {Duration}ms (batch of {BatchSize})",
-            llmResponse.Explanations.Count, resumeUId, sw.ElapsedMilliseconds, jobs.Count);
+    private async Task PersistExplanationsAsync(
+        Guid resumeUId,
+        List<JobExplanationItem> explanations,
+        Dictionary<Guid, double> scoresByJobId,
+        CancellationToken ct)
+    {
+        if (explanations.Count == 0) return;
 
-        foreach (var item in llmResponse.Explanations)
+        var jobIds = explanations.Select(e => e.JobId).ToList();
+        var existingByJobId = await dbContext.MatchExplanations
+            .Where(e => e.ResumeUId == resumeUId && jobIds.Contains(e.JobId))
+            .ToDictionaryAsync(e => e.JobId, ct);
+
+        foreach (var item in explanations)
         {
-            var existing = await dbContext.MatchExplanations
-                .FirstOrDefaultAsync(e => e.ResumeUId == resumeUId && e.JobId == item.JobId, ct);
-
             var detailsJson = JsonSerializer.Serialize(item.Details);
             var gapsJson = JsonSerializer.Serialize(item.Gaps);
+            var similarity = scoresByJobId.GetValueOrDefault(item.JobId, 0);
 
-            if (existing is not null)
+            if (existingByJobId.TryGetValue(item.JobId, out var existing))
             {
-                existing.Update(item.Summary, detailsJson, gapsJson, "openai", "gpt-4o-mini");
+                existing.Update(item.Summary, detailsJson, gapsJson, "openai", "gpt-4o-mini", similarity);
             }
             else
             {
                 var explanation = new MatchExplanation(
-                    resumeUId, item.JobId, item.Summary, detailsJson, gapsJson, "openai", "gpt-4o-mini");
+                    resumeUId, item.JobId, item.Summary, detailsJson, gapsJson, "openai", "gpt-4o-mini", similarity);
                 await dbContext.MatchExplanations.AddAsync(explanation, ct);
             }
         }
 
         await dbContext.SaveChangesAsync(ct);
-        return llmResponse.Explanations.Count;
     }
 
     private async Task NotifyFrontendAsync(Guid resumeUId, string? userId, CancellationToken ct)
@@ -231,58 +240,20 @@ public class GenerateMatchExplanationsCommandHandler(
 
         if (!hasSections)
         {
-            // Simple cosine similarity — in-memory calculation
-            var allJobs = await dbContext.JobEmbeddings.ToListAsync(ct);
-            return allJobs
-                .Select(j => (j.JobId, Score: CosineSimilarity(resume.VectorData, j.VectorData)))
-                .OrderByDescending(x => x.Score)
+            // Simple cosine similarity — computed in pgvector
+            var raw = await dbContext.JobEmbeddings
+                .Select(j => new { j.JobId, Similarity = 1 - j.VectorData.CosineDistance(resume.VectorData) })
+                .OrderByDescending(x => x.Similarity)
                 .Take(TopN)
-                .ToList();
+                .ToListAsync(ct);
+            return raw.Select(r => (r.JobId, r.Similarity)).ToList();
         }
 
-        // Weighted composite similarity (same logic as ListMatchingJobsQuery)
-        const double wFull = 0.20, wSkills = 0.40, wExperience = 0.40;
-
-        var skillsW = resume.SkillsVectorData is not null ? wSkills : 0;
-        var experienceW = resume.ExperienceVectorData is not null ? wExperience : 0;
-        var usedSectionWeight = skillsW + experienceW;
-        var fullWeight = wFull + (1.0 - wFull - usedSectionWeight);
-        var total = fullWeight + usedSectionWeight;
-        fullWeight /= total;
-        skillsW /= total;
-        experienceW /= total;
-
-        var jobEmbeddings = await dbContext.JobEmbeddings.ToListAsync(ct);
-
-        return jobEmbeddings.Select(j =>
-            {
-                var fullSim = CosineSimilarity(resume.VectorData, j.VectorData);
-                var skillsSim = resume.SkillsVectorData is not null
-                    ? CosineSimilarity(resume.SkillsVectorData, j.VectorData) : 0;
-                var experienceSim = resume.ExperienceVectorData is not null
-                    ? CosineSimilarity(resume.ExperienceVectorData, j.VectorData) : 0;
-
-                var score = fullWeight * fullSim + skillsW * skillsSim + experienceW * experienceSim;
-                return (j.JobId, score);
-            })
-            .OrderByDescending(x => x.score)
-            .Take(TopN)
-            .ToList();
-    }
-
-    private static double CosineSimilarity(Vector a, Vector b)
-    {
-        var aVals = a.ToArray();
-        var bVals = b.ToArray();
-        double dot = 0, normA = 0, normB = 0;
-        for (var i = 0; i < aVals.Length; i++)
-        {
-            dot += aVals[i] * bVals[i];
-            normA += aVals[i] * aVals[i];
-            normB += bVals[i] * bVals[i];
-        }
-        var denom = Math.Sqrt(normA) * Math.Sqrt(normB);
-        return denom == 0 ? 0 : dot / denom;
+        // Weighted composite similarity — reuse shared DB query from ListMatchingJobsQueryHandler
+        var (fullWeight, skillsW, experienceW) = ListMatchingJobsQueryHandler.ComputeWeights(resume);
+        var scored = await ListMatchingJobsQueryHandler.ComputeWeightedScoresInDb(
+            dbContext, resume, fullWeight, skillsW, experienceW, TopN, ct);
+        return scored.Select(s => (s.JobId, s.Score)).ToList();
     }
 
     private static string BuildUserPrompt(ResumeParsedContentResponse resume, List<JobBatchDetailDto> jobs, Dictionary<Guid, double> scoresByJobId)
