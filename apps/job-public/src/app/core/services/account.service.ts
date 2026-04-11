@@ -43,6 +43,7 @@ export class AccountService {
   }
 
   logout(): void {
+    sessionStorage.removeItem('job-public-tour-shown');
     this.oidc?.logoff().subscribe();
   }
 }

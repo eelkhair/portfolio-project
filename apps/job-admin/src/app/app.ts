@@ -11,6 +11,7 @@ import {AiChat} from './shared/ai-chat/ai-chat';
 import {DebugSidebar} from './shared/debug-sidebar/debug-sidebar';
 import {OidcSecurityService} from 'angular-auth-oidc-client';
 import {GettingStarted} from './layout/getting-started/getting-started';
+import {GuidedTour} from './shared/guided-tour/guided-tour';
 
 @Component({
   selector: 'app-root',
@@ -22,7 +23,8 @@ import {GettingStarted} from './layout/getting-started/getting-started';
     Nav,
     AiChat,
     DebugSidebar,
-    GettingStarted
+    GettingStarted,
+    GuidedTour
   ],
   templateUrl: './app.html',
   styleUrl: './app.css'

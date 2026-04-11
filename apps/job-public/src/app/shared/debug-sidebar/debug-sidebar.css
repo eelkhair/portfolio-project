@@ -255,88 +255,6 @@
 .trace-link.seq { color: #7C3AED; }
 .trace-link.grafana { color: #E65100; }
 
-/* Grouped entries */
-.debug-group {
-  border-radius: 10px;
-  background: #f8fafc;
-  border: 1px solid #f1f5f9;
-  animation: entryFadeIn 0.2s ease;
-  overflow: hidden;
-}
-
-.debug-group.group-has-error {
-  border-color: rgba(239, 68, 68, 0.3);
-  background: rgba(239, 68, 68, 0.04);
-}
-
-.group-trace-row {
-  padding: 0 12px 8px;
-}
-
-.group-header {
-  padding: 10px 12px;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.group-header:hover {
-  background: rgba(0, 0, 0, 0.03);
-}
-
-.group-badge {
-  font-size: 0.6rem;
-  font-weight: 700;
-  min-width: 18px;
-  height: 18px;
-  border-radius: 9px;
-  background: #64748b;
-  color: white;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 5px;
-  margin-left: auto;
-}
-
-.group-total-duration {
-  color: #F59E0B;
-  font-weight: 700;
-}
-
-
-.group-chevron {
-  color: #94a3b8;
-  flex-shrink: 0;
-  transition: transform 0.2s ease;
-}
-
-.group-chevron-open {
-  transform: rotate(180deg);
-}
-
-.group-children {
-  border-top: 1px solid #e2e8f0;
-  margin: 0 8px 8px;
-  padding-top: 6px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  max-height: 240px;
-  overflow-y: auto;
-}
-
-.child-entry {
-  padding: 8px 10px;
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.02);
-  border: 1px solid transparent;
-}
-
-.child-entry.entry-error {
-  border-color: rgba(239, 68, 68, 0.2);
-  background: rgba(239, 68, 68, 0.03);
-}
-
 /* Empty state */
 .debug-empty {
   display: flex;
@@ -394,37 +312,6 @@
 :host-context(.dark) .method-post { background: #1E40AF; color: #BFDBFE; }
 :host-context(.dark) .method-put { background: #854D0E; color: #FEF08A; }
 :host-context(.dark) .method-delete { background: #991B1B; color: #FECACA; }
-
-:host-context(.dark) .debug-group {
-  background: #1e293b;
-  border-color: #334155;
-}
-
-:host-context(.dark) .debug-group.group-has-error {
-  border-color: rgba(239, 68, 68, 0.3);
-  background: rgba(239, 68, 68, 0.08);
-}
-
-:host-context(.dark) .group-header:hover {
-  background: rgba(255, 255, 255, 0.03);
-}
-
-:host-context(.dark) .group-badge {
-  background: #475569;
-}
-
-:host-context(.dark) .group-children {
-  border-top-color: #334155;
-}
-
-:host-context(.dark) .child-entry {
-  background: rgba(255, 255, 255, 0.02);
-}
-
-:host-context(.dark) .child-entry.entry-error {
-  border-color: rgba(239, 68, 68, 0.2);
-  background: rgba(239, 68, 68, 0.05);
-}
 
 :host-context(.dark) .trace-link.jaeger { color: #F59E0B; }
 :host-context(.dark) .trace-link.seq { color: #A78BFA; }

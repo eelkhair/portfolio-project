@@ -10,26 +10,18 @@ export interface ActivityEntry {
   timestamp: Date;
 }
 
-const OPEN_KEY = 'debug-sidebar-open';
-const ENTRIES_KEY = 'debug-entries';
+const STORAGE_KEY = 'debug-sidebar-open';
 const MAX_ENTRIES = 50;
 
 @Injectable({providedIn: 'root'})
 export class DebugService {
-  readonly entries = signal<ActivityEntry[]>(this.loadEntries());
+  readonly entries = signal<ActivityEntry[]>([]);
   readonly isOpen = signal(this.getStoredState());
 
   constructor() {
     effect(() => {
       if (typeof window !== 'undefined') {
-        localStorage.setItem(OPEN_KEY, this.isOpen() ? 'true' : 'false');
-      }
-    });
-
-    effect(() => {
-      if (typeof window !== 'undefined') {
-        const raw = this.entries().map(e => ({...e, timestamp: e.timestamp.getTime()}));
-        sessionStorage.setItem(ENTRIES_KEY, JSON.stringify(raw));
+        localStorage.setItem(STORAGE_KEY, this.isOpen() ? 'true' : 'false');
       }
     });
   }
@@ -60,17 +52,6 @@ export class DebugService {
 
   private getStoredState(): boolean {
     if (typeof window === 'undefined') return false;
-    return localStorage.getItem(OPEN_KEY) === 'true';
-  }
-
-  private loadEntries(): ActivityEntry[] {
-    if (typeof window === 'undefined') return [];
-    try {
-      const raw = sessionStorage.getItem(ENTRIES_KEY);
-      if (!raw) return [];
-      return JSON.parse(raw).map((e: any) => ({...e, timestamp: new Date(e.timestamp)}));
-    } catch {
-      return [];
-    }
+    return localStorage.getItem(STORAGE_KEY) === 'true';
   }
 }

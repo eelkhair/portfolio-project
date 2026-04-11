@@ -1,9 +1,11 @@
 import {MenuItem} from 'primeng/api';
 import {inject} from '@angular/core';
 import {AccountService} from '../../core/services/account.service';
+import {GettingStartedService} from '../getting-started/getting-started.service';
 
 export class NavItems{
   accountService = inject(AccountService);
+  gettingStarted = inject(GettingStartedService);
 
   getNavItems(){
     const groups = this.accountService.groups();
@@ -57,6 +59,11 @@ export class NavItems{
       },
 
       { label: 'Audit Logs', icon: 'pi pi-history', routerLink: '/audit', visible: false },
+
+      {
+        label: 'How to Explore', icon: 'pi pi-question-circle',
+        command: () => this.gettingStarted.visible.set(true),
+      },
     ];
     return NAV_ITEMS;
   }
