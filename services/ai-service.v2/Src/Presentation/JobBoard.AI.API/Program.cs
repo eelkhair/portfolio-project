@@ -35,8 +35,7 @@ builder.Services
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-    await app.MigrateDatabase<AiDbContext>();
+await app.MigrateDatabase<AiDbContext>();
 
 app.UseConfiguredSwagger(builder.Configuration)
     .UseApplicationServices()
