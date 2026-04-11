@@ -4,6 +4,7 @@ import { isPlatformServer } from '@angular/common';
 import { trace, SpanKind, SpanStatusCode, Span } from '@opentelemetry/api';
 import { tap, finalize } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
+import { DebugService } from '../services/debug.service';
 
 // Extract host from OIDC authority to exclude from tracing (avoids CORS issues with Keycloak)
 const oidcHost = (() => {
@@ -33,6 +34,7 @@ export const tracingInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req);
   }
 
+  const debugService = inject(DebugService);
   const tracer = trace.getTracer('public-fe');
   const span: Span = tracer.startSpan(`HTTP ${req.method} ${path(urlStr)}`, {
     kind: SpanKind.CLIENT,
@@ -55,6 +57,17 @@ export const tracingInterceptor: HttpInterceptorFn = (req, next) => {
           span.setAttribute('http.status_code', evt.status);
           if (evt.status >= 400) {
             span.setStatus({ code: SpanStatusCode.ERROR });
+          }
+          const traceId = evt.headers.get('x-trace-id') || evt.headers.get('trace-id');
+          if (traceId) {
+            debugService.push({
+              method: req.method,
+              path: path(urlStr),
+              status: evt.status,
+              duration: Math.round(performance.now() - t0),
+              traceId,
+              timestamp: new Date(),
+            });
           }
         }
       },

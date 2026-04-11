@@ -1,0 +1,129 @@
+<!-- Floating toggle button -->
+<button
+  class="debug-fab"
+  (click)="debug.toggle()"
+  [class.debug-fab-open]="debug.isOpen()">
+  @if (debug.isOpen()) {
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+  } @else {
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+    @if (debug.entries().length) {
+      <span class="debug-fab-badge">{{ debug.entries().length }}</span>
+    }
+  }
+</button>
+
+<!-- Sidebar panel -->
+@if (debug.isOpen()) {
+  <aside class="debug-panel">
+    <div class="debug-header">
+      <div class="debug-header-left">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#F59E0B"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        <span>Activity</span>
+        <span class="debug-count">{{ groupedEntries().length }}</span>
+      </div>
+      <button class="debug-clear" (click)="debug.clear()" title="Clear all">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+      </button>
+    </div>
+
+    <div class="debug-entries">
+      @for (group of groupedEntries(); track group.traceId) {
+        <!-- Single request in this trace — render flat -->
+        @if (group.entries.length === 1) {
+          <div class="debug-entry" [class.entry-error]="group.latest.status >= 400">
+            <div class="entry-top">
+              <span class="entry-method" [class]="methodClass(group.latest.method)">{{ group.latest.method }}</span>
+              <span class="entry-path" [title]="group.latest.path">{{ truncatePath(group.latest.path) }}</span>
+            </div>
+            <div class="entry-meta">
+              <span class="entry-status" [class]="statusClass(group.latest.status)">{{ group.latest.status }}</span>
+              <span class="entry-duration">{{ group.latest.duration }}ms</span>
+              <span class="entry-time">{{ formatTime(group.latest.timestamp) }}</span>
+            </div>
+            <div class="entry-trace" (click)="copyTraceId(group.traceId)" title="Click to copy">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="trace-id-text">{{ group.traceId }}</span>
+            </div>
+            <div class="entry-links">
+              <a [href]="debug.jaegerLink(group.traceId)" target="_blank" rel="noopener" class="trace-link jaeger">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                Jaeger
+              </a>
+              <a [href]="debug.seqLink(group.traceId)" target="_blank" rel="noopener" class="trace-link seq">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                Seq
+              </a>
+              <a [href]="debug.grafanaLink(group.traceId)" target="_blank" rel="noopener" class="trace-link grafana">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                Grafana
+              </a>
+            </div>
+          </div>
+        } @else {
+          <!-- Multiple requests sharing the same trace — collapsible -->
+          <div class="debug-group" [class.group-has-error]="group.entries.some(e => e.status >= 400)">
+            <div class="group-header" (click)="toggleGroup(group.traceId)">
+              <div class="entry-top">
+                <span class="entry-method" [class]="methodClass(group.latest.method)">{{ group.latest.method }}</span>
+                <span class="entry-path" [title]="group.latest.path">{{ truncatePath(group.latest.path) }}</span>
+                <span class="group-badge">{{ group.entries.length }}</span>
+                <svg class="group-chevron" [class.group-chevron-open]="expandedTraces().has(group.traceId)" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+              <div class="entry-meta">
+                <span class="entry-status" [class]="statusClass(group.latest.status)">{{ group.latest.status }}</span>
+                <span class="entry-duration group-total-duration">{{ formatDuration(group.totalDuration) }}</span>
+                <span class="entry-time">{{ formatTime(group.latest.timestamp) }}</span>
+              </div>
+            </div>
+
+            <!-- Trace ID + links (always visible for the group) -->
+            <div class="group-trace-row">
+              <div class="entry-trace" (click)="copyTraceId(group.traceId)" title="Click to copy">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                <span class="trace-id-text">{{ group.traceId }}</span>
+              </div>
+              <div class="entry-links">
+                <a [href]="debug.jaegerLink(group.traceId)" target="_blank" rel="noopener" class="trace-link jaeger">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  Jaeger
+                </a>
+                <a [href]="debug.seqLink(group.traceId)" target="_blank" rel="noopener" class="trace-link seq">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  Seq
+                </a>
+                <a [href]="debug.grafanaLink(group.traceId)" target="_blank" rel="noopener" class="trace-link grafana">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  Grafana
+                </a>
+              </div>
+            </div>
+
+            @if (expandedTraces().has(group.traceId)) {
+              <div class="group-children">
+                @for (entry of group.entries; track $index) {
+                  <div class="child-entry" [class.entry-error]="entry.status >= 400">
+                    <div class="entry-top">
+                      <span class="entry-method" [class]="methodClass(entry.method)">{{ entry.method }}</span>
+                      <span class="entry-path" [title]="entry.path">{{ truncatePath(entry.path) }}</span>
+                    </div>
+                    <div class="entry-meta">
+                      <span class="entry-status" [class]="statusClass(entry.status)">{{ entry.status }}</span>
+                      <span class="entry-duration">{{ entry.duration }}ms</span>
+                      <span class="entry-time">{{ formatTime(entry.timestamp) }}</span>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      } @empty {
+        <div class="debug-empty">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 8V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2v-2"/><path d="M7 12h10"/></svg>
+          <span>No activity yet</span>
+        </div>
+      }
+    </div>
+  </aside>
+}

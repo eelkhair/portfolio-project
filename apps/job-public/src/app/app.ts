@@ -6,11 +6,12 @@ import { filter, map, switchMap, take } from 'rxjs';
 import { Header } from './layout/header/header';
 import { Footer } from './layout/footer/footer';
 import { Chat } from './shared/chat/chat';
+import { DebugSidebar } from './shared/debug-sidebar/debug-sidebar';
 import { ResumeRealtimeService } from './core/services/resume-realtime.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Header, Footer, Chat],
+  imports: [RouterOutlet, Header, Footer, Chat, DebugSidebar],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })

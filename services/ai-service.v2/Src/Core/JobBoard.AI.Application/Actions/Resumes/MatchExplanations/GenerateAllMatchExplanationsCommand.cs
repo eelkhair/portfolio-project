@@ -4,7 +4,6 @@ using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Application.Interfaces.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace JobBoard.AI.Application.Actions.Resumes.MatchExplanations;
@@ -17,47 +16,42 @@ public class GenerateAllMatchExplanationsCommandHandler(
     IHandlerContext context,
     IAiDbContext dbContext,
     IActivityFactory activityFactory,
-    IServiceScopeFactory serviceScopeFactory)
+    IApplicationOrchestrator orchestrator)
     : BaseCommandHandler(context),
         IHandler<GenerateAllMatchExplanationsCommand, GenerateAllMatchExplanationsResponse>
 {
+    private const int MaxConcurrency = 3;
+
     public async Task<GenerateAllMatchExplanationsResponse> HandleAsync(
         GenerateAllMatchExplanationsCommand request, CancellationToken cancellationToken)
     {
         using var activity = activityFactory.StartActivity(
             "GenerateAllMatchExplanationsCommandHandler.HandleAsync", ActivityKind.Internal);
 
-        var resumeEmbeddings = await dbContext.ResumeEmbeddings
+        var resumeUIds = await dbContext.ResumeEmbeddings
             .Select(e => e.ResumeUId)
             .ToListAsync(cancellationToken);
 
-        activity?.SetTag("resumes.total", resumeEmbeddings.Count);
-        Logger.LogInformation("Generating match explanations for {Count} resumes", resumeEmbeddings.Count);
+        activity?.SetTag("resumes.total", resumeUIds.Count);
+        Logger.LogInformation("Generating match explanations for {Count} resumes (concurrency: {Concurrency})",
+            resumeUIds.Count, MaxConcurrency);
 
-        var totalExplanations = 0;
         var resumesProcessed = 0;
+        using var semaphore = new SemaphoreSlim(MaxConcurrency);
 
-        foreach (var resumeUId in resumeEmbeddings)
+        var tasks = resumeUIds.Select(async resumeUId =>
         {
+            await semaphore.WaitAsync(cancellationToken);
             try
             {
-                using var scope = serviceScopeFactory.CreateScope();
-                var handler = scope.ServiceProvider
-                    .GetRequiredService<IHandler<GenerateMatchExplanationsCommand, Unit>>();
+                await orchestrator.ExecuteCommandAsync(
+                    new GenerateMatchExplanationsCommand(resumeUId), cancellationToken);
 
-                await handler.HandleAsync(
-                    new GenerateMatchExplanationsCommand(resumeUId),
-                    cancellationToken);
-
-                var generated = await dbContext.MatchExplanations
-                    .CountAsync(e => e.ResumeUId == resumeUId, cancellationToken);
-
-                totalExplanations += generated;
-                resumesProcessed++;
+                Interlocked.Increment(ref resumesProcessed);
 
                 Logger.LogInformation(
                     "Generated explanations for resume {ResumeUId} ({Current}/{Total})",
-                    resumeUId, resumesProcessed, resumeEmbeddings.Count);
+                    resumeUId, resumesProcessed, resumeUIds.Count);
             }
             catch (Exception ex)
             {
@@ -65,15 +59,23 @@ public class GenerateAllMatchExplanationsCommandHandler(
                     "Failed to generate explanations for resume {ResumeUId}, continuing with next",
                     resumeUId);
             }
-        }
+            finally
+            {
+                semaphore.Release();
+            }
+        });
+
+        await Task.WhenAll(tasks);
+
+        var totalGenerated = await dbContext.MatchExplanations.CountAsync(cancellationToken);
 
         activity?.SetTag("resumes.processed", resumesProcessed);
-        activity?.SetTag("explanations.total", totalExplanations);
+        activity?.SetTag("explanations.total", totalGenerated);
 
         Logger.LogInformation(
             "Completed match explanation generation: {Processed}/{Total} resumes, {Explanations} explanations",
-            resumesProcessed, resumeEmbeddings.Count, totalExplanations);
+            resumesProcessed, resumeUIds.Count, totalGenerated);
 
-        return new GenerateAllMatchExplanationsResponse(resumesProcessed, totalExplanations);
+        return new GenerateAllMatchExplanationsResponse(resumesProcessed, totalGenerated);
     }
 }
