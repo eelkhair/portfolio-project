@@ -65,7 +65,10 @@ public class Resume : BaseAuditableEntity
         ParseStatus = ResumeParseStatus.Processing;
     }
 
-    private static readonly string[] RequiredSections = ["quick", "workHistory", "education", "certifications", "projects"];
+    private static readonly string[] RequiredSections = ["contact", "skills", "workHistory", "education", "certifications", "projects"];
+
+    // Sections whose JSON properties are merged at the top level (flat fields, not wrapped arrays)
+    private static readonly HashSet<string> TopLevelMergeSections = ["quick", "contact", "skills"];
 
     public void MergeSectionContent(string section, string sectionJson)
     {
@@ -75,9 +78,9 @@ public class Resume : BaseAuditableEntity
 
         var sectionNode = JsonNode.Parse(sectionJson);
 
-        if (section == "quick")
+        if (TopLevelMergeSections.Contains(section))
         {
-            // Quick section has top-level fields — merge each property
+            // Flat sections (contact, skills, legacy quick) — merge each property at root level
             foreach (var prop in sectionNode!.AsObject())
             {
                 existing.Remove(prop.Key);

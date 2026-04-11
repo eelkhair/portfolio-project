@@ -14,7 +14,7 @@ participant "Gateway\n(YARP)" as GW
 participant "Monolith API\n(System of Record)" as MON
 database "Monolith DB\n(SQL Server)" as MSQL
 participant "Outbox Processor" as OBX
-participant "AI Service v2\n(Orchestrator + SignalR)" as AI
+participant "AI Service v2\n(Orchestrator)" as AI
 participant "OpenAI API" as OAI
 database "Embeddings DB\n(PostgreSQL + pgvector)" as PG
 
@@ -36,7 +36,7 @@ end note
 MSQL --> MON: committed
 deactivate MSQL
 
-MON --> GW: 202 Accepted
+MON --> GW: 201 Created
 deactivate MON
 GW --> FE: Upload accepted
 deactivate GW
@@ -48,139 +48,184 @@ end note
 
 == ASYNCHRONOUS PATH — Event-Driven Processing ==
 
-OBX -> AI: resume.uploaded (event)
+OBX -> AI: resume.uploaded (via Dapr pub/sub)
 activate AI
 
 note over AI
-End-to-end pipeline (~17–18s):
-- Parsing
-- Progressive updates
-- Embeddings
-- Matching + explanations
+End-to-end pipeline (~19s):
+- Phase 1: Contact parse (~1s)
+- Phase 2: 5 parallel sections (~9s)
+- Embeddings (~0.5s)
+- 4 parallel match explanations (~6s)
 end note
 
-== Phase 1 — Progressive Resume Parsing ==
+== Phase 1 — Contact Info (Sequential, Fast) ==
 
-AI -> OAI: Parse resume (LLM)
+AI -> OAI: Parse contact info only
 activate OAI
 note right of OAI
-~4.9s
-Structured extraction
-~2.6k tokens
+~1.3s — minimal extraction
+name, email, phone, links
 end note
-OAI --> AI: structured resume
+OAI --> AI: contact JSON
 deactivate OAI
 
-AI -> MON: Save parsed section
+AI -> MON: Save contact section
 activate MON
-MON -> MSQL: UPDATE resume content
-activate MSQL
+MON -> MSQL: MERGE into parsed content
 MSQL --> MON: committed
-deactivate MSQL
-MON --> AI: OK
 deactivate MON
 
-AI -> FE: SignalR ResumeSectionParsed ("quick")
+AI -> FE: SignalR ResumeSectionParsed ("contact")
 
 note over FE
-First section appears immediately.
-UX becomes responsive early.
+Contact info appears immediately (~1s).
+UI kicks remaining sections to "parsing".
 end note
 
-AI -> MON: Save additional section
-activate MON
-MON -> MSQL: UPDATE resume content
-activate MSQL
-MSQL --> MON: committed
-deactivate MSQL
-MON --> AI: OK
-deactivate MON
+== Phase 2 — 5 Parallel Section Parses ==
 
-AI -> FE: SignalR ResumeSectionParsed ("workHistory")
+note over AI, OAI
+5 independent LLM calls via Task.WhenAll:
+skills, workHistory, education, certifications, projects
+Wall time = slowest section (~8-9s)
+end note
+
+par skills
+AI -> OAI: Parse summary + skills
+OAI --> AI: skills JSON
+else workHistory
+AI -> OAI: Parse work history
+OAI --> AI: workHistory JSON
+else education
+AI -> OAI: Parse education
+OAI --> AI: education JSON
+else certifications
+AI -> OAI: Parse certifications
+OAI --> AI: certifications JSON
+else projects
+AI -> OAI: Parse projects
+OAI --> AI: projects JSON
+end
+
+loop each completed section
+AI -> MON: Save section
+MON -> MSQL: MERGE into parsed content
+MON --> AI: OK
+AI -> FE: SignalR ResumeSectionParsed (section)
+end
 
 note over FE
 UI progressively hydrates
-as parsing continues.
+as each section completes.
 end note
 
-== Phase 2 — Embeddings Generation ==
+AI -> MON: All sections completed
+activate MON
+MON -> MSQL: Mark resume fully parsed + INSERT Outbox (resume.parsed)
+MSQL --> MON: committed
+deactivate MON
 
-AI -> OAI: Generate embeddings
+== Phase 3 — Embeddings Generation ==
+
+note over AI
+Triggered by resume.parsed event (via Dapr pub/sub)
+end note
+
+AI -> OAI: Generate 3 embeddings (parallel batch)
 activate OAI
 note right of OAI
-Batch embeddings (~1.06s)
-~11k characters processed
+~0.5s parallel batch
+full + skills + experience vectors
+text-embedding-3-small (1536-dim)
 end note
-OAI --> AI: vectors
+OAI --> AI: 3 vectors
 deactivate OAI
 
-AI -> PG: Upsert embeddings
+AI -> PG: Upsert resume embeddings
 activate PG
 PG --> AI: stored
 deactivate PG
 
-== Phase 3 — Match Resolution + Explanation Generation ==
+AI -> FE: SignalR ResumeEmbedded
 
-note over AI,FE
-SignalR-driven orchestration (push model):
+== Phase 4 — Match Explanations (Parallel, Fire-and-Forget) ==
 
-AI emits events → UI reacts →
-triggers downstream enrichment pipeline.
-
-No polling required.
-System is event-driven and reactive.
-end note
-
-FE -> GW: Request matches
-activate GW
-GW -> MON: GET /resumes/{id}/matching
-activate MON
-
-MON -> AI: Resolve matches + explanations
-activate AI
-
-AI -> PG: Check cached explanations
+AI -> PG: Find top 10 matching jobs (pgvector cosine similarity)
 activate PG
-note right of PG: cache miss
-PG --> AI: none
+note right of PG
+Weighted composite scoring in DB:
+40% skills + 40% experience + 20% full
+ORDER BY score DESC LIMIT 10
+end note
+PG --> AI: top 10 job IDs + scores
 deactivate PG
 
-AI -> OAI: Generate explanations
-activate OAI
-note right of OAI
-~24s total
-10 explanations
-~3.9k tokens
-expensive, uncached path
-end note
-OAI --> AI: explanations
-deactivate OAI
+AI -> MON: Fetch job details (batch)
+activate MON
+MON --> AI: job titles, descriptions, qualifications
+deactivate MON
 
-AI -> PG: Persist explanations
+note over AI, OAI
+4 parallel LLM calls (batches of 3 jobs each)
+Wall time = slowest batch (~6-7s)
+end note
+
+par batch 1 (jobs 1-3)
+AI -> OAI: Generate explanations
+OAI --> AI: explanations JSON
+else batch 2 (jobs 4-6)
+AI -> OAI: Generate explanations
+OAI --> AI: explanations JSON
+else batch 3 (jobs 7-9)
+AI -> OAI: Generate explanations
+OAI --> AI: explanations JSON
+else batch 4 (job 10)
+AI -> OAI: Generate explanations
+OAI --> AI: explanations JSON
+end
+
+AI -> PG: Persist explanations + similarity scores
 activate PG
 PG --> AI: saved
 deactivate PG
 
+AI -> MON: Notify match explanations generated
+activate MON
+MON -> FE: SignalR MatchExplanationsGenerated
+deactivate MON
+
+== Final Real-Time UX ==
+
+FE -> GW: GET /resumes/jobs/matching
+activate GW
+GW -> MON: Forward request
+activate MON
+MON -> AI: Resolve matches
+activate AI
+AI -> PG: Read cached explanations + scores
+activate PG
+note right of PG
+Cache hit — no vector recomputation.
+Scores stored alongside explanations.
+end note
+PG --> AI: cached results
+deactivate PG
 AI --> MON: matches + explanations
 deactivate AI
-
 MON --> GW: 200 OK
 deactivate MON
-GW --> FE: results
+GW --> FE: Matching jobs with AI explanations
 deactivate GW
 
-== Phase 4 — Final Real-Time UX ==
-
-AI -> FE: SignalR FinalUpdates
-
 note over FE
-Final user experience:
-- Resume parsed progressively
-- Matches computed via embeddings
-- AI explanations generated
-- UI updated in real time
+Complete user experience:
+- Resume parsed progressively (~10s)
+- Matches computed via pgvector
+- AI explanations generated in parallel (~6s)
+- All subsequent requests served from cache
 
-No blocking. No polling.
+No blocking. No polling. Event-driven.
 end note
 
 deactivate AI

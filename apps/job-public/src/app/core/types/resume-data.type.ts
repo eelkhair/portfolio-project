@@ -70,14 +70,15 @@ export interface ResumeResponse {
 
 export type ParseStatus = 'idle' | 'uploading' | 'parsing' | 'partial' | 'complete' | 'ready' | 'parsed' | 'error' | 'retrying';
 
-export type ResumeSection = 'quick' | 'workHistory' | 'education' | 'certifications' | 'projects';
+export type ResumeSection = 'contact' | 'skills' | 'workHistory' | 'education' | 'certifications' | 'projects';
 
 export type SectionStatus = 'pending' | 'parsing' | 'done' | 'failed';
 
-export const ALL_RESUME_SECTIONS: ResumeSection[] = ['quick', 'workHistory', 'education', 'certifications', 'projects'];
+export const ALL_RESUME_SECTIONS: ResumeSection[] = ['contact', 'skills', 'workHistory', 'education', 'certifications', 'projects'];
 
 export const SECTION_LABELS: Record<ResumeSection, string> = {
-  quick: 'Contact & Skills',
+  contact: 'Contact Info',
+  skills: 'Summary & Skills',
   workHistory: 'Work History',
   education: 'Education',
   certifications: 'Certifications',

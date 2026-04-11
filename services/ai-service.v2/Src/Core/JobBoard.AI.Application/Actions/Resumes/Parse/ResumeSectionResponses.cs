@@ -1,7 +1,30 @@
 namespace JobBoard.AI.Application.Actions.Resumes.Parse;
 
 /// <summary>
-/// Phase 1 quick parse: contact info, summary, and skills.
+/// Phase 1 contact parse: contact info only (fast).
+/// </summary>
+public class ResumeContactParseResponse
+{
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Phone { get; set; } = string.Empty;
+    public string Linkedin { get; set; } = string.Empty;
+    public string Portfolio { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// Phase 2: summary and skills (runs in parallel with other sections).
+/// </summary>
+public class ResumeSkillsParseResponse
+{
+    public string? Summary { get; set; }
+    public List<string> Skills { get; set; } = [];
+}
+
+/// <summary>
+/// Legacy Phase 1 quick parse: contact info, summary, and skills.
+/// Kept for backward compatibility with existing parsed resumes.
 /// </summary>
 public class ResumeQuickParseResponse
 {

@@ -4,32 +4,45 @@ autonumber
 
 actor "Candidate UI" as FE
 participant "Monolith API" as MON
-participant "AI Service\n(Parse + Stream)" as AI
-participant "Embeddings + Matching" as EMB
+participant "AI Service\n(Parse + Orchestrate)" as AI
+participant "OpenAI + pgvector" as EMB
 
-== Upload ==
+== Upload (~0.3s) ==
 FE -> MON: Upload resume
-MON --> FE: Accepted
+MON --> FE: 201 Created
 
 note right of MON
 Atomic write:
-Resume + Outbox
+Resume + Outbox event
 end note
 
-== Async Processing ==
-MON -> AI: resume.uploaded
+== Phase 1 — Contact Parse (~1s) ==
+MON -> AI: resume.uploaded (event)
+AI -> AI: Extract contact info (1 LLM call)
+AI -> FE: SignalR "contact" parsed
 
-AI -> AI: Parse resume progressively
-AI -> FE: SignalR (sections stream)
+== Phase 2 — Parallel Sections (~9s) ==
+AI -> AI: 5 parallel LLM calls\n(skills, work, education, certs, projects)
+AI -> FE: SignalR per section (progressive)
 
 note right of FE
-UI updates live as resume is parsed
+UI updates live as each section completes
 end note
 
-== Enrichment ==
-AI -> EMB: Generate embeddings
-EMB -> AI: Matches + explanations
+== Phase 3 — Embeddings (~0.5s) ==
+AI -> EMB: 3 parallel embeddings\n(full + skills + experience)
+EMB --> AI: vectors stored in pgvector
 
-AI -> FE: SignalR (final results)
+== Phase 4 — Match Explanations (~6s) ==
+AI -> EMB: Top 10 jobs (pgvector similarity)\n+ 4 parallel LLM explanation batches
+EMB --> AI: Explanations + scores cached
+
+AI -> FE: SignalR (matching complete)
+
+note over FE
+Total: ~19s end-to-end
+No blocking. No polling. Event-driven.
+Subsequent requests served from cache.
+end note
 
 @enduml

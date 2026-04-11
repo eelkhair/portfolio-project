@@ -66,11 +66,11 @@ public class ProcessResumeUploadedCommandHandler(
                 FileContent = base64Content
             };
 
-            // Phase 1: Quick parse (contact info + summary + skills)
-            await ParseSectionAsync<ResumeQuickParseResponse>(
-                "quick", resumeText,
-                ParseResumeQuickPrompt.SystemPrompt,
-                ParseResumeQuickPrompt.BuildUserPrompt(parseRequest),
+            // Phase 1: Contact info only (fast ~1s — name, email, phone, links)
+            await ParseSectionAsync<ResumeContactParseResponse>(
+                "contact", resumeText,
+                ParseResumeContactPrompt.SystemPrompt,
+                ParseResumeContactPrompt.BuildUserPrompt(parseRequest),
                 eventData, request.Event.UserId, result =>
                 {
                     // Backfill email/phone from regex if the LLM missed them
@@ -81,8 +81,15 @@ public class ProcessResumeUploadedCommandHandler(
                 },
                 cancellationToken);
 
-            // Phase 2: Parallel section parsing — all 4 sections are independent
+            // Phase 2: All content sections in parallel (skills + 4 sections)
             await Task.WhenAll(
+                ParseSectionAsync<ResumeSkillsParseResponse>(
+                    "skills", resumeText,
+                    ParseResumeSkillsPrompt.SystemPrompt,
+                    ParseResumeSkillsPrompt.BuildUserPrompt(parseRequest),
+                    eventData, request.Event.UserId, null,
+                    cancellationToken),
+
                 ParseSectionAsync<ResumeWorkHistoryParseResponse>(
                     "workHistory", resumeText,
                     ParseResumeWorkHistoryPrompt.SystemPrompt,
@@ -202,8 +209,8 @@ public class ProcessResumeUploadedCommandHandler(
                     "Section {Section} attempt {Attempt}/{Max} failed for resume {ResumeUId}",
                     sectionName, attempt, MaxSectionRetries, eventData.ResumeUId);
 
-                // Re-throw immediately for quick section (Phase 1 failure is fatal)
-                if (sectionName == "quick")
+                // Re-throw immediately for contact section (Phase 1 failure is fatal)
+                if (sectionName == "contact")
                     throw;
             }
         }

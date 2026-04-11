@@ -35,7 +35,8 @@ export class ApplicationStore {
 
   // Progressive parse state
   readonly sectionStatuses = signal<Record<ResumeSection, SectionStatus>>({
-    quick: 'pending',
+    contact: 'pending',
+    skills: 'pending',
     workHistory: 'pending',
     education: 'pending',
     certifications: 'pending',
@@ -70,7 +71,8 @@ export class ApplicationStore {
     this.resumeData.set(null);
     this.parseStatus.set('parsing');
     this.sectionStatuses.set({
-      quick: 'parsing',
+      contact: 'parsing',
+      skills: 'pending',
       workHistory: 'pending',
       education: 'pending',
       certifications: 'pending',
@@ -101,10 +103,11 @@ export class ApplicationStore {
 
     this.sectionStatuses.update(s => ({ ...s, [section]: 'done' }));
 
-    // When quick parse completes, kick all Phase 2 sections to 'parsing' (they run in parallel)
-    if (section === 'quick') {
+    // When contact parse completes, kick all Phase 2 sections to 'parsing' (they run in parallel)
+    if (section === 'contact') {
       this.sectionStatuses.update(s => ({
         ...s,
+        skills: 'parsing',
         workHistory: 'parsing',
         education: 'parsing',
         certifications: 'parsing',
@@ -256,7 +259,8 @@ export class ApplicationStore {
     this.fileName.set('');
     this.lastTraceParent = undefined;
     this.sectionStatuses.set({
-      quick: 'pending',
+      contact: 'pending',
+      skills: 'pending',
       workHistory: 'pending',
       education: 'pending',
       certifications: 'pending',
