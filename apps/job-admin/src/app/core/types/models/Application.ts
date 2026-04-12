@@ -10,6 +10,10 @@ export interface ApplicationListItem {
   status: ApplicationStatus;
   createdAt: string;
   updatedAt?: string;
+  matchScore?: number;
+  matchSummary?: string;
+  matchDetails?: string[];
+  matchGaps?: string[];
 }
 
 export interface ApplicationDetail extends ApplicationListItem {

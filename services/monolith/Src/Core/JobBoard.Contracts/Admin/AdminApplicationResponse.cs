@@ -13,6 +13,12 @@ public class AdminApplicationListItem
     public string Status { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
+
+    // AI match data (populated when includeMatchScores=true)
+    public double? MatchScore { get; set; }
+    public string? MatchSummary { get; set; }
+    public List<string>? MatchDetails { get; set; }
+    public List<string>? MatchGaps { get; set; }
 }
 
 public class AdminApplicationDetail : AdminApplicationListItem
@@ -29,6 +35,12 @@ public class AdminApplicationDetail : AdminApplicationListItem
 
 public class UpdateApplicationStatusRequest
 {
+    public required string Status { get; set; }
+}
+
+public class BatchUpdateStatusRequest
+{
+    public required List<Guid> ApplicationIds { get; set; }
     public required string Status { get; set; }
 }
 

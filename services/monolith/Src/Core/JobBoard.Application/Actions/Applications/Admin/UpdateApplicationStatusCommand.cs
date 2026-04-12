@@ -24,8 +24,7 @@ public class UpdateApplicationStatusCommandHandler(
     public async Task<AdminApplicationListItem> HandleAsync(
         UpdateApplicationStatusCommand command, CancellationToken cancellationToken)
     {
-        if (!Enum.TryParse<ApplicationStatus>(command.Status, true, out var newStatus))
-            throw new FluentValidation.ValidationException($"Invalid status: {command.Status}");
+        var newStatus = Enum.Parse<ApplicationStatus>(command.Status, true);
 
         var app = await context.JobApplications
             .Include(a => a.Job).ThenInclude(j => j.Company)
@@ -52,4 +51,5 @@ public class UpdateApplicationStatusCommandHandler(
             UpdatedAt = app.UpdatedAt
         };
     }
+
 }

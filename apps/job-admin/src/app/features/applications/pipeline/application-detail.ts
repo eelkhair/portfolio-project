@@ -131,7 +131,7 @@ interface StatusOption {
 export class ApplicationDetailDialog {
   readonly store = inject(PipelineStore);
 
-  statusOptions: StatusOption[] = [
+  private readonly allStatusOptions: StatusOption[] = [
     { label: 'Submitted', value: 'Submitted' },
     { label: 'Under Review', value: 'UnderReview' },
     { label: 'Shortlisted', value: 'Shortlisted' },
@@ -139,14 +139,26 @@ export class ApplicationDetailDialog {
     { label: 'Accepted', value: 'Accepted' },
   ];
 
+  private readonly allowedTransitions: Record<ApplicationStatus, ApplicationStatus[]> = {
+    Submitted: ['UnderReview', 'Shortlisted', 'Rejected'],
+    UnderReview: ['Shortlisted', 'Rejected'],
+    Shortlisted: ['Accepted', 'Rejected'],
+    Rejected: ['UnderReview'],
+    Accepted: [],
+  };
+
+  statusOptions: StatusOption[] = [];
   selectedStatus: ApplicationStatus = 'Submitted';
 
   constructor() {
-    // Sync dropdown when selected application changes
     const checkInterval = setInterval(() => {
       const app = this.store.selectedApplication();
       if (app) {
         this.selectedStatus = app.status;
+        const allowed = this.allowedTransitions[app.status] ?? [];
+        this.statusOptions = this.allStatusOptions.filter(
+          o => o.value === app.status || allowed.includes(o.value)
+        );
         clearInterval(checkInterval);
       }
     }, 100);

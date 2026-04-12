@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../types/Dtos/ApiResponse';
-import { map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { ApplicationDetail, ApplicationListItem, ApplicationStatus, PaginatedResponse } from '../types/models/Application';
 
 export interface ApplicationFilters {
@@ -11,6 +11,7 @@ export interface ApplicationFilters {
   search?: string;
   page?: number;
   pageSize?: number;
+  includeMatchScores?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -25,6 +26,7 @@ export class ApplicationService {
     if (filters?.search) params = params.set('search', filters.search);
     if (filters?.page) params = params.set('page', filters.page.toString());
     if (filters?.pageSize) params = params.set('pageSize', filters.pageSize.toString());
+    if (filters?.includeMatchScores) params = params.set('includeMatchScores', 'true');
 
     return this.http.get<ApiResponse<PaginatedResponse<ApplicationListItem>>>(this.baseUrl, { params });
   }
@@ -37,6 +39,13 @@ export class ApplicationService {
     return this.http.patch<ApiResponse<ApplicationListItem>>(
       `${this.baseUrl}/${id}/status`,
       { status }
+    );
+  }
+
+  batchUpdateStatus(ids: string[], status: ApplicationStatus): Observable<ApiResponse<ApplicationListItem[]>> {
+    return this.http.patch<ApiResponse<ApplicationListItem[]>>(
+      `${this.baseUrl}/batch-status`,
+      { applicationIds: ids, status }
     );
   }
 }

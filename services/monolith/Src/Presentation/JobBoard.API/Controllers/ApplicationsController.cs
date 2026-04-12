@@ -21,10 +21,11 @@ public class ApplicationsController : BaseApiController
         [FromQuery] Guid? jobId,
         [FromQuery] string? search,
         [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 50)
+        [FromQuery] int pageSize = 50,
+        [FromQuery] bool includeMatchScores = false)
     {
         return await ExecuteQueryAsync(
-            new ListApplicationsQuery(status, jobId, search, page, pageSize), Ok);
+            new ListApplicationsQuery(status, jobId, search, page, pageSize, includeMatchScores), Ok);
     }
 
     /// <summary>
@@ -37,7 +38,7 @@ public class ApplicationsController : BaseApiController
     }
 
     /// <summary>
-    /// Updates the status of an application (e.g., Submitted → UnderReview → Shortlisted).
+    /// Updates the status of an application.
     /// </summary>
     [HttpPatch("{id:guid}/status")]
     public async Task<IActionResult> UpdateStatus(
@@ -46,5 +47,16 @@ public class ApplicationsController : BaseApiController
     {
         return await ExecuteCommandAsync(
             new UpdateApplicationStatusCommand(id, request.Status), Ok);
+    }
+
+    /// <summary>
+    /// Batch updates the status of multiple applications.
+    /// </summary>
+    [HttpPatch("batch-status")]
+    public async Task<IActionResult> BatchUpdateStatus(
+        [FromBody] BatchUpdateStatusRequest request)
+    {
+        return await ExecuteCommandAsync(
+            new UpdateBatchApplicationStatusCommand(request.ApplicationIds, request.Status), Ok);
     }
 }

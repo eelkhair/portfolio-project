@@ -1,40 +1,69 @@
-import {Component} from '@angular/core';
-import {Card} from 'primeng/card';
-import {Tag} from 'primeng/tag';
-import {Avatar} from 'primeng/avatar';
-import {ProgressBar} from 'primeng/progressbar';
+import { Component, effect, inject, OnInit } from '@angular/core';
+import { Card } from 'primeng/card';
+import { Tag } from 'primeng/tag';
+import { Avatar } from 'primeng/avatar';
+import { ProgressBar } from 'primeng/progressbar';
+import { ProgressSpinner } from 'primeng/progressspinner';
+import { Checkbox } from 'primeng/checkbox';
+import { Button } from 'primeng/button';
+import { Tooltip } from 'primeng/tooltip';
+import { Drawer } from 'primeng/drawer';
+import { Divider } from 'primeng/divider';
+import { Select } from 'primeng/select';
+import { FormsModule } from '@angular/forms';
+import { ReviewsStore } from './reviews.store';
+import { ApplicationStatus } from '../../../core/types/models/Application';
 
-interface ReviewCandidate {
-  name: string;
-  role: string;
-  company: string;
-  matchScore: number;
-  status: 'Pending' | 'Reviewed' | 'Shortlisted' | 'Rejected';
-  severity: 'warn' | 'info' | 'success' | 'danger';
-  avatar: string;
-  skills: string[];
-}
+interface StatusOption { label: string; value: ApplicationStatus; }
 
 @Component({
   selector: 'app-reviews',
-  imports: [Card, Tag, Avatar, ProgressBar],
+  imports: [Card, Tag, Avatar, ProgressBar, ProgressSpinner, Checkbox, Button, Tooltip, Drawer, Divider, Select, FormsModule],
   templateUrl: './reviews.html',
 })
-export class Reviews {
-  stats = {
-    pendingReview: 7,
-    avgMatchScore: 82,
-    shortlisted: 3
+export class Reviews implements OnInit {
+  readonly store = inject(ReviewsStore);
+
+  private readonly allStatusOptions: StatusOption[] = [
+    { label: 'Submitted', value: 'Submitted' },
+    { label: 'Under Review', value: 'UnderReview' },
+    { label: 'Shortlisted', value: 'Shortlisted' },
+    { label: 'Rejected', value: 'Rejected' },
+    { label: 'Accepted', value: 'Accepted' },
+  ];
+
+  private readonly allowedTransitions: Record<ApplicationStatus, ApplicationStatus[]> = {
+    Submitted: ['UnderReview', 'Shortlisted', 'Rejected'],
+    UnderReview: ['Shortlisted', 'Rejected'],
+    Shortlisted: ['Accepted', 'Rejected'],
+    Rejected: ['UnderReview'],
+    Accepted: [],
   };
 
-  candidates: ReviewCandidate[] = [
-    {name: 'Sarah Chen', role: 'Staff .NET Engineer', company: 'Nexus Analytics', matchScore: 94, status: 'Shortlisted', severity: 'success', avatar: 'SC', skills: ['.NET', 'DDD', 'CQRS', 'Azure']},
-    {name: 'Thomas Wright', role: 'Principal Engineer', company: 'Nexus Analytics', matchScore: 91, status: 'Shortlisted', severity: 'success', avatar: 'TW', skills: ['.NET', 'Microservices', 'Kubernetes']},
-    {name: 'Elena Vasquez', role: 'Staff .NET Engineer', company: 'Nexus Analytics', matchScore: 87, status: 'Reviewed', severity: 'info', avatar: 'EV', skills: ['.NET', 'Angular', 'SQL Server']},
-    {name: 'David Kim', role: 'Senior ML Engineer', company: 'Paradise Hospitality', matchScore: 83, status: 'Shortlisted', severity: 'success', avatar: 'DK', skills: ['Python', 'PyTorch', 'pgvector']},
-    {name: 'Marcus Rivera', role: 'Senior DevOps Engineer', company: 'Paradise Hospitality', matchScore: 78, status: 'Reviewed', severity: 'info', avatar: 'MR', skills: ['Docker', 'Terraform', 'GitHub Actions']},
-    {name: 'Priya Sharma', role: 'DevOps Engineer', company: 'GreenWave Energy', matchScore: 72, status: 'Pending', severity: 'warn', avatar: 'PS', skills: ['Kubernetes', 'Helm', 'Grafana']},
-    {name: 'James O\'Brien', role: 'Principal Engineer', company: 'Nexus Analytics', matchScore: 68, status: 'Pending', severity: 'warn', avatar: 'JO', skills: ['.NET', 'SignalR', 'Redis']},
-    {name: 'Lisa Nakamura', role: 'Staff .NET Engineer', company: 'Urban Retail', matchScore: 45, status: 'Rejected', severity: 'danger', avatar: 'LN', skills: ['Java', 'Spring Boot', 'AWS']},
-  ];
+  statusOptions: StatusOption[] = this.allStatusOptions;
+  selectedStatus: ApplicationStatus = 'Submitted';
+
+  constructor() {
+    effect(() => {
+      const app = this.store.selectedApplication();
+      if (app) {
+        this.selectedStatus = app.status;
+        const allowed = this.allowedTransitions[app.status] ?? [];
+        this.statusOptions = this.allStatusOptions.filter(
+          o => o.value === app.status || allowed.includes(o.value)
+        );
+      }
+    });
+  }
+
+  ngOnInit() {
+    this.store.load();
+  }
+
+  onStatusChange() {
+    const app = this.store.selectedApplication();
+    if (app && this.selectedStatus !== app.status) {
+      this.store.updateStatus(app.id, this.selectedStatus);
+    }
+  }
 }

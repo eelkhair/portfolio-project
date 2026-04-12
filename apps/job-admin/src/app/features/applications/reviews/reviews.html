@@ -1,67 +1,223 @@
-<div class="flex w-full justify-between mb-5">
+<div class="flex w-full justify-between items-center mb-5">
   <h1 class="text-3xl pl-2">Resume Reviews</h1>
+  @if (store.selectedIds().size > 0) {
+    <div class="flex gap-2">
+      <p-button label="Shortlist Selected" icon="pi pi-check" severity="success" size="small"
+                (click)="store.batchUpdateStatus('Shortlisted')" />
+      <p-button label="Reject Selected" icon="pi pi-times" severity="danger" size="small"
+                (click)="store.batchUpdateStatus('Rejected')" />
+      <p-button label="Clear" icon="pi pi-times-circle" severity="secondary" [text]="true" size="small"
+                (click)="store.clearSelection()" />
+    </div>
+  }
 </div>
 
-<div class="flex items-center gap-3 mb-6 px-3 py-3 rounded-lg surface-ground border-1 border-yellow-500/30">
-  <i class="pi pi-wrench text-yellow-400"></i>
-  <span class="text-sm text-color-secondary">
-    <span class="font-semibold text-yellow-400">Coming Soon</span> — AI-powered resume matching with pgvector cosine similarity scoring. Below is a preview of the planned UI.
-  </span>
-</div>
-
-<!-- Stats -->
-<div class="grid grid-cols-3 gap-4 mb-6">
-  <p-card>
-    <div class="flex flex-col items-center py-2">
-      <i class="pi pi-clock text-2xl text-orange-400 mb-2"></i>
-      <div class="text-3xl font-bold">{{ stats.pendingReview }}</div>
-      <div class="text-sm text-color-secondary mt-1">Pending Review</div>
-    </div>
-  </p-card>
-  <p-card>
-    <div class="flex flex-col items-center py-2">
-      <i class="pi pi-percentage text-2xl text-primary mb-2"></i>
-      <div class="text-3xl font-bold">{{ stats.avgMatchScore }}%</div>
-      <div class="text-sm text-color-secondary mt-1">Avg Match Score</div>
-    </div>
-  </p-card>
-  <p-card>
-    <div class="flex flex-col items-center py-2">
-      <i class="pi pi-star text-2xl text-green-400 mb-2"></i>
-      <div class="text-3xl font-bold">{{ stats.shortlisted }}</div>
-      <div class="text-sm text-color-secondary mt-1">Shortlisted</div>
-    </div>
-  </p-card>
-</div>
-
-<!-- Candidate List -->
-<div class="flex flex-col gap-3">
-  @for (c of candidates; track c.name) {
+@if (store.loading()) {
+  <div class="flex justify-center py-20">
+    <p-progressSpinner strokeWidth="3" />
+  </div>
+} @else if (store.error()) {
+  <div class="flex items-center gap-3 px-3 py-3 rounded-lg surface-ground border-1 border-red-500/30">
+    <i class="pi pi-exclamation-triangle text-red-400"></i>
+    <span class="text-sm text-color-secondary">{{ store.error() }}</span>
+  </div>
+} @else {
+  <!-- Stats -->
+  <div class="grid grid-cols-3 gap-4 mb-6">
     <p-card>
-      <div class="flex items-center gap-4">
-        <p-avatar [label]="c.avatar" shape="circle" size="large" />
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-2 mb-1">
-            <span class="font-semibold">{{ c.name }}</span>
-            <p-tag [value]="c.status" [severity]="c.severity" [rounded]="true" />
+      <div class="flex flex-col items-center py-2">
+        <i class="pi pi-clock text-2xl text-orange-400 mb-2"></i>
+        <div class="text-3xl font-bold">{{ store.stats().pending }}</div>
+        <div class="text-sm text-color-secondary mt-1">Pending Review</div>
+      </div>
+    </p-card>
+    <p-card>
+      <div class="flex flex-col items-center py-2">
+        <i class="pi pi-percentage text-2xl text-primary mb-2"></i>
+        <div class="text-3xl font-bold">{{ store.stats().avgScore }}%</div>
+        <div class="text-sm text-color-secondary mt-1">Avg Match Score</div>
+      </div>
+    </p-card>
+    <p-card>
+      <div class="flex flex-col items-center py-2">
+        <i class="pi pi-star text-2xl text-green-400 mb-2"></i>
+        <div class="text-3xl font-bold">{{ store.stats().shortlisted }}</div>
+        <div class="text-sm text-color-secondary mt-1">Shortlisted</div>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- Candidate List -->
+  <div class="flex flex-col gap-3">
+    @for (c of store.sortedByScore(); track c.id) {
+      <p-card styleClass="cursor-pointer hover:shadow-lg transition-shadow">
+        <div class="flex items-center gap-4">
+          @if (c.status !== 'Accepted') {
+            <p-checkbox
+              [binary]="true"
+              [ngModel]="store.selectedIds().has(c.id)"
+              (onChange)="store.toggleSelect(c.id)" />
+          } @else {
+            <div class="w-5"></div>
+          }
+          <p-avatar [label]="store.initials(c.applicantName)" shape="circle" size="large"
+                    (click)="store.selectApplication(c.id)" />
+          <div class="flex-1 min-w-0" (click)="store.selectApplication(c.id)">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-semibold">{{ c.applicantName }}</span>
+              <p-tag [value]="c.status" [severity]="store.statusSeverity(c.status)" [rounded]="true" />
+            </div>
+            <div class="text-sm text-color-secondary">{{ c.jobTitle }} · {{ c.companyName }}</div>
+            @if (c.matchSummary) {
+              <div class="text-xs text-color-secondary mt-1 opacity-80">{{ c.matchSummary }}</div>
+            }
           </div>
-          <div class="text-sm text-color-secondary">{{ c.role }} · {{ c.company }}</div>
-          <div class="flex gap-1 mt-2">
-            @for (skill of c.skills; track skill) {
-              <span class="text-xs px-2 py-0.5 rounded-full surface-ground text-color-secondary">{{ skill }}</span>
+          <div class="flex flex-col items-end gap-1 min-w-32">
+            <div class="text-sm text-color-secondary">Match Score</div>
+            <div class="w-full">
+              <p-progressBar
+                [value]="c.matchScore ?? 0"
+                [showValue]="true"
+                styleClass="h-2" />
+            </div>
+          </div>
+          @if (c.status !== 'Accepted') {
+            <div class="flex gap-1">
+              @if (c.status !== 'Shortlisted') {
+                <p-button icon="pi pi-check" severity="success" [text]="true" [rounded]="true"
+                          pTooltip="Shortlist" tooltipPosition="top"
+                          (click)="store.updateStatus(c.id, 'Shortlisted'); $event.stopPropagation()" />
+              }
+              @if (c.status !== 'Rejected') {
+                <p-button icon="pi pi-times" severity="danger" [text]="true" [rounded]="true"
+                          pTooltip="Reject" tooltipPosition="top"
+                          (click)="store.updateStatus(c.id, 'Rejected'); $event.stopPropagation()" />
+              }
+            </div>
+          }
+        </div>
+      </p-card>
+    } @empty {
+      <div class="text-center py-10 text-color-secondary">
+        <i class="pi pi-inbox text-4xl opacity-30 mb-3"></i>
+        <div>No applications to review</div>
+      </div>
+    }
+  </div>
+}
+
+<!-- Detail Drawer -->
+<p-drawer
+  [visible]="store.detailVisible()"
+  (visibleChange)="store.detailVisible.set($event)"
+  position="right"
+  [style]="{width: '520px'}"
+  (onHide)="store.closeDetail()">
+
+  <ng-template #header>
+    <span class="font-semibold text-lg">Application Review</span>
+  </ng-template>
+
+  @if (store.detailLoading()) {
+    <div class="flex justify-center py-10">
+      <p-progressSpinner strokeWidth="3" />
+    </div>
+  } @else if (store.selectedApplication(); as app) {
+    <div class="flex flex-col gap-4">
+      <div>
+        <h3 class="text-xl font-bold m-0">{{ app.applicantName }}</h3>
+        <div class="text-sm text-color-secondary mt-1">{{ app.applicantEmail }}</div>
+        <div class="text-sm text-color-secondary mt-1">
+          Applied for <strong>{{ app.jobTitle }}</strong> at {{ app.companyName }}
+        </div>
+      </div>
+
+      <!-- Match Score -->
+      @if (app.matchScore != null) {
+        <div>
+          <h4 class="text-sm font-semibold text-color-secondary uppercase tracking-wide mb-2">AI Match Score</h4>
+          <p-progressBar [value]="app.matchScore" [showValue]="true" styleClass="h-3" />
+          @if (app.matchSummary) {
+            <div class="text-sm mt-2">{{ app.matchSummary }}</div>
+          }
+          @if (app.matchDetails?.length) {
+            <div class="mt-2">
+              <div class="text-xs font-semibold text-green-500 mb-1">Strengths</div>
+              <ul class="text-xs text-color-secondary m-0 pl-4">
+                @for (d of app.matchDetails; track d) { <li>{{ d }}</li> }
+              </ul>
+            </div>
+          }
+          @if (app.matchGaps?.length) {
+            <div class="mt-2">
+              <div class="text-xs font-semibold text-orange-400 mb-1">Gaps</div>
+              <ul class="text-xs text-color-secondary m-0 pl-4">
+                @for (g of app.matchGaps; track g) { <li>{{ g }}</li> }
+              </ul>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Status -->
+      <div class="flex items-center gap-3">
+        <span class="text-sm font-semibold">Status:</span>
+        <p-select
+          [options]="statusOptions"
+          [(ngModel)]="selectedStatus"
+          optionLabel="label"
+          optionValue="value"
+          [style]="{width: '180px'}"
+          (onChange)="onStatusChange()" />
+      </div>
+
+      <p-divider />
+
+      <!-- Skills -->
+      @if (app.skills?.length) {
+        <div>
+          <h4 class="text-sm font-semibold text-color-secondary uppercase tracking-wide mb-2">Skills</h4>
+          <div class="flex flex-wrap gap-1">
+            @for (skill of app.skills; track skill) {
+              <p-tag [value]="skill" severity="info" />
             }
           </div>
         </div>
-        <div class="flex flex-col items-end gap-1 min-w-32">
-          <div class="text-sm text-color-secondary">Match Score</div>
-          <div class="w-full">
-            <p-progressBar
-              [value]="c.matchScore"
-              [showValue]="true"
-              styleClass="h-2" />
-          </div>
+      }
+
+      <!-- Work History -->
+      @if (app.workHistory?.length) {
+        <div>
+          <h4 class="text-sm font-semibold text-color-secondary uppercase tracking-wide mb-2">Work History</h4>
+          @for (w of app.workHistory; track w.company + w.jobTitle) {
+            <div class="mb-3">
+              <div class="font-semibold text-sm">{{ w.jobTitle }}</div>
+              <div class="text-xs text-color-secondary">{{ w.company }}</div>
+            </div>
+          }
         </div>
-      </div>
-    </p-card>
+      }
+
+      <!-- Education -->
+      @if (app.education?.length) {
+        <div>
+          <h4 class="text-sm font-semibold text-color-secondary uppercase tracking-wide mb-2">Education</h4>
+          @for (e of app.education; track e.institution + e.degree) {
+            <div class="mb-2">
+              <div class="font-semibold text-sm">{{ e.degree }}</div>
+              <div class="text-xs text-color-secondary">{{ e.institution }}</div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Cover Letter -->
+      @if (app.coverLetter) {
+        <div>
+          <h4 class="text-sm font-semibold text-color-secondary uppercase tracking-wide mb-2">Cover Letter</h4>
+          <div class="text-sm whitespace-pre-wrap">{{ app.coverLetter }}</div>
+        </div>
+      }
+    </div>
   }
-</div>
+</p-drawer>
