@@ -4,10 +4,11 @@ using CompanyApi.Infrastructure.Data;
 using CompanyApi.Infrastructure.Data.Entities;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace CompanyApi.Application.Queries;
 
-public class CompanyQueryService(ICompanyDbContext companyDbContext)
+public partial class CompanyQueryService(ICompanyDbContext companyDbContext, ILogger<CompanyQueryService> logger)
 : ICompanyQueryService
 {
     public async Task<List<CompanyResponse>> ListAsync(HttpContext context, CancellationToken ct)
@@ -18,13 +19,16 @@ public class CompanyQueryService(ICompanyDbContext companyDbContext)
         var uIds = FilteredUIds(context);
         if (uIds.Count > 0)
         {
+            LogListingFilteredCompanies(logger, uIds.Count);
             companies = await companiesQuery.Where(c => uIds.Contains(c.UId)).ToListAsync(ct);
         }
         else
         {
+            LogListingAllCompanies(logger);
             companies = await companiesQuery.ToListAsync(ct);
         }
 
+        LogListCompaniesCompleted(logger, companies.Count);
         return companies.Adapt<List<CompanyResponse>>();
     }
 
@@ -48,4 +52,13 @@ public class CompanyQueryService(ICompanyDbContext companyDbContext)
             .Distinct()
             .ToList();
     }
+
+    [LoggerMessage(LogLevel.Information, "Listing all companies (admin access)")]
+    static partial void LogListingAllCompanies(ILogger logger);
+
+    [LoggerMessage(LogLevel.Information, "Listing companies filtered to {Count} company UIDs")]
+    static partial void LogListingFilteredCompanies(ILogger logger, int count);
+
+    [LoggerMessage(LogLevel.Information, "List companies completed, returned {Count} companies")]
+    static partial void LogListCompaniesCompleted(ILogger logger, int count);
 }

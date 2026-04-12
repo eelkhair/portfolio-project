@@ -4,27 +4,28 @@ using CompanyAPI.Contracts.Models.Industries.Responses;
 using CompanyApi.Infrastructure.Data;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace CompanyApi.Application.Queries;
 
-public class IndustryQueryService(ICompanyDbContext companyDbContext, ILogger<IndustryQueryService> logger, ActivitySource activitySource) : IIndustryQueryService
+public partial class IndustryQueryService(ICompanyDbContext companyDbContext, ILogger<IndustryQueryService> logger, ActivitySource activitySource) : IIndustryQueryService
 {
     public async Task<List<IndustryResponse>> ListAsync(CancellationToken ct)
-    { 
+    {
         var activity = activitySource.StartActivity("ListIndustries");
         try
         {
-            logger.LogInformation("Fetching Industries");
+            LogFetchingIndustries(logger);
             var industries = await companyDbContext.Industries.AsNoTracking().ToListAsync(ct);
 
             activity?.SetTag("industries.count", industries.Count);
 
+            LogIndustriesFetched(logger, industries.Count);
             activity?.Stop();
             return industries.Adapt<List<IndustryResponse>>();
         }catch (OperationCanceledException e)
         {
             activity?.SetStatus(ActivityStatusCode.Error, "canceled");
-            logger.LogError(e, "Fetch industries canceled");
             throw;
         }
         catch (Exception ex)
@@ -36,9 +37,13 @@ public class IndustryQueryService(ICompanyDbContext companyDbContext, ILogger<In
                     ["exception.type"] = ex.GetType().FullName!,
                     ["exception.message"] = ex.Message
                 }));
-
-            logger.LogError(ex, "Failed to fetch industries");
             throw;
         }
     }
+
+    [LoggerMessage(LogLevel.Information, "Fetching industries")]
+    static partial void LogFetchingIndustries(ILogger logger);
+
+    [LoggerMessage(LogLevel.Information, "Industries fetched, returned {Count} industries")]
+    static partial void LogIndustriesFetched(ILogger logger, int count);
 }

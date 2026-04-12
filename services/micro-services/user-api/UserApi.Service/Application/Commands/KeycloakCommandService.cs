@@ -8,13 +8,15 @@ using UserAPI.Contracts.Models.Events;
 
 namespace UserApi.Application.Commands;
 
-public class KeycloakCommandService(ActivitySource activitySource, IKeycloakFactory factory, ILogger<KeycloakCommandService> logger) : IKeycloakCommandService
+public partial class KeycloakCommandService(ActivitySource activitySource, IKeycloakFactory factory, ILogger<KeycloakCommandService> logger) : IKeycloakCommandService
 {
     private IKeycloakResource? _resource;
 
     public async Task<(KeycloakUser User, KeycloakGroup Group)> ProvisionUserAsync(
         ProvisionUserEvent user, CancellationToken ct)
     {
+        LogProvisioningUser(logger, user.Email, user.CompanyName);
+
         _resource ??= await factory.GetKeycloakResourceAsync(ct);
 
         // 1. Create company group under /Companies/{uid}
@@ -61,11 +63,11 @@ public class KeycloakCommandService(ActivitySource activitySource, IKeycloakFact
             using var activity6 = activitySource.StartActivity("Sending Verification Email.");
             var emailResult = await _resource.SendVerifyEmailAsync(userResult.Data!.Id!, ct);
             if (!emailResult.Success)
-                logger.LogWarning("Failed to send verification email to {Email}: {Error}",
-                    user.Email, emailResult.Exceptions?.Message);
+                LogVerificationEmailFailed(logger, user.Email, emailResult.Exceptions?.Message);
             activity6?.SetTag("email.sent", emailResult.Success);
         }
 
+        LogProvisioningCompleted(logger, user.Email);
         return (userResult.Data!, groupResult.Data!);
     }
 
@@ -95,9 +97,20 @@ public class KeycloakCommandService(ActivitySource activitySource, IKeycloakFact
                           ?? result.Exceptions?.Errors?.Values.SelectMany(v => v).FirstOrDefault()
                           ?? "Unknown error";
 
-        logger.LogError("Keycloak provisioning failed at '{Context}': {Error} (StatusCode: {StatusCode})",
-            context, errorDetail, result.StatusCode);
+        LogProvisioningFailed(logger, context, errorDetail, result.StatusCode);
 
         throw new ArgumentException($"{context}: {errorDetail}");
     }
+
+    [LoggerMessage(LogLevel.Information, "Provisioning user '{Email}' for company '{CompanyName}'")]
+    static partial void LogProvisioningUser(ILogger logger, string email, string companyName);
+
+    [LoggerMessage(LogLevel.Information, "Provisioning completed for user '{Email}'")]
+    static partial void LogProvisioningCompleted(ILogger logger, string email);
+
+    [LoggerMessage(LogLevel.Warning, "Failed to send verification email to {Email}: {Error}")]
+    static partial void LogVerificationEmailFailed(ILogger logger, string email, string? error);
+
+    [LoggerMessage(LogLevel.Error, "Keycloak provisioning failed at '{Context}': {Error} (StatusCode: {StatusCode})")]
+    static partial void LogProvisioningFailed(ILogger logger, string context, string error, System.Net.HttpStatusCode? statusCode);
 }

@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using NSwag;
 using UserApi.Application.Commands;
 using UserApi.Application.Commands.Interfaces;
+using UserApi.Application.Queries;
+using UserApi.Application.Queries.Interfaces;
 using UserApi.Infrastructure.Data;
 using UserApi.Infrastructure.Keycloak;
 using UserApi.Infrastructure.Keycloak.Interfaces;
@@ -96,6 +98,7 @@ public static class DependencyInjection
         });
         services.AddScoped<IUserDbContext, UserDbContext>();
         services.AddScoped<ICompanyCommandService, CompanyCommandService>();
+        services.AddScoped<IUserQueryService, UserQueryService>();
 
         services.AddKeycloakJwtAuth(cfg);
         services.AddAuthorization();

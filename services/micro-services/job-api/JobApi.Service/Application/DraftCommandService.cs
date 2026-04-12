@@ -10,10 +10,11 @@ using JobAPI.Contracts.Models.Drafts.Requests;
 using JobAPI.Contracts.Models.Drafts.Responses;
 using JobBoard.IntegrationEvents.Draft;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace JobApi.Application;
 
-public class DraftCommandService(IJobDbContext context, IMessageSender messageSender) : IDraftCommandService
+public partial class DraftCommandService(IJobDbContext context, IMessageSender messageSender, ILogger<DraftCommandService> logger) : IDraftCommandService
 {
     private static readonly JsonSerializerOptions JsonOpts = new()
     {
@@ -23,6 +24,7 @@ public class DraftCommandService(IJobDbContext context, IMessageSender messageSe
 
     public async Task<DraftResponse> SaveDraftAsync(Guid companyUId, SaveDraftRequest request, ClaimsPrincipal user, CancellationToken ct, bool publishEvent = true)
     {
+        LogSavingDraft(logger, companyUId, request.Id);
         Activity.Current?.SetTag("draft.incoming.id", request.Id);
         Activity.Current?.SetTag("draft.companyUid", companyUId);
         Activity.Current?.SetTag("draft.publishEvent", publishEvent);
@@ -81,11 +83,14 @@ public class DraftCommandService(IJobDbContext context, IMessageSender messageSe
 
         var response = JsonSerializer.Deserialize<DraftResponse>(draft.ContentJson, JsonOpts) ?? new DraftResponse();
         response.Id = draft.UId.ToString();
+
+        LogDraftSaved(logger, draft.UId);
         return response;
     }
 
     public async Task DeleteDraftAsync(Guid draftUId, ClaimsPrincipal user, CancellationToken ct, bool publishEvent = true)
     {
+        LogDeletingDraft(logger, draftUId);
         Activity.Current?.SetTag("draft.uid", draftUId);
         Activity.Current?.SetTag("draft.publishEvent", publishEvent);
 
@@ -108,5 +113,19 @@ public class DraftCommandService(IJobDbContext context, IMessageSender messageSe
             var evt = new DraftDeletedV1Event(draftUId, companyUId);
             await messageSender.SendEventAsync("rabbitmq.pubsub", "micro.draft-deleted.v1", userId, evt, ct);
         }
+
+        LogDraftDeleted(logger, draftUId);
     }
+
+    [LoggerMessage(LogLevel.Information, "Saving draft for company {CompanyUId}, incoming ID '{DraftId}'")]
+    static partial void LogSavingDraft(ILogger logger, Guid companyUId, string? draftId);
+
+    [LoggerMessage(LogLevel.Information, "Draft saved: {DraftUId}")]
+    static partial void LogDraftSaved(ILogger logger, Guid draftUId);
+
+    [LoggerMessage(LogLevel.Information, "Deleting draft {DraftUId}")]
+    static partial void LogDeletingDraft(ILogger logger, Guid draftUId);
+
+    [LoggerMessage(LogLevel.Information, "Draft deleted: {DraftUId}")]
+    static partial void LogDraftDeleted(ILogger logger, Guid draftUId);
 }

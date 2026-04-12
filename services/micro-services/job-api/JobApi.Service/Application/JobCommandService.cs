@@ -8,13 +8,16 @@ using JobApi.Infrastructure.Data.Entities;
 using JobBoard.IntegrationEvents.Job;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace JobApi.Application;
 
-public class JobCommandService(IJobDbContext context, IMessageSender messageSender) : IJobCommandService
+public partial class JobCommandService(IJobDbContext context, IMessageSender messageSender, ILogger<JobCommandService> logger) : IJobCommandService
 {
     public async Task<JobResponse> CreateJobAsync(CreateJobRequest request, ClaimsPrincipal user, CancellationToken ct, bool publishEvent = true)
     {
+        LogCreatingJob(logger, request.Title, request.CompanyUId);
+
         var company = await context.Companies.FirstAsync(c=> c.UId == request.CompanyUId, ct);
         var job = request.Adapt<Job>();
         job.CompanyId = company.Id;
@@ -38,6 +41,13 @@ public class JobCommandService(IJobDbContext context, IMessageSender messageSend
                 userId, evt, ct);
         }
 
+        LogJobCreated(logger, job.Title, job.UId);
         return job.Adapt<JobResponse>();
     }
+
+    [LoggerMessage(LogLevel.Information, "Creating job '{JobTitle}' for company {CompanyUId}")]
+    static partial void LogCreatingJob(ILogger logger, string jobTitle, Guid companyUId);
+
+    [LoggerMessage(LogLevel.Information, "Job created: '{JobTitle}' ({JobUId})")]
+    static partial void LogJobCreated(ILogger logger, string jobTitle, Guid jobUId);
 }

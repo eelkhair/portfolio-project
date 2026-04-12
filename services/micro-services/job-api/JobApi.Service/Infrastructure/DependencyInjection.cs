@@ -103,6 +103,7 @@ public static class DependencyInjection
         services.AddScoped<IJobCommandService, JobCommandService>();
         services.AddScoped<IDraftCommandService, DraftCommandService>();
         services.AddScoped<IDraftQueryService, DraftQueryService>();
+        services.AddScoped<IDashboardQueryService, DashboardQueryService>();
         services.AddMessageSender();
 
         services.AddKeycloakJwtAuth(cfg);

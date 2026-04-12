@@ -39,16 +39,21 @@ public class TracingMiddleware(RequestDelegate next, ILogger<TracingMiddleware> 
         }
 
         var method = context.Request.Method;
-        var route = context.GetEndpoint()?.DisplayName ?? path;
+
+        // Resolve endpoint name: FastEndpoints sets DisplayName to the endpoint class name
+        var endpointName = ResolveEndpointName(context, path);
+        var entityType = activity?.GetTagItem("entity.type")?.ToString();
+        var operation = activity?.GetTagItem("operation")?.ToString();
 
         using (logger.BeginScope(new Dictionary<string, object?>
         {
             ["HttpMethod"] = method,
             ["RequestPath"] = path,
+            ["EndpointName"] = endpointName,
             ["TraceId"] = activity?.TraceId.ToString()
         }))
         {
-            logger.LogInformation("Executing {Method} {Path}", method, path);
+            logger.LogInformation("Executing {Endpoint}...", endpointName);
 
             var sw = Stopwatch.StartNew();
             try
@@ -56,18 +61,22 @@ public class TracingMiddleware(RequestDelegate next, ILogger<TracingMiddleware> 
                 await next(context);
                 sw.Stop();
 
+                // Re-read tags set by the endpoint handler
+                entityType ??= activity?.GetTagItem("entity.type")?.ToString();
+                operation ??= activity?.GetTagItem("operation")?.ToString();
+
                 var status = context.Response.StatusCode;
                 activity?.SetTag("endpoint.duration_ms", sw.ElapsedMilliseconds);
 
                 if (status >= 400)
                 {
-                    logger.LogWarning("Completed {Method} {Path} with {StatusCode} in {Duration}ms",
-                        method, path, status, sw.ElapsedMilliseconds);
+                    logger.LogWarning("Failed {Endpoint} with {StatusCode} in {Duration}ms",
+                        endpointName, status, sw.ElapsedMilliseconds);
                 }
                 else
                 {
-                    logger.LogInformation("Completed {Method} {Path} with {StatusCode} in {Duration}ms",
-                        method, path, status, sw.ElapsedMilliseconds);
+                    logger.LogInformation("Successfully executed {Endpoint} ({EntityType}.{Operation}) in {Duration}ms",
+                        endpointName, entityType ?? "unknown", operation ?? "unknown", sw.ElapsedMilliseconds);
                 }
             }
             catch (Exception ex)
@@ -77,10 +86,24 @@ public class TracingMiddleware(RequestDelegate next, ILogger<TracingMiddleware> 
                 activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
                 activity?.SetTag("endpoint.duration_ms", sw.ElapsedMilliseconds);
 
-                logger.LogError(ex, "Failed {Method} {Path} after {Duration}ms",
-                    method, path, sw.ElapsedMilliseconds);
+                logger.LogError(ex, "An unexpected failure occurred while executing {Endpoint} after {Duration}ms",
+                    endpointName, sw.ElapsedMilliseconds);
                 throw;
             }
         }
+    }
+
+    private static string ResolveEndpointName(HttpContext context, string path)
+    {
+        var endpoint = context.GetEndpoint();
+        if (endpoint?.DisplayName is { } display && !display.StartsWith("HTTP:"))
+        {
+            // FastEndpoints sets DisplayName to the fully qualified class name
+            // Extract just the class name: "AdminApi.Features.Dashboard.GetDashboardEndpoint" -> "GetDashboardEndpoint"
+            var lastDot = display.LastIndexOf('.');
+            return lastDot >= 0 ? display[(lastDot + 1)..] : display;
+        }
+
+        return $"{context.Request.Method} {path}";
     }
 }

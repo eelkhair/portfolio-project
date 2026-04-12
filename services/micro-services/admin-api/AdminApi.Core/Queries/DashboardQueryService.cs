@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AdminApi.Application.Queries;
 
-public class DashboardQueryService(DaprClient client, UserContextService accessor, ILogger<DashboardQueryService> logger)
+public partial class DashboardQueryService(DaprClient client, UserContextService accessor, ILogger<DashboardQueryService> logger)
     : IDashboardQueryService
 {
     static readonly JsonSerializerOptions JsonOpts = new()
@@ -23,6 +23,7 @@ public class DashboardQueryService(DaprClient client, UserContextService accesso
     {
         try
         {
+            LogFetchingDashboard(logger);
             var req = client.CreateInvokeMethodRequest(HttpMethod.Get, "job-api", "api/dashboard");
 
             if (accessor.GetHeader("Authorization") is { } auth && !string.IsNullOrWhiteSpace(auth))
@@ -33,7 +34,7 @@ public class DashboardQueryService(DaprClient client, UserContextService accesso
 
             if (!resp.IsSuccessStatusCode)
             {
-                logger.LogError("job-api returned {StatusCode}: {Body}", (int)resp.StatusCode, raw);
+                LogJobApiError(logger, (int)resp.StatusCode, raw);
                 var error = JsonSerializer.Deserialize<ApiError>(raw, JsonOpts);
                 return new ApiResponse<DashboardResponse>
                 {
@@ -44,6 +45,7 @@ public class DashboardQueryService(DaprClient client, UserContextService accesso
             }
 
             var result = JsonSerializer.Deserialize<DashboardResponse>(raw, JsonOpts);
+            LogDashboardFetched(logger);
             return new ApiResponse<DashboardResponse>
             {
                 Data = result,
@@ -53,7 +55,7 @@ public class DashboardQueryService(DaprClient client, UserContextService accesso
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error fetching dashboard from job-api");
+            LogFetchDashboardError(logger, e);
             return new ApiResponse<DashboardResponse>
             {
                 Success = false,
@@ -66,4 +68,16 @@ public class DashboardQueryService(DaprClient client, UserContextService accesso
             };
         }
     }
+
+    [LoggerMessage(LogLevel.Information, "Fetching dashboard from job-api")]
+    static partial void LogFetchingDashboard(ILogger logger);
+
+    [LoggerMessage(LogLevel.Information, "Dashboard fetched successfully")]
+    static partial void LogDashboardFetched(ILogger logger);
+
+    [LoggerMessage(LogLevel.Error, "job-api returned {StatusCode}: {Body}")]
+    static partial void LogJobApiError(ILogger logger, int statusCode, string body);
+
+    [LoggerMessage(LogLevel.Error, "Error fetching dashboard from job-api")]
+    static partial void LogFetchDashboardError(ILogger logger, Exception exception);
 }

@@ -1,12 +1,10 @@
 using FastEndpoints;
-using Microsoft.EntityFrameworkCore;
+using UserApi.Application.Queries.Interfaces;
 using UserAPI.Contracts.Models.Responses;
-using UserApi.Features.Users.Mappers;
-using UserApi.Infrastructure.Data;
 
 namespace UserApi.Features.Users.List;
 
-public class ListUsersEndpoint(IUserDbContext dbContext) : EndpointWithoutRequest<List<UserResponse>, UserMapper>
+public class ListUsersEndpoint(IUserQueryService userQueryService) : EndpointWithoutRequest<List<UserResponse>>
 {
     public override void Configure()
     {
@@ -16,7 +14,7 @@ public class ListUsersEndpoint(IUserDbContext dbContext) : EndpointWithoutReques
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var companies = await dbContext.Users.AsNoTracking().ToListAsync(cancellationToken: ct);
-        await Send.OkAsync(  companies.Select(Map.FromEntity).ToList(), cancellation: ct);
+        var users = await userQueryService.ListAsync(ct);
+        await Send.OkAsync(users, cancellation: ct);
     }
 }

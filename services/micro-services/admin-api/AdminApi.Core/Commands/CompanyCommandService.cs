@@ -6,15 +6,16 @@ using Elkhair.Dev.Common.Application;
 using Elkhair.Dev.Common.Dapr;
 using Elkhair.Dev.Common.Domain.Constants;
 using JobBoard.IntegrationEvents.Company;
+using Microsoft.Extensions.Logging;
 using UserAPI.Contracts.Models.Events;
 
 namespace AdminApi.Application.Commands;
 
-public class CompanyCommandService(DaprClient client, UserContextService accessor, IMessageSender sender, ILogger<CompanyCommandService> logger) : ICompanyCommandService
+public partial class CompanyCommandService(DaprClient client, UserContextService accessor, IMessageSender sender, ILogger<CompanyCommandService> logger) : ICompanyCommandService
 {
     public async Task<ApiResponse<CompanyResponse>> CreateAsync(CreateCompanyRequest request, CancellationToken ct)
     {
-        logger.LogInformation("Calling company-api to create company: {CompanyName}", request.Name);
+        LogCreatingCompany(logger, request.Name);
         var message = client.CreateInvokeMethodRequest(HttpMethod.Post, "company-api", "api/companies");
         message.Headers.Add("Authorization", accessor.GetHeader("Authorization"));
         message.Content=  JsonContent.Create(request);
@@ -51,6 +52,8 @@ public class CompanyCommandService(DaprClient client, UserContextService accesso
                 {
                     UserId = userId
                 }, ct);
+
+            LogCompanyCreated(logger, data.UId, data.Name);
         }
 
         return company;
@@ -58,11 +61,25 @@ public class CompanyCommandService(DaprClient client, UserContextService accesso
 
     public async Task<ApiResponse<CompanyResponse>> UpdateAsync(Guid companyUId, UpdateCompanyRequest request, CancellationToken ct)
     {
-        logger.LogInformation("Calling company-api to update company: {CompanyUId}", companyUId);
+        LogUpdatingCompany(logger, companyUId);
         var message = client.CreateInvokeMethodRequest(HttpMethod.Put, "company-api", $"api/companies/{companyUId}");
         message.Headers.Add("Authorization", accessor.GetHeader("Authorization"));
         message.Content = JsonContent.Create(request);
-        return await DaprExtensions.Process(() =>
+        var result = await DaprExtensions.Process(() =>
             client.InvokeMethodAsync<CompanyResponse>(message, cancellationToken: ct));
+        LogCompanyUpdated(logger, companyUId);
+        return result;
     }
+
+    [LoggerMessage(LogLevel.Information, "Creating company: {CompanyName}")]
+    static partial void LogCreatingCompany(ILogger logger, string companyName);
+
+    [LoggerMessage(LogLevel.Information, "Company created: {CompanyUId} ({CompanyName})")]
+    static partial void LogCompanyCreated(ILogger logger, Guid companyUId, string companyName);
+
+    [LoggerMessage(LogLevel.Information, "Updating company: {CompanyUId}")]
+    static partial void LogUpdatingCompany(ILogger logger, Guid companyUId);
+
+    [LoggerMessage(LogLevel.Information, "Company updated: {CompanyUId}")]
+    static partial void LogCompanyUpdated(ILogger logger, Guid companyUId);
 }

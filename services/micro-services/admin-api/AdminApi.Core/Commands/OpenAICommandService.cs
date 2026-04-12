@@ -6,10 +6,11 @@ using AdminAPI.Contracts.Models.Jobs.Requests;
 using AdminAPI.Contracts.Models.Jobs.Responses;
 using Dapr.Client;
 using Elkhair.Dev.Common.Application;
+using Microsoft.Extensions.Logging;
 
 namespace AdminApi.Application.Commands;
 
-public class OpenAICommandService(DaprClient client, UserContextService accessor, ILogger<OpenAICommandService> _logger): IOpenAICommandService
+public partial class OpenAICommandService(DaprClient client, UserContextService accessor, ILogger<OpenAICommandService> logger): IOpenAICommandService
 {
     static readonly JsonSerializerOptions JsonOpts = new()
          {
@@ -22,6 +23,7 @@ public class OpenAICommandService(DaprClient client, UserContextService accessor
     {
         try
         {
+            LogGeneratingJob(logger, companyId);
             var req = client.CreateInvokeMethodRequest(
                 HttpMethod.Post,
                 appId: "ai-service-v2",
@@ -40,19 +42,19 @@ public class OpenAICommandService(DaprClient client, UserContextService accessor
 
             if (!resp.IsSuccessStatusCode)
             {
-
-                _logger.LogError("ai-service-v2 returned {StatusCode}: {Body}", (int)resp.StatusCode, raw);
+                LogAiServiceError(logger, (int)resp.StatusCode, raw);
 
                 throw new HttpRequestException(
                     $"ai-service-v2 {resp.StatusCode}: {raw}", null, resp.StatusCode);
             }
 
             var result = JsonSerializer.Deserialize<ApiResponse<JobGenResponse>>(raw, JsonOpts);
+            LogJobGenerated(logger, companyId);
 
             return result ?? throw new InvalidOperationException("Empty or invalid JSON from ai-service-v2.");
         }catch (Exception e)
         {
-            _logger.LogError(e, "Error generating job draft");
+            LogGenerateJobError(logger, e, companyId);
             return new ApiResponse<JobGenResponse>() { Success = false, StatusCode = HttpStatusCode.InternalServerError, Exceptions = new ApiError()
             {
                 Message = e.Message,
@@ -63,4 +65,16 @@ public class OpenAICommandService(DaprClient client, UserContextService accessor
             }};
         }
     }
+
+    [LoggerMessage(LogLevel.Information, "Generating job draft for company {CompanyId}")]
+    static partial void LogGeneratingJob(ILogger logger, string companyId);
+
+    [LoggerMessage(LogLevel.Information, "Job draft generated for company {CompanyId}")]
+    static partial void LogJobGenerated(ILogger logger, string companyId);
+
+    [LoggerMessage(LogLevel.Error, "ai-service-v2 returned {StatusCode}: {Body}")]
+    static partial void LogAiServiceError(ILogger logger, int statusCode, string body);
+
+    [LoggerMessage(LogLevel.Error, "Error generating job draft for company {CompanyId}")]
+    static partial void LogGenerateJobError(ILogger logger, Exception exception, string companyId);
 }

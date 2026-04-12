@@ -3,6 +3,7 @@ using AdminApi.Tests.Helpers;
 using CompanyAPI.Contracts.Models.Companies.Responses;
 using Dapr.Client;
 using Elkhair.Dev.Common.Application;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using Shouldly;
@@ -19,7 +20,7 @@ public class CompanyQueryServiceTests
     public CompanyQueryServiceTests()
     {
         _daprClient.SetupCreateInvokeMethodRequest();
-        _sut = new CompanyQueryService(_daprClient, _accessor);
+        _sut = new CompanyQueryService(_daprClient, _accessor, Substitute.For<ILogger<CompanyQueryService>>());
     }
 
     [Fact]

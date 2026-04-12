@@ -10,10 +10,11 @@ using Elkhair.Dev.Common.Application;
 using Elkhair.Dev.Common.Dapr;
 using Elkhair.Dev.Common.Domain.Constants;
 using JobAPI.Contracts.Models.Jobs.Responses;
+using Microsoft.Extensions.Logging;
 
 namespace AdminApi.Application.Commands;
 
-public class JobCommandService(DaprClient client, UserContextService accessor, IMessageSender sender, ILogger<JobCommandService> _logger) : IJobCommandService
+public partial class JobCommandService(DaprClient client, UserContextService accessor, IMessageSender sender, ILogger<JobCommandService> logger) : IJobCommandService
 {
     static readonly JsonSerializerOptions JsonOpts = new()
     {
@@ -26,6 +27,7 @@ public class JobCommandService(DaprClient client, UserContextService accessor, I
     {
         try
         {
+            LogCreatingDraft(logger, companyId);
             var req = client.CreateInvokeMethodRequest(
                 HttpMethod.Put,
                 appId: "job-api",
@@ -45,13 +47,14 @@ public class JobCommandService(DaprClient client, UserContextService accessor, I
 
             if (!resp.IsSuccessStatusCode)
             {
-                _logger.LogError("job-api returned {StatusCode}: {Body}", (int)resp.StatusCode, raw);
+                LogJobApiError(logger, (int)resp.StatusCode, raw);
 
                 throw new HttpRequestException(
                     $"job-api {resp.StatusCode}: {raw}", null, resp.StatusCode);
             }
 
             var draft = JsonSerializer.Deserialize<JobDraftResponse>(raw, JsonOpts);
+            LogDraftCreated(logger, companyId);
 
             return new ApiResponse<JobDraftResponse>
             {
@@ -61,7 +64,7 @@ public class JobCommandService(DaprClient client, UserContextService accessor, I
             };
         }catch (Exception e)
         {
-            _logger.LogError(e, "Error creating job draft");
+            LogCreateDraftError(logger, e);
             return new ApiResponse<JobDraftResponse> { Success = false, StatusCode = HttpStatusCode.InternalServerError, Exceptions = new ApiError()
             {
                 Message = e.Message,
@@ -76,6 +79,7 @@ public class JobCommandService(DaprClient client, UserContextService accessor, I
     {
         try
         {
+            LogRewritingItem(logger);
             var req = client.CreateInvokeMethodRequest(
                 HttpMethod.Put,
                 appId: "ai-service-v2",
@@ -93,19 +97,20 @@ public class JobCommandService(DaprClient client, UserContextService accessor, I
 
             if (!resp.IsSuccessStatusCode)
             {
-                _logger.LogError("ai-service-v2 returned {StatusCode}: {Body}", (int)resp.StatusCode, raw);
+                LogAiServiceError(logger, (int)resp.StatusCode, raw);
 
                 throw new HttpRequestException(
                     $"ai-service-v2 {resp.StatusCode}: {raw}", null, resp.StatusCode);
             }
 
             var result = JsonSerializer.Deserialize<ApiResponse<JobRewriteResponse>>(raw, JsonOpts);
+            LogRewriteCompleted(logger);
 
             return result ?? throw new InvalidOperationException("Empty or invalid JSON from ai-service-v2.");
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error rewriting job item");
+            LogRewriteItemError(logger, e);
             return new ApiResponse<JobRewriteResponse> { Success = false, StatusCode = HttpStatusCode.InternalServerError, Exceptions = new ApiError()
             {
                 Message = e.Message,
@@ -121,6 +126,7 @@ public class JobCommandService(DaprClient client, UserContextService accessor, I
     {
         try
         {
+            LogCreatingJob(logger);
             var req = client.CreateInvokeMethodRequest(HttpMethod.Post, "job-api", "api/jobs");
 
             if (accessor.GetHeader("Authorization") is { } auth && !string.IsNullOrWhiteSpace(auth))
@@ -135,7 +141,7 @@ public class JobCommandService(DaprClient client, UserContextService accessor, I
 
             if (!resp.IsSuccessStatusCode)
             {
-                _logger.LogError("job-api returned {StatusCode}: {Body}", (int)resp.StatusCode, raw);
+                LogJobApiError(logger, (int)resp.StatusCode, raw);
                 var error = JsonSerializer.Deserialize<ApiError>(raw, JsonOpts);
                 return new ApiResponse<JobResponse>
                 {
@@ -168,6 +174,8 @@ public class JobCommandService(DaprClient client, UserContextService accessor, I
                         DraftId = request.DraftId,
                         DeleteDraft = request.DeleteDraft
                     }, ct);
+
+                LogJobCreated(logger, job.UId);
             }
 
             return new ApiResponse<JobResponse>
@@ -179,7 +187,7 @@ public class JobCommandService(DaprClient client, UserContextService accessor, I
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error creating job");
+            LogCreateJobError(logger, e);
             return new ApiResponse<JobResponse>
             {
                 Success = false,
@@ -197,6 +205,7 @@ public class JobCommandService(DaprClient client, UserContextService accessor, I
     {
         try
         {
+            LogDeletingDraft(logger, draftId, companyId);
             var req = client.CreateInvokeMethodRequest(
                 HttpMethod.Delete,
                 appId: "job-api",
@@ -207,11 +216,54 @@ public class JobCommandService(DaprClient client, UserContextService accessor, I
                 req.Headers.TryAddWithoutValidation("Authorization", auth);
 
             await client.InvokeMethodAsync(req, ct);
+            LogDraftDeleted(logger, draftId);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error deleting draft {DraftId} for company {CompanyId}", draftId, companyId);
+            LogDeleteDraftError(logger, e, draftId, companyId);
             throw;
         }
     }
+
+    [LoggerMessage(LogLevel.Information, "Creating job draft for company {CompanyId}")]
+    static partial void LogCreatingDraft(ILogger logger, string companyId);
+
+    [LoggerMessage(LogLevel.Information, "Job draft created for company {CompanyId}")]
+    static partial void LogDraftCreated(ILogger logger, string companyId);
+
+    [LoggerMessage(LogLevel.Information, "Rewriting job item via ai-service-v2")]
+    static partial void LogRewritingItem(ILogger logger);
+
+    [LoggerMessage(LogLevel.Information, "Job item rewrite completed")]
+    static partial void LogRewriteCompleted(ILogger logger);
+
+    [LoggerMessage(LogLevel.Information, "Creating job via job-api")]
+    static partial void LogCreatingJob(ILogger logger);
+
+    [LoggerMessage(LogLevel.Information, "Job created: {JobUId}")]
+    static partial void LogJobCreated(ILogger logger, Guid jobUId);
+
+    [LoggerMessage(LogLevel.Information, "Deleting draft {DraftId} for company {CompanyId}")]
+    static partial void LogDeletingDraft(ILogger logger, Guid draftId, string companyId);
+
+    [LoggerMessage(LogLevel.Information, "Draft deleted: {DraftId}")]
+    static partial void LogDraftDeleted(ILogger logger, Guid draftId);
+
+    [LoggerMessage(LogLevel.Error, "job-api returned {StatusCode}: {Body}")]
+    static partial void LogJobApiError(ILogger logger, int statusCode, string body);
+
+    [LoggerMessage(LogLevel.Error, "ai-service-v2 returned {StatusCode}: {Body}")]
+    static partial void LogAiServiceError(ILogger logger, int statusCode, string body);
+
+    [LoggerMessage(LogLevel.Error, "Error creating job draft")]
+    static partial void LogCreateDraftError(ILogger logger, Exception exception);
+
+    [LoggerMessage(LogLevel.Error, "Error rewriting job item")]
+    static partial void LogRewriteItemError(ILogger logger, Exception exception);
+
+    [LoggerMessage(LogLevel.Error, "Error creating job")]
+    static partial void LogCreateJobError(ILogger logger, Exception exception);
+
+    [LoggerMessage(LogLevel.Error, "Error deleting draft {DraftId} for company {CompanyId}")]
+    static partial void LogDeleteDraftError(ILogger logger, Exception exception, Guid draftId, string companyId);
 }
