@@ -48,6 +48,11 @@
                    title="View trace in Jaeger">
                   <i class="pi pi-external-link"></i> <span class="trace-label">view in jaeger</span>
                 </a>
+                <a class="trace-link architecture"
+                   (click)="showArchitecture(msg.traceId!)"
+                   title="What just happened?">
+                  <i class="pi pi-sitemap"></i> <span class="trace-label">what happened?</span>
+                </a>
               </div>
             }
           </div>

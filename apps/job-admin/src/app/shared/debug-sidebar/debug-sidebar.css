@@ -272,6 +272,7 @@
 .trace-link.jaeger { color: #B45309; }
 .trace-link.seq { color: #7C3AED; }
 .trace-link.grafana { color: #E65100; }
+.trace-link.architecture { color: #7C3AED; cursor: pointer; }
 
 /* Empty state */
 .debug-empty {
@@ -319,3 +320,4 @@
 :host-context(.dark) .trace-link.jaeger { color: #F59E0B; }
 :host-context(.dark) .trace-link.seq { color: #A78BFA; }
 :host-context(.dark) .trace-link.grafana { color: #FF9800; }
+:host-context(.dark) .trace-link.architecture { color: #A78BFA; }

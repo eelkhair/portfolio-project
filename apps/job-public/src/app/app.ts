@@ -9,11 +9,12 @@ import { Chat } from './shared/chat/chat';
 import { DebugSidebar } from './shared/debug-sidebar/debug-sidebar';
 import { HelpPanel } from './shared/help-panel/help-panel';
 import { GuidedTour } from './shared/guided-tour/guided-tour';
+import { ArchitecturePopup } from './shared/architecture-popup/architecture-popup';
 import { ResumeRealtimeService } from './core/services/resume-realtime.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Header, Footer, Chat, DebugSidebar, HelpPanel, GuidedTour],
+  imports: [RouterOutlet, Header, Footer, Chat, DebugSidebar, HelpPanel, GuidedTour, ArchitecturePopup],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })

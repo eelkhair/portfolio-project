@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import mammoth from 'mammoth';
 import { propagation, ROOT_CONTEXT, SpanKind, trace } from '@opentelemetry/api';
 import { ApiService } from '../services/api.service';
+import { ArchitecturePopupService } from '../../shared/architecture-popup/architecture-popup.service';
 import { MatchingJob } from '../types/job.type';
 import {
   ALL_RESUME_SECTIONS,
@@ -19,6 +20,7 @@ import {
 export class ProfileStore {
   private readonly api = inject(ApiService);
   private readonly router = inject(Router);
+  private readonly architecturePopup = inject(ArchitecturePopupService);
   private readonly tracer = trace.getTracer('public-fe');
   private lastTraceParent: string | undefined;
 
@@ -295,6 +297,7 @@ export class ProfileStore {
 
   /** Called by ResumeRealtimeService when SignalR "ResumeEmbedded" arrives */
   onResumeEmbedded(_resumeId: string, traceParent?: string): void {
+    this.architecturePopup.show('resume-parse');
     this.loadMatchingJobs(traceParent);
   }
 

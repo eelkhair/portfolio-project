@@ -3,6 +3,7 @@ import {FormsModule} from '@angular/forms';
 import {Button} from 'primeng/button';
 import {InputText} from 'primeng/inputtext';
 import {ChatStore} from './ai-chat.store';
+import {ArchitecturePopupService} from '../architecture-popup/architecture-popup.service';
 
 @Component({
   selector: 'app-ai-chat',
@@ -14,6 +15,7 @@ import {ChatStore} from './ai-chat.store';
 })
 export class AiChat {
   readonly store = inject(ChatStore);
+  private readonly architecturePopup = inject(ArchitecturePopupService);
 
   isOpen = signal(false);
   message = '';
@@ -76,5 +78,9 @@ export class AiChat {
       const el = this.messagesContainer()?.nativeElement;
       if (el) el.scrollTop = el.scrollHeight;
     }, 0);
+  }
+
+  showArchitecture(traceId: string) {
+    this.architecturePopup.show('ai-chat', traceId);
   }
 }

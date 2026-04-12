@@ -12,6 +12,7 @@ import {DebugSidebar} from './shared/debug-sidebar/debug-sidebar';
 import {OidcSecurityService} from 'angular-auth-oidc-client';
 import {GettingStarted} from './layout/getting-started/getting-started';
 import {GuidedTour} from './shared/guided-tour/guided-tour';
+import {ArchitecturePopup} from './shared/architecture-popup/architecture-popup';
 
 @Component({
   selector: 'app-root',
@@ -24,7 +25,8 @@ import {GuidedTour} from './shared/guided-tour/guided-tour';
     AiChat,
     DebugSidebar,
     GettingStarted,
-    GuidedTour
+    GuidedTour,
+    ArchitecturePopup
   ],
   templateUrl: './app.html',
   styleUrl: './app.css'

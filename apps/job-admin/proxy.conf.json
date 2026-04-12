@@ -1,4 +1,10 @@
 {
+  "/jaeger-api/": {
+    "target": "http://localhost:16686",
+    "pathRewrite": {"^/jaeger-api": "/api"},
+    "secure": false,
+    "changeOrigin": true
+  },
   "/v1/traces": {
     "target": "http://localhost:4328",
     "secure": false,

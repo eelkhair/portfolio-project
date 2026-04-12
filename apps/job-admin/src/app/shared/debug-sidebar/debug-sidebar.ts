@@ -1,5 +1,6 @@
 import {Component, inject} from '@angular/core';
 import {DebugService} from '../../core/services/debug.service';
+import {ArchitecturePopupService} from '../architecture-popup/architecture-popup.service';
 import {DatePipe} from '@angular/common';
 
 @Component({
@@ -10,6 +11,7 @@ import {DatePipe} from '@angular/common';
 })
 export class DebugSidebar {
   debug = inject(DebugService);
+  private architecturePopup = inject(ArchitecturePopupService);
 
   methodClass(method: string): string {
     switch (method) {
@@ -37,5 +39,9 @@ export class DebugSidebar {
 
   copyTraceId(traceId: string): void {
     navigator.clipboard.writeText(traceId);
+  }
+
+  showArchitecture(traceId: string): void {
+    this.architecturePopup.show('trace', traceId);
   }
 }

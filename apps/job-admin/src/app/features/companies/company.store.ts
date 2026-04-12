@@ -82,9 +82,9 @@ export class CompanyStore {
           }
           console.log(this.companies());
           this.showCreateCompanyDialog.set(false);
-          this.notificationService.success(
-            'Success',
-            'Company created successfully'
+          this.notificationService.successWithArchitecture(
+            'Company Created',
+            'Company provisioned across all services', 'create-company'
           );
         },
         error: err => {

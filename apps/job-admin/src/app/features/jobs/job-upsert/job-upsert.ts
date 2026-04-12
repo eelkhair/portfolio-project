@@ -153,7 +153,7 @@ export class JobUpsert implements OnInit, OnDestroy{
       } as CreateJobDto
       this.store.createJob(model).subscribe({
         next: () => {
-          this.store.notificationService.success("Success","The job was published successfully.");
+          this.store.notificationService.successWithArchitecture("Job Published", "Job published and AI embeddings queued", "create-job");
           void this.router.navigate(["jobs"]);
         }
       })

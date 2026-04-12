@@ -225,6 +225,11 @@
   color: #FFB74D;
 }
 
+.trace-link.architecture { color: #7C3AED; cursor: pointer; }
+.trace-link.architecture:hover { color: #6D28D9; }
+:host-context(.dark) .trace-link.architecture { color: #A78BFA; }
+:host-context(.dark) .trace-link.architecture:hover { color: #C4B5FD; }
+
 .trace-link i {
   font-size: 0.7rem;
   font-weight: 700;

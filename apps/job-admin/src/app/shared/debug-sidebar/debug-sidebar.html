@@ -62,6 +62,11 @@
                title="View trace in Grafana">
               <i class="pi pi-external-link"></i> Grafana
             </a>
+            <a (click)="showArchitecture(entry.traceId)"
+               class="trace-link architecture"
+               title="What just happened?">
+              <i class="pi pi-sitemap"></i>
+            </a>
           </div>
         </div>
       } @empty {
