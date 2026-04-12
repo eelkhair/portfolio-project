@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using FastEndpoints;
 using JobApi.Application.Interfaces;
 using JobAPI.Contracts.Models.Drafts.Responses;
@@ -20,6 +21,10 @@ public class GetDraftEndpoint(IDraftQueryService service) : Endpoint<GetDraftReq
 
     public override async Task HandleAsync(GetDraftRequest request, CancellationToken ct)
     {
+        Activity.Current?.SetTag("entity.type", "draft");
+        Activity.Current?.SetTag("entity.id", request.DraftUId);
+        Activity.Current?.SetTag("operation", "get");
+
         var response = await service.GetDraftAsync(request.DraftUId, ct);
         if (response is null)
         {

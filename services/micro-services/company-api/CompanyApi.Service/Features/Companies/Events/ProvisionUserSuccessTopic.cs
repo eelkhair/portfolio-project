@@ -22,6 +22,10 @@ public class ProvisionUserSuccessTopic(ICompanyCommandService service, IMessageS
     
     public override async Task HandleAsync(EventDto<ProvisionUserEvent> request, CancellationToken ct)
     {
+        Activity.Current?.SetTag("entity.type", "company");
+        Activity.Current?.SetTag("entity.id", request.Data.CompanyUId.ToString());
+        Activity.Current?.SetTag("operation", "activate");
+
         using var activity = activitySource.StartActivity("Activating Company");
         activity?.SetTag("CompanyUId", request.Data.CompanyUId.ToString());
         activity?.SetTag("Name", request.Data?.CompanyName);

@@ -1,4 +1,5 @@
-﻿using AdminAPI.Contracts.Services;
+﻿using System.Diagnostics;
+using AdminAPI.Contracts.Services;
 using AdminAPI.Contracts.Models.Jobs.Requests;
 using AdminAPI.Contracts.Models.Jobs.Responses;
 using Elkhair.Dev.Common.Application;
@@ -9,7 +10,7 @@ namespace AdminApi.Features.Jobs.DraftGenerator;
 public sealed class JobGenEndpoint(IOpenAICommandService _ai)
     : Endpoint<JobGenRequest, ApiResponse<JobGenResponse>>
 {
-    
+
     private const string RouteTemplate = "jobs/{companyId}/generate";
     public override void Configure()
     {
@@ -20,10 +21,13 @@ public sealed class JobGenEndpoint(IOpenAICommandService _ai)
             s.Description = "Returns title, aboutRole, bullets, notes, location, and metadata.";
         });
     }
-    
+
     public override async Task HandleAsync(JobGenRequest req, CancellationToken ct)
     {
         var companyId = Route<string>("companyId")!;
+        Activity.Current?.SetTag("entity.type", "draft");
+        Activity.Current?.SetTag("entity.id", companyId);
+        Activity.Current?.SetTag("operation", "create");
 
         // Normalize UI-friendly enums to the lowercase strings your model expects (if needed in your service)
         var normalized = new JobGenRequest

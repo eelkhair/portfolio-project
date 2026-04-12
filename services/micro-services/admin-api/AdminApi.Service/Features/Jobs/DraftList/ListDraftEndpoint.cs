@@ -1,4 +1,5 @@
-﻿using AdminAPI.Contracts.Services;
+﻿using System.Diagnostics;
+using AdminAPI.Contracts.Services;
 using AdminAPI.Contracts.Models.Jobs.Responses;
 using Elkhair.Dev.Common.Application;
 using FastEndpoints;
@@ -23,6 +24,9 @@ public sealed class ListDraftEndpoint(IJobQueryService service) :
     public override async Task HandleAsync(CancellationToken ct)
     {
         var companyId = Route<string>("companyId")!;
+        Activity.Current?.SetTag("entity.type", "draft");
+        Activity.Current?.SetTag("entity.id", companyId);
+        Activity.Current?.SetTag("operation", "list");
         var response = await service.ListDrafts(companyId, ct);
         await Send.OkAsync(response, ct);
     }

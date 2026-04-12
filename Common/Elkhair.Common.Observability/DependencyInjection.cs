@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Elkhair.Common.Observability.Middleware;
 using Elkhair.Common.Observability.Observability;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -133,6 +134,9 @@ public static class DependencyInjection
         builder.Logging.SetMinimumLevel(LogLevel.Warning);
         return builder;
     }
+
+    public static IApplicationBuilder UseTracingMiddleware(this IApplicationBuilder app)
+        => app.UseMiddleware<TracingMiddleware>();
 
     private static ElasticsearchSinkOptions ConfigureElasticSink(
         IConfiguration configuration,

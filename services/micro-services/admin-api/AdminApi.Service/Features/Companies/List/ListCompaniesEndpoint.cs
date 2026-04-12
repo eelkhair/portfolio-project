@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using AdminAPI.Contracts.Services;
 using CompanyAPI.Contracts.Models.Companies.Responses;
 using Elkhair.Dev.Common.Application;
@@ -15,6 +16,8 @@ public class ListCompaniesEndpoint(ICompanyQueryService service) : EndpointWitho
 
     public override async Task HandleAsync(CancellationToken ct)
     {
+        Activity.Current?.SetTag("entity.type", "company");
+        Activity.Current?.SetTag("operation", "list");
         var companies = await service.ListAsync(ct);
         await Send.OkAsync( companies , cancellation: ct);
     }

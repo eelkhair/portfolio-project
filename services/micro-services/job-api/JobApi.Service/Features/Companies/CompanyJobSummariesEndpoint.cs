@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using FastEndpoints;
 using JobApi.Application.Interfaces;
 
@@ -13,6 +14,9 @@ public class CompanyJobSummariesEndpoint(IJobQueryService service) : EndpointWit
 
     public override async Task HandleAsync(CancellationToken ct)
     {
+        Activity.Current?.SetTag("entity.type", "company");
+        Activity.Current?.SetTag("operation", "list");
+
         var summaries = await service.ListCompanyJobSummariesAsync(ct);
         await Send.OkAsync(summaries, cancellation: ct);
     }

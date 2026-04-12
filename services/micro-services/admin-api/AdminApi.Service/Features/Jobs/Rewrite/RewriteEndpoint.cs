@@ -1,4 +1,5 @@
-﻿using AdminAPI.Contracts.Services;
+﻿using System.Diagnostics;
+using AdminAPI.Contracts.Services;
 using AdminAPI.Contracts.Models.Jobs.Requests;
 using AdminAPI.Contracts.Models.Jobs.Responses;
 using Elkhair.Dev.Common.Application;
@@ -22,6 +23,8 @@ public class RewriteEndpoint(IJobCommandService jobCommandService, ILogger<Rewri
 
     public override async Task HandleAsync(JobRewriteRequest req, CancellationToken ct)
     {
+        Activity.Current?.SetTag("entity.type", "draft");
+        Activity.Current?.SetTag("operation", "update");
         logger.LogInformation("rewriting item {@Request}", req);
         var response = await jobCommandService.RewriteItem(req, ct);
         await Send.OkAsync(response, ct);

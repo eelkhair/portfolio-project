@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Elkhair.Dev.Common.Application;
 using Elkhair.Dev.Common.Dapr;
 using FastEndpoints;
@@ -18,6 +19,11 @@ public class UpdateCompanyEndpoint(ICompanyCommandService service, ILogger<Updat
     public override async Task HandleAsync(EventDto<UpdateCompanyRequest> request, CancellationToken ct)
     {
         var companyUId = Route<Guid>("id");
+
+        Activity.Current?.SetTag("entity.type", "company");
+        Activity.Current?.SetTag("entity.id", companyUId);
+        Activity.Current?.SetTag("operation", "update");
+
         logger.LogInformation("Updating Company: {CompanyUId}", companyUId);
         await service.UpdateCompanyAsync(companyUId, request.Data, DaprExtensions.CreateUser(request.UserId), ct);
     }

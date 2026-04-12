@@ -1,3 +1,4 @@
+using Elkhair.Common.Observability;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using HealthChecks.UI.Client;
@@ -15,6 +16,7 @@ public static class WebApplicationExtensions
         app.UseCors(DependencyInjection.CorsPolicy);
         app.UseAuthentication();
         app.UseAuthorization();
+        app.UseTracingMiddleware();
         app.UseCloudEvents();
         app.MapSubscribeHandler();
 

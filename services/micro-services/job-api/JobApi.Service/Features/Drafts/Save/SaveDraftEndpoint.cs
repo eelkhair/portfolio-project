@@ -22,6 +22,9 @@ public class SaveDraftEndpoint(IDraftCommandService service) : Endpoint<EventDto
         var companyUId = Route<Guid>("companyUId");
         var isForwardSync = HttpContext.Request.Headers["X-Sync-Source"].FirstOrDefault() == "forward";
 
+        Activity.Current?.SetTag("entity.type", "draft");
+        Activity.Current?.SetTag("entity.id", request.Data.Id);
+        Activity.Current?.SetTag("operation", "save");
         Activity.Current?.SetTag("draft.request.id", request.Data.Id);
         Activity.Current?.SetTag("draft.companyUid", companyUId);
         Activity.Current?.SetTag("userId", request.UserId);

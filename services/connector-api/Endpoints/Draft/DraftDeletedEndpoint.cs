@@ -24,6 +24,8 @@ public static class DraftDeletedEndpoint
                 CancellationToken cancellationToken) =>
             {
                 using var parentSpan = activitySource.StartActivity("sync.draft.delete");
+                parentSpan?.SetTag("sync.direction", "forward");
+                parentSpan?.SetTag("sync.entity", "draft");
                 parentSpan?.SetTag("draft.uid", @event.Data.UId);
                 parentSpan?.SetTag("draft.companyUid", @event.Data.CompanyUId);
                 parentSpan?.SetTag("event.type", @event.EventType);

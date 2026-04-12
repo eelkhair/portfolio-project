@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using FastEndpoints;
 using JobApi.Infrastructure.Data;
 using JobAPI.Contracts.Models.Dashboard;
@@ -15,6 +16,9 @@ public class GetDashboardEndpoint(IJobDbContext db) : EndpointWithoutRequest<Das
 
     public override async Task HandleAsync(CancellationToken ct)
     {
+        Activity.Current?.SetTag("entity.type", "dashboard");
+        Activity.Current?.SetTag("operation", "get");
+
         var jobCount = await db.Jobs.CountAsync(ct);
         var companyCount = await db.Companies.CountAsync(ct);
         var draftCount = await db.Drafts.CountAsync(ct);

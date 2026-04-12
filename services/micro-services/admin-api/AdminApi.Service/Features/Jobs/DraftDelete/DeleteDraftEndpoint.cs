@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using AdminAPI.Contracts.Services;
 using FastEndpoints;
 
@@ -19,6 +20,9 @@ public sealed class DeleteDraftEndpoint(IJobCommandService service) : EndpointWi
     {
         var companyId = Route<string>("companyId")!;
         var draftId = Route<Guid>("draftId");
+        Activity.Current?.SetTag("entity.type", "draft");
+        Activity.Current?.SetTag("entity.id", draftId);
+        Activity.Current?.SetTag("operation", "delete");
         await service.DeleteDraft(companyId, draftId, ct);
         await Send.NoContentAsync(cancellation: ct);
     }

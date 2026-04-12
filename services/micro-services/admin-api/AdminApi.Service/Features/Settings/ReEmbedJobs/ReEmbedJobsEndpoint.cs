@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using AdminAPI.Contracts.Services;
 using AdminAPI.Contracts.Models.Settings;
 using Elkhair.Dev.Common.Application;
@@ -22,6 +23,8 @@ public sealed class ReEmbedJobsEndpoint(ISettingsCommandService settings)
 
     public override async Task HandleAsync(CancellationToken ct)
     {
+        Activity.Current?.SetTag("entity.type", "settings");
+        Activity.Current?.SetTag("operation", "publish");
         var result = await settings.ReEmbedJobsAsync(ct);
         await Send.OkAsync(result, ct);
     }

@@ -24,6 +24,8 @@ public static class JobCreatedEndpoint
                 CancellationToken cancellationToken) =>
             {
                 using var parentSpan = activitySource.StartActivity("provision.job");
+                parentSpan?.SetTag("sync.direction", "forward");
+                parentSpan?.SetTag("sync.entity", "job");
                 parentSpan?.SetTag("job.uid", @event.Data.UId);
                 parentSpan?.SetTag("job.companyUid", @event.Data.CompanyUId);
                 parentSpan?.SetTag("event.type", @event.EventType);

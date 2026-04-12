@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using AdminAPI.Contracts.Services;
 using AdminAPI.Contracts.Models.Settings;
 using Elkhair.Dev.Common.Application;
@@ -9,7 +10,7 @@ public sealed class GetApplicationModeEndpoint(ISettingsCommandService settings)
     : EndpointWithoutRequest<ApiResponse<ApplicationModeDto>>
 {
     private const string RouteTemplate = "settings/mode";
-    
+
     public override void Configure()
     {
         Get(RouteTemplate);
@@ -19,9 +20,11 @@ public sealed class GetApplicationModeEndpoint(ISettingsCommandService settings)
             s.Description = "Returns the current application mode (e.g. 'monolith' or 'microservices').";
         });
     }
-    
+
     public override async Task HandleAsync(CancellationToken ct)
     {
+        Activity.Current?.SetTag("entity.type", "settings");
+        Activity.Current?.SetTag("operation", "get");
         var mode = await settings.GetApplicationModeAsync(ct);
         await Send.OkAsync(mode, ct);
     }

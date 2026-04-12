@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using CompanyApi.Application.Commands.Interfaces;
 using CompanyAPI.Contracts.Models.Companies.Requests;
 using CompanyAPI.Contracts.Models.Companies.Responses;
@@ -16,6 +17,9 @@ public class CreateCompanyEndpoint(ICompanyCommandService service, ILogger<Creat
 
     public override async Task HandleAsync(CreateCompanyRequest request, CancellationToken ct)
     {
+        Activity.Current?.SetTag("entity.type", "company");
+        Activity.Current?.SetTag("operation", "create");
+
         logger.LogInformation("Creating Company: {Name}", request.Name);
         var company = await service.CreateAsync(request, User, ct);
         await Send.OkAsync(company, cancellation:ct);

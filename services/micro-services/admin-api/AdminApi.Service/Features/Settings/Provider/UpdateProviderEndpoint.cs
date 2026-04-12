@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using AdminAPI.Contracts.Services;
 using AdminAPI.Contracts.Models.Settings;
 using Elkhair.Dev.Common.Application;
@@ -22,6 +23,8 @@ public sealed class UpdateProviderEndpoint(ISettingsCommandService settings)
 
     public override async Task HandleAsync(UpdateProviderRequest req, CancellationToken ct)
     {
+        Activity.Current?.SetTag("entity.type", "settings");
+        Activity.Current?.SetTag("operation", "update");
         var result = await settings.UpdateProviderAsync(req, ct);
         await Send.OkAsync(result, ct);
     }

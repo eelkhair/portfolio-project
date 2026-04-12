@@ -25,6 +25,8 @@ public static class JobCreatedEndpointExtensions
                 CancellationToken cancellationToken) =>
             {
                 using var parentSpan = activitySource.StartActivity("reverse-sync.job.create");
+                parentSpan?.SetTag("sync.direction", "reverse");
+                parentSpan?.SetTag("sync.entity", "job");
                 parentSpan?.SetTag("job.uid", @event.Data.UId);
                 parentSpan?.SetTag("job.companyUid", @event.Data.CompanyUId);
                 parentSpan?.SetTag("job.title", @event.Data.Title);

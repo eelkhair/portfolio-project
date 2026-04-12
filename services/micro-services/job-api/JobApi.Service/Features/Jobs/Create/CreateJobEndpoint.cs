@@ -19,6 +19,9 @@ public class CreateJobEndpoint(IJobCommandService service) :  Endpoint<EventDto<
 
     public override async Task HandleAsync(EventDto<CreateJobRequest> request, CancellationToken ct)
     {
+        Activity.Current?.SetTag("entity.type", "job");
+        Activity.Current?.SetTag("operation", "create");
+
         var isForwardSync = HttpContext.Request.Headers["X-Sync-Source"].FirstOrDefault() == "forward";
         Activity.Current?.SetTag("job.isForwardSync", isForwardSync);
         var response = await service.CreateJobAsync(request.Data, DaprExtensions.CreateUser(request.UserId), ct, publishEvent: !isForwardSync);

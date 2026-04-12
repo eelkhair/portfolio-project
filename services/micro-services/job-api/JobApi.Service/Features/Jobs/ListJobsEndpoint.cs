@@ -1,4 +1,5 @@
-﻿using FastEndpoints;
+﻿using System.Diagnostics;
+using FastEndpoints;
 using JobApi.Application.Interfaces;
 using JobAPI.Contracts.Models.Jobs.Responses;
 
@@ -14,6 +15,10 @@ public class ListJobsEndpoint(IJobQueryService service): Endpoint<ListJobsReques
 
     public override async Task HandleAsync(ListJobsRequest request, CancellationToken ct)
     {
+        Activity.Current?.SetTag("entity.type", "job");
+        Activity.Current?.SetTag("entity.id", request.CompanyUId);
+        Activity.Current?.SetTag("operation", "list");
+
         var jobs = await service.ListAsync(request.CompanyUId, ct);
         await Send.OkAsync( jobs , cancellation: ct);
     }

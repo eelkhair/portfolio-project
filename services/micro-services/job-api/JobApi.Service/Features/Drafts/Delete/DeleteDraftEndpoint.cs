@@ -22,6 +22,10 @@ public class DeleteDraftEndpoint(IDraftCommandService service) : Endpoint<Delete
 
     public override async Task HandleAsync(DeleteDraftRequest request, CancellationToken ct)
     {
+        Activity.Current?.SetTag("entity.type", "draft");
+        Activity.Current?.SetTag("entity.id", request.DraftUId);
+        Activity.Current?.SetTag("operation", "delete");
+
         var isForwardSync = HttpContext.Request.Headers["X-Sync-Source"].FirstOrDefault() == "forward";
         Activity.Current?.SetTag("draft.isForwardSync", isForwardSync);
 

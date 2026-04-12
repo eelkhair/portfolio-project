@@ -23,6 +23,8 @@ public static class CompanyUpdatedEndpoint
                 CancellationToken cancellationToken) =>
             {
                 using var parentSpan = activitySource.StartActivity("update.company");
+                parentSpan?.SetTag("sync.direction", "forward");
+                parentSpan?.SetTag("sync.entity", "company");
                 parentSpan?.SetTag("company.uid", @event.Data.CompanyUId);
                 parentSpan?.SetTag("event.type", @event.EventType);
                 parentSpan?.SetTag("idempotency.key", @event.IdempotencyKey);

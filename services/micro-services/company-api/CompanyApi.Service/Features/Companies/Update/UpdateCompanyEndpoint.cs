@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using CompanyApi.Application.Commands.Interfaces;
 using CompanyAPI.Contracts.Models.Companies.Requests;
 using CompanyAPI.Contracts.Models.Companies.Responses;
@@ -17,6 +18,9 @@ public class UpdateCompanyEndpoint(ICompanyCommandService service, ILogger<Updat
     public override async Task HandleAsync(UpdateCompanyRequest request, CancellationToken ct)
     {
         var companyUId = Route<Guid>("id");
+        Activity.Current?.SetTag("entity.type", "company");
+        Activity.Current?.SetTag("entity.id", companyUId.ToString());
+        Activity.Current?.SetTag("operation", "update");
         var isForwardSync = HttpContext.Request.Headers["X-Sync-Source"].FirstOrDefault() == "forward";
         logger.LogInformation("Updating Company: {CompanyUId}, isForwardSync: {IsForwardSync}", companyUId, isForwardSync);
         var company = await service.UpdateAsync(companyUId, request, User, ct, publishEvent: !isForwardSync);

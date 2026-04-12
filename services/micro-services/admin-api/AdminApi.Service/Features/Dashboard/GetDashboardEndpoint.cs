@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using AdminAPI.Contracts.Models.Dashboard;
 using AdminAPI.Contracts.Services;
 using Elkhair.Dev.Common.Application;
@@ -15,6 +16,8 @@ public class GetDashboardEndpoint(IDashboardQueryService service) : EndpointWith
 
     public override async Task HandleAsync(CancellationToken ct)
     {
+        Activity.Current?.SetTag("entity.type", "dashboard");
+        Activity.Current?.SetTag("operation", "get");
         var result = await service.GetDashboardAsync(ct);
         await Send.OkAsync(result, cancellation: ct);
     }

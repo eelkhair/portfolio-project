@@ -1,4 +1,5 @@
-﻿using Elkhair.Dev.Common.Application;
+﻿using System.Diagnostics;
+using Elkhair.Dev.Common.Application;
 using Elkhair.Dev.Common.Dapr;
 using Elkhair.Dev.Common.Domain.Constants;
 using FastEndpoints;
@@ -20,6 +21,10 @@ public class CreateCompanyTopic(ICompanyCommandService service, ILogger<CreateCo
     
     public override async  Task HandleAsync(EventDto<ProvisionUserEvent> request, CancellationToken ct)
     {
+        Activity.Current?.SetTag("entity.type", "company");
+        Activity.Current?.SetTag("entity.id", request.Data?.CompanyUId);
+        Activity.Current?.SetTag("operation", "create");
+
         logger.LogInformation("Creating company - {CompanyName}", request.Data?.CompanyName);
         await service.CreateCompanyAsync(new CreateCompanyRequest
         {

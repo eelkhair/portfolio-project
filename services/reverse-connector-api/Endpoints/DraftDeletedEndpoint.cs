@@ -24,6 +24,8 @@ public static class DraftDeletedEndpointExtensions
                 CancellationToken cancellationToken) =>
             {
                 using var parentSpan = activitySource.StartActivity("reverse-sync.draft.delete");
+                parentSpan?.SetTag("sync.direction", "reverse");
+                parentSpan?.SetTag("sync.entity", "draft");
                 parentSpan?.SetTag("draft.uid", @event.Data.UId);
                 parentSpan?.SetTag("draft.companyUid", @event.Data.CompanyUId);
                 parentSpan?.SetTag("idempotency.key", @event.IdempotencyKey);

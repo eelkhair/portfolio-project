@@ -17,6 +17,9 @@ public class CreateJobEndpoint(IJobCommandService service,
 
     public override async Task HandleAsync(JobCreateRequest req, CancellationToken ct)
     {
+        Activity.Current?.SetTag("entity.type", "job");
+        Activity.Current?.SetTag("operation", "create");
+
         using var act = activitySource.StartActivity(
                      "job.create",
                      ActivityKind.Producer);

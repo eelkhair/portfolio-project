@@ -25,6 +25,8 @@ public static class CompanyUpdatedEndpointExtensions
                 CancellationToken cancellationToken) =>
             {
                 using var parentSpan = activitySource.StartActivity("reverse-sync.company.update");
+                parentSpan?.SetTag("sync.direction", "reverse");
+                parentSpan?.SetTag("sync.entity", "company");
                 parentSpan?.SetTag("company.uid", @event.Data.CompanyUId);
                 parentSpan?.SetTag("company.name", @event.Data.Name);
                 parentSpan?.SetTag("idempotency.key", @event.IdempotencyKey);

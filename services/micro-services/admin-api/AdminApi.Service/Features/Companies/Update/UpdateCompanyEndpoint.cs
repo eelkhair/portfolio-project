@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using AdminAPI.Contracts.Services;
 using AdminAPI.Contracts.Models.Companies.Requests;
 using CompanyAPI.Contracts.Models.Companies.Responses;
@@ -18,6 +19,9 @@ public class UpdateCompanyEndpoint(ICompanyCommandService service, ILogger<Updat
     public override async Task HandleAsync(UpdateCompanyRequest request, CancellationToken ct)
     {
         var companyUId = Route<Guid>("id");
+        Activity.Current?.SetTag("entity.type", "company");
+        Activity.Current?.SetTag("entity.id", companyUId);
+        Activity.Current?.SetTag("operation", "update");
         logger.LogInformation("Updating company {CompanyUId}", companyUId);
         var company = await service.UpdateAsync(companyUId, request, ct);
         await Send.OkAsync(company, ct);

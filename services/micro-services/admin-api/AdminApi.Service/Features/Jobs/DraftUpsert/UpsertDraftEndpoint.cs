@@ -1,4 +1,5 @@
-﻿using AdminAPI.Contracts.Services;
+﻿using System.Diagnostics;
+using AdminAPI.Contracts.Services;
 using AdminAPI.Contracts.Models.Jobs.Requests;
 using AdminAPI.Contracts.Models.Jobs.Responses;
 using Elkhair.Dev.Common.Application;
@@ -23,6 +24,9 @@ public sealed class UpsertDraftEndpoint(IJobCommandService service):
     public override async Task HandleAsync(JobDraftRequest req, CancellationToken ct)
     {
         var companyId = Route<string>("companyId")!;
+        Activity.Current?.SetTag("entity.type", "draft");
+        Activity.Current?.SetTag("entity.id", companyId);
+        Activity.Current?.SetTag("operation", "create");
         var result = await service.CreateDraft(companyId, req, ct);
         await Send.OkAsync(result, ct);
 

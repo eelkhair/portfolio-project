@@ -1,4 +1,5 @@
-﻿using AdminAPI.Contracts.Services;
+﻿using System.Diagnostics;
+using AdminAPI.Contracts.Services;
 using CompanyAPI.Contracts.Models.Industries.Responses;
 using Elkhair.Dev.Common.Application;
 using FastEndpoints;
@@ -16,6 +17,8 @@ public class ListIndustriesEndpoint(IIndustryQueryService service) : EndpointWit
 
     public override async Task HandleAsync(CancellationToken ct)
     {
+        Activity.Current?.SetTag("entity.type", "industry");
+        Activity.Current?.SetTag("operation", "list");
         var industries = await service.ListAsync(ct);
         await Send.OkAsync( industries , cancellation: ct);
     }
