@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using NSubstitute;
 using Shouldly;
 using UserApi.Application.Commands;
 using UserApi.Infrastructure.Data;
@@ -16,7 +18,7 @@ public class CompanyCommandServiceTests : IAsyncLifetime
     public Task InitializeAsync()
     {
         _context = TestDbContextFactory.Create();
-        _sut = new CompanyCommandService(_context);
+        _sut = new CompanyCommandService(_context, Substitute.For<ILogger<CompanyCommandService>>());
         return Task.CompletedTask;
     }
 

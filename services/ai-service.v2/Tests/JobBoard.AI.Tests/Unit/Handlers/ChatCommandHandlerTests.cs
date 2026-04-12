@@ -45,7 +45,7 @@ public class ChatCommandHandlerTests
         // Assert
         result.ShouldBe(expectedResponse);
         await _chatService.Received(1).RunChatAsync(
-            Arg.Is<string>(s => s.Contains("access to tools")),
+            Arg.Is<string>(s => s.Contains("with tool access")),
             "Hello",
             ChatScope.Admin,
             Arg.Any<CancellationToken>());
@@ -89,7 +89,7 @@ public class ChatCommandHandlerTests
         // Assert
         result.ShouldBe(expectedResponse);
         await _chatService.Received(1).RunChatAsync(
-            Arg.Is<string>(s => s.Contains("access to tools")),
+            Arg.Is<string>(s => s.Contains("with tool access")),
             Arg.Any<string>(),
             ChatScope.CompanyAdmin,
             Arg.Any<CancellationToken>());

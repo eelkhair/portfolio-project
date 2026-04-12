@@ -2,6 +2,8 @@ using JobApi.Application;
 using JobApi.Infrastructure.Data;
 using JobApi.Infrastructure.Data.Entities;
 using JobApi.Tests.Helpers;
+using Microsoft.Extensions.Logging;
+using NSubstitute;
 using Shouldly;
 
 namespace JobApi.Tests.Unit.Queries;
@@ -17,7 +19,7 @@ public class JobQueryServiceTests : IAsyncLifetime
     {
         MapsterSetup.Initialize();
         (_context, _company) = await TestDbContextFactory.CreateWithCompanyAsync();
-        _sut = new JobQueryService(_context);
+        _sut = new JobQueryService(_context, Substitute.For<ILogger<JobQueryService>>());
     }
 
     public Task DisposeAsync()

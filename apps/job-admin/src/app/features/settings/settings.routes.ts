@@ -3,13 +3,6 @@ import {roleGuard} from '../../core/guards/role-guard';
 
 export const SETTINGS_ROUTES: Route[] = [
   {
-    path:'app',
-    title: 'App Settings',
-    canActivate: [roleGuard],
-    data: {groups: ['SystemAdmins']},
-    loadComponent: () => import('./settings').then(c=>c.Settings)
-  },
-  {
     path:'ai-provider',
     title: 'AI Provider',
     canActivate: [roleGuard],

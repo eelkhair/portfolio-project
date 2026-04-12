@@ -3,6 +3,8 @@ using CompanyApi.Infrastructure.Data;
 using CompanyApi.Infrastructure.Data.Entities;
 using CompanyApi.Tests.Helpers;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using NSubstitute;
 using Shouldly;
 using System.Security.Claims;
 
@@ -18,7 +20,7 @@ public class CompanyQueryServiceTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         (_context, _industry) = await TestDbContextFactory.CreateWithIndustryAsync();
-        _sut = new CompanyQueryService(_context);
+        _sut = new CompanyQueryService(_context, Substitute.For<ILogger<CompanyQueryService>>());
     }
 
     public Task DisposeAsync()

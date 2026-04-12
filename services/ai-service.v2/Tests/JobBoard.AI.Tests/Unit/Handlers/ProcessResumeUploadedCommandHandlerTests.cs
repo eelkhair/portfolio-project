@@ -61,9 +61,12 @@ public class ProcessResumeUploadedCommandHandlerTests
             .Returns(resumeBytes);
 
         // Return a valid response for all section parse calls
-        _chatService.GetResponseAsync<ResumeQuickParseResponse>(
+        _chatService.GetResponseAsync<ResumeContactParseResponse>(
                 Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
-            .Returns(new ResumeQuickParseResponse());
+            .Returns(new ResumeContactParseResponse());
+        _chatService.GetResponseAsync<ResumeSkillsParseResponse>(
+                Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(new ResumeSkillsParseResponse());
         _chatService.GetResponseAsync<ResumeWorkHistoryParseResponse>(
                 Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
             .Returns(new ResumeWorkHistoryParseResponse());
@@ -93,9 +96,12 @@ public class ProcessResumeUploadedCommandHandlerTests
         _blobStorage.DownloadAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Encoding.UTF8.GetBytes("test resume"));
 
-        _chatService.GetResponseAsync<ResumeQuickParseResponse>(
+        _chatService.GetResponseAsync<ResumeContactParseResponse>(
                 Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
-            .Returns(new ResumeQuickParseResponse());
+            .Returns(new ResumeContactParseResponse());
+        _chatService.GetResponseAsync<ResumeSkillsParseResponse>(
+                Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(new ResumeSkillsParseResponse());
         _chatService.GetResponseAsync<ResumeWorkHistoryParseResponse>(
                 Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
             .Returns(new ResumeWorkHistoryParseResponse());
@@ -125,9 +131,12 @@ public class ProcessResumeUploadedCommandHandlerTests
         _blobStorage.DownloadAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Encoding.UTF8.GetBytes("test resume"));
 
-        _chatService.GetResponseAsync<ResumeQuickParseResponse>(
+        _chatService.GetResponseAsync<ResumeContactParseResponse>(
                 Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
-            .Returns(new ResumeQuickParseResponse());
+            .Returns(new ResumeContactParseResponse());
+        _chatService.GetResponseAsync<ResumeSkillsParseResponse>(
+                Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(new ResumeSkillsParseResponse());
         _chatService.GetResponseAsync<ResumeWorkHistoryParseResponse>(
                 Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
             .Returns(new ResumeWorkHistoryParseResponse());
@@ -167,15 +176,15 @@ public class ProcessResumeUploadedCommandHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_WhenQuickParseFails_NotifiesParseFailure()
+    public async Task HandleAsync_WhenContactParseFails_NotifiesParseFailure()
     {
         // Arrange
         var command = CreateCommand();
         _blobStorage.DownloadAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Encoding.UTF8.GetBytes("test resume"));
 
-        // Quick parse (phase 1) failure is fatal and rethrown from ParseSectionAsync
-        _chatService.GetResponseAsync<ResumeQuickParseResponse>(
+        // Contact parse (phase 1) failure is fatal and rethrown from ParseSectionAsync
+        _chatService.GetResponseAsync<ResumeContactParseResponse>(
                 Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
             .Throws(new Exception("LLM timeout"));
 

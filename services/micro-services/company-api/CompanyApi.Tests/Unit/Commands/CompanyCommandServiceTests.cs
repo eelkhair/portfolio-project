@@ -8,6 +8,7 @@ using Mapster;
 using Elkhair.Dev.Common.Dapr;
 using JobBoard.IntegrationEvents.Company;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Shouldly;
 
@@ -30,7 +31,7 @@ public class CompanyCommandServiceTests : IAsyncLifetime
     {
         MapsterSetup.Initialize();
         (_context, _industry) = await TestDbContextFactory.CreateWithIndustryAsync();
-        _sut = new CompanyCommandService(_context, _messageSender);
+        _sut = new CompanyCommandService(_context, _messageSender, Substitute.For<ILogger<CompanyCommandService>>());
     }
 
     public Task DisposeAsync()

@@ -8,6 +8,7 @@ using JobApi.Tests.Helpers;
 using JobAPI.Contracts.Models.Drafts.Requests;
 using JobBoard.IntegrationEvents.Draft;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Shouldly;
 
@@ -35,7 +36,7 @@ public class DraftCommandServiceTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         (_context, _company) = await TestDbContextFactory.CreateWithCompanyAsync();
-        _sut = new DraftCommandService(_context, _messageSender);
+        _sut = new DraftCommandService(_context, _messageSender, Substitute.For<ILogger<DraftCommandService>>());
     }
 
     public Task DisposeAsync()

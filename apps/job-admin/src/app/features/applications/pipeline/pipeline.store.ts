@@ -34,9 +34,17 @@ export class PipelineStore {
     }));
   });
 
-  readonly rejectedCount = computed(() =>
-    this.applications().filter(a => a.status === 'Rejected').length
+  readonly showRejected = signal(false);
+
+  toggleRejected() {
+    this.showRejected.update(v => !v);
+  }
+
+  readonly rejectedApplications = computed(() =>
+    this.applications().filter(a => a.status === 'Rejected')
   );
+
+  readonly rejectedCount = computed(() => this.rejectedApplications().length);
 
   readonly totalCount = computed(() => this.applications().length);
 

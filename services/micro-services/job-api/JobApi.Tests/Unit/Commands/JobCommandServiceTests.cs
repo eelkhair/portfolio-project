@@ -7,6 +7,7 @@ using JobAPI.Contracts.Enums;
 using JobAPI.Contracts.Models.Jobs.Requests;
 using JobBoard.IntegrationEvents.Job;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Shouldly;
 
@@ -29,7 +30,7 @@ public class JobCommandServiceTests : IAsyncLifetime
     {
         MapsterSetup.Initialize();
         (_context, _company) = await TestDbContextFactory.CreateWithCompanyAsync();
-        _sut = new JobCommandService(_context, _messageSender);
+        _sut = new JobCommandService(_context, _messageSender, Substitute.For<ILogger<JobCommandService>>());
     }
 
     public Task DisposeAsync()

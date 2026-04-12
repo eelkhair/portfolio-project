@@ -14,7 +14,7 @@ public class YarpProviderTests
         var routes = YarpProvider.GetRoutes();
 
         // Assert
-        routes.Count.ShouldBe(4);
+        routes.Count.ShouldBe(7);
     }
 
     [Fact]

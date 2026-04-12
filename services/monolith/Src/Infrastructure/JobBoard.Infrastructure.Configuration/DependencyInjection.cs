@@ -44,7 +44,6 @@ public static class AppConfigurationExtensions
     public static IServiceCollection AddAppConfigurationServices(this IServiceCollection services)
     {
         services.AddScoped<IApplicationOrchestrator, ApplicationOrchestrator>();
-        services.AddScoped<IFeatureFlagService, FeatureFlagService>();
         services.AddAzureAppConfiguration();
         services.AddFeatureManagement();
         return services;

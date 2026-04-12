@@ -4,6 +4,8 @@ using JobApi.Infrastructure.Data;
 using JobApi.Tests.Helpers;
 using JobAPI.Contracts.Models.Companies.Requests;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using NSubstitute;
 using Shouldly;
 
 namespace JobApi.Tests.Unit.Commands;
@@ -22,7 +24,7 @@ public class CompanyCommandServiceTests : IAsyncLifetime
     public Task InitializeAsync()
     {
         _context = TestDbContextFactory.Create();
-        _sut = new CompanyCommandService(_context);
+        _sut = new CompanyCommandService(_context, Substitute.For<ILogger<CompanyCommandService>>());
         return Task.CompletedTask;
     }
 

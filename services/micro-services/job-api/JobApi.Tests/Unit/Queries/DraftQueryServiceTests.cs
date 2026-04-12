@@ -5,6 +5,8 @@ using JobApi.Infrastructure.Data;
 using JobApi.Infrastructure.Data.Entities;
 using JobApi.Tests.Helpers;
 using JobAPI.Contracts.Models.Drafts.Requests;
+using Microsoft.Extensions.Logging;
+using NSubstitute;
 using Shouldly;
 
 namespace JobApi.Tests.Unit.Queries;
@@ -25,7 +27,7 @@ public class DraftQueryServiceTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         (_context, _company) = await TestDbContextFactory.CreateWithCompanyAsync();
-        _sut = new DraftQueryService(_context);
+        _sut = new DraftQueryService(_context, Substitute.For<ILogger<DraftQueryService>>());
     }
 
     public Task DisposeAsync()
