@@ -3,6 +3,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { ChatService } from '../../core/services/chat.service';
 import { marked } from 'marked';
 import { Observable, tap } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface ChatMessage {
   role: 'user' | 'assistant';
@@ -38,6 +39,8 @@ export class ChatStore {
       localStorage.getItem(ChatStore.JAEGER_KEY) === 'true',
   );
   readonly jaegerNotification = signal<string | null>(null);
+  readonly grafanaUrl = signal(environment.grafanaUrl);
+  readonly jaegerUrl = signal(environment.jaegerUrl);
 
   toggleJaeger(show: boolean): void {
     this.showJaeger.set(show);

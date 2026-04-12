@@ -52,6 +52,8 @@ public class ChatService(
         "industry_list",
         "job_list",
         "company_job_summaries",
+        "find_matching_jobs",
+        "search_jobs",
         "draft_list",
         "drafts_by_company",
         "system_info"

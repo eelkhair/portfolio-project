@@ -50,7 +50,13 @@ public sealed class ChatOptionsFactory(
 
         // System group — only activated by system/mode/config keywords
         ["system_info"] = "system",
-        ["set_mode"] = "system"
+        ["set_mode"] = "system",
+
+        // Public group — job seeker tools
+        ["find_matching_jobs"] = "public",
+        ["search_jobs"] = "public",
+        ["get_similar_jobs"] = "public",
+        ["get_job_detail"] = "public"
     };
 
     public ChatOptions Create(IServiceProvider sp, ChatScope scope, string userMessage,

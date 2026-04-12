@@ -44,7 +44,7 @@
               @if (store.showJaeger() && msg.traceId) {
                 <div class="chat-trace-links">
                   <a class="chat-trace-link chat-trace-grafana"
-                     [href]="'https://grafana.eelkhair.net/d/bf5m5dwukfncwd/find-by-trace-id?orgId=1&var-TraceId=' + msg.traceId"
+                     [href]="store.grafanaUrl() + msg.traceId"
                      target="_blank"
                      rel="noopener"
                      title="View trace in Grafana">
@@ -52,7 +52,7 @@
                     grafana
                   </a>
                   <a class="chat-trace-link chat-trace-jaeger"
-                     [href]="'https://jaeger.eelkhair.net/trace/' + msg.traceId"
+                     [href]="store.jaegerUrl() + msg.traceId"
                      target="_blank"
                      rel="noopener"
                      title="View trace in Jaeger">
