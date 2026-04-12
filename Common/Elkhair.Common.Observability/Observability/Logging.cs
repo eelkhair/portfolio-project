@@ -99,6 +99,7 @@ public static class LoggingFilters
         
         builder.AddFilter("JobBoard.Application", LogLevel.Information);
         builder.AddFilter("JobBoard.Infrastructure", LogLevel.Information);
+        builder.AddFilter("Elkhair.Common.Observability.Middleware", LogLevel.Information);
 
         builder.AddFilter("HealthChecks.UI", LogLevel.Warning);
         builder.AddFilter("Microsoft.Extensions.Diagnostics.HealthChecks", LogLevel.Warning);

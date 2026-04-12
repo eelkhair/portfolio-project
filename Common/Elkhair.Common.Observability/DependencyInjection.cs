@@ -64,7 +64,6 @@ public static class DependencyInjection
         this WebApplicationBuilder builder,
         string appTag)
     {
-        builder.Logging.SetMinimumLevel(LogLevel.Warning);
         builder.Logging.AddFilters();
 
         var configuration = builder.Configuration;
@@ -100,6 +99,7 @@ public static class DependencyInjection
                     log.MessageTemplate.Text.Contains("Failed to determine the https port")
                 )
             )
+            .MinimumLevel.Override("Elkhair.Common.Observability.Middleware", LogEventLevel.Information)
             .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
             .MinimumLevel.Override("System", LogEventLevel.Warning)
             .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
@@ -131,7 +131,6 @@ public static class DependencyInjection
             .CreateLogger();
 
         builder.Host.UseSerilog();
-        builder.Logging.SetMinimumLevel(LogLevel.Warning);
         return builder;
     }
 
