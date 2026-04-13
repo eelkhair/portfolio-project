@@ -16,4 +16,8 @@ export const ARCHITECTURE_EVENTS: Record<string, ArchitectureEvent> = {
     title: 'Resume Processed',
     description: 'Resume parsed by AI, embedded for matching, and match explanations generated.',
   },
+  'trace': {
+    title: 'Request Trace',
+    description: 'Live architecture diagram built from the distributed trace across all services.',
+  },
 };

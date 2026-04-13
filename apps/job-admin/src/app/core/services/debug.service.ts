@@ -49,6 +49,6 @@ export class DebugService {
   }
 
   private getStoredState(): boolean {
-    return localStorage.getItem(STORAGE_KEY) === 'true';
+    return false; // Always start closed
   }
 }
