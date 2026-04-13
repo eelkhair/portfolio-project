@@ -157,25 +157,69 @@ jobs:
           build-args: ${{ matrix.build_args || '' }}
 
   # ════════════════════════════════════════════════════════════════════════════
-  # Job 2: Deploy to Dev (runs locally on proxmox-dev runner)
+  # Job 2: Deploy to target environments
+  # Runs on all self-hosted runners; each runner deploys based on its hostname
   # ════════════════════════════════════════════════════════════════════════════
-  deploy-dev:
+  deploy:
     needs: build-and-push
-    if: >-
-      github.event_name == 'push' ||
-      (github.event_name == 'workflow_dispatch' && (inputs.environment == 'dev' || inputs.environment == 'both'))
-    runs-on: [self-hosted, proxmox-dev]
-    environment: proxmox-dev
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        include:
+          - env: dev
+            compose_file: scripts/docker-compose.dev.yml
+            hostname: job-board-dev
+          - env: prod
+            compose_file: scripts/docker-compose.prod.yml
+            hostname: khairoooon
     steps:
-      - uses: actions/checkout@v4
+      - name: Check if this runner should deploy ${{ matrix.env }}
+        id: check
+        run: |
+          ACTUAL=$(hostname)
+          if [ "$ACTUAL" = "${{ matrix.hostname }}" ]; then
+            echo "match=true" >> $GITHUB_OUTPUT
+            echo "This runner ($ACTUAL) will deploy ${{ matrix.env }}"
+          else
+            echo "match=false" >> $GITHUB_OUTPUT
+            echo "Skipping — this runner ($ACTUAL) is not the ${{ matrix.env }} host (${{ matrix.hostname }})"
+          fi
 
-      - name: Deploy to dev
+      - name: Check trigger applies to ${{ matrix.env }}
+        id: trigger
+        if: steps.check.outputs.match == 'true'
+        run: |
+          EVENT="${{ github.event_name }}"
+          ENV="${{ matrix.env }}"
+          INPUT="${{ inputs.environment }}"
+
+          if [ "$ENV" = "dev" ]; then
+            # Dev deploys on push or manual dev/both
+            if [ "$EVENT" = "push" ] || [ "$INPUT" = "dev" ] || [ "$INPUT" = "both" ]; then
+              echo "deploy=true" >> $GITHUB_OUTPUT
+            else
+              echo "deploy=false" >> $GITHUB_OUTPUT
+            fi
+          elif [ "$ENV" = "prod" ]; then
+            # Prod only on manual prod/both
+            if [ "$EVENT" = "workflow_dispatch" ] && ([ "$INPUT" = "prod" ] || [ "$INPUT" = "both" ]); then
+              echo "deploy=true" >> $GITHUB_OUTPUT
+            else
+              echo "deploy=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.check.outputs.match == 'true' && steps.trigger.outputs.deploy == 'true'
+
+      - name: Deploy ${{ matrix.env }}
+        if: steps.check.outputs.match == 'true' && steps.trigger.outputs.deploy == 'true'
         env:
           REG_USER: ${{ secrets.REGISTRY_USERNAME }}
           REG_PASS: ${{ secrets.REGISTRY_PASSWORD }}
         run: |
           echo "Copying compose file..."
-          cp scripts/docker-compose.dev.yml ~/docker-compose.yml
+          cp ${{ matrix.compose_file }} ~/docker-compose.yml
 
           echo "Docker login..."
           echo "$REG_PASS" | docker login $REGISTRY -u $REG_USER --password-stdin
@@ -188,55 +232,4 @@ jobs:
           docker system prune -a --volumes -f || true
           docker builder prune -a -f || true
 
-          echo "Dev deploy complete!"
-
-      - name: Print dev URLs
-        run: |
-          echo "══════════════════════════════════════════════"
-          echo "Dev deployment complete"
-          echo "  Admin:   https://job-admin-dev.eelkhair.net"
-          echo "  Public:  https://jobs-dev.eelkhair.net"
-          echo "  Gateway: https://job-gateway-dev.eelkhair.net"
-          echo "══════════════════════════════════════════════"
-
-  # ════════════════════════════════════════════════════════════════════════════
-  # Job 3: Deploy to Prod (runs locally on proxmox-prod runner)
-  # ════════════════════════════════════════════════════════════════════════════
-  deploy-prod:
-    needs: build-and-push
-    if: >-
-      github.event_name == 'workflow_dispatch' && (inputs.environment == 'prod' || inputs.environment == 'both')
-    runs-on: [self-hosted, proxmox-prod]
-    environment: proxmox-prod
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Deploy to prod
-        env:
-          REG_USER: ${{ secrets.REGISTRY_USERNAME }}
-          REG_PASS: ${{ secrets.REGISTRY_PASSWORD }}
-        run: |
-          echo "Copying compose file..."
-          cp scripts/docker-compose.prod.yml ~/docker-compose.yml
-
-          echo "Docker login..."
-          echo "$REG_PASS" | docker login $REGISTRY -u $REG_USER --password-stdin
-
-          echo "Pulling and starting stack..."
-          docker compose -f ~/docker-compose.yml -p job-board pull
-          docker compose -f ~/docker-compose.yml -p job-board up -d --remove-orphans
-
-          echo "Cleanup..."
-          docker system prune -a --volumes -f || true
-          docker builder prune -a -f || true
-
-          echo "Prod deploy complete!"
-
-      - name: Print prod URLs
-        run: |
-          echo "══════════════════════════════════════════════"
-          echo "Prod deployment complete"
-          echo "  Admin:   https://job-admin.eelkhair.net"
-          echo "  Public:  https://jobs.eelkhair.net"
-          echo "  Gateway: https://job-gateway.eelkhair.net"
-          echo "══════════════════════════════════════════════"
+          echo "${{ matrix.env }} deploy complete!"
