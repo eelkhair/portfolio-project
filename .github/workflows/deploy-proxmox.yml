@@ -25,7 +25,7 @@ jobs:
   # Job 1: Build and Push Docker Images
   # ════════════════════════════════════════════════════════════════════════════
   build-and-push:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     strategy:
       fail-fast: false
       matrix:
@@ -157,53 +157,38 @@ jobs:
           build-args: ${{ matrix.build_args || '' }}
 
   # ════════════════════════════════════════════════════════════════════════════
-  # Job 2: Deploy to Dev
+  # Job 2: Deploy to Dev (runs locally on proxmox-dev runner)
   # ════════════════════════════════════════════════════════════════════════════
   deploy-dev:
     needs: build-and-push
     if: >-
       github.event_name == 'push' ||
       (github.event_name == 'workflow_dispatch' && (inputs.environment == 'dev' || inputs.environment == 'both'))
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, proxmox-dev]
     environment: proxmox-dev
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install sshpass
-        run: sudo apt-get install -y sshpass
-
       - name: Deploy to dev
         env:
-          SSH_HOST: 192.168.1.200
-          SSH_USER: eelkhair
-          SSH_PASS: ${{ secrets.PROXMOX_SSH_PASSWORD }}
           REG_USER: ${{ secrets.REGISTRY_USERNAME }}
           REG_PASS: ${{ secrets.REGISTRY_PASSWORD }}
         run: |
-          export SSHPASS="$SSH_PASS"
-          SSH="sshpass -e ssh -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST}"
-          SCP="sshpass -e scp -o StrictHostKeyChecking=no"
-
-          echo "Uploading compose file..."
-          $SCP scripts/docker-compose.dev.yml ${SSH_USER}@${SSH_HOST}:/home/${SSH_USER}/docker-compose.yml
-
-          echo "Deploying..."
-          $SSH bash -s << REMOTE
-          set -euo pipefail
+          echo "Copying compose file..."
+          cp scripts/docker-compose.dev.yml ~/docker-compose.yml
 
           echo "Docker login..."
-          echo "${REG_PASS}" | docker login ${REGISTRY} -u ${REG_USER} --password-stdin
+          echo "$REG_PASS" | docker login $REGISTRY -u $REG_USER --password-stdin
 
           echo "Pulling and starting stack..."
-          docker compose -p job-board pull
-          docker compose -p job-board up -d --remove-orphans
+          docker compose -f ~/docker-compose.yml -p job-board pull
+          docker compose -f ~/docker-compose.yml -p job-board up -d --remove-orphans
 
           echo "Cleanup..."
           docker system prune -a --volumes -f || true
           docker builder prune -a -f || true
 
           echo "Dev deploy complete!"
-          REMOTE
 
       - name: Print dev URLs
         run: |
@@ -215,52 +200,37 @@ jobs:
           echo "══════════════════════════════════════════════"
 
   # ════════════════════════════════════════════════════════════════════════════
-  # Job 3: Deploy to Prod (manual only)
+  # Job 3: Deploy to Prod (runs locally on proxmox-prod runner)
   # ════════════════════════════════════════════════════════════════════════════
   deploy-prod:
     needs: build-and-push
     if: >-
       github.event_name == 'workflow_dispatch' && (inputs.environment == 'prod' || inputs.environment == 'both')
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, proxmox-prod]
     environment: proxmox-prod
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install sshpass
-        run: sudo apt-get install -y sshpass
-
       - name: Deploy to prod
         env:
-          SSH_HOST: 192.168.1.112
-          SSH_USER: eelkhair
-          SSH_PASS: ${{ secrets.PROXMOX_SSH_PASSWORD }}
           REG_USER: ${{ secrets.REGISTRY_USERNAME }}
           REG_PASS: ${{ secrets.REGISTRY_PASSWORD }}
         run: |
-          export SSHPASS="$SSH_PASS"
-          SSH="sshpass -e ssh -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST}"
-          SCP="sshpass -e scp -o StrictHostKeyChecking=no"
-
-          echo "Uploading compose file..."
-          $SCP scripts/docker-compose.prod.yml ${SSH_USER}@${SSH_HOST}:/home/${SSH_USER}/docker-compose.yml
-
-          echo "Deploying..."
-          $SSH bash -s << REMOTE
-          set -euo pipefail
+          echo "Copying compose file..."
+          cp scripts/docker-compose.prod.yml ~/docker-compose.yml
 
           echo "Docker login..."
-          echo "${REG_PASS}" | docker login ${REGISTRY} -u ${REG_USER} --password-stdin
+          echo "$REG_PASS" | docker login $REGISTRY -u $REG_USER --password-stdin
 
           echo "Pulling and starting stack..."
-          docker compose -p job-board pull
-          docker compose -p job-board up -d --remove-orphans
+          docker compose -f ~/docker-compose.yml -p job-board pull
+          docker compose -f ~/docker-compose.yml -p job-board up -d --remove-orphans
 
           echo "Cleanup..."
           docker system prune -a --volumes -f || true
           docker builder prune -a -f || true
 
           echo "Prod deploy complete!"
-          REMOTE
 
       - name: Print prod URLs
         run: |
