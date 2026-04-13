@@ -29,6 +29,7 @@ ADR Index: [`docs/ADRs`](./ADRs)
 - [Authentication](#authentication)
 - [Observability](#observability)
 - [Health checks](#health-checks)
+- [Code quality](#code-quality)
 - [Running locally](#running-locally)
 - [Further reading](#further-reading)
 - [Architecture Decision Records](#architecture-decision-records)
@@ -272,6 +273,47 @@ See also: [`health-checks.md`](./guides/health-checks.md)
 
 ---
 
+## Code quality
+
+### .NET Static Analysis
+
+All C# projects are configured with static analysis via a root-level `Directory.Build.props` and `.editorconfig`:
+
+- **Microsoft.CodeAnalysis.NetAnalyzers** enabled at `latest-recommended` level (auto-maps per TFM)
+- **Meziantou.Analyzer** for modern best-practice rules (naming, performance, security)
+- **`EnforceCodeStyleInBuild`** ensures code style rules are checked during build
+- Code style conventions (var usage, expression-bodied members, file-scoped namespaces, `_camelCase` private fields) documented in `.editorconfig`
+- Rule severities tuned for the portfolio context -- noisy rules set to `suggestion`, actionable rules kept as `warning`
+
+```bash
+# Format check
+dotnet format JobBoard.sln --verify-no-changes
+
+# Auto-fix formatting
+dotnet format JobBoard.sln
+```
+
+### Angular ESLint
+
+Both frontend apps are configured with ESLint (flat config) + Prettier:
+
+- **job-admin** (Angular 20) -- `angular-eslint` + `typescript-eslint` + `eslint-config-prettier`
+- **job-public** (Angular 21) -- same stack, independent config
+- Template accessibility rules enabled (`templateAccessibility`)
+- PrimeNG/Tailwind a11y false positives set to `warn`
+
+```bash
+# Lint
+cd apps/job-admin && npm run lint
+cd apps/job-public && npm run lint
+
+# Auto-fix
+cd apps/job-admin && npm run lint:fix
+cd apps/job-public && npm run lint:fix
+```
+
+---
+
 ## Running locally
 
 ### With .NET Aspire (recommended)
@@ -453,10 +495,15 @@ See: `.github/workflows/deploy.yml` | `.github/workflows/cloudflare-tunnel.yml`
 - ~~Automate Cloudflare DNS updates in CI/CD pipeline~~ (`cloudflare-tunnel.yml`)
 - ~~Public app: job search, application flow, resume management UI~~
 - ~~Feature flag management (Redis/SignalR, admin settings page, public chat toggle)~~
-- Public chat AI tools — job matching, search, resume analysis
-- Applications pipeline & reviews — real backend integration
-- Microservices observability — consistent tracing across all services
-- In-app guided tour for admin and public apps
+- ~~Public chat AI tools — 4 tools (job matching, semantic search, similar jobs, job detail)~~
+- ~~Applications pipeline & reviews — Kanban board, AI match scoring, batch operations~~
+- ~~Microservices observability — TracingMiddleware across all 4 services, per-endpoint domain tags~~
+- ~~In-app guided tour — guided overlay, "How to Explore" drawer, architecture popups with Mermaid diagrams~~
+- ~~Code quality — ESLint (Angular), .NET static analysis (Meziantou + NetAnalyzers), dotnet format~~
+- Resume API microservice — extract resume bounded context from monolith (FastEndpoints, connector saga, reverse sync)
+- Application API microservice — extract application bounded context, integration events, bidirectional sync
+- User API / Company API / Job API endpoint parity — CRUD completions, search, filter
+- Reverse sync verification — end-to-end bidirectional proof, idempotency, DLQ paths, DB reset procedure
 
 ---
 
