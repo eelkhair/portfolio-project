@@ -109,11 +109,11 @@ public class JobQueryServiceTests : IAsyncLifetime
         var result = await _sut.ListCompanyJobSummariesAsync(CancellationToken.None);
 
         result.Count.ShouldBe(2);
-        var companyA = result.First(r => r.CompanyName == "Test Corp");
+        var companyA = result.First(r => string.Equals(r.CompanyName, "Test Corp", StringComparison.Ordinal));
         companyA.JobCount.ShouldBe(2);
         companyA.Jobs.Count.ShouldBe(2);
 
-        var companyB = result.First(r => r.CompanyName == "Corp B");
+        var companyB = result.First(r => string.Equals(r.CompanyName, "Corp B", StringComparison.Ordinal));
         companyB.JobCount.ShouldBe(1);
     }
 

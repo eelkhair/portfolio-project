@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Elkhair.Dev.Common.Application;
 using Elkhair.Dev.Common.Dapr;
 using Elkhair.Dev.Common.Domain.Constants;
@@ -9,17 +9,17 @@ using UserAPI.Contracts.Models.Events;
 
 namespace JobApi.Features.Companies.Events;
 
-public class CreateCompanyTopic(ICompanyCommandService service, ILogger<CreateCompanyTopic> logger):  Endpoint<EventDto<ProvisionUserEvent>>
+public class CreateCompanyTopic(ICompanyCommandService service, ILogger<CreateCompanyTopic> logger) : Endpoint<EventDto<ProvisionUserEvent>>
 {
     public override void Configure()
     {
         Post("events/company/create");
         AllowAnonymous();
-        Options(c => 
+        Options(c =>
             c.WithTopic(PubSubNames.RabbitMq, "company.created"));
     }
-    
-    public override async  Task HandleAsync(EventDto<ProvisionUserEvent> request, CancellationToken ct)
+
+    public override async Task HandleAsync(EventDto<ProvisionUserEvent> request, CancellationToken ct)
     {
         Activity.Current?.SetTag("entity.type", "company");
         Activity.Current?.SetTag("entity.id", request.Data?.CompanyUId);
@@ -29,7 +29,7 @@ public class CreateCompanyTopic(ICompanyCommandService service, ILogger<CreateCo
         await service.CreateCompanyAsync(new CreateCompanyRequest
         {
             UId = request.Data?.CompanyUId ?? Guid.Empty,
-            Name = request.Data?.CompanyName!, 
+            Name = request.Data?.CompanyName!,
         }, DaprExtensions.CreateUser(request.UserId), ct);
     }
 }

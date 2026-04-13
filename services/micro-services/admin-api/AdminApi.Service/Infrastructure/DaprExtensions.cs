@@ -6,9 +6,9 @@ namespace AdminApi.Infrastructure;
 
 public static class DaprExtensions
 {
-     public static async Task<WebApplicationBuilder> AddDaprServices(
-        this WebApplicationBuilder builder,
-        string serviceName)
+    public static async Task<WebApplicationBuilder> AddDaprServices(
+       this WebApplicationBuilder builder,
+       string serviceName)
     {
         // Core Dapr setup (DaprClient, secrets, configuration) — shared with MCP
         await builder.AddDaprCoreServices(serviceName);

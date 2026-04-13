@@ -15,7 +15,7 @@ public static class DraftSavedEndpoint
     {
         app.MapPost("/connector/draft-saved",
             [Topic("rabbitmq.pubsub", "monolith.draft-saved.v1")]
-            async (
+        async (
                 EventDto<DraftSavedV1Event> @event,
                 DraftSyncSaga saga,
                 ActivitySource activitySource,
@@ -55,7 +55,7 @@ public static class DraftSavedEndpoint
                         StateStores.Redis,
                         stateKey,
                         "processing",
-                        metadata: new Dictionary<string, string> { ["ttlInSeconds"] = IdempotencyOptions.PendingTTLSeconds.ToString() },
+                        metadata: new Dictionary<string, string>(StringComparer.Ordinal) { ["ttlInSeconds"] = IdempotencyOptions.PendingTTLSeconds.ToString() },
                         cancellationToken: cancellationToken);
                 }
 
@@ -80,6 +80,7 @@ public static class DraftSavedEndpoint
                         stateKey,
                         "done",
                         metadata: new Dictionary<string, string>
+(StringComparer.Ordinal)
                         {
                             ["ttlInSeconds"] = IdempotencyOptions.CompletedTTLSeconds.ToString()
                         },

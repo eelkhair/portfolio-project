@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace JobBoard.Infrastructure.Persistence.Repositories;
 
 // ReSharper disable once UnusedType.Global
-public class UserRepository(IJobBoardQueryDbContext context): BaseRepository(context), IUserRepository
+public class UserRepository(IJobBoardQueryDbContext context) : BaseRepository(context), IUserRepository
 {
     public async Task<User?> FindUserByIdAsync(string userId, CancellationToken cancellationToken)
     {
@@ -35,7 +35,7 @@ public class UserRepository(IJobBoardQueryDbContext context): BaseRepository(con
         await Context.UserCompanies.AddAsync(companyUser, cancellationToken);
     }
 
-    public async  Task<bool> EmailExistsAsync(string email, CancellationToken ct)
+    public async Task<bool> EmailExistsAsync(string email, CancellationToken ct)
     {
         return await Context.Users.AnyAsync(x => EF.Property<DateTime>(x, "PeriodEnd") == DateTime.MaxValue && x.Email == email, ct);
     }

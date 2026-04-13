@@ -56,7 +56,7 @@ public class ProvisionUserTopic(
             StateStores.Redis,
             stateKey,
             "processing",
-            metadata: new Dictionary<string, string> { ["ttlInSeconds"] = IdempotencyOptions.PendingTTLSeconds.ToString() },
+            metadata: new Dictionary<string, string>(StringComparer.Ordinal) { ["ttlInSeconds"] = IdempotencyOptions.PendingTTLSeconds.ToString() },
             cancellationToken: ct);
 
 
@@ -148,6 +148,7 @@ public class ProvisionUserTopic(
                 stateKey,
                 "done",
                 metadata: new Dictionary<string, string>
+(StringComparer.Ordinal)
                 {
                     ["ttlInSeconds"] = IdempotencyOptions.CompletedTTLSeconds.ToString()
                 },

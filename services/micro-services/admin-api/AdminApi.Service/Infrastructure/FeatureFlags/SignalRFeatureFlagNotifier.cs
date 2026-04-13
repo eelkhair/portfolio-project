@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.SignalR;
 
 namespace AdminApi.Infrastructure.FeatureFlags;
 
@@ -7,7 +7,7 @@ namespace AdminApi.Infrastructure.FeatureFlags;
 /// Implements the <see cref="IFeatureFlagNotifier"/> interface to provide real-time updates
 /// for feature flag changes.
 /// </summary>
-public class SignalRFeatureFlagNotifier(IHubContext<NotificationsHub> hub): IFeatureFlagNotifier
+public class SignalRFeatureFlagNotifier(IHubContext<NotificationsHub> hub) : IFeatureFlagNotifier
 {
     /// <summary>
     /// Notifies all connected clients about updated feature flags.

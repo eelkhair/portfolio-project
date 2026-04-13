@@ -1,6 +1,5 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using JobAPI.Contracts.Models.Companies.Requests;
-using JobApi.Infrastructure.Data;
 
 namespace JobApi.Application.Interfaces;
 

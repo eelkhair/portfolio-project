@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Elkhair.Common.Observability.Middleware;
 using Elkhair.Common.Observability.Observability;
 using Microsoft.AspNetCore.Builder;
@@ -59,10 +59,10 @@ public static class DependencyInjection
 
         return services;
     }
-    
-      public static WebApplicationBuilder ConfigureLogging(
-        this WebApplicationBuilder builder,
-        string appTag)
+
+    public static WebApplicationBuilder ConfigureLogging(
+      this WebApplicationBuilder builder,
+      string appTag)
     {
         builder.Logging.AddFilters();
 
@@ -75,17 +75,17 @@ public static class DependencyInjection
                 (
                     log.Properties.TryGetValue("SourceContext", out var ctx) &&
                     (
-                        ctx.ToString().Contains("HttpClient.health-checks") ||
-                        ctx.ToString().Contains("HealthCheck") ||
-                        ctx.ToString().Contains("HealthReportCollector") ||
+                        ctx.ToString(null, System.Globalization.CultureInfo.InvariantCulture).Contains("HttpClient.health-checks") ||
+                        ctx.ToString(null, System.Globalization.CultureInfo.InvariantCulture).Contains("HealthCheck") ||
+                        ctx.ToString(null, System.Globalization.CultureInfo.InvariantCulture).Contains("HealthReportCollector") ||
                         (configuration.GetValue<bool>("FeatureFlags:SuppressEfCommandLogs") &&
-                         ctx.ToString().Contains("EntityFrameworkCore.Database.Command"))
+                         ctx.ToString(null, System.Globalization.CultureInfo.InvariantCulture).Contains("EntityFrameworkCore.Database.Command"))
                     )
                 )
                 ||
                 (
                     log.Properties.TryGetValue("Uri", out var uri) &&
-                    uri.ToString().Contains("health")
+                    uri.ToString(null, System.Globalization.CultureInfo.InvariantCulture).Contains("health")
                 )
                 ||
                 (
@@ -110,7 +110,7 @@ public static class DependencyInjection
             .MinimumLevel.Override("Microsoft.AspNetCore.DataProtection", LogEventLevel.Error)
             .MinimumLevel.Override("Microsoft.AspNetCore.Server.Kestrel", LogEventLevel.Error)
             .ReadFrom.Configuration(builder.Configuration)
-            .Enrich.With<ElasticTimestampEnricher>()  
+            .Enrich.With<ElasticTimestampEnricher>()
             .Enrich.FromLogContext()
             .Enrich.WithExceptionDetails()
             .Enrich.WithProperty("ApplicationName", appTag)

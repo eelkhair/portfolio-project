@@ -1,4 +1,4 @@
-﻿using JobBoard.Domain.Entities.Infrastructure;
+using JobBoard.Domain.Entities.Infrastructure;
 
 namespace JobBoard.Application.Interfaces.Infrastructure;
 

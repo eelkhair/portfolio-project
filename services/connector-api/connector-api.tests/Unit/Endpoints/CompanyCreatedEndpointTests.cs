@@ -10,7 +10,6 @@ using ConnectorAPI.Sagas;
 using Dapr.Client;
 using JobBoard.IntegrationEvents.Company;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -128,10 +127,16 @@ public class CompanyCreatedEndpointTests : IAsyncDisposable
                 Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns((new CompanyCreateCompanyResult
             {
-                Name = "Test", Email = "t@t.com", Website = "https://t.com", IndustryUId = Guid.NewGuid()
+                Name = "Test",
+                Email = "t@t.com",
+                Website = "https://t.com",
+                IndustryUId = Guid.NewGuid()
             }, new CompanyCreateUserResult
             {
-                Id = Guid.NewGuid(), FirstName = "John", LastName = "Doe", Email = "j@t.com"
+                Id = Guid.NewGuid(),
+                FirstName = "John",
+                LastName = "Doe",
+                Email = "j@t.com"
             }));
 
         _userApi.SendCompanyCreatedAsync(
@@ -139,9 +144,13 @@ public class CompanyCreatedEndpointTests : IAsyncDisposable
                 Arg.Any<CancellationToken>())
             .Returns(new CompanyCreatedUserApiPayload
             {
-                KeycloakUserId = "kc-user", KeycloakGroupId = "kc-group",
-                CompanyName = "Test", FirstName = "John", LastName = "Doe",
-                Email = "j@t.com", CompanyUId = _eventData.CompanyUId
+                KeycloakUserId = "kc-user",
+                KeycloakGroupId = "kc-group",
+                CompanyName = "Test",
+                FirstName = "John",
+                LastName = "Doe",
+                Email = "j@t.com",
+                CompanyUId = _eventData.CompanyUId
             });
 
         var response = await _client.PostAsJsonAsync("/connector/company", _event);

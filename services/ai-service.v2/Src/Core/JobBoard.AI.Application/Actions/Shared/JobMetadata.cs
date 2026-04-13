@@ -1,4 +1,4 @@
-﻿namespace JobBoard.AI.Application.Actions.Shared;
+namespace JobBoard.AI.Application.Actions.Shared;
 
 public class JobMetadata
 {

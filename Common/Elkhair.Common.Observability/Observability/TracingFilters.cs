@@ -4,13 +4,14 @@ using OpenTelemetry.Instrumentation.EntityFrameworkCore;
 using OpenTelemetry.Instrumentation.Http;
 
 namespace Elkhair.Common.Observability.Observability;
+
 public static class TracingFilters
 {
     public static readonly ActivitySource Source = new("JobBoard");
 
     public static void AddFilters(this AspNetCoreTraceInstrumentationOptions options)
     {
-        
+
         options.Filter = httpContext =>
         {
             var path = httpContext.Request.Path.ToString();
@@ -28,7 +29,7 @@ public static class TracingFilters
                    !path.Contains("/api/health", StringComparison.OrdinalIgnoreCase) &&
                    !path.Contains("swagger", StringComparison.OrdinalIgnoreCase) &&
                    !path.Contains("/openapi", StringComparison.OrdinalIgnoreCase) &&
-                   !path.Contains("login.microsoftonline.com")&&
+                   !path.Contains("login.microsoftonline.com") &&
                    !path.Contains("/ui/resources/", StringComparison.OrdinalIgnoreCase) &&
                    !path.StartsWith("/health-results", StringComparison.OrdinalIgnoreCase) &&
                    !path.Equals("/dapr/config", StringComparison.OrdinalIgnoreCase) &&
@@ -74,14 +75,14 @@ public static class TracingFilters
 
             return path == null
                    ||
-                   !path.Contains(".well-known")&&
-                   !path.Contains("discovery/v2.0/keys")&&
-                   !path.Contains("api/health")&&
-                   !path.Contains("scalar")&&
-                   !path.Contains("discovery/keys")&&
+                   !path.Contains(".well-known") &&
+                   !path.Contains("discovery/v2.0/keys") &&
+                   !path.Contains("api/health") &&
+                   !path.Contains("scalar") &&
+                   !path.Contains("discovery/keys") &&
                    !path.Contains("/cfg-omni", StringComparison.OrdinalIgnoreCase) &&
-                   !path.StartsWith("/health-results", StringComparison.OrdinalIgnoreCase)&&
-                   !path.Contains("/AzureFunctionsRpcMessages.FunctionRpc/EventStream", StringComparison.OrdinalIgnoreCase)&&
+                   !path.StartsWith("/health-results", StringComparison.OrdinalIgnoreCase) &&
+                   !path.Contains("/AzureFunctionsRpcMessages.FunctionRpc/EventStream", StringComparison.OrdinalIgnoreCase) &&
                    !path.Contains("/QuickPulseService", StringComparison.OrdinalIgnoreCase) &&
                    !path.Equals("/v1/models", StringComparison.OrdinalIgnoreCase) &&
                    !path.Contains("/openai/models", StringComparison.OrdinalIgnoreCase);

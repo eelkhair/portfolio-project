@@ -1,4 +1,4 @@
-﻿using JobBoard.Application.Interfaces.Configurations;
+using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Infrastructure.Configuration.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -24,7 +24,7 @@ public static class AppConfigurationExtensions
             ConfigureCommonOptions(options);
             options.Connect(connectionString);
         });
-            
+
         config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
         config.AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true, reloadOnChange: true);
         return;
@@ -40,7 +40,7 @@ public static class AppConfigurationExtensions
             });
         }
     }
-    
+
     public static IServiceCollection AddAppConfigurationServices(this IServiceCollection services)
     {
         services.AddScoped<IApplicationOrchestrator, ApplicationOrchestrator>();

@@ -1,4 +1,4 @@
-﻿namespace JobBoard.HealthChecks;
+namespace JobBoard.HealthChecks;
 
 public class DaprHealthCheck : IHealthCheck
 {
@@ -14,7 +14,7 @@ public class DaprHealthCheck : IHealthCheck
         CancellationToken cancellationToken = default)
     {
         var healthy = await _daprClient.CheckHealthAsync(cancellationToken);
-            
+
         if (healthy)
         {
             return HealthCheckResult.Healthy("Dapr sidecar is healthy.");

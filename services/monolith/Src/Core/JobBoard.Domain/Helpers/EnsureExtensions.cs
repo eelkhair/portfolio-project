@@ -1,4 +1,4 @@
-﻿
+
 
 using JobBoard.Domain.Exceptions;
 

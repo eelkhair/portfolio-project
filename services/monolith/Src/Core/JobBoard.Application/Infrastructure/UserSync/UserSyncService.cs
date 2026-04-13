@@ -1,8 +1,8 @@
 using JobBoard.Application.Interfaces;
 using JobBoard.Application.Interfaces.Repositories;
 using JobBoard.Application.Interfaces.Users;
-using JobBoard.Mcp.Common;
 using JobBoard.Domain.Entities.Users;
+using JobBoard.Mcp.Common;
 
 // ReSharper disable NullableWarningSuppressionIsUsed
 
@@ -36,15 +36,15 @@ public class UserSyncService(
                 email: userAccessor.Email!,
                 externalId: userId,
                 id: uid, internalId: id,
-                createdAt:DateTime.UtcNow,
-                createdBy:userId
+                createdAt: DateTime.UtcNow,
+                createdBy: userId
             );
-            
+
             await userRepository.AddAsync(entity, cancellationToken);
         }
         else
         {
-            if (!string.IsNullOrWhiteSpace(userAccessor.FirstName) && !string.IsNullOrWhiteSpace(userAccessor.LastName) && !string.IsNullOrWhiteSpace(userAccessor.Email) 
+            if (!string.IsNullOrWhiteSpace(userAccessor.FirstName) && !string.IsNullOrWhiteSpace(userAccessor.LastName) && !string.IsNullOrWhiteSpace(userAccessor.Email)
                 && (!user.FirstName.Equals(userAccessor.FirstName, StringComparison.InvariantCultureIgnoreCase) ||
                     !user.LastName.Equals(userAccessor.LastName, StringComparison.InvariantCultureIgnoreCase) ||
                     !user.Email.Equals(userAccessor.Email, StringComparison.InvariantCultureIgnoreCase)))

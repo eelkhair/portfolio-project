@@ -65,7 +65,7 @@ public class EmbedResumeCommandHandler(
         var vectors = await embeddingService.GenerateBatchEmbeddingsAsync(textsToEmbed, cancellationToken);
 
         // Map results to named vectors
-        var vectorMap = new Dictionary<string, EmbeddingVector>();
+        var vectorMap = new Dictionary<string, EmbeddingVector>(StringComparer.Ordinal);
         for (var i = 0; i < sectionKeys.Count; i++)
             vectorMap[sectionKeys[i]] = new EmbeddingVector(vectors[i]);
 

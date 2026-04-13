@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Net.Http.Headers;
 using AH.Metadata.Domain.Constants;
 using Dapr.Client;
 using UserApi.Infrastructure.Keycloak.Interfaces;
@@ -38,6 +37,7 @@ public class KeycloakTokenService(
         var http = httpClientFactory.CreateClient("keycloak");
 
         var formData = new FormUrlEncodedContent(new Dictionary<string, string>
+(StringComparer.Ordinal)
         {
             ["grant_type"] = "client_credentials",
             ["client_id"] = clientId,
@@ -58,7 +58,7 @@ public class KeycloakTokenService(
             StateStoreName,
             key: TokenStateKey,
             value: token,
-            metadata: new Dictionary<string, string> { ["ttlInSeconds"] = ttl.ToString() },
+            metadata: new Dictionary<string, string>(StringComparer.Ordinal) { ["ttlInSeconds"] = ttl.ToString(System.Globalization.CultureInfo.InvariantCulture) },
             cancellationToken: ct);
 
         activity?.SetTag("token.length", token.Length);

@@ -2,7 +2,6 @@ using System.Diagnostics;
 using JobBoard.AI.Application.Actions.Base;
 using JobBoard.AI.Application.Interfaces.AI;
 using JobBoard.AI.Application.Interfaces.Configurations;
-using JobBoard.AI.Application.Interfaces.Observability;
 
 namespace JobBoard.AI.Application.Actions.Chat;
 
@@ -28,7 +27,7 @@ public sealed class ChatCommandHandler(
 {
     private static readonly PublicChatSystemPrompt PublicPrompt = new();
     private static readonly AdminSystemPrompt AdminSystemPrompt = new();
-    
+
     public async Task<ChatResponse> HandleAsync(
         ChatCommand request,
         CancellationToken cancellationToken)

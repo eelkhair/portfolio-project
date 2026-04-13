@@ -29,6 +29,8 @@ public class PublicController : BaseApiController
     /// <param name="location">
     /// A location string to filter job postings by their geographical location.
     /// </param>
+    /// <param name="page"></param>
+    /// <param name="pageSize"></param>
     /// <returns>
     /// An asynchronous operation that resolves to an IActionResult containing the list
     /// of jobs matching the specified criteria.
@@ -39,8 +41,11 @@ public class PublicController : BaseApiController
     {
         return await ExecuteQueryAsync(new ListPublicJobsQuery
         {
-            Search = search, JobType = jobType, Location = location,
-            Page = page, PageSize = pageSize
+            Search = search,
+            JobType = jobType,
+            Location = location,
+            Page = page,
+            PageSize = pageSize
         }, Ok);
     }
 

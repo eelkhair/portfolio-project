@@ -1,9 +1,8 @@
 using System.Diagnostics;
+using JobBoard.AI.Application.Actions.Base;
 using JobBoard.AI.Application.Actions.Chat;
 using JobBoard.AI.Application.Interfaces.AI;
 using JobBoard.AI.Application.Interfaces.Configurations;
-using JobBoard.AI.Application.Interfaces.Observability;
-using JobBoard.AI.Application.Actions.Base;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Shouldly;

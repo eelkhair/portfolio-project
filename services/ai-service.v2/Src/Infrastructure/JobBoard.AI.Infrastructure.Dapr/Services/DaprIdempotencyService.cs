@@ -20,7 +20,7 @@ public class DaprIdempotencyService(DaprClient daprClient) : IIdempotencyService
             StateStores.Redis,
             stateKey,
             "processing",
-            metadata: new Dictionary<string, string> { ["ttlInSeconds"] = ttlSeconds.ToString() },
+            metadata: new Dictionary<string, string>(StringComparer.Ordinal) { ["ttlInSeconds"] = ttlSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture) },
             cancellationToken: ct);
     }
 
@@ -31,7 +31,7 @@ public class DaprIdempotencyService(DaprClient daprClient) : IIdempotencyService
             StateStores.Redis,
             stateKey,
             "done",
-            metadata: new Dictionary<string, string> { ["ttlInSeconds"] = ttlSeconds.ToString() },
+            metadata: new Dictionary<string, string>(StringComparer.Ordinal) { ["ttlInSeconds"] = ttlSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture) },
             cancellationToken: ct);
     }
 }

@@ -1,11 +1,11 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using FastEndpoints;
 using JobApi.Application.Interfaces;
 using JobAPI.Contracts.Models.Jobs.Responses;
 
 namespace JobApi.Features.Jobs;
 
-public class ListJobsEndpoint(IJobQueryService service): Endpoint<ListJobsRequest,List<JobResponse>>
+public class ListJobsEndpoint(IJobQueryService service) : Endpoint<ListJobsRequest, List<JobResponse>>
 {
     public override void Configure()
     {
@@ -20,7 +20,7 @@ public class ListJobsEndpoint(IJobQueryService service): Endpoint<ListJobsReques
         Activity.Current?.SetTag("operation", "list");
 
         var jobs = await service.ListAsync(request.CompanyUId, ct);
-        await Send.OkAsync( jobs , cancellation: ct);
+        await Send.OkAsync(jobs, cancellation: ct);
     }
 }
 

@@ -1,4 +1,4 @@
-﻿using Elkhair.Dev.Common.Domain.Constants;
+using Elkhair.Dev.Common.Domain.Constants;
 
 namespace Elkhair.Dev.Common.Domain.Entities;
 

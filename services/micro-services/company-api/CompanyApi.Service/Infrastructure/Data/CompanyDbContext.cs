@@ -17,31 +17,31 @@ public partial class CompanyDbContext : DbContext, ICompanyDbContext
 {
     public CompanyDbContext()
     {
-        
+
     }
 
-    public CompanyDbContext(DbContextOptions options): base(options)
+    public CompanyDbContext(DbContextOptions options) : base(options)
     {
-        
+
     }
-    
+
     public CompanyDbContext(string connectionString) : base(GetOptions(connectionString))
     {
     }
-    
+
     private static DbContextOptions GetOptions(string connectionString)
     {
         return new DbContextOptionsBuilder().UseSqlServer(connectionString)
             .Options;
     }
-    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(CompanyDbContext).Assembly);
         modelBuilder.HasDefaultSchema("Company");
         //modelBuilder.SeedData();
     }
-    
+
     public Task<int> SaveChangesAsync(ClaimsPrincipal user, CancellationToken cancellationToken)
     {
         var now = DateTime.UtcNow;

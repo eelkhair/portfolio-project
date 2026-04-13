@@ -12,8 +12,8 @@ public sealed record ToolResultEnvelope<T>(
     T Data,
     int Count,
     DateTimeOffset ExecutedAt);
-    
-    
+
+
 public interface IAiToolHandlerResolver
 {
     IHandler<TRequest, TResponse> Resolve<TRequest, TResponse>()

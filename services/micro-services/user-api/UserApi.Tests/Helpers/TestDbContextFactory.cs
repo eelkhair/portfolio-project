@@ -25,29 +25,29 @@ public static class TestDbContextFactory
         string lastName = "Doe",
         string? keycloakUserId = null,
         Guid? uid = null) => new()
-    {
-        Email = email,
-        FirstName = firstName,
-        LastName = lastName,
-        KeycloakUserId = keycloakUserId ?? "kc-user-123",
-        UId = uid ?? Guid.NewGuid(),
-        CreatedAt = Now,
-        UpdatedAt = Now,
-        CreatedBy = "test",
-        UpdatedBy = "test"
-    };
+        {
+            Email = email,
+            FirstName = firstName,
+            LastName = lastName,
+            KeycloakUserId = keycloakUserId ?? "kc-user-123",
+            UId = uid ?? Guid.NewGuid(),
+            CreatedAt = Now,
+            UpdatedAt = Now,
+            CreatedBy = "test",
+            UpdatedBy = "test"
+        };
 
     public static Company CreateCompany(
         string name = "Test Corp",
         string keycloakGroupId = "kc-group-123",
         Guid? uid = null) => new()
-    {
-        Name = name,
-        KeycloakGroupId = keycloakGroupId,
-        UId = uid ?? Guid.NewGuid(),
-        CreatedAt = Now,
-        UpdatedAt = Now,
-        CreatedBy = "test",
-        UpdatedBy = "test"
-    };
+        {
+            Name = name,
+            KeycloakGroupId = keycloakGroupId,
+            UId = uid ?? Guid.NewGuid(),
+            CreatedAt = Now,
+            UpdatedAt = Now,
+            CreatedBy = "test",
+            UpdatedBy = "test"
+        };
 }

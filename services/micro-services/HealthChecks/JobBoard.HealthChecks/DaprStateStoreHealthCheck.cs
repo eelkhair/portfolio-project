@@ -15,7 +15,7 @@ public class DaprStateStoreHealthCheck : IHealthCheck
 
     public virtual string Name => typeof(DaprStateStoreHealthCheck).Name;
     protected virtual string StateStoreName => _stateStoreOptions.StoreName;
-    
+
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = new CancellationToken())
     {
         try

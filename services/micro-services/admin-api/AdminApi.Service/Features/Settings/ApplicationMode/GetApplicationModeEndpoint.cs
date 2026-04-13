@@ -1,6 +1,6 @@
 using System.Diagnostics;
-using AdminAPI.Contracts.Services;
 using AdminAPI.Contracts.Models.Settings;
+using AdminAPI.Contracts.Services;
 using Elkhair.Dev.Common.Application;
 using FastEndpoints;
 
@@ -28,5 +28,5 @@ public sealed class GetApplicationModeEndpoint(ISettingsCommandService settings)
         var mode = await settings.GetApplicationModeAsync(ct);
         await Send.OkAsync(mode, ct);
     }
-    
+
 }

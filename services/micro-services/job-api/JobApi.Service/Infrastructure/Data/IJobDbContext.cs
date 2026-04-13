@@ -12,6 +12,6 @@ public interface IJobDbContext
     DbSet<Qualification> Qualifications { get; set; }
     DbSet<Responsibility> Responsibilities { get; set; }
     DbSet<Draft> Drafts { get; set; }
-    ChangeTracker ChangeTracker { get;}
+    ChangeTracker ChangeTracker { get; }
     Task<int> SaveChangesAsync(ClaimsPrincipal user, CancellationToken cancellationToken);
 }

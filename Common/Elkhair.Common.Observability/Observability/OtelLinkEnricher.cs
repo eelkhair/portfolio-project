@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Serilog.Core;
 using Serilog.Events;
 
@@ -23,11 +23,11 @@ public class OtelLinkEnricher : ILogEventEnricher
             logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(
                 "parentSpanId", activity.ParentSpanId.ToString()));
         }
-        
+
         if (activity.Links.Any())
         {
             var linked = activity.Links
-                .Select(l => new 
+                .Select(l => new
                 {
                     traceId = l.Context.TraceId.ToString(),
                     spanId = l.Context.SpanId.ToString()

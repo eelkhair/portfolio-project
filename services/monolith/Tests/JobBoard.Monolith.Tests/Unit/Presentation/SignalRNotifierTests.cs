@@ -31,7 +31,7 @@ public class SignalRFeatureFlagNotifierTests
     [Fact]
     public async Task NotifyAsync_ShouldSendToAllClients()
     {
-        var flags = new Dictionary<string, bool> { ["EnableEfTracking"] = true };
+        var flags = new Dictionary<string, bool>(StringComparer.Ordinal) { ["EnableEfTracking"] = true };
 
         await _sut.NotifyAsync(flags);
 
@@ -44,7 +44,7 @@ public class SignalRFeatureFlagNotifierTests
     [Fact]
     public async Task NotifyAsync_WithEmptyFlags_ShouldStillSend()
     {
-        var flags = new Dictionary<string, bool>();
+        var flags = new Dictionary<string, bool>(StringComparer.Ordinal);
 
         await _sut.NotifyAsync(flags);
 

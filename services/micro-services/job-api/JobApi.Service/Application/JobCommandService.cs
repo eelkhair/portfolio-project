@@ -1,14 +1,13 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Elkhair.Dev.Common.Dapr;
 using JobApi.Application.Interfaces;
-using JobAPI.Contracts.Models.Jobs.Requests;
-using JobAPI.Contracts.Models.Jobs.Responses;
 using JobApi.Infrastructure.Data;
 using JobApi.Infrastructure.Data.Entities;
+using JobAPI.Contracts.Models.Jobs.Requests;
+using JobAPI.Contracts.Models.Jobs.Responses;
 using JobBoard.IntegrationEvents.Job;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace JobApi.Application;
 
@@ -18,7 +17,7 @@ public partial class JobCommandService(IJobDbContext context, IMessageSender mes
     {
         LogCreatingJob(logger, request.Title, request.CompanyUId);
 
-        var company = await context.Companies.FirstAsync(c=> c.UId == request.CompanyUId, ct);
+        var company = await context.Companies.FirstAsync(c => c.UId == request.CompanyUId, ct);
         var job = request.Adapt<Job>();
         job.CompanyId = company.Id;
 

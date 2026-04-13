@@ -1,6 +1,6 @@
-﻿using JobBoard.Application.Actions.Outbox;
-using JobBoard.Mcp.Common;
+using JobBoard.Application.Actions.Outbox;
 using JobBoard.Domain;
+using JobBoard.Mcp.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,7 +27,7 @@ public class OutboxController(IUserAccessor accessor) : BaseApiController
         accessor.FirstName = "OutboxProcessor";
         accessor.LastName = "OutboxProcessor";
         accessor.Email = "OutboxProcessor@eelkhair.net";
-        accessor.Roles = new List<string>{"OutboxProcessor"};
+        accessor.Roles = new List<string> { "OutboxProcessor" };
         await ExecuteCommandAsync(new ProcessOutboxMessageCommand(), Ok);
         return Ok();
     }

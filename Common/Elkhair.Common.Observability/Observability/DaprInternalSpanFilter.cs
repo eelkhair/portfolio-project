@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using OpenTelemetry;
 using OpenTelemetry.Trace;
 
@@ -33,5 +33,5 @@ public sealed class DaprConfigSampler : Sampler
         // Everything else → keep as normal
         return new SamplingResult(SamplingDecision.RecordAndSample);
     }
-    
+
 }

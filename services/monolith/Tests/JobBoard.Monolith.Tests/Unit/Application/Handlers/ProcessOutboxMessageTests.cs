@@ -6,11 +6,9 @@ using JobBoard.Application.Interfaces.Infrastructure;
 using JobBoard.Application.Interfaces.Messaging;
 using JobBoard.Application.Interfaces.Observability;
 using JobBoard.Domain.Entities.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 using JobBoard.Monolith.Tests.Unit.Application.Decorators;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 using Shouldly;
 
 namespace JobBoard.Monolith.Tests.Unit.Application.Handlers;

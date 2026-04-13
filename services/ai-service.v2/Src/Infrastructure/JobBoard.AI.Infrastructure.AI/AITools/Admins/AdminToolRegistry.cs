@@ -1,7 +1,6 @@
 using JobBoard.AI.Application.Interfaces.Clients;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Notifications;
-using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Infrastructure.AI.AITools.Admins.System;
 using JobBoard.AI.Infrastructure.AI.Services;
 using Microsoft.AspNetCore.Http;

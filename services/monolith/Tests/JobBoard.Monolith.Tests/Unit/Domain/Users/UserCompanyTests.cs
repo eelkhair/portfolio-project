@@ -1,5 +1,5 @@
-using Shouldly;
 using JobBoard.Domain.Entities;
+using Shouldly;
 
 namespace JobBoard.Monolith.Tests.Unit.Domain.Users;
 

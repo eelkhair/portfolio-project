@@ -1,2 +1,3 @@
-﻿namespace JobBoard.AI.Application.Actions.Shared;
+namespace JobBoard.AI.Application.Actions.Shared;
+
 public enum Tone { Neutral, Concise, Friendly }

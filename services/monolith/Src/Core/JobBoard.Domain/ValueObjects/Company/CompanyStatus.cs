@@ -1,18 +1,18 @@
-﻿using JobBoard.Domain.Exceptions;
+using JobBoard.Domain.Exceptions;
 
 namespace JobBoard.Domain.ValueObjects.Company;
 
 public class CompanyStatus
 {
     public string Value { get; }
-    
+
     private CompanyStatus(string value) { Value = value; }
-    
+
     public static Result<CompanyStatus> Create(string value)
     {
         if (string.IsNullOrEmpty(value)) value = string.Empty;
         value = value.Trim();
-        
+
         var errors = new List<Error>();
 
         if (string.IsNullOrWhiteSpace(value))

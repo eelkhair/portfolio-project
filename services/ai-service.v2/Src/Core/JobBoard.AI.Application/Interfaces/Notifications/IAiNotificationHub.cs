@@ -10,7 +10,7 @@ public sealed record AiNotificationDto(
     string? CorrelationId = null,
     Dictionary<string, object>? Metadata = null,
     DateTimeOffset Timestamp = default
-    
+
 );
 
 public interface IAiNotificationHub

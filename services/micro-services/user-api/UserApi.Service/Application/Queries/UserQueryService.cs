@@ -1,8 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using UserApi.Application.Queries.Interfaces;
-using UserAPI.Contracts.Models.Responses;
 using UserApi.Infrastructure.Data;
+using UserAPI.Contracts.Models.Responses;
 
 namespace UserApi.Application.Queries;
 

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using AdminApi.Infrastructure;
 using CompanyAPI.Contracts.Models.Companies;
 using Elkhair.Dev.Common.Dapr;
@@ -6,13 +6,12 @@ using Elkhair.Dev.Common.Domain.Constants;
 using FastEndpoints;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using UserAPI.Contracts.Models.Events;
 
 namespace AdminApi.Features.Companies.Events;
 
 public class CompanyActivatedSubscriber(
     ILogger<CompanyActivatedSubscriber> log,
-    IHubContext<NotificationsHub> hub, ActivitySource activitySource) 
+    IHubContext<NotificationsHub> hub, ActivitySource activitySource)
     : Endpoint<EventDto<CompanyCreatedSuccess>, OkObjectResult>
 {
     public override void Configure()
@@ -33,13 +32,13 @@ public class CompanyActivatedSubscriber(
             act?.SetTag("messaging.system", "signalr");
             act?.SetTag("messaging.destination.name", "CompanyActivated");
             act?.SetTag("messaging.operation", "send");
-            var parent = Activity.Current; 
+            var parent = Activity.Current;
             await hub.Clients.Group(e.UserId).SendAsync("CompanyActivated", new
             {
                 e.Data.CompanyUId,
                 e.Data.CompanyName,
-                TraceParent =parent?.Id,                 
-                TraceState =parent?.TraceStateString,    
+                TraceParent = parent?.Id,
+                TraceState = parent?.TraceStateString,
                 Message = $"“{e.Data.CompanyName}” has been activated."
             }, ct);
             act?.SetTag("enduser.id", e.UserId);

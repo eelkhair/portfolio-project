@@ -9,7 +9,7 @@ public class MetricsServiceTests : IDisposable
 {
     private readonly MetricsService _sut;
     private readonly MeterListener _listener;
-    private readonly Dictionary<string, long> _counters = new();
+    private readonly Dictionary<string, long> _counters = new(StringComparer.Ordinal);
 
     public MetricsServiceTests()
     {
@@ -17,7 +17,7 @@ public class MetricsServiceTests : IDisposable
         _listener = new MeterListener();
         _listener.InstrumentPublished = (instrument, listener) =>
         {
-            if (instrument.Meter.Name == "JobBoard")
+            if (string.Equals(instrument.Meter.Name, "JobBoard", StringComparison.Ordinal))
                 listener.EnableMeasurementEvents(instrument);
         };
         _listener.SetMeasurementEventCallback<long>((instrument, measurement, _, _) =>

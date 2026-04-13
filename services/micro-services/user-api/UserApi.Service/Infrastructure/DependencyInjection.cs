@@ -49,6 +49,7 @@ public static class DependencyInjection
                                     AuthorizationUrl = $"{authority}/protocol/openid-connect/auth",
                                     TokenUrl = $"{authority}/protocol/openid-connect/token",
                                     Scopes = new Dictionary<string, string>
+(StringComparer.Ordinal)
                                     {
                                         ["openid"] = "OpenID",
                                         ["profile"] = "Profile",

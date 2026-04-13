@@ -8,12 +8,12 @@ using JobBoard.AI.Application.Interfaces.Notifications;
 using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Infrastructure.AI.Infrastructure;
 using Microsoft.Extensions.AI;
-using McpCtx = JobBoard.AI.Infrastructure.AI.Infrastructure.McpRequestContext;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ChatMessage = Microsoft.Extensions.AI.ChatMessage;
 using ChatResponse = JobBoard.AI.Application.Actions.Chat.ChatResponse;
+using McpCtx = JobBoard.AI.Infrastructure.AI.Infrastructure.McpRequestContext;
 
 namespace JobBoard.AI.Infrastructure.AI.Services;
 
@@ -69,10 +69,10 @@ public class ChatService(
         var msg = userMessage.Trim().ToLowerInvariant();
 
         // Questions or "tell me about" → need LLM interpretation
-        if (msg.StartsWith("tell me") || msg.StartsWith("what") || msg.StartsWith("who") ||
-            msg.StartsWith("how") || msg.StartsWith("why") || msg.StartsWith("describe") ||
-            msg.StartsWith("explain") || msg.StartsWith("find") || msg.StartsWith("search") ||
-            msg.StartsWith("which") || msg.Contains("about") || msg.Contains("detail") ||
+        if (msg.StartsWith("tell me", StringComparison.Ordinal) || msg.StartsWith("what", StringComparison.Ordinal) || msg.StartsWith("who", StringComparison.Ordinal) ||
+            msg.StartsWith("how", StringComparison.Ordinal) || msg.StartsWith("why", StringComparison.Ordinal) || msg.StartsWith("describe", StringComparison.Ordinal) ||
+            msg.StartsWith("explain", StringComparison.Ordinal) || msg.StartsWith("find", StringComparison.Ordinal) || msg.StartsWith("search", StringComparison.Ordinal) ||
+            msg.StartsWith("which", StringComparison.Ordinal) || msg.Contains("about") || msg.Contains("detail") ||
             msg.Contains("?"))
         {
             return false;
@@ -86,10 +86,10 @@ public class ChatService(
         }
 
         // Short imperative commands like "list companies", "show jobs", "get drafts"
-        return msg.StartsWith("list") || msg.StartsWith("show") || msg.StartsWith("get") ||
-               msg.StartsWith("fetch") || msg.StartsWith("display") ||
-               msg.StartsWith("all ") || msg.StartsWith("system info") ||
-               msg.StartsWith("sys info") || msg.StartsWith("config");
+        return msg.StartsWith("list", StringComparison.Ordinal) || msg.StartsWith("show", StringComparison.Ordinal) || msg.StartsWith("get", StringComparison.Ordinal) ||
+               msg.StartsWith("fetch", StringComparison.Ordinal) || msg.StartsWith("display", StringComparison.Ordinal) ||
+               msg.StartsWith("all ", StringComparison.Ordinal) || msg.StartsWith("system info", StringComparison.Ordinal) ||
+               msg.StartsWith("sys info", StringComparison.Ordinal) || msg.StartsWith("config", StringComparison.Ordinal);
     }
 
     public async Task<ChatResponse> RunChatAsync(
@@ -244,7 +244,7 @@ public class ChatService(
 
             try
             {
-                var args = new AIFunctionArguments(call.Arguments ?? new Dictionary<string, object?>());
+                var args = new AIFunctionArguments(call.Arguments ?? new Dictionary<string, object?>(), StringComparer.Ordinal);
                 var result = await function.InvokeAsync(args, ct);
                 results.Add((call.Name!, new FunctionResultContent(call.CallId, result)));
             }
@@ -273,7 +273,7 @@ public class ChatService(
         var toolCallArgs = toolResults
             .Select(r => r.Content)
             .OfType<FunctionResultContent>()
-            .ToDictionary(r => r.CallId, _ => (IDictionary<string, object?>?)null);
+            .ToDictionary(r => r.CallId, _ => (IDictionary<string, object?>?)null, StringComparer.Ordinal);
 
         foreach (var (toolName, content) in toolResults)
         {
@@ -284,9 +284,9 @@ public class ChatService(
 
                 var result = JsonSerializer.Deserialize<JsonElement>(resultJson);
 
-                if (toolName == "create_job" &&
+                if (string.Equals(toolName, "create_job", StringComparison.Ordinal) &&
                     result.TryGetProperty("status", out var status) &&
-                    status.GetString() == "published")
+string.Equals(status.GetString(), "published", StringComparison.Ordinal))
                 {
                     var title = result.TryGetProperty("title", out var t) ? t.GetString() : null;
                     var companyName = result.TryGetProperty("companyName", out var cn) ? cn.GetString() : null;
@@ -305,6 +305,7 @@ public class ChatService(
                             CorrelationId: null,
                             Timestamp: DateTimeOffset.UtcNow,
                             Metadata: new Dictionary<string, object>
+(StringComparer.Ordinal)
                             {
                                 { "companyName", companyName ?? string.Empty }
                             }
@@ -320,7 +321,7 @@ public class ChatService(
 
     private static Dictionary<string, AITool> BuildToolMap(IList<AITool>? tools)
     {
-        if (tools is null || tools.Count == 0) return new();
+        if (tools is null || tools.Count == 0) return new(StringComparer.Ordinal);
         return tools.ToDictionary(t => t.Name, t => t, StringComparer.OrdinalIgnoreCase);
     }
 
@@ -378,7 +379,7 @@ public class ChatService(
         // Remove injected summary context messages before saving
         if (nonSystemMessages.Count >= 2
             && nonSystemMessages[0].Role == ChatRole.User
-            && nonSystemMessages[0].Text?.StartsWith("[Previous conversation summary]") == true)
+            && nonSystemMessages[0].Text?.StartsWith("[Previous conversation summary]", StringComparison.Ordinal) == true)
         {
             nonSystemMessages.RemoveRange(0, 2);
         }
@@ -527,7 +528,7 @@ public class ChatService(
                              ?? "";
 
                     var idSuffix = !string.IsNullOrEmpty(id) ? $" (id: {id})" : "";
-                    sb.AppendLine($"{idx}. {name}{idSuffix}");
+                    sb.AppendLine(System.Globalization.CultureInfo.InvariantCulture, $"{idx}. {name}{idSuffix}");
                     idx++;
                 }
             }
@@ -554,7 +555,7 @@ public class ChatService(
         text = text.Trim();
 
         // Remove markdown code fences if present
-        if (!text.StartsWith("```")) return text;
+        if (!text.StartsWith("```", StringComparison.Ordinal)) return text;
         var firstBrace = text.IndexOf('{');
         var lastBrace = text.LastIndexOf('}');
 

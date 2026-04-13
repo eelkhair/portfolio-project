@@ -1,7 +1,6 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using JobBoard.Application.Actions.Base;
 using JobBoard.Application.Interfaces.Configurations;
-using JobBoard.Application.Interfaces.Observability;
 using JobBoard.Application.Interfaces.Repositories;
 using JobBoard.Monolith.Contracts.Companies;
 using Microsoft.Extensions.Logging;
@@ -22,10 +21,10 @@ public class ActivateCompanyCommandHandler(IHandlerContext handlerContext,
     public async Task<Unit> HandleAsync(ActivateCompanyCommand request, CancellationToken cancellationToken)
     {
         using var activity = activityFactory.StartActivity("ActivateCompany", ActivityKind.Internal);
-        
-        activity?.SetTag("activated.company.name",request.Model.CompanyName);
-        activity?.SetTag("activated.company.id",request.Model.CompanyUId);
-        
+
+        activity?.SetTag("activated.company.name", request.Model.CompanyName);
+        activity?.SetTag("activated.company.id", request.Model.CompanyUId);
+
         Logger.LogInformation("Activating company; Name: {CompanyName}; Id: {CompanyUId}", request.Model.CompanyName, request.Model.CompanyUId);
         var company = await companyRepository.GetCompanyById(request.Model.CompanyUId, cancellationToken);
         company.SetStatus("Active");
@@ -33,9 +32,9 @@ public class ActivateCompanyCommandHandler(IHandlerContext handlerContext,
 
         var user = await userRepository.FindUserByUIdAsync(request.Model.UserUId, cancellationToken);
         user.SetExternalId(request.Model.KeycloakUserId);
-        
+
         await Context.SaveChangesAsync(request.UserId, cancellationToken);
-        
+
         UnitOfWorkEvents.Enqueue(() =>
         {
             Logger.LogInformation("Successfully activated company; Name: {CompanyName}; Id: {CompanyUId}", request.Model.CompanyName, request.Model.CompanyUId);

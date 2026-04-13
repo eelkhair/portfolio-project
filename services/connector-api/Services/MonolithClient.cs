@@ -1,9 +1,7 @@
 using System.Diagnostics;
-using System.Net.Http.Json;
 using System.Text.Json;
 using ConnectorAPI.Helpers;
 using ConnectorAPI.Interfaces.Clients;
-using ConnectorAPI.Models;
 using ConnectorAPI.Models.CompanyCreated;
 using ConnectorAPI.Models.CompanyUpdated;
 using JobBoard.IntegrationEvents.Company;

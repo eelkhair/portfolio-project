@@ -1,5 +1,4 @@
 using JobBoard.Domain.Entities;
-using JobBoard.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

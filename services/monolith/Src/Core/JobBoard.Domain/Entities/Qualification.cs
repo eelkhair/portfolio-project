@@ -1,4 +1,4 @@
-﻿using JobBoard.Domain.Aggregates;
+using JobBoard.Domain.Aggregates;
 using JobBoard.Domain.Exceptions;
 using JobBoard.Domain.Helpers;
 using JobBoard.Domain.ValueObjects.Qualification;

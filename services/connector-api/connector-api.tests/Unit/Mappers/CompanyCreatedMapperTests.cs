@@ -63,7 +63,10 @@ public class CompanyCreatedMapperTests
     {
         var company = new CompanyCreateCompanyResult
         {
-            Name = "Test", Email = "test@test.com", Website = null, IndustryUId = Guid.NewGuid()
+            Name = "Test",
+            Email = "test@test.com",
+            Website = null,
+            IndustryUId = Guid.NewGuid()
         };
 
         var result = CompanyCreatedMapper.Map(_event, company, _admin);

@@ -21,7 +21,7 @@ public class GetApplicationModeQueryHandler(
         Logger.LogInformation("Fetching application Mode from AI Service v2...");
 
         var settings = await aiServiceClient.GetApplicationMode(cancellationToken);
-        
+
         Activity.Current?.SetTag("IsMonolith", settings.IsMonolith);
         Logger.LogInformation("Fetched Application Mode: {IsMonolith} ", settings.IsMonolith);
 

@@ -1,4 +1,4 @@
-﻿using JobBoard.Application.Interfaces;
+using JobBoard.Application.Interfaces;
 
 namespace JobBoard.Infrastructure.Persistence.Repositories;
 

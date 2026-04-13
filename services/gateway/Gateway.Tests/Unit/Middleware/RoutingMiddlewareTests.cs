@@ -10,7 +10,7 @@ public class RoutingMiddlewareTests
 {
     private static IConfiguration BuildConfig(string? monolithValue)
     {
-        var data = new Dictionary<string, string?>();
+        var data = new Dictionary<string, string?>(StringComparer.Ordinal);
         if (monolithValue is not null)
             data["FeatureFlags:Monolith"] = monolithValue;
 

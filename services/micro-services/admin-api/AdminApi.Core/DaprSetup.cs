@@ -24,7 +24,7 @@ public static class DaprSetup
             builder.Configuration.AddDaprSecretStore(
                 "vault",
                 new DaprClientBuilder().Build(),
-                new Dictionary<string, string>()
+                new Dictionary<string, string>(StringComparer.Ordinal)
             );
 
             var daprClient = new DaprClientBuilder().Build();
@@ -47,7 +47,7 @@ public static class DaprSetup
         string prefix,
         string serviceName)
     {
-        foreach (var item in cfg.Items.Where(k => k.Key.StartsWith(prefix)))
+        foreach (var item in cfg.Items.Where(k => k.Key.StartsWith(prefix, StringComparison.Ordinal)))
         {
             var cleanKey = CleanKey(item.Key, serviceName);
             config[cleanKey] = item.Value.Value;

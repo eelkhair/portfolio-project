@@ -22,12 +22,12 @@ public class DaprPubSubHealthCheck : IHealthCheck
         {
             var topicName = $"{_distributedEventBusOptions.Prefix}{"healthCheckTopic"}";
             var ttl = 60;
-            
-            await _daprClient.PublishEventAsync(_distributedEventBusOptions.PubSubName, topicName, new { }, new Dictionary<string, string>()
+
+            await _daprClient.PublishEventAsync(_distributedEventBusOptions.PubSubName, topicName, new { }, new Dictionary<string, string>(StringComparer.Ordinal)
             {
-                {"ttlInSeconds", ttl.ToString()}
+                {"ttlInSeconds", ttl.ToString(System.Globalization.CultureInfo.InvariantCulture) }
             }, cancellationToken: cancellationToken);
-            
+
 
             return HealthCheckResult.Healthy($"Dapr pubsub: {PubSubName} for topic '{topicName}' is healthy.");
         }

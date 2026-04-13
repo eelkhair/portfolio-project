@@ -87,8 +87,8 @@ public class JobsEndpointTests : IAsyncLifetime
         {
             Field = "title",
             Value = "Original Title",
-            Context = new Dictionary<string, object> { ["role"] = "Engineer" },
-            Style = new Dictionary<string, object> { ["tone"] = "professional" }
+            Context = new Dictionary<string, object>(StringComparer.Ordinal) { ["role"] = "Engineer" },
+            Style = new Dictionary<string, object>(StringComparer.Ordinal) { ["tone"] = "professional" }
         };
 
         var response = await _client.PutAsJsonAsync("/api/jobs/drafts/rewrite", request);

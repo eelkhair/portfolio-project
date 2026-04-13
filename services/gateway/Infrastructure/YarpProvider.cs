@@ -1,5 +1,3 @@
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Yarp.ReverseProxy.Configuration;
 
 namespace Gateway.Api.Infrastructure;
@@ -22,7 +20,7 @@ public static class YarpProvider
             Transforms = new[]
             {
                 new Dictionary<string, string>
-                {
+(StringComparer.Ordinal) {
                     ["PathRemovePrefix"] = "/jaeger-api"
                 }
             }
@@ -38,7 +36,7 @@ public static class YarpProvider
             Transforms = new[]
             {
                 new Dictionary<string, string>
-                {
+(StringComparer.Ordinal) {
                     ["PathRemovePrefix"] = "/ai/v2"
                 }
             }
@@ -138,6 +136,7 @@ public static class YarpProvider
         {
             ClusterId = clusterId,
             Destinations = new Dictionary<string, DestinationConfig>
+(StringComparer.Ordinal)
             {
                 ["default"] = new() { Address = address }
             }

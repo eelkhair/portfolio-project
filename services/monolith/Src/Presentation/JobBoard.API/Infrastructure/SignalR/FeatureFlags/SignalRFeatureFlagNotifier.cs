@@ -1,4 +1,4 @@
-﻿using JobBoard.Infrastructure.RedisConfig;
+using JobBoard.Infrastructure.RedisConfig;
 using Microsoft.AspNetCore.SignalR;
 
 namespace JobBoard.API.Infrastructure.SignalR.FeatureFlags;
@@ -8,7 +8,7 @@ namespace JobBoard.API.Infrastructure.SignalR.FeatureFlags;
 /// Implements the <see cref="IFeatureFlagNotifier"/> interface to provide real-time updates
 /// for feature flag changes.
 /// </summary>
-public class SignalRFeatureFlagNotifier(IHubContext<NotificationsHub> hub): IFeatureFlagNotifier
+public class SignalRFeatureFlagNotifier(IHubContext<NotificationsHub> hub) : IFeatureFlagNotifier
 {
     /// <summary>
     /// Notifies all connected clients about updated feature flags.

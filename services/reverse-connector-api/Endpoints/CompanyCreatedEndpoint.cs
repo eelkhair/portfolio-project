@@ -16,7 +16,7 @@ public static class CompanyCreatedEndpointExtensions
     {
         app.MapPost("/sync/company-created",
             [Topic("rabbitmq.pubsub", "micro.company-created.v1")]
-            async (
+        async (
                 EventDto<MicroCompanyCreatedV1Event> @event,
                 MonolithHttpClient monolithClient,
                 ActivitySource activitySource,
@@ -56,7 +56,8 @@ public static class CompanyCreatedEndpointExtensions
                         stateKey,
                         "processing",
                         metadata: new Dictionary<string, string>
-                            { ["ttlInSeconds"] = IdempotencyOptions.PendingTTLSeconds.ToString() },
+(StringComparer.Ordinal)
+                        { ["ttlInSeconds"] = IdempotencyOptions.PendingTTLSeconds.ToString() },
                         cancellationToken: cancellationToken);
                 }
 
@@ -83,6 +84,7 @@ public static class CompanyCreatedEndpointExtensions
                         stateKey,
                         "done",
                         metadata: new Dictionary<string, string>
+(StringComparer.Ordinal)
                         {
                             ["ttlInSeconds"] = IdempotencyOptions.CompletedTTLSeconds.ToString()
                         },

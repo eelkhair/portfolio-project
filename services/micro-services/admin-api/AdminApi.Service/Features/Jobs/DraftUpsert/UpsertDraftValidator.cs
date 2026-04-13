@@ -1,10 +1,10 @@
-﻿using AdminAPI.Contracts.Models.Jobs.Requests;
+using AdminAPI.Contracts.Models.Jobs.Requests;
 using FastEndpoints;
 using FluentValidation;
 
 namespace AdminApi.Features.Jobs.DraftUpsert;
 
-public sealed class UpsertDraftValidator: Validator<JobDraftRequest>
+public sealed class UpsertDraftValidator : Validator<JobDraftRequest>
 {
     public UpsertDraftValidator()
     {
@@ -12,10 +12,10 @@ public sealed class UpsertDraftValidator: Validator<JobDraftRequest>
         {
             RuleFor(x => x.Metadata.RoleLevel)
                 .IsInEnum();
-       
-             RuleFor(x => x.Metadata.Tone)
-                        .IsInEnum();
+
+            RuleFor(x => x.Metadata.Tone)
+                       .IsInEnum();
         });
-       
+
     }
 }

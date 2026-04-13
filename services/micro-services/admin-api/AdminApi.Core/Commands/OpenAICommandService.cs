@@ -1,23 +1,22 @@
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using AdminAPI.Contracts.Services;
 using AdminAPI.Contracts.Models.Jobs.Requests;
 using AdminAPI.Contracts.Models.Jobs.Responses;
+using AdminAPI.Contracts.Services;
 using Dapr.Client;
 using Elkhair.Dev.Common.Application;
-using Microsoft.Extensions.Logging;
 
 namespace AdminApi.Application.Commands;
 
-public partial class OpenAICommandService(DaprClient client, UserContextService accessor, ILogger<OpenAICommandService> logger): IOpenAICommandService
+public partial class OpenAICommandService(DaprClient client, UserContextService accessor, ILogger<OpenAICommandService> logger) : IOpenAICommandService
 {
     static readonly JsonSerializerOptions JsonOpts = new()
-         {
-             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-             DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
-             Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-         };
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+    };
     public async Task<ApiResponse<JobGenResponse>> GenerateJobAsync(string companyId, JobGenRequest request,
         CancellationToken ct = default)
     {
@@ -52,17 +51,23 @@ public partial class OpenAICommandService(DaprClient client, UserContextService 
             LogJobGenerated(logger, companyId);
 
             return result ?? throw new InvalidOperationException("Empty or invalid JSON from ai-service-v2.");
-        }catch (Exception e)
+        }
+        catch (Exception e)
         {
             LogGenerateJobError(logger, e, companyId);
-            return new ApiResponse<JobGenResponse>() { Success = false, StatusCode = HttpStatusCode.InternalServerError, Exceptions = new ApiError()
+            return new ApiResponse<JobGenResponse>()
             {
-                Message = e.Message,
-                Errors = new Dictionary<string, string[]>()
+                Success = false,
+                StatusCode = HttpStatusCode.InternalServerError,
+                Exceptions = new ApiError()
+                {
+                    Message = e.Message,
+                    Errors = new Dictionary<string, string[]>(StringComparer.Ordinal)
                 {
                     {"Error", [e.Message]}
                 }
-            }};
+                }
+            };
         }
     }
 

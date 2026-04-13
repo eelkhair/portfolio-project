@@ -4,12 +4,11 @@ using JobBoard.Application.Actions.Public;
 using JobBoard.Application.Interfaces.Infrastructure;
 using JobBoard.Application.Interfaces.Observability;
 using JobBoard.Application.Interfaces.Storage;
-using JobBoard.Mcp.Common;
+using JobBoard.Domain;
 using JobBoard.Infrastructure.Diagnostics.Observability;
 using JobBoard.Infrastructure.Persistence.Context;
 using JobBoard.Monolith.Contracts.Drafts;
 using JobBoard.Monolith.Contracts.Settings;
-using JobBoard.Domain;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
@@ -45,6 +44,7 @@ public class JobBoardWebApplicationFactory : WebApplicationFactory<Program>
         builder.ConfigureAppConfiguration((_, config) =>
         {
             config.AddInMemoryCollection(new Dictionary<string, string?>
+(StringComparer.Ordinal)
             {
                 ["ConnectionStrings:Monolith"] = _dbFixture.ConnectionString,
                 ["Keycloak:Authority"] = "https://auth.test.com/realms/test",

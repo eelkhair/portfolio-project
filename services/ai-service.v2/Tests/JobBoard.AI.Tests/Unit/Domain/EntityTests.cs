@@ -1,6 +1,5 @@
 using JobBoard.AI.Domain.AI;
 using JobBoard.AI.Domain.Drafts;
-using Pgvector;
 using Shouldly;
 
 namespace JobBoard.AI.Tests.Unit.Domain;

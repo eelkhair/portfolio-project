@@ -4,7 +4,6 @@ using System.Text.Json;
 using JobBoard.AI.Application.Actions.Jobs.Similar;
 using JobBoard.AI.Application.Interfaces.Clients;
 using JobBoard.AI.Application.Interfaces.Configurations;
-using JobBoard.AI.Application.Interfaces.Observability;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
 

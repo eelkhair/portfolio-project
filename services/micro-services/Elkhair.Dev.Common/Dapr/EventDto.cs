@@ -1,4 +1,4 @@
-﻿
+
 namespace Elkhair.Dev.Common.Dapr;
 
 public class EventDto<T>(string userId, string idempotencyKey, T data)

@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using ConnectorAPI.Interfaces;
+using System.Diagnostics;
 using ConnectorAPI.Interfaces.Clients;
 using ConnectorAPI.Models.CompanyCreated;
 using ConnectorAPI.Models.CompanyUpdated;
@@ -15,7 +14,7 @@ public class CompanyApiClient(DaprClient client, ActivitySource activitySource, 
         logger.LogInformation("Sending company created event to company-api");
         var message = client.CreateInvokeMethodRequest(HttpMethod.Post, "company-api", "api/companies");
         message.Headers.Add("X-Sync-Source", "forward");
-        message.Content= JsonContent.Create(companyApiPayload);
+        message.Content = JsonContent.Create(companyApiPayload);
         return client.InvokeMethodAsync(message, cancellationToken);
     }
 

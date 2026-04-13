@@ -51,7 +51,7 @@ public static class DependencyInjection
             builder.Configuration.AddDaprSecretStore(
                 "vault",
                 new DaprClientBuilder().Build(),
-                new Dictionary<string, string>()
+                new Dictionary<string, string>(StringComparer.Ordinal)
             );
 
             var daprClient = new DaprClientBuilder().Build();
@@ -74,7 +74,7 @@ public static class DependencyInjection
         string prefix,
         string serviceName)
     {
-        foreach (var item in cfg.Items.Where(k => k.Key.StartsWith(prefix)))
+        foreach (var item in cfg.Items.Where(k => k.Key.StartsWith(prefix, StringComparison.Ordinal)))
         {
             var cleanKey = item.Key
                 .Replace($"jobboard:config:{serviceName}:", "")

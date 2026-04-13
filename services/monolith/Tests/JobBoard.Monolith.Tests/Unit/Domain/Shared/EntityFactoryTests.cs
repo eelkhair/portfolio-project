@@ -1,6 +1,6 @@
-using Shouldly;
 using JobBoard.Domain.Aggregates;
 using JobBoard.Domain.Entities;
+using Shouldly;
 
 namespace JobBoard.Monolith.Tests.Unit.Domain.Shared;
 

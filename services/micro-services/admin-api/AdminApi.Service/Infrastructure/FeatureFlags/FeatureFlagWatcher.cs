@@ -1,4 +1,4 @@
-﻿using Dapr.Client;
+using Dapr.Client;
 
 namespace AdminApi.Infrastructure.FeatureFlags;
 
@@ -23,7 +23,7 @@ public sealed class FeatureFlagWatcher : BackgroundService
         IConfiguration configuration,
         IFeatureFlagNotifier notifier,
         ILogger<FeatureFlagWatcher> logger,
-        string serviceName )
+        string serviceName)
     {
         _daprClient = daprClient;
         _configuration = configuration;
@@ -45,7 +45,7 @@ public sealed class FeatureFlagWatcher : BackgroundService
         {
             try
             {
-                var featureFlags = new Dictionary<string, bool>();
+                var featureFlags = new Dictionary<string, bool>(StringComparer.Ordinal);
                 var config = await _daprClient.GetConfiguration(
                     storeName,
                     new List<string>(),
@@ -53,13 +53,13 @@ public sealed class FeatureFlagWatcher : BackgroundService
 
                 foreach (var kvp in config.Items)
                 {
-                    if (!kvp.Key.StartsWith($"jobboard:config:{_serviceName}") &&
-                        !kvp.Key.StartsWith("jobboard:config:global"))
+                    if (!kvp.Key.StartsWith($"jobboard:config:{_serviceName}", StringComparison.Ordinal) &&
+                        !kvp.Key.StartsWith("jobboard:config:global", StringComparison.Ordinal))
                         continue;
 
                     var cleanedKey = CleanKey(kvp.Key, _serviceName);
 
-                    if (cleanedKey.StartsWith("FeatureFlags:"))
+                    if (cleanedKey.StartsWith("FeatureFlags:", StringComparison.Ordinal))
                     {
                         var isEnabled = bool.TryParse(kvp.Value.Value, out var enabled) && enabled;
                         featureFlags[cleanedKey.Replace("FeatureFlags:", "")] = isEnabled;

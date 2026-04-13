@@ -1,4 +1,4 @@
-﻿using JobBoard.Application.Actions.Base;
+using JobBoard.Application.Actions.Base;
 using JobBoard.Application.Interfaces;
 using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Monolith.Contracts.Users;
@@ -8,7 +8,7 @@ namespace JobBoard.Application.Actions.Users.Get;
 
 public class GetUsersQuery : BaseQuery<IQueryable<UserDto>>;
 
-public class GetUsersQueryHandler(IJobBoardQueryDbContext context, ILogger<GetUsersQueryHandler> logger) 
+public class GetUsersQueryHandler(IJobBoardQueryDbContext context, ILogger<GetUsersQueryHandler> logger)
     : BaseQueryHandler(context, logger)
     , IHandler<GetUsersQuery, IQueryable<UserDto>>
 {
@@ -25,9 +25,9 @@ public class GetUsersQueryHandler(IJobBoardQueryDbContext context, ILogger<GetUs
             UpdatedAt = u.UpdatedAt,
             UpdatedBy = u.UpdatedBy,
             Id = u.Id
-            
+
         });
-        
+
         return Task.FromResult(users);
     }
 }

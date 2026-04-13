@@ -1,4 +1,4 @@
-﻿namespace AdminApi.Infrastructure.FeatureFlags;
+namespace AdminApi.Infrastructure.FeatureFlags;
 
 /// <summary>
 /// Represents a notification or event that is raised when feature flags are updated.

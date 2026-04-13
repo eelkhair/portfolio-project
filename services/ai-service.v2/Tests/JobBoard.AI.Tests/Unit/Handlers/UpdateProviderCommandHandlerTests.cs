@@ -1,10 +1,10 @@
 using JobBoard.AI.Application.Actions.Base;
 using JobBoard.AI.Application.Actions.Settings.Provider;
 using JobBoard.AI.Application.Interfaces.Configurations;
-using AppUnit = JobBoard.AI.Application.Interfaces.Configurations.Unit;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Shouldly;
+using AppUnit = JobBoard.AI.Application.Interfaces.Configurations.Unit;
 
 namespace JobBoard.AI.Tests.Unit.Handlers;
 

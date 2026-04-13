@@ -54,6 +54,8 @@ public class JobsController : BaseApiController
     /// Searches for jobs based on the specified query and returns a limited number of results.
     /// </summary>
     /// <param name="query">The search query used to find matching jobs.</param>
+    /// <param name="location"></param>
+    /// <param name="jobType"></param>
     /// <param name="limit">The maximum number of job results to return. Defaults to 30.</param>
     /// <returns>An IActionResult containing the search results, which include a list of job candidates.</returns>
     [HttpGet("search")]
@@ -62,7 +64,7 @@ public class JobsController : BaseApiController
         [FromQuery] string? query,
         [FromQuery] string? location,
         [FromQuery] string? jobType,
-        [FromQuery] int limit = 30)=>
+        [FromQuery] int limit = 30) =>
         await ExecuteQueryAsync(
             new SearchJobsQuery(query, location, jobType, limit),
             Ok

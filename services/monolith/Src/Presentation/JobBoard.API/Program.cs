@@ -1,24 +1,24 @@
+using Elkhair.Common.Observability;
+using Elkhair.Common.Persistence;
 using JobBoard.API.Infrastructure;
 using JobBoard.API.Infrastructure.Authorization;
-using JobBoard.Mcp.Common;
 using JobBoard.API.Infrastructure.OpenApi;
 using JobBoard.API.Infrastructure.SignalR.CompanyActivation;
 using JobBoard.API.Infrastructure.SignalR.FeatureFlags;
 using JobBoard.API.Infrastructure.SignalR.ResumeParse;
 using JobBoard.Application;
-using JobBoard.Infrastructure.RedisConfig;
+using JobBoard.Infrastructure.BlobStorage;
+using JobBoard.Infrastructure.Configuration;
 using JobBoard.Infrastructure.Diagnostics;
-using Elkhair.Common.Observability;
 using JobBoard.Infrastructure.HttpClients;
 using JobBoard.Infrastructure.Messaging;
 using JobBoard.Infrastructure.Outbox;
 using JobBoard.Infrastructure.Persistence;
-using JobBoard.Infrastructure.BlobStorage;
 using JobBoard.Infrastructure.Persistence.Context;
+using JobBoard.Infrastructure.RedisConfig;
 using JobBoard.Infrastructure.Smtp;
 using JobBoard.Infrastructure.Vault;
-using Elkhair.Common.Persistence;
-using JobBoard.Infrastructure.Configuration;
+using JobBoard.Mcp.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 

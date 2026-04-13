@@ -1,4 +1,4 @@
-﻿
+
 namespace JobBoard.Monolith.Contracts.Drafts;
 
 public class DraftGenMetadata

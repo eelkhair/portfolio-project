@@ -21,15 +21,15 @@ public class ValidationCommandHandlerDecorator<TRequest, TResult>(
                    $"{typeof(TRequest).Name}.validate",
                    ActivityKind.Internal))
         {
-           var validationResult = await validator.ValidateAsync(request, cancellationToken);
-                activity?.SetTag("validation.is_valid", validationResult.IsValid);
-                activity?.SetTag("validation.error_count", validationResult.Errors.Count);
-                if (!validationResult.IsValid)
-                {
-                    activity?.SetStatus(ActivityStatusCode.Error);
-                    metricsService.IncrementValidationFailure(typeof(TRequest).Name);
-                    throw new ValidationException(validationResult.Errors);
-                }
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
+            activity?.SetTag("validation.is_valid", validationResult.IsValid);
+            activity?.SetTag("validation.error_count", validationResult.Errors.Count);
+            if (!validationResult.IsValid)
+            {
+                activity?.SetStatus(ActivityStatusCode.Error);
+                metricsService.IncrementValidationFailure(typeof(TRequest).Name);
+                throw new ValidationException(validationResult.Errors);
+            }
         }
 
         return await decorated.HandleAsync(request, cancellationToken);

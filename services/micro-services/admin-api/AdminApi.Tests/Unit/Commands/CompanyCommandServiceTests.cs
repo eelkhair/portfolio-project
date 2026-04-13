@@ -1,4 +1,3 @@
-using System.Net;
 using AdminApi.Application.Commands;
 using AdminApi.Tests.Helpers;
 using AdminAPI.Contracts.Models.Companies.Requests;
@@ -10,7 +9,6 @@ using Elkhair.Dev.Common.Domain.Constants;
 using JobBoard.IntegrationEvents.Company;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 using Shouldly;
 using UserAPI.Contracts.Models.Events;
 

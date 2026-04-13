@@ -46,7 +46,7 @@ public class KeycloakResource(HttpClient http, string adminApiBaseUrl) : IKeyclo
             {
                 // Sub-group already exists — find and return it
                 var children = await GetSubGroupsAsync(parentGroupId, ct);
-                var existing = children.FirstOrDefault(g => g.Name == name);
+                var existing = children.FirstOrDefault(g => string.Equals(g.Name, name, StringComparison.Ordinal));
                 return existing != null
                     ? OkResult(existing)
                     : throw new InvalidOperationException(
@@ -84,7 +84,7 @@ public class KeycloakResource(HttpClient http, string adminApiBaseUrl) : IKeyclo
                 // Update attributes on existing user if needed
                 if (attributes is { Count: > 0 })
                 {
-                    var merged = existingUser.Attributes ?? new Dictionary<string, List<string>>();
+                    var merged = existingUser.Attributes ?? new Dictionary<string, List<string>>(StringComparer.Ordinal);
                     foreach (var (key, value) in attributes)
                         merged[key] = value;
 
@@ -146,7 +146,7 @@ public class KeycloakResource(HttpClient http, string adminApiBaseUrl) : IKeyclo
     {
         var groups = await http.GetFromJsonAsync<List<KeycloakGroup>>(
             $"{_baseUrl}/groups?search={Uri.EscapeDataString(name)}&exact=true", ct);
-        return groups?.FirstOrDefault(g => g.Name == name);
+        return groups?.FirstOrDefault(g => string.Equals(g.Name, name, StringComparison.Ordinal));
     }
 
     public async Task<ApiResponse<bool>> SendVerifyEmailAsync(string userId, CancellationToken ct)
@@ -192,6 +192,7 @@ public class KeycloakResource(HttpClient http, string adminApiBaseUrl) : IKeyclo
         {
             Message = e.Message,
             Errors = new Dictionary<string, string[]>
+(StringComparer.Ordinal)
             {
                 ["500"] = [e.Message]
             }

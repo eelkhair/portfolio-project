@@ -1,6 +1,5 @@
-using System.Diagnostics;
-using System.Security.Claims;
 using System.Reflection;
+using System.Security.Claims;
 using CompanyApi.Application.Commands;
 using CompanyApi.Application.Commands.Interfaces;
 using CompanyApi.Application.Queries;
@@ -54,6 +53,7 @@ public static class DependencyInjection
                                     AuthorizationUrl = $"{authority}/protocol/openid-connect/auth",
                                     TokenUrl = $"{authority}/protocol/openid-connect/token",
                                     Scopes = new Dictionary<string, string>
+(StringComparer.Ordinal)
                                     {
                                         ["openid"] = "OpenID",
                                         ["profile"] = "Profile",

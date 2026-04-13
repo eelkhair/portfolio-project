@@ -1,6 +1,6 @@
-using JobAPI.Contracts.Models.Jobs.Requests;
-using JobAPI.Contracts.Enums;
 using FluentValidation;
+using JobAPI.Contracts.Enums;
+using JobAPI.Contracts.Models.Jobs.Requests;
 using Shouldly;
 
 namespace JobApi.Tests.Unit.Validators;

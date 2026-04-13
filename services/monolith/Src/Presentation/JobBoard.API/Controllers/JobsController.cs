@@ -1,4 +1,4 @@
-﻿using JobBoard.Application.Actions.Drafts.Delete;
+using JobBoard.Application.Actions.Drafts.Delete;
 using JobBoard.Application.Actions.Drafts.Generate;
 using JobBoard.Application.Actions.Drafts.Get;
 using JobBoard.Application.Actions.Drafts.List;
@@ -6,7 +6,6 @@ using JobBoard.Application.Actions.Drafts.ListByCompany;
 using JobBoard.Application.Actions.Drafts.Rewrite;
 using JobBoard.Application.Actions.Drafts.Save;
 using JobBoard.Application.Actions.Jobs.Create;
-using JobBoard.Application.Actions.Public;
 using JobBoard.Monolith.Contracts.Drafts;
 using JobBoard.Monolith.Contracts.Jobs;
 using Microsoft.AspNetCore.Mvc;
@@ -26,7 +25,7 @@ public class JobsController : BaseApiController
     [HttpPost]
     public async Task<IActionResult> Create(CreateJobRequest request) =>
      await ExecuteCommandAsync(new CreateJobCommand(request), Ok);
-    
+
     /// <summary>
     /// Generate a job draft via AI
     /// </summary>
@@ -45,7 +44,7 @@ public class JobsController : BaseApiController
     /// <returns>An IActionResult containing the list of job drafts or an error response.</returns>
     [HttpGet("{companyId:guid}/list-drafts")]
     public async Task<IActionResult> ListDrafts(Guid companyId) =>
-        await ExecuteQueryAsync(new ListDraftsQuery{CompanyId = companyId}, Ok);
+        await ExecuteQueryAsync(new ListDraftsQuery { CompanyId = companyId }, Ok);
 
     /// <summary>
     /// Updates specific fields of a job draft with new values based on the provided rewrite request.
@@ -68,7 +67,7 @@ public class JobsController : BaseApiController
     /// <returns></returns>
     [HttpPut("drafts/rewrite")]
     public async Task<IActionResult> RewriteDraftItem(DraftItemRewriteRequest request)
-        => await ExecuteCommandAsync(new RewriteDraftItemCommand{DraftItemRewriteRequest = request}, Ok);
+        => await ExecuteCommandAsync(new RewriteDraftItemCommand { DraftItemRewriteRequest = request }, Ok);
 
     /// <summary>
     /// Get a draft by its ID

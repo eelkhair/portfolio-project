@@ -15,7 +15,7 @@ public static class DraftDeletedEndpointExtensions
     {
         app.MapPost("/sync/draft-deleted",
             [Topic("rabbitmq.pubsub", "micro.draft-deleted.v1")]
-            async (
+        async (
                 EventDto<DraftDeletedV1Event> @event,
                 MonolithHttpClient monolithClient,
                 ActivitySource activitySource,
@@ -56,7 +56,8 @@ public static class DraftDeletedEndpointExtensions
                         stateKey,
                         "processing",
                         metadata: new Dictionary<string, string>
-                            { ["ttlInSeconds"] = IdempotencyOptions.PendingTTLSeconds.ToString() },
+(StringComparer.Ordinal)
+                        { ["ttlInSeconds"] = IdempotencyOptions.PendingTTLSeconds.ToString() },
                         cancellationToken: cancellationToken);
                 }
 
@@ -83,6 +84,7 @@ public static class DraftDeletedEndpointExtensions
                         stateKey,
                         "done",
                         metadata: new Dictionary<string, string>
+(StringComparer.Ordinal)
                         {
                             ["ttlInSeconds"] = IdempotencyOptions.CompletedTTLSeconds.ToString()
                         },

@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace JobBoard.Application.Infrastructure.Decorators;
 
-public class ObservabilityCommandHandlerDecorator<TRequest, TResult>(
+public partial class ObservabilityCommandHandlerDecorator<TRequest, TResult>(
     IHandler<TRequest, TResult> innerHandler,
     ILogger<TRequest> logger,
     IUserAccessor userAccessor,
@@ -25,14 +25,15 @@ public class ObservabilityCommandHandlerDecorator<TRequest, TResult>(
         Activity.Current?.SetTag("email", userAccessor.Email);
 
         // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-        if(typeof(TRequest).Name != "ProcessOutboxMessageCommand"){
+        if (!string.Equals(typeof(TRequest).Name, "ProcessOutboxMessageCommand", StringComparison.Ordinal))
+        {
             if (request is BaseCommand<TResult>)
             {
-                 logger.LogInformation("Executing command {Request}...", requestType);
+                LogExecutingCommandRequest(requestType);
             }
             else
             {
-                logger.LogInformation("Executing query {Request}...", requestType);
+                LogExecutingQueryRequest(requestType);
             }
         }
 
@@ -44,7 +45,7 @@ public class ObservabilityCommandHandlerDecorator<TRequest, TResult>(
             metricsService.IncrementCommandSuccess(requestType);
             metricsService.RecordCommandDuration(requestType, sw.Elapsed.TotalMilliseconds);
 
-            if (typeof(TRequest).Name == "ProcessOutboxMessageCommand") return result;
+            if (string.Equals(typeof(TRequest).Name, "ProcessOutboxMessageCommand", StringComparison.Ordinal)) return result;
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
             if (request is BaseCommand<TResult>)
             {
@@ -75,4 +76,10 @@ public class ObservabilityCommandHandlerDecorator<TRequest, TResult>(
             throw;
         }
     }
+
+    [LoggerMessage(LogLevel.Information, "Executing command {Request}...")]
+    partial void LogExecutingCommandRequest(string request);
+
+    [LoggerMessage(LogLevel.Information, "Executing query {Request}...")]
+    partial void LogExecutingQueryRequest(string request);
 }

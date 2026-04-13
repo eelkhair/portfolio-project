@@ -5,7 +5,6 @@ using JobBoard.AI.Application.Actions.Jobs.Similar;
 using JobBoard.AI.Application.Actions.Resumes.MatchingJobs;
 using JobBoard.AI.Application.Interfaces.Clients;
 using JobBoard.AI.Application.Interfaces.Configurations;
-using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Application.Interfaces.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.AI;

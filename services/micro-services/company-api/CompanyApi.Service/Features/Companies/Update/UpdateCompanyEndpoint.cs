@@ -21,7 +21,7 @@ public class UpdateCompanyEndpoint(ICompanyCommandService service, ILogger<Updat
         Activity.Current?.SetTag("entity.type", "company");
         Activity.Current?.SetTag("entity.id", companyUId.ToString());
         Activity.Current?.SetTag("operation", "update");
-        var isForwardSync = HttpContext.Request.Headers["X-Sync-Source"].FirstOrDefault() == "forward";
+        var isForwardSync = string.Equals(HttpContext.Request.Headers["X-Sync-Source"].FirstOrDefault(), "forward", StringComparison.Ordinal);
         logger.LogInformation("Updating Company: {CompanyUId}, isForwardSync: {IsForwardSync}", companyUId, isForwardSync);
         var company = await service.UpdateAsync(companyUId, request, User, ct, publishEvent: !isForwardSync);
         await Send.OkAsync(company, cancellation: ct);

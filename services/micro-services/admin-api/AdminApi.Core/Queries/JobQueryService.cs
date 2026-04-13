@@ -1,12 +1,11 @@
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using AdminAPI.Contracts.Services;
 using AdminAPI.Contracts.Models.Jobs.Responses;
+using AdminAPI.Contracts.Services;
 using Dapr.Client;
 using Elkhair.Dev.Common.Application;
 using JobAPI.Contracts.Models.Jobs.Responses;
-using Microsoft.Extensions.Logging;
 
 namespace AdminApi.Application.Queries;
 
@@ -62,7 +61,7 @@ public partial class JobQueryService(DaprClient client, UserContextService acces
                 Exceptions = new ApiError
                 {
                     Message = e.Message,
-                    Errors = new Dictionary<string, string[]> { { "Error", [e.Message] } }
+                    Errors = new Dictionary<string, string[]>(StringComparer.Ordinal) { { "Error", [e.Message] } }
                 }
             };
         }
@@ -112,7 +111,7 @@ public partial class JobQueryService(DaprClient client, UserContextService acces
                 Exceptions = new ApiError
                 {
                     Message = e.Message,
-                    Errors = new Dictionary<string, string[]> { { "Error", [e.Message] } }
+                    Errors = new Dictionary<string, string[]>(StringComparer.Ordinal) { { "Error", [e.Message] } }
                 }
             };
         }
@@ -153,17 +152,23 @@ public partial class JobQueryService(DaprClient client, UserContextService acces
                 Success = true,
                 StatusCode = HttpStatusCode.OK
             };
-        }catch (Exception e)
+        }
+        catch (Exception e)
         {
             LogListDraftsError(logger, e, companyId);
-            return new ApiResponse<List<JobDraftResponse>> { Success = false, StatusCode = HttpStatusCode.InternalServerError, Exceptions = new ApiError()
+            return new ApiResponse<List<JobDraftResponse>>
             {
-                Message = e.Message,
-                Errors = new Dictionary<string, string[]>()
+                Success = false,
+                StatusCode = HttpStatusCode.InternalServerError,
+                Exceptions = new ApiError()
+                {
+                    Message = e.Message,
+                    Errors = new Dictionary<string, string[]>(StringComparer.Ordinal)
                 {
                     {"Error", [e.Message]}
                 }
-            }};
+                }
+            };
         }
     }
 
@@ -215,7 +220,7 @@ public partial class JobQueryService(DaprClient client, UserContextService acces
                 Exceptions = new ApiError
                 {
                     Message = e.Message,
-                    Errors = new Dictionary<string, string[]> { { "Error", [e.Message] } }
+                    Errors = new Dictionary<string, string[]>(StringComparer.Ordinal) { { "Error", [e.Message] } }
                 }
             };
         }

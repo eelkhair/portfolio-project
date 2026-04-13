@@ -74,7 +74,7 @@ export class JobEnhancer implements OnInit {
   }
 
   // ------------------ MUTATORS ------------------
-  addAvoidPhrase(value: string = ''): void {
+  addAvoidPhrase(value = ''): void {
     const v = value.trim();
     if (!v || v.length < 2) return;
     if (this.avoidPhrases.length >= 20) return;
@@ -99,7 +99,7 @@ export class JobEnhancer implements OnInit {
 
   save(): void {
     if (this.form.invalid) return;
-    let newModel = { ...this.model(),
+    const newModel = { ...this.model(),
       style:{
         tone: this.form.controls.tone.value,
         formality: this.form.controls.formality.value,

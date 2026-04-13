@@ -148,7 +148,7 @@ export class JobUpsert implements OnInit, OnDestroy{
       const model = {
         ...this.form.value,
         draftId: this.store.aiResponse()?.id,
-        companyUId: this.store.selectedCompany()?.uId!,
+        companyUId: this.store.selectedCompany()?.uId ?? '',
         deleteDraft: result
       } as CreateJobDto
       this.store.createJob(model).subscribe({
@@ -248,11 +248,11 @@ export class JobUpsert implements OnInit, OnDestroy{
      if(!result ){ return; }
       if(selectedIndex != undefined){
         if(model.field== 'responsibilities'){
-          let current = this.form.controls.responsibilities.value;
+          const current = this.form.controls.responsibilities.value;
           current[selectedIndex] = result;
           this.form.controls.responsibilities.setValue(current);
         }else{
-          let current = this.form.controls.qualifications.value;
+          const current = this.form.controls.qualifications.value;
           current[selectedIndex] = result;
           this.form.controls.qualifications.setValue(current);
         }

@@ -4,7 +4,6 @@ using JobBoard.Application.Infrastructure.Exceptions;
 using JobBoard.Application.Interfaces;
 using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Application.Interfaces.Infrastructure;
-using JobBoard.Application.Interfaces.Observability;
 using JobBoard.Mcp.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -29,13 +28,13 @@ public class ListMatchingJobsQueryHandler(
         using var activity = activityFactory.StartActivity("ListMatchingJobsQueryHandler.HandleAsync", ActivityKind.Internal);
         activity?.SetTag("matching.limit", request.Limit);
 
-        var user = await Context.Users.Where(c=> c.ExternalId == userAccessor.UserId).FirstOrDefaultAsync(cancellationToken);
+        var user = await Context.Users.Where(c => c.ExternalId == userAccessor.UserId).FirstOrDefaultAsync(cancellationToken);
         if (user == null)
         {
             throw new NotFoundException("User not found");
         }
-        
-        var resume = await Context.Resumes.Where(c=>c.IsDefault && c.UserId == user.InternalId).FirstOrDefaultAsync(cancellationToken);
+
+        var resume = await Context.Resumes.Where(c => c.IsDefault && c.UserId == user.InternalId).FirstOrDefaultAsync(cancellationToken);
         if (resume == null)
         {
             throw new NotFoundException("Resume not found");

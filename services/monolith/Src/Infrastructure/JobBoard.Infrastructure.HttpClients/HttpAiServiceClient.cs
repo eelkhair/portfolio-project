@@ -6,7 +6,6 @@ using Elkhair.Dev.Common.Application;
 using JobBoard.Application.Actions.Public;
 using JobBoard.Application.Infrastructure.Exceptions;
 using JobBoard.Application.Interfaces.Infrastructure;
-using JobBoard.Application.Interfaces.Observability;
 using JobBoard.Monolith.Contracts.Drafts;
 using JobBoard.Monolith.Contracts.Settings;
 using Microsoft.Extensions.Logging;

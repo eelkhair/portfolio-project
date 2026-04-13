@@ -133,7 +133,7 @@
       </div>
 
       <!-- Match Score -->
-      @if (app.matchScore != null) {
+      @if (app.matchScore !== null) {
         <div>
           <h4 class="text-sm font-semibold text-color-secondary uppercase tracking-wide mb-2">AI Match Score</h4>
           <p-progressBar [value]="app.matchScore" [showValue]="true" styleClass="h-3" />

@@ -10,7 +10,6 @@ using JobAPI.Contracts.Models.Drafts.Requests;
 using JobAPI.Contracts.Models.Drafts.Responses;
 using JobBoard.IntegrationEvents.Draft;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace JobApi.Application;
 

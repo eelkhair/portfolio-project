@@ -5,7 +5,6 @@ using AdminAPI.Contracts.Models.Dashboard;
 using AdminAPI.Contracts.Services;
 using Dapr.Client;
 using Elkhair.Dev.Common.Application;
-using Microsoft.Extensions.Logging;
 
 namespace AdminApi.Application.Queries;
 
@@ -63,7 +62,7 @@ public partial class DashboardQueryService(DaprClient client, UserContextService
                 Exceptions = new ApiError
                 {
                     Message = e.Message,
-                    Errors = new Dictionary<string, string[]> { { "Error", [e.Message] } }
+                    Errors = new Dictionary<string, string[]>(StringComparer.Ordinal) { { "Error", [e.Message] } }
                 }
             };
         }

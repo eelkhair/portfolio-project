@@ -6,7 +6,7 @@ public class ChatResponse
 {
     public required string Response { get; set; }
     public Guid ConversationId { get; set; }
-    public string TraceId { get; set; }
+    public string? TraceId { get; set; }
 
     /// <summary>
     /// Structured tool results returned directly without a second LLM call.

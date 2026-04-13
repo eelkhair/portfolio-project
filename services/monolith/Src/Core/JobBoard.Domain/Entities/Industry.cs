@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using JobBoard.Domain.Exceptions;
 using JobBoard.Domain.Helpers;
 using JobBoard.Domain.ValueObjects.Industry;
@@ -11,7 +11,7 @@ public class Industry : BaseAuditableEntity
     {
         Name = string.Empty;
     }
-    
+
     private Industry(string name)
     {
         Name = name;

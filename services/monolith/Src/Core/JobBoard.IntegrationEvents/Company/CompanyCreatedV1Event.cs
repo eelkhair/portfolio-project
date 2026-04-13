@@ -1,4 +1,4 @@
-﻿namespace JobBoard.IntegrationEvents.Company;
+namespace JobBoard.IntegrationEvents.Company;
 
 public record CompanyCreatedV1Event(
     Guid CompanyUId,
@@ -9,6 +9,6 @@ public record CompanyCreatedV1Event(
 {
     public string EventType => "company.created.v1";
     public required string UserId { get; set; }
-  
+
 }
 

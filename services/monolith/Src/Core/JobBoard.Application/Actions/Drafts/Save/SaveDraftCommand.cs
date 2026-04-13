@@ -70,7 +70,8 @@ public class SaveDraftCommandHandler(IHandlerContext handlerContext)
             command.Draft.Notes,
             command.Draft.Responsibilities,
             command.Draft.Qualifications
-        ) { UserId = command.UserId };
+        )
+        { UserId = command.UserId };
         await OutboxPublisher.PublishAsync(draftEvent, cancellationToken);
 
         await Context.SaveChangesAsync(command.UserId, cancellationToken);

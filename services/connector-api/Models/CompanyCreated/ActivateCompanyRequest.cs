@@ -1,4 +1,4 @@
-﻿namespace ConnectorAPI.Models.CompanyCreated;
+namespace ConnectorAPI.Models.CompanyCreated;
 
 public class ActivateCompanyRequest
 {

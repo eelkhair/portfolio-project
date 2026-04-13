@@ -1,7 +1,5 @@
-using System.Diagnostics;
 using System.Reflection;
 using System.Security.Claims;
-using System.Text.Json.Serialization;
 using Elkhair.Common.Observability;
 using Elkhair.Dev.Common.Dapr;
 using FastEndpoints;
@@ -56,6 +54,7 @@ public static class DependencyInjection
                                     AuthorizationUrl = $"{authority}/protocol/openid-connect/auth",
                                     TokenUrl = $"{authority}/protocol/openid-connect/token",
                                     Scopes = new Dictionary<string, string>
+(StringComparer.Ordinal)
                                     {
                                         ["openid"] = "OpenID",
                                         ["profile"] = "Profile",

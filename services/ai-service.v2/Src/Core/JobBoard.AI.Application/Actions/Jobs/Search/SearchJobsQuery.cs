@@ -3,7 +3,6 @@ using JobBoard.AI.Application.Actions.Base;
 using JobBoard.AI.Application.Actions.Jobs.Similar;
 using JobBoard.AI.Application.Interfaces.AI;
 using JobBoard.AI.Application.Interfaces.Configurations;
-using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Application.Interfaces.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -23,7 +22,7 @@ public partial class SearchJobsQueryHandler(
     IEmbeddingService embeddingService,
     ILogger<SearchJobsQuery> logger,
     IAiDbContext dbContext
-    ): BaseQueryHandler(logger),
+    ) : BaseQueryHandler(logger),
     IHandler<SearchJobsQuery, List<JobCandidate>>
 {
     public async Task<List<JobCandidate>> HandleAsync(SearchJobsQuery request, CancellationToken cancellationToken)

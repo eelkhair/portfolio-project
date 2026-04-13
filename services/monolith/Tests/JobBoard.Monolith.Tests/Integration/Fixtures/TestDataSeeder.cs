@@ -1,7 +1,6 @@
 using JobBoard.Domain.Aggregates;
 using JobBoard.Domain.Entities;
 using JobBoard.Domain.Entities.Users;
-using JobBoard.Infrastructure.Persistence.Context;
 using JobBoard.Monolith.Contracts.Jobs;
 using Microsoft.EntityFrameworkCore;
 

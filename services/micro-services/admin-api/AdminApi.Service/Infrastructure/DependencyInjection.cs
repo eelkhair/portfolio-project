@@ -6,9 +6,6 @@ using Elkhair.Dev.Common.Dapr;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using JobBoard.Mcp.Common;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using NSwag;
 
 namespace AdminApi.Infrastructure;
@@ -50,6 +47,7 @@ public static class DependencyInjection
                                     AuthorizationUrl = $"{authority}/protocol/openid-connect/auth",
                                     TokenUrl = $"{authority}/protocol/openid-connect/token",
                                     Scopes = new Dictionary<string, string>
+(StringComparer.Ordinal)
                                     {
                                         ["openid"] = "OpenID",
                                         ["profile"] = "Profile",
@@ -87,7 +85,7 @@ public static class DependencyInjection
                 var token = context.Request.Query["access_token"];
 
                 if (!string.IsNullOrEmpty(token) &&
-                    path.StartsWithSegments("/hubs/notifications"))
+                    path.StartsWithSegments("/hubs/notifications", StringComparison.Ordinal))
                 {
                     context.Token = token;
                 }

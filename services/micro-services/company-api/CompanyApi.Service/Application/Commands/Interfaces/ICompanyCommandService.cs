@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using CompanyAPI.Contracts.Models.Companies.Requests;
 using CompanyAPI.Contracts.Models.Companies.Responses;
 

@@ -9,20 +9,20 @@ namespace JobBoard.Infrastructure.Persistence.Context;
 
 public partial class JobBoardDbContext
 {
-    public DbSet<User> Users { get; set; }
-    public DbSet<UserProfile> UserProfiles { get; set; }
-    public DbSet<Resume> Resumes { get; set; }
-    public DbSet<OutboxMessage> OutboxMessages { get; set; }
-    public DbSet<OutboxArchivedMessage> OutboxArchivedMessages { get; set; }
-    public DbSet<OutboxDeadLetter> OutboxDeadLetters { get; set; }
-    public DbSet<Job> Jobs { get; set; }
-    public DbSet<JobApplication> JobApplications { get; set; }
-    public DbSet<Qualification> Qualifications { get; set; }
-    public DbSet<Responsibility> Responsibilities { get; set; }
-    public DbSet<Industry> Industries { get; set; }
-    public DbSet<UserCompany> UserCompanies { get; set; }
-    public DbSet<Company> Companies { get; set; }
-    public DbSet<Draft> Drafts { get; set; }
+    public DbSet<User>? Users { get; set; }
+    public DbSet<UserProfile>? UserProfiles { get; set; }
+    public DbSet<Resume>? Resumes { get; set; }
+    public DbSet<OutboxMessage>? OutboxMessages { get; set; }
+    public DbSet<OutboxArchivedMessage>? OutboxArchivedMessages { get; set; }
+    public DbSet<OutboxDeadLetter>? OutboxDeadLetters { get; set; }
+    public DbSet<Job>? Jobs { get; set; }
+    public DbSet<JobApplication>? JobApplications { get; set; }
+    public DbSet<Qualification>? Qualifications { get; set; }
+    public DbSet<Responsibility>? Responsibilities { get; set; }
+    public DbSet<Industry>? Industries { get; set; }
+    public DbSet<UserCompany>? UserCompanies { get; set; }
+    public DbSet<Company>? Companies { get; set; }
+    public DbSet<Draft>? Drafts { get; set; }
 }
 
 public partial class JobBoardDbContext(DbContextOptions<JobBoardDbContext> options)
@@ -32,7 +32,7 @@ public partial class JobBoardDbContext(DbContextOptions<JobBoardDbContext> optio
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(JobBoardDbContext).Assembly);
         base.OnModelCreating(modelBuilder);
-        
+
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
             var tableName = entityType.GetTableName();
@@ -41,12 +41,12 @@ public partial class JobBoardDbContext(DbContextOptions<JobBoardDbContext> optio
             {
                 continue;
             }
-            
+
             var sequenceName = $"{tableName}_Sequence";
-        
+
             modelBuilder.HasSequence<int>(sequenceName);
         }
-        
+
         //modelBuilder.SeedData();
     }
     public Task<int> SaveChangesAsync(string userId, CancellationToken cancellationToken)
@@ -60,7 +60,7 @@ public partial class JobBoardDbContext(DbContextOptions<JobBoardDbContext> optio
                     entry.Entity.CreatedAt = now;
                     if (string.IsNullOrEmpty(entry.Entity.CreatedBy))
                         entry.Entity.CreatedBy = userId;
-                    
+
                     entry.Entity.UpdatedAt = now;
                     if (string.IsNullOrEmpty(entry.Entity.UpdatedBy))
                         entry.Entity.UpdatedBy = userId;
@@ -70,7 +70,7 @@ public partial class JobBoardDbContext(DbContextOptions<JobBoardDbContext> optio
                     if (string.IsNullOrEmpty(entry.Entity.UpdatedBy))
                         entry.Entity.UpdatedBy = userId;
                     break;
-                
+
                 case EntityState.Detached:
                 case EntityState.Unchanged:
                 case EntityState.Deleted:
@@ -85,13 +85,13 @@ public partial class JobBoardDbContext(DbContextOptions<JobBoardDbContext> optio
     public async Task<(int id, Guid uid)> GetNextValueFromSequenceAsync(Type entityType,
         CancellationToken cancellationToken)
     {
-       
+
         var et = Model.FindEntityType(entityType);
         if (et == null)
         {
             throw new ArgumentException($"The type '{entityType.Name}' is not a configured entity in this DbContext.", nameof(entityType));
         }
-        
+
         var tableName = et.GetTableName();
         if (string.IsNullOrEmpty(tableName))
         {
@@ -99,22 +99,22 @@ public partial class JobBoardDbContext(DbContextOptions<JobBoardDbContext> optio
         }
 
         var sequenceName = $"{tableName}_Sequence";
-        
+
         var connection = Database.GetDbConnection();
-        
+
         await using var command = connection.CreateCommand();
-        
+
         command.Transaction = Database.CurrentTransaction?.GetDbTransaction();
         command.CommandText = $"SELECT NEXT VALUE FOR {sequenceName};";
-        
+
         if (connection.State != System.Data.ConnectionState.Open)
         {
             await connection.OpenAsync(cancellationToken);
         }
-        
+
         var result = await command.ExecuteScalarAsync(cancellationToken);
-    
-        var id = (int)(result   ?? throw new InvalidOperationException());
+
+        var id = (int)(result ?? throw new InvalidOperationException());
         var uid = Guid.CreateVersion7();
         return (id, uid);
     }

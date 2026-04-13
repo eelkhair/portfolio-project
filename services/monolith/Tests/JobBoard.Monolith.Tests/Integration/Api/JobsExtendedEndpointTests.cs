@@ -1,7 +1,5 @@
 using System.Net;
 using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using JobBoard.Domain.Entities;
 using JobBoard.Monolith.Contracts.Drafts;
 using JobBoard.Monolith.Contracts.Jobs;

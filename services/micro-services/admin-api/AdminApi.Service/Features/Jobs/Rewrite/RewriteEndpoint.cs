@@ -1,14 +1,14 @@
-﻿using System.Diagnostics;
-using AdminAPI.Contracts.Services;
+using System.Diagnostics;
 using AdminAPI.Contracts.Models.Jobs.Requests;
 using AdminAPI.Contracts.Models.Jobs.Responses;
+using AdminAPI.Contracts.Services;
 using Elkhair.Dev.Common.Application;
 using FastEndpoints;
 
 namespace AdminApi.Features.Jobs.Rewrite;
 
-public class RewriteEndpoint(IJobCommandService jobCommandService, ILogger<RewriteEndpoint> logger):
-    Endpoint<JobRewriteRequest,ApiResponse<JobRewriteResponse>>
+public class RewriteEndpoint(IJobCommandService jobCommandService, ILogger<RewriteEndpoint> logger) :
+    Endpoint<JobRewriteRequest, ApiResponse<JobRewriteResponse>>
 {
     public override void Configure()
     {

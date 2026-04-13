@@ -6,5 +6,5 @@ public record DraftDeletedV1Event(
 ) : IIntegrationEvent
 {
     public string EventType => "draft.deleted.v1";
-    public string UserId { get; set; }
+    public string? UserId { get; set; }
 }

@@ -18,6 +18,6 @@ public class ListIndustriesEndpoint(IIndustryQueryService service) : EndpointWit
         Activity.Current?.SetTag("operation", "list");
 
         var industries = await service.ListAsync(ct);
-        await Send.OkAsync( industries , cancellation: ct);
+        await Send.OkAsync(industries, cancellation: ct);
     }
 }

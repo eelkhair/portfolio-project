@@ -3,7 +3,6 @@ using JobBoard.AI.Application.Actions.Base;
 using JobBoard.AI.Application.Actions.Jobs.ReEmbedAll;
 using JobBoard.AI.Application.Interfaces.AI;
 using JobBoard.AI.Application.Interfaces.Clients;
-using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Application.Interfaces.Persistence;
 using JobBoard.AI.Domain.Drafts;

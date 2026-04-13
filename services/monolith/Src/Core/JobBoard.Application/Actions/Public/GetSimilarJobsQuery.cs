@@ -55,7 +55,7 @@ public class GetSimilarJobsQueryHandler(IJobBoardQueryDbContext context, IAiServ
             Qualifications = job.Qualifications.Select(q => q.Value).ToList(),
             CreatedAt = job.CreatedAt,
             UpdatedAt = job.UpdatedAt
-            
+
         }).ToList();
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace JobBoard.API.Infrastructure.SignalR.FeatureFlags;
+namespace JobBoard.API.Infrastructure.SignalR.FeatureFlags;
 
 /// <summary>
 /// Represents a notification or event that is raised when feature flags are updated.

@@ -1,4 +1,4 @@
-﻿using ConnectorAPI.Models.CompanyCreated;
+using ConnectorAPI.Models.CompanyCreated;
 using ConnectorAPI.Models.CompanyUpdated;
 using JobBoard.IntegrationEvents.Company;
 

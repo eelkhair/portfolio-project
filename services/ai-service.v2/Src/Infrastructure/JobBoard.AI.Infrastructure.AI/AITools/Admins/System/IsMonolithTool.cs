@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Text.Json;
 using JobBoard.AI.Application.Interfaces.Configurations;
-using JobBoard.AI.Application.Interfaces.Observability;
 using Microsoft.Extensions.AI;
 
 namespace JobBoard.AI.Infrastructure.AI.AITools.Admins.System;

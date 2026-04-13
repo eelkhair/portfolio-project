@@ -15,7 +15,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services, string corsPolicy = "AllowJobAdmin")
     {
-       
+
         services.AddCors(options =>
         {
             options.AddPolicy(corsPolicy, p => p
@@ -28,7 +28,7 @@ public static class DependencyInjection
                     "https://swagger-dev.eelkhair.net",
                     "https://job-admin.eelkhair.net",
                     "http://192.168.1.112:9000",
-                    "https://swagger.eelkhair.net")    
+                    "https://swagger.eelkhair.net")
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials()
@@ -44,13 +44,13 @@ public static class DependencyInjection
                 Description = "Standard RESTful endpoints."
             });
         });
-        
+
         services.ConfigureHttpJsonOptions(options =>
         {
             options.SerializerOptions.PropertyNameCaseInsensitive = true;
             options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
         });
-        
+
         services.AddHttpClient<IMonolithClient, MonolithOClient>((sp, client) =>
         {
             var config = sp.GetRequiredService<IConfiguration>();
@@ -75,8 +75,8 @@ public static class DependencyInjection
     // ------------------------------------------------------------
     // LOGGING (SERILOG + FILTERS)
     // ------------------------------------------------------------
-    
-    
+
+
     public static async Task<WebApplicationBuilder> AddDaprServices(
         this WebApplicationBuilder builder,
         string serviceName)
@@ -88,7 +88,7 @@ public static class DependencyInjection
             builder.Configuration.AddDaprSecretStore(
                 "vault",
                 new DaprClientBuilder().Build(),
-                new Dictionary<string, string>()
+                new Dictionary<string, string>(StringComparer.Ordinal)
             );
 
             var daprClient = new DaprClientBuilder().Build();
@@ -109,8 +109,8 @@ public static class DependencyInjection
 
                     foreach (var kvp in config.Items)
                     {
-                        if (!kvp.Key.StartsWith($"jobboard:config:{serviceName}")
-                            && !kvp.Key.StartsWith($"jobboard:config:global")) continue;
+                        if (!kvp.Key.StartsWith($"jobboard:config:{serviceName}", StringComparison.Ordinal)
+                            && !kvp.Key.StartsWith($"jobboard:config:global", StringComparison.Ordinal)) continue;
 
                         var cleanedKey = CleanKey(kvp.Key, serviceName);
                         builder.Configuration[cleanedKey] = kvp.Value.Value;
@@ -134,7 +134,7 @@ public static class DependencyInjection
         string prefix,
         string serviceName)
     {
-        foreach (var item in cfg.Items.Where(k => k.Key.StartsWith(prefix)))
+        foreach (var item in cfg.Items.Where(k => k.Key.StartsWith(prefix, StringComparison.Ordinal)))
         {
             var cleanKey = CleanKey(item.Key, serviceName);
             config[cleanKey] = item.Value.Value;
@@ -147,7 +147,7 @@ public static class DependencyInjection
         key = key.Replace("jobboard:config:global:", "");
         return key;
     }
-    
+
 
 
     public static WebApplication MapServices(this WebApplication app)
@@ -157,7 +157,7 @@ public static class DependencyInjection
             "/healthzEndpoint",
             "/liveness",
             UIResponseWriter.WriteHealthCheckUIResponse);
-        
+
         // Swagger UI must come after endpoints
         app.UseSwagger();
         app.UseSwaggerUI(options =>
@@ -165,7 +165,7 @@ public static class DependencyInjection
             options.SwaggerEndpoint("/swagger/v1/swagger.json", "Connector API v1");
         });
         app.MapGet("/", (HttpContext ctx) => ctx.Response.Redirect("/swagger")).ExcludeFromDescription();
-       
+
         return app;
     }
 }

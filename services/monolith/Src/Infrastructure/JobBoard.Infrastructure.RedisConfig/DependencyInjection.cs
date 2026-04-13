@@ -16,7 +16,7 @@ public static class DependencyInjection
         TimeSpan pollInterval)
     {
         var redisConnection = builder.Configuration["Redis:ConnectionString"] ?? DefaultRedisConnection;
-        var configDb = int.TryParse(builder.Configuration["Redis:ConfigDb"], out var db) ? db : 1;
+        var configDb = int.TryParse(builder.Configuration["Redis:ConfigDb"], System.Globalization.CultureInfo.InvariantCulture, out var db) ? db : 1;
 
         var options = ConfigurationOptions.Parse(redisConnection);
         options.AbortOnConnectFail = false;

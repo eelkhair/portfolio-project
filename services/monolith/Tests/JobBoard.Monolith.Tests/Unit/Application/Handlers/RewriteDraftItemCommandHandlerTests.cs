@@ -43,8 +43,8 @@ public class RewriteDraftItemCommandHandlerTests
         {
             Field = "title",
             Value = "Software Engineer",
-            Context = new Dictionary<string, object> { ["companyName"] = "Acme" },
-            Style = new Dictionary<string, object> { ["tone"] = "professional" }
+            Context = new Dictionary<string, object>(StringComparer.Ordinal) { ["companyName"] = "Acme" },
+            Style = new Dictionary<string, object>(StringComparer.Ordinal) { ["tone"] = "professional" }
         };
         var command = new RewriteDraftItemCommand
         {
@@ -83,8 +83,8 @@ public class RewriteDraftItemCommandHandlerTests
             {
                 Field = "aboutRole",
                 Value = "Original about role text",
-                Context = new Dictionary<string, object>(),
-                Style = new Dictionary<string, object>()
+                Context = new Dictionary<string, object>(StringComparer.Ordinal),
+                Style = new Dictionary<string, object>(StringComparer.Ordinal)
             },
             UserId = "user-123"
         };
@@ -116,8 +116,8 @@ public class RewriteDraftItemCommandHandlerTests
             {
                 Field = "title",
                 Value = "Test",
-                Context = new Dictionary<string, object>(),
-                Style = new Dictionary<string, object>()
+                Context = new Dictionary<string, object>(StringComparer.Ordinal),
+                Style = new Dictionary<string, object>(StringComparer.Ordinal)
             },
             UserId = "user-123"
         };
@@ -138,8 +138,8 @@ public class RewriteDraftItemCommandHandlerTests
             {
                 Field = "qualifications",
                 Value = "Must have 3 years experience",
-                Context = new Dictionary<string, object> { ["role"] = "Backend Engineer" },
-                Style = new Dictionary<string, object> { ["tone"] = "formal" }
+                Context = new Dictionary<string, object>(StringComparer.Ordinal) { ["role"] = "Backend Engineer" },
+                Style = new Dictionary<string, object>(StringComparer.Ordinal) { ["tone"] = "formal" }
             },
             UserId = "user-123"
         };

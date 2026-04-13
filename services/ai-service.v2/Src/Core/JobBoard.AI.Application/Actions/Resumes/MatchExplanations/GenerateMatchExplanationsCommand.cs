@@ -1,12 +1,11 @@
 using System.Diagnostics;
 using System.Text.Json;
 using JobBoard.AI.Application.Actions.Base;
+using JobBoard.AI.Application.Actions.Resumes.MatchingJobs;
 using JobBoard.AI.Application.Interfaces.AI;
 using JobBoard.AI.Application.Interfaces.Clients;
 using JobBoard.AI.Application.Interfaces.Configurations;
-using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Application.Interfaces.Persistence;
-using JobBoard.AI.Application.Actions.Resumes.MatchingJobs;
 using JobBoard.AI.Domain.Drafts;
 using JobBoard.IntegrationEvents.Resume;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +17,7 @@ namespace JobBoard.AI.Application.Actions.Resumes.MatchExplanations;
 public class GenerateMatchExplanationsCommand(Guid resumeUId, string? userId = null) : BaseCommand<Unit>, ISystemCommand
 {
     public Guid ResumeUId { get; } = resumeUId;
-    public string? UserId { get; } = userId;
+    public new string? UserId { get; } = userId;
 }
 
 public class GenerateMatchExplanationsCommandHandler(

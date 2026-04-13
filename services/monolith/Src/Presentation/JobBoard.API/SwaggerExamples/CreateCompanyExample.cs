@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using JobBoard.API.Helpers;
 using JobBoard.Monolith.Contracts.Companies;
 using Swashbuckle.AspNetCore.Filters;
@@ -28,7 +28,7 @@ public class CreateCompanyExample : IExamplesProvider<ApiResponse<CompanyDto>>
             }
         );
         response.StatusCode = HttpStatusCode.Created;
-        
+
         return response;
     }
 }

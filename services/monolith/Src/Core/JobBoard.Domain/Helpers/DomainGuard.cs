@@ -1,4 +1,4 @@
-﻿using JobBoard.Domain.Exceptions;
+using JobBoard.Domain.Exceptions;
 
 namespace JobBoard.Domain.Helpers;
 

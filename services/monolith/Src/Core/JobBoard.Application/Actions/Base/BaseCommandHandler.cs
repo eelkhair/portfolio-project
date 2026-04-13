@@ -19,12 +19,12 @@ public abstract class BaseCommandHandler
         Context = handlerContext.UnitOfWork;
         Logger = handlerContext.LoggerFactory.CreateLogger(GetType());
         OutboxPublisher = handlerContext.OutboxPublisher;
-        ((ITransactionDbContext) Context).ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.TrackAll;
+        ((ITransactionDbContext)Context).ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.TrackAll;
     }
     protected IUnitOfWork Context { get; }
     protected ILogger Logger { get; }
     protected IOutboxPublisher OutboxPublisher { get; }
     protected IMetricsService MetricsService { get; }
     protected IUnitOfWorkEvents UnitOfWorkEvents { get; }
-    
+
 }

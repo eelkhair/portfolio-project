@@ -20,7 +20,7 @@ public class SaveDraftEndpoint(IDraftCommandService service) : Endpoint<EventDto
     public override async Task HandleAsync(EventDto<SaveDraftRequest> request, CancellationToken ct)
     {
         var companyUId = Route<Guid>("companyUId");
-        var isForwardSync = HttpContext.Request.Headers["X-Sync-Source"].FirstOrDefault() == "forward";
+        var isForwardSync = string.Equals(HttpContext.Request.Headers["X-Sync-Source"].FirstOrDefault(), "forward", StringComparison.Ordinal);
 
         Activity.Current?.SetTag("entity.type", "draft");
         Activity.Current?.SetTag("entity.id", request.Data.Id);

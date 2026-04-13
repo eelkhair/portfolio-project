@@ -1,7 +1,6 @@
 using System.Reflection;
 using FluentValidation;
 using JobBoard.AI.Application.Actions.Base;
-using JobBoard.AI.Application.Actions.Chat;
 using JobBoard.AI.Application.Infrastructure.Decorators;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,7 +14,7 @@ public static class DependencyInjection
         var assemblies = new[] { typeof(BaseCommandHandler).Assembly }.Concat(additionalAssemblies).ToArray();
         services.AddValidatorsFromAssemblyContaining(typeof(IHandler<,>));
         services.AddScoped<IAiToolHandlerResolver, AiToolHandlerResolver>();
-        
+
         services.Scan(scan => scan
             .FromAssemblies(assemblies)
             .AddClasses(c => c.AssignableTo(typeof(IHandler<,>)))

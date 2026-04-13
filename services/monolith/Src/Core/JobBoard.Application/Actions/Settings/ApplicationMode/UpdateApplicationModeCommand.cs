@@ -12,7 +12,7 @@ public class UpdateApplicationModeCommand(ApplicationModeDto request) : BaseComm
     public ApplicationModeDto Request { get; } = request;
 }
 
-public class UpdateApplicationModeCommandHandler(IHandlerContext handlerContext, IAiServiceClient aiServiceClient) : 
+public class UpdateApplicationModeCommandHandler(IHandlerContext handlerContext, IAiServiceClient aiServiceClient) :
     BaseCommandHandler(handlerContext), IHandler<UpdateApplicationModeCommand, ApplicationModeDto>
 {
     public async Task<ApplicationModeDto> HandleAsync(UpdateApplicationModeCommand command, CancellationToken cancellationToken)
@@ -24,7 +24,7 @@ public class UpdateApplicationModeCommandHandler(IHandlerContext handlerContext,
         await aiServiceClient.UpdateApplicationMode(command.Request, cancellationToken);
 
         Logger.LogInformation("Application Mode updated successfully");
-       
+
         return command.Request;
     }
 }

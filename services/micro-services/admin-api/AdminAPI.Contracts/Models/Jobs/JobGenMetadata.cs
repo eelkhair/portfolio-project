@@ -1,4 +1,4 @@
-﻿namespace AdminAPI.Contracts.Models.Jobs;
+namespace AdminAPI.Contracts.Models.Jobs;
 
 public class JobGenMetadata
 {

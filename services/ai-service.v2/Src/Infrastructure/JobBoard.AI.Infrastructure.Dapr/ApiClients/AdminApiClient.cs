@@ -25,7 +25,7 @@ public class AdminApiClient(DaprClient client, IUserAccessor accessor, ILogger<A
         {
             var response = ex.Response;
             var body = await response.Content.ReadAsStringAsync(cancellationToken);
-            
+
             logger.LogError(ex, "Error getting companies from admin-api: {Body}", body);
             throw;
         }

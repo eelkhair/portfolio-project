@@ -1,4 +1,3 @@
-using JobBoard.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
@@ -32,7 +31,7 @@ public class JobBoardDbContextFactory : IDesignTimeDbContextFactory<JobBoardDbCo
 
         var optionsBuilder = new DbContextOptionsBuilder<JobBoardDbContext>();
         optionsBuilder.UseSqlServer(connectionString);
-        
+
         return new JobBoardDbContext(optionsBuilder.Options);
     }
 

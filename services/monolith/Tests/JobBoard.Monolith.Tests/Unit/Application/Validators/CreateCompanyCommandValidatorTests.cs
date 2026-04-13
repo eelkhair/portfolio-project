@@ -1,10 +1,8 @@
-using FluentValidation;
 using FluentValidation.TestHelper;
 using JobBoard.Application.Actions.Companies.Create;
 using JobBoard.Application.Interfaces;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using Shouldly;
 
 namespace JobBoard.Monolith.Tests.Unit.Application.Validators;
 

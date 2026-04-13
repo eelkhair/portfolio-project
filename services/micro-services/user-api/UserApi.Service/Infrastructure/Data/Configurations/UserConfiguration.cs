@@ -1,4 +1,4 @@
-﻿using Elkhair.Dev.Common.Data;
+using Elkhair.Dev.Common.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using UserApi.Infrastructure.Data.Entities;

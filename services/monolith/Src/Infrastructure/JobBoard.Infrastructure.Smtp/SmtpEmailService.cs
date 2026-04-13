@@ -9,7 +9,7 @@ namespace JobBoard.Infrastructure.Smtp;
 public class SmtpEmailService(IOptions<SmtpSettings> smtpSettings) : IEmailService
 {
     private readonly SmtpSettings _smtpSettings = smtpSettings.Value;
-    
+
     public async Task SendEmailAsync(string to, string subject, string body, CancellationToken cancellationToken)
     {
         var message = new MimeMessage();

@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using ConnectorAPI.Interfaces;
+using System.Diagnostics;
 using ConnectorAPI.Interfaces.Clients;
 using ConnectorAPI.Models;
 using ConnectorAPI.Models.CompanyCreated;

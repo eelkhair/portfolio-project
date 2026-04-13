@@ -1,4 +1,4 @@
-﻿namespace JobBoard.AI.Infrastructure.Dapr;
+namespace JobBoard.AI.Infrastructure.Dapr;
 
 /// <summary>
 /// Represents a notifier for feature flag updates.
@@ -11,5 +11,5 @@ public interface IFeatureFlagNotifier
     /// </summary>
     /// <param name="flags">A read-only collection of feature flags that have been updated.</param>
     /// <returns>A task that represents the asynchronous notify operation.</returns>
-    Task NotifyAsync(IReadOnlyDictionary<string,bool> flags);
+    Task NotifyAsync(IReadOnlyDictionary<string, bool> flags);
 }

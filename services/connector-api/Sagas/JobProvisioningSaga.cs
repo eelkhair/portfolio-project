@@ -52,7 +52,7 @@ public class JobProvisioningSaga
             }
 
             _logger.LogInformation("Saga step: Job forwarded to job-api {JobUId}", @event.Data.UId);
-            
+
             using (_activitySource.StartActivity("provision.job.saga.publish"))
             {
                 var publishedEvent = new EventDto<Models.JobCreated.JobApiResponse>(

@@ -12,7 +12,7 @@ public class UserLastName
     {
         if (string.IsNullOrEmpty(value)) value = string.Empty;
         value = value.Trim();
-        
+
         var errors = new List<Error>();
 
         if (string.IsNullOrWhiteSpace(value))
@@ -24,7 +24,7 @@ public class UserLastName
             errors.Add(new Error("LastName.TooLong", "LastName cannot exceed 100 characters."));
         }
 
-        return errors.Count > 0 ? Result<UserLastName>.Failure(errors) : 
+        return errors.Count > 0 ? Result<UserLastName>.Failure(errors) :
             Result<UserLastName>.Success(new UserLastName(value));
     }
 }

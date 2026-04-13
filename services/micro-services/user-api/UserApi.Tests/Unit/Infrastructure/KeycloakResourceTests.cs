@@ -145,6 +145,7 @@ public class KeycloakResourceTests
             new Uri($"{BaseUrl}/users/{newUserId}"));
 
         var attributes = new Dictionary<string, List<string>>
+(StringComparer.Ordinal)
         {
             ["companyName"] = ["Acme Inc"]
         };
@@ -180,6 +181,7 @@ public class KeycloakResourceTests
         _handler.EnqueueResponse(HttpStatusCode.NoContent);
 
         var attributes = new Dictionary<string, List<string>>
+(StringComparer.Ordinal)
         {
             ["companyName"] = ["New Corp"]
         };

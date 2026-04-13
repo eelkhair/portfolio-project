@@ -1,4 +1,4 @@
-﻿using UserAPI.Contracts.Models.Requests;
+using UserAPI.Contracts.Models.Requests;
 
 namespace UserApi.Application.Commands.Interfaces;
 

@@ -111,13 +111,13 @@ public class UserMapperTests
         string email = "test@example.com",
         DateTime? createdAt = null,
         DateTime? updatedAt = null) => new()
-    {
-        UId = uid ?? Guid.NewGuid(),
-        Email = email,
-        CreatedAt = createdAt ?? DateTime.UtcNow,
-        UpdatedAt = updatedAt,
-        FirstName = "Test",
-        LastName = "User",
-        UserCompanies = new List<UserCompany>()
-    };
+        {
+            UId = uid ?? Guid.NewGuid(),
+            Email = email,
+            CreatedAt = createdAt ?? DateTime.UtcNow,
+            UpdatedAt = updatedAt,
+            FirstName = "Test",
+            LastName = "User",
+            UserCompanies = new List<UserCompany>()
+        };
 }

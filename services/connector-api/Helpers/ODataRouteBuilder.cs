@@ -1,4 +1,4 @@
-﻿using System.Web;
+using System.Web;
 
 namespace ConnectorAPI.Helpers;
 
@@ -19,14 +19,14 @@ public static class ODataRouteBuilder
 
     public static string CompanyById(Guid id, Action<IDictionary<string, string>>? configureQuery = null)
     {
-        var q = new Dictionary<string, string>();
+        var q = new Dictionary<string, string>(StringComparer.Ordinal);
         configureQuery?.Invoke(q);
         return Build($"odata/companies({id})", q);
     }
 
     public static string UserById(Guid id, Action<IDictionary<string, string>>? configureQuery = null)
     {
-        var q = new Dictionary<string, string>();
+        var q = new Dictionary<string, string>(StringComparer.Ordinal);
         configureQuery?.Invoke(q);
         return Build($"odata/users({id})", q);
     }

@@ -1,15 +1,15 @@
+using System.Diagnostics;
 using JobBoard.Application.Infrastructure.Decorators;
 using JobBoard.Application.Interfaces;
 using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Application.Interfaces.Observability;
+using JobBoard.Monolith.Tests.Unit.Application.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using Shouldly;
-using System.Diagnostics;
-using JobBoard.Monolith.Tests.Unit.Application.Helpers;
 
 namespace JobBoard.Monolith.Tests.Unit.Application.Decorators;
 

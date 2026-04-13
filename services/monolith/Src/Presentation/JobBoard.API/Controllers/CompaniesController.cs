@@ -1,11 +1,11 @@
-﻿using JobBoard.API.Helpers;
+using JobBoard.API.Helpers;
 using JobBoard.API.Infrastructure.Authorization;
 using JobBoard.API.Infrastructure.SignalR.CompanyActivation;
 using JobBoard.Application.Actions.Companies.Activate;
 using JobBoard.Application.Actions.Companies.Create;
 using JobBoard.Application.Actions.Companies.Update;
-using JobBoard.Mcp.Common;
 using JobBoard.Domain;
+using JobBoard.Mcp.Common;
 using JobBoard.Monolith.Contracts.Companies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -55,7 +55,7 @@ public class CompaniesController(IUserAccessor accessor, ICompanyActivationNotif
         accessor.UserId = request.CreatedBy;
 
         await ExecuteCommandAsync(new ActivateCompanyCommand(request), Ok);
-        
+
         await notifier.NotifyAsync(request, cancellationToken);
         return Ok();
     }

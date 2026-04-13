@@ -1,10 +1,9 @@
 using CompanyApi.Application.Queries.Interfaces;
-using CompanyAPI.Contracts.Models.Companies.Responses;
 using CompanyApi.Infrastructure.Data;
 using CompanyApi.Infrastructure.Data.Entities;
+using CompanyAPI.Contracts.Models.Companies.Responses;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace CompanyApi.Application.Queries;
 
@@ -35,17 +34,17 @@ public partial class CompanyQueryService(ICompanyDbContext companyDbContext, ILo
     private static List<Guid> FilteredUIds(HttpContext context)
     {
         var groups = context.User.Claims
-            .Where(c => c.Type == "groups")
+            .Where(c => string.Equals(c.Type, "groups", StringComparison.Ordinal))
             .Select(c => c.Value.TrimStart('/'))
             .ToList();
 
         // Admins see all companies
-        if (groups.Any(g => g == "Admins"))
+        if (groups.Any(g => string.Equals(g, "Admins", StringComparison.Ordinal)))
             return [];
 
         // Extract company UIDs from Companies/{uid}/... group paths
         return groups
-            .Where(g => g.StartsWith("Companies/"))
+            .Where(g => g.StartsWith("Companies/", StringComparison.Ordinal))
             .Select(g => g.Split('/'))
             .Where(parts => parts.Length >= 2 && Guid.TryParse(parts[1], out _))
             .Select(parts => Guid.Parse(parts[1]))

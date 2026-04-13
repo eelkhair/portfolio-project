@@ -1,13 +1,13 @@
-﻿using JobBoard.Domain.Exceptions;
+using JobBoard.Domain.Exceptions;
 
 namespace JobBoard.Domain.ValueObjects.Job;
 
 public class JobSalaryRange
 {
     public string? Value { get; }
-    
+
     private JobSalaryRange(string? value) { Value = value; }
-    
+
     public static Result<JobSalaryRange> Create(string? value)
     {
         var errors = new List<Error>();
@@ -16,7 +16,7 @@ public class JobSalaryRange
         {
             return Result<JobSalaryRange>.Success(new JobSalaryRange(value));
         }
-        
+
         value = value.Trim();
         if (value.Length > 100)
         {

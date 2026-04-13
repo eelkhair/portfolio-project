@@ -1,7 +1,7 @@
-﻿using JobBoard.Domain.Aggregates;
+using JobBoard.Domain.Aggregates;
 using JobBoard.Domain.Exceptions;
-using JobBoard.Domain.ValueObjects.Company;
 using JobBoard.Domain.Helpers;
+using JobBoard.Domain.ValueObjects.Company;
 
 namespace JobBoard.Domain.Entities;
 
@@ -36,7 +36,7 @@ public class Company : BaseAuditableEntity
     public string? ExternalId { get; private set; } = string.Empty;
     public int IndustryId { get; private set; }
     public Industry Industry { get; private set; } = null!;
-    
+
 
     private readonly List<Job> _jobs = [];
     public IReadOnlyCollection<Job> Jobs => _jobs.AsReadOnly();
@@ -54,7 +54,7 @@ public class Company : BaseAuditableEntity
         job.SetCompany(InternalId);
         _jobs.Add(job);
     }
-    
+
     public void SetName(string name) =>
         Name = CompanyName.Create(name).Ensure<CompanyName, string>("Company.InvalidName")!;
 
@@ -102,7 +102,7 @@ public class Company : BaseAuditableEntity
     {
         IndustryId = industryId;
     }
-    
+
 
     public static Company Create(CompanyInput input)
     {
@@ -131,7 +131,7 @@ public class Company : BaseAuditableEntity
         var phone = CompanyPhone.Create(input.Phone)
             .Collect<CompanyPhone, string?>(errors);
         var about = CompanyAbout.Create(input.About)
-            .Collect<CompanyAbout, string?>(errors); 
+            .Collect<CompanyAbout, string?>(errors);
         var externalId = CompanyExternalId.Create(input.ExternalId)
             .Collect<CompanyExternalId, string?>(errors);
         var eeo = CompanyEEO.Create(input.EEO)

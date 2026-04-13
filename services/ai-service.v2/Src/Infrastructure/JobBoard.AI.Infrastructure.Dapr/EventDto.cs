@@ -1,4 +1,4 @@
-﻿namespace JobBoard.AI.Infrastructure.Dapr;
+namespace JobBoard.AI.Infrastructure.Dapr;
 
 public class EventDto<T>(string userId, string idempotencyKey, T data)
 {

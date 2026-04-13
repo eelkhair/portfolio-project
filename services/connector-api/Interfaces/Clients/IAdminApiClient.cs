@@ -1,4 +1,4 @@
-﻿using ConnectorAPI.Models.CompanyCreated;
+using ConnectorAPI.Models.CompanyCreated;
 
 namespace ConnectorAPI.Interfaces.Clients;
 

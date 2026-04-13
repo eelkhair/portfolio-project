@@ -40,16 +40,16 @@ public static class TestDbContextFactory
 
     public static Company CreateCompany(Industry industry, string name = "Test Corp", string email = "test@corp.com",
         string status = "Active", Guid? uid = null) => new()
-    {
-        Name = name,
-        Email = email,
-        Status = status,
-        IndustryId = industry.Id,
-        Industry = industry,
-        UId = uid ?? Guid.NewGuid(),
-        CreatedAt = Now,
-        UpdatedAt = Now,
-        CreatedBy = "test",
-        UpdatedBy = "test"
-    };
+        {
+            Name = name,
+            Email = email,
+            Status = status,
+            IndustryId = industry.Id,
+            Industry = industry,
+            UId = uid ?? Guid.NewGuid(),
+            CreatedAt = Now,
+            UpdatedAt = Now,
+            CreatedBy = "test",
+            UpdatedBy = "test"
+        };
 }

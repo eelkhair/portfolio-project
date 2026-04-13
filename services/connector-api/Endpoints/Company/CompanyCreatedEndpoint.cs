@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using AH.Metadata.Domain.Constants;
 using ConnectorAPI.Models;
 using ConnectorAPI.Sagas;
@@ -14,7 +14,7 @@ public static class CompanyCreatedEndpoint
     {
         app.MapPost("/connector/company",
             [Topic("rabbitmq.pubsub", "monolith.company-created.v1")]
-            async (
+        async (
                 EventDto<CompanyCreatedV1Event> @event,
                 CompanyProvisioningSaga saga,
                 ActivitySource activitySource,
@@ -54,7 +54,7 @@ public static class CompanyCreatedEndpoint
                         StateStores.Redis,
                         stateKey,
                         "processing",
-                        metadata: new Dictionary<string, string> { ["ttlInSeconds"] = IdempotencyOptions.PendingTTLSeconds.ToString() },
+                        metadata: new Dictionary<string, string>(StringComparer.Ordinal) { ["ttlInSeconds"] = IdempotencyOptions.PendingTTLSeconds.ToString() },
                         cancellationToken: cancellationToken);
                 }
 
@@ -79,6 +79,7 @@ public static class CompanyCreatedEndpoint
                         stateKey,
                         "done",
                         metadata: new Dictionary<string, string>
+(StringComparer.Ordinal)
                         {
                             ["ttlInSeconds"] = IdempotencyOptions.CompletedTTLSeconds.ToString()
                         },

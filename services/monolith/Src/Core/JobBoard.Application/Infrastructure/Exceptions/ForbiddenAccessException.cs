@@ -4,10 +4,10 @@ namespace JobBoard.Application.Infrastructure.Exceptions;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 public class ForbiddenAccessException : Exception
-{ 
+{
     public string? ResourceName { get; }
     public object? Key { get; }
-    
+
     public ForbiddenAccessException(string resourceName, object key)
         : base($"Resource '{resourceName}' with key '{key}' was not found.")
     {

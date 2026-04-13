@@ -4,7 +4,6 @@ using JobBoard.Application.Actions.Base;
 using JobBoard.Application.Infrastructure.Exceptions;
 using JobBoard.Application.Interfaces;
 using JobBoard.Application.Interfaces.Configurations;
-using JobBoard.Application.Interfaces.Observability;
 using JobBoard.IntegrationEvents.Resume;
 using JobBoard.Monolith.Contracts.Public;
 using Microsoft.EntityFrameworkCore;

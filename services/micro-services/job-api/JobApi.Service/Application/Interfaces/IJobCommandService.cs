@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using JobAPI.Contracts.Models.Jobs.Requests;
 using JobAPI.Contracts.Models.Jobs.Responses;
 

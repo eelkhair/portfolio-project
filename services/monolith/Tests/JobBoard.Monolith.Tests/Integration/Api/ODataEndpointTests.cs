@@ -1,9 +1,7 @@
 using System.Net;
-using System.Net.Http.Json;
 using System.Text.Json;
 using JobBoard.Domain.Aggregates;
 using JobBoard.Domain.Entities;
-using JobBoard.Monolith.Contracts.Companies;
 using JobBoard.Monolith.Tests.Integration.Fixtures;
 using Shouldly;
 

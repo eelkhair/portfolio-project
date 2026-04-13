@@ -2,8 +2,6 @@ using System.Diagnostics;
 using JobBoard.AI.Application.Actions.Base;
 using JobBoard.AI.Application.Actions.Drafts.RewriteItem;
 using JobBoard.AI.Application.Interfaces.AI;
-using JobBoard.AI.Application.Interfaces.Configurations;
-using JobBoard.AI.Application.Interfaces.Observability;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Shouldly;

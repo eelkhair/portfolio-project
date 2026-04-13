@@ -1,4 +1,4 @@
-﻿namespace CompanyAPI.Contracts.Models.Companies;
+namespace CompanyAPI.Contracts.Models.Companies;
 
 public class CompanyCreatedSuccess
 {

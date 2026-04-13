@@ -7,7 +7,7 @@ namespace JobBoard.API.Controllers.OData;
 /// <summary>
 /// The JobsController handles OData requests for job-related resources in the system.
 /// </summary>
-public class JobsController: BaseODataController
+public class JobsController : BaseODataController
 {
     /// <summary>
     /// Retrieves a list of jobs for a specific company.
@@ -20,7 +20,7 @@ public class JobsController: BaseODataController
     public async Task<IActionResult> Get(Guid companyId)
     {
         var jobs = await ExecuteODataQueryAsync(new ListJobsQuery(companyId));
-       
+
         return Ok(jobs);
     }
 }

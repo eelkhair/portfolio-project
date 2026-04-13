@@ -3,7 +3,6 @@ using FastEndpoints;
 using FastEndpoints.Swagger;
 using HealthChecks.UI.Client;
 using JobBoard.HealthChecks;
-using Microsoft.AspNetCore.Builder;
 
 namespace CompanyApi.Infrastructure;
 

@@ -43,6 +43,7 @@ public sealed class CloudEventsPublisher : IAsyncDisposable
             cancellationToken: ct);
 
         var cloudEvent = new Dictionary<string, object>
+(StringComparer.Ordinal)
         {
             ["specversion"] = "1.0",
             ["type"] = "com.dapr.event.sent",

@@ -1,4 +1,4 @@
-﻿namespace AdminAPI.Contracts.Models.Jobs.Requests;
+namespace AdminAPI.Contracts.Models.Jobs.Requests;
 
 public class JobDraftRequest
 {

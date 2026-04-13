@@ -1,6 +1,5 @@
-﻿using JobBoard.Application.Actions.Public;
+using JobBoard.Application.Actions.Public;
 using JobBoard.Monolith.Contracts.Drafts;
-using JobBoard.Monolith.Contracts.Public;
 using JobBoard.Monolith.Contracts.Settings;
 
 namespace JobBoard.Application.Interfaces.Infrastructure;

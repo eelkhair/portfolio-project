@@ -13,18 +13,16 @@ using Elkhair.Dev.Common.Domain.Constants;
 using JobAPI.Contracts.Models.Jobs.Responses;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 using Shouldly;
-
-using ResponseJobType = JobAPI.Contracts.Models.Jobs.Responses.JobType;
 using RequestJobType = JobAPI.Contracts.Enums.JobType;
+using ResponseJobType = JobAPI.Contracts.Models.Jobs.Responses.JobType;
 
 namespace AdminApi.Tests.Unit.Commands;
 
 [Trait("Category", "Unit")]
 public class JobCommandServiceTests
 {
-    private static readonly JsonSerializerOptions JsonOpts = new()
+    private static readonly JsonSerializerOptions _jsonOpts = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
@@ -124,8 +122,8 @@ public class JobCommandServiceTests
         {
             Field = "aboutRole",
             Value = "Original about role text",
-            Context = new Dictionary<string, object> { { "title", "Engineer" } },
-            Style = new Dictionary<string, object> { { "tone", "professional" } }
+            Context = new Dictionary<string, object>(StringComparer.Ordinal) { { "title", "Engineer" } },
+            Style = new Dictionary<string, object>(StringComparer.Ordinal) { { "tone", "professional" } }
         };
 
         var rewriteResponse = new ApiResponse<JobRewriteResponse>
@@ -159,8 +157,8 @@ public class JobCommandServiceTests
         {
             Field = "aboutRole",
             Value = "Text",
-            Context = new Dictionary<string, object>(),
-            Style = new Dictionary<string, object>()
+            Context = new Dictionary<string, object>(StringComparer.Ordinal),
+            Style = new Dictionary<string, object>(StringComparer.Ordinal)
         };
 
         _daprClient.SetupInvokeMethodWithErrorResponse(HttpStatusCode.InternalServerError, "AI service error");
@@ -206,7 +204,7 @@ public class JobCommandServiceTests
             CreatedAt = DateTime.UtcNow
         };
 
-        var json = JsonSerializer.Serialize(jobResponse, JsonOpts);
+        var json = JsonSerializer.Serialize(jobResponse, _jsonOpts);
         var httpResponse = new HttpResponseMessage(HttpStatusCode.OK)
         {
             Content = new StringContent(json, System.Text.Encoding.UTF8, "application/json")
@@ -254,7 +252,7 @@ public class JobCommandServiceTests
             CreatedAt = DateTime.UtcNow
         };
 
-        var json = JsonSerializer.Serialize(jobResponse, JsonOpts);
+        var json = JsonSerializer.Serialize(jobResponse, _jsonOpts);
         var httpResponse = new HttpResponseMessage(HttpStatusCode.OK)
         {
             Content = new StringContent(json, System.Text.Encoding.UTF8, "application/json")
@@ -294,7 +292,7 @@ public class JobCommandServiceTests
             DraftId = Guid.NewGuid().ToString()
         };
 
-        var errorJson = JsonSerializer.Serialize(new ApiError { Message = "Bad request" }, JsonOpts);
+        var errorJson = JsonSerializer.Serialize(new ApiError { Message = "Bad request" }, _jsonOpts);
         var httpResponse = new HttpResponseMessage(HttpStatusCode.BadRequest)
         {
             Content = new StringContent(errorJson, System.Text.Encoding.UTF8, "application/json")

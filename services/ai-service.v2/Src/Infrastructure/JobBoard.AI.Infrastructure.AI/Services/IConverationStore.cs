@@ -27,7 +27,7 @@ public interface IConversationStore
 
 public class ConversationStore(IRedisStore store, IConfiguration configuration) : IConversationStore
 {
-    public int AiDbId { get; } = int.TryParse(configuration["Redis:AiDb"], out var db) ? db : 2;
+    public int AiDbId { get; } = int.TryParse(configuration["Redis:AiDb"], System.Globalization.CultureInfo.InvariantCulture, out var db) ? db : 2;
 
     public async Task<ConversationSnapshot> GetConversation(Guid conversationId, string userId)
     {
@@ -74,7 +74,7 @@ public class ConversationStore(IRedisStore store, IConfiguration configuration) 
         {
             traceParents.AddRange(
                 result.TraceParents
-                    .Where(tp => tp != traceParent)
+                    .Where(tp => !string.Equals(tp, traceParent, StringComparison.Ordinal))
                     .TakeLast(15)
             );
         }

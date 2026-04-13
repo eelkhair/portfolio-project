@@ -36,7 +36,7 @@ public class StandardResponsesOperationFilter(IServiceProvider serviceProvider) 
         {
             AddResponseWithExample(context, serviceProvider, operation, "400", "Bad Request", typeof(ValidationFailureResponseExample));
         }
-        
+
 
         var hasAllowAnonymous = context.MethodInfo.GetCustomAttributes(typeof(AllowAnonymousAttribute), true).Length != 0;
         if (hasAllowAnonymous) return;
@@ -64,7 +64,7 @@ public class StandardResponsesOperationFilter(IServiceProvider serviceProvider) 
                 });
             }
         }
-        
+
         operation.Responses.TryAdd(statusCode, response);
     }
 }

@@ -1,7 +1,4 @@
 using System.Collections.Concurrent;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using JobBoard.Application.Interfaces.Storage;
@@ -10,7 +7,7 @@ namespace JobBoard.Infrastructure.BlobStorage;
 
 public class AzureBlobStorageService(BlobServiceClient blobServiceClient) : IBlobStorageService
 {
-    private static readonly ConcurrentDictionary<string, bool> EnsuredContainers = new();
+    private static readonly ConcurrentDictionary<string, bool> EnsuredContainers = new(StringComparer.Ordinal);
 
     public async Task<string> UploadAsync(string container, string blobName, Stream stream, string contentType,
         CancellationToken cancellationToken)

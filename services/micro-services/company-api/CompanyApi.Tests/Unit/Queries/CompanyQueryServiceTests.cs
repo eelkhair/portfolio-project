@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using CompanyApi.Application.Queries;
 using CompanyApi.Infrastructure.Data;
 using CompanyApi.Infrastructure.Data.Entities;
@@ -6,7 +7,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Shouldly;
-using System.Security.Claims;
 
 namespace CompanyApi.Tests.Unit.Queries;
 

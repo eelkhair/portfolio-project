@@ -1,4 +1,4 @@
-﻿using JobBoard.Domain.Aggregates;
+using JobBoard.Domain.Aggregates;
 using JobBoard.Domain.Exceptions;
 using JobBoard.Domain.Helpers;
 using JobBoard.Domain.ValueObjects.Job;
@@ -14,7 +14,7 @@ public class Job : BaseAuditableEntity
         Location = string.Empty;
         AboutRole = string.Empty;
     }
-    
+
     private Job(string title, string location, string aboutRole)
     {
         Title = title;
@@ -38,7 +38,7 @@ public class Job : BaseAuditableEntity
 
     private readonly List<Qualification> _qualifications = [];
     public IReadOnlyCollection<Qualification> Qualifications => _qualifications.AsReadOnly();
-    
+
     public void SetTitle(string title) =>
         Title = JobTitle.Create(title).Ensure<JobTitle, string>("Job.InvalidTitle")!;
 
@@ -52,14 +52,14 @@ public class Job : BaseAuditableEntity
         SalaryRange = JobSalaryRange.Create(salaryRange).Ensure<JobSalaryRange, string?>("Job.InvalidSalaryRange")!;
 
     public void SetJobType(JobType jobType) => JobType = jobType;
-    
+
     public void AddResponsibility(Responsibility responsibility)
     {
         if (responsibility is null)
         {
             throw new DomainException(
                 "Job.NullResponsibility",
-                [ new Error("Job.NullResponsibility", "Responsibility cannot be null.") ]);
+                [new Error("Job.NullResponsibility", "Responsibility cannot be null.")]);
         }
         responsibility.SetJob(InternalId);
         _responsibilities.Add(responsibility);
@@ -71,7 +71,7 @@ public class Job : BaseAuditableEntity
         {
             throw new DomainException(
                 "Job.NullQualification",
-                [ new Error("Job.NullQualification", "Qualification cannot be null.") ]);
+                [new Error("Job.NullQualification", "Qualification cannot be null.")]);
         }
 
         qualification.SetJob(InternalId);
@@ -93,7 +93,7 @@ public class Job : BaseAuditableEntity
         _qualifications.Remove(qualification);
         qualification.SetJob(0);
     }
-    
+
     public static Job Create(JobInput jobInput)
     {
         var job = ValidateAndCreate(jobInput);
@@ -124,10 +124,10 @@ public class Job : BaseAuditableEntity
                 job.AddQualification(qualification);
             }
         }
- 
+
         job.InternalId = jobInput.InternalId;
         job.Id = jobInput.UId;
-        
+
         return job;
     }
 

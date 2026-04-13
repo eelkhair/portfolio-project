@@ -256,6 +256,7 @@ public class KeycloakCommandServiceTests
                 {
                     Message = null,
                     Errors = new Dictionary<string, string[]>
+(StringComparer.Ordinal)
                     {
                         ["field1"] = ["Validation error detail"]
                     }

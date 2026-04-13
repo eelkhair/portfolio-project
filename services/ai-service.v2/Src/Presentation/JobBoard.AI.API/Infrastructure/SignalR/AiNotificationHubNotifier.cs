@@ -1,6 +1,6 @@
 using System.Diagnostics;
-using JobBoard.AI.Application.Interfaces.Notifications;
 using Elkhair.Common.Observability.Observability;
+using JobBoard.AI.Application.Interfaces.Notifications;
 using Microsoft.AspNetCore.SignalR;
 
 #pragma warning disable CS1591
@@ -28,7 +28,7 @@ public class AiNotificationHubNotifier(
             {
                 act?.SetTag("correlation.id", payload.CorrelationId);
             }
-            
+
             act?.SetTag("enduser.id", userId);
 
             await hub.Clients.Group(userId).SendAsync(method, payload, ct);

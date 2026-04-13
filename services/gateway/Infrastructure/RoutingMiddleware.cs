@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Text.RegularExpressions;
 
 namespace Gateway.Api.Infrastructure;
 
@@ -9,13 +8,13 @@ namespace Gateway.Api.Infrastructure;
 /// </summary>
 public class RoutingMiddleware(RequestDelegate next, IConfiguration configuration)
 {
-  public async Task InvokeAsync(HttpContext context)
+    public async Task InvokeAsync(HttpContext context)
     {
-        if (context.Request.Path.StartsWithSegments("/ai/v2")
-            || context.Request.Path.StartsWithSegments("/dapr/config")
-            || context.Request.Path.StartsWithSegments("/dapr/subscribe"))
+        if (context.Request.Path.StartsWithSegments("/ai/v2", StringComparison.Ordinal)
+            || context.Request.Path.StartsWithSegments("/dapr/config", StringComparison.Ordinal)
+            || context.Request.Path.StartsWithSegments("/dapr/subscribe", StringComparison.Ordinal))
         {
-            if (context.Request.Path.StartsWithSegments("/ai/v2"))
+            if (context.Request.Path.StartsWithSegments("/ai/v2", StringComparison.Ordinal))
                 Activity.Current?.SetTag("service", "AI V2");
 
             await next(context);
@@ -27,7 +26,7 @@ public class RoutingMiddleware(RequestDelegate next, IConfiguration configuratio
             ? clientMode
             : configuration.GetValue<bool>("FeatureFlags:Monolith") ? "monolith" : "admin";
         context.Request.Headers["x-mode"] = mode;
-        Activity.Current?.SetTag("service", mode == "monolith" ? "Monolith" : "Admin");
+        Activity.Current?.SetTag("service", string.Equals(mode, "monolith", StringComparison.Ordinal) ? "Monolith" : "Admin");
 
         await next(context);
     }

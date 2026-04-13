@@ -1,18 +1,17 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using CompanyApi.Application.Commands.Interfaces;
-using CompanyAPI.Contracts.Models.Companies.Requests;
-using CompanyAPI.Contracts.Models.Companies.Responses;
 using CompanyApi.Infrastructure.Data;
 using CompanyApi.Infrastructure.Data.Entities;
+using CompanyAPI.Contracts.Models.Companies.Requests;
+using CompanyAPI.Contracts.Models.Companies.Responses;
 using Elkhair.Dev.Common.Dapr;
 using JobBoard.IntegrationEvents.Company;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace CompanyApi.Application.Commands;
 
-public partial class CompanyCommandService(ICompanyDbContext context, IMessageSender messageSender, ILogger<CompanyCommandService> logger): ICompanyCommandService
+public partial class CompanyCommandService(ICompanyDbContext context, IMessageSender messageSender, ILogger<CompanyCommandService> logger) : ICompanyCommandService
 {
     private static readonly TypeAdapterConfig IgnoreIndustryConfig = TypeAdapterConfig.GlobalSettings.Fork(c =>
         c.NewConfig<Company, CompanyResponse>().Ignore(dest => dest.IndustryUId));

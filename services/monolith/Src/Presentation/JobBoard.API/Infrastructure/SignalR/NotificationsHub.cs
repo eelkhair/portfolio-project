@@ -1,6 +1,5 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Configuration;
 
 namespace JobBoard.API.Infrastructure.SignalR;
 
@@ -37,7 +36,7 @@ public class NotificationsHub(ActivitySource activitySource, IServiceProvider se
             var configuration = serviceProvider.GetRequiredService<IConfiguration>();
             var flags = configuration.GetSection("FeatureFlags")
                 .GetChildren()
-                .ToDictionary(c => c.Key, c => bool.TryParse(c.Value, out var b) && b);
+                .ToDictionary(c => c.Key, c => bool.TryParse(c.Value, out var b) && b, StringComparer.Ordinal);
 
             if (flags.Count > 0)
                 await Clients.Caller.SendAsync("featureFlagsUpdated", new { flags });

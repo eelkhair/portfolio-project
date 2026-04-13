@@ -1,6 +1,5 @@
 using JobBoard.AI.Application.Interfaces.Clients;
 using JobBoard.AI.Application.Interfaces.Configurations;
-using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Application.Interfaces.Persistence;
 using JobBoard.AI.Infrastructure.AI.AITools.Public;
 using Microsoft.Extensions.AI;

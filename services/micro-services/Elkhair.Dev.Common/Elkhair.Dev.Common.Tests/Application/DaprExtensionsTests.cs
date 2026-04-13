@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Elkhair.Dev.Common.Application;
 using Shouldly;
 

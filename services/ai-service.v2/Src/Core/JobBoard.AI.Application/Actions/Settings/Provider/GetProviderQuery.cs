@@ -6,7 +6,7 @@ namespace JobBoard.AI.Application.Actions.Settings.Provider;
 
 public class GetProviderQuery : BaseQuery<GetProviderResponse>
 {
-    
+
 }
 
 public class GetProviderQueryHandler(ILogger<GetProviderQuery> logger, ISettingsService settingsService) : BaseQueryHandler(logger), IHandler<GetProviderQuery, GetProviderResponse>

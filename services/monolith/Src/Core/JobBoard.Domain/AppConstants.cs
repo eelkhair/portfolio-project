@@ -40,7 +40,7 @@ public static class MonolithTopicNames
     public const string DraftSavedV1 = "monolith.draft-saved.v1";
     public const string DraftDeletedV1 = "monolith.draft-deleted.v1";
 
-    private static readonly Dictionary<string, string> EventTypeToTopic = new()
+    private static readonly Dictionary<string, string> EventTypeToTopic = new(StringComparer.Ordinal)
     {
         ["company.created.v1"] = CompanyCreatedV1,
         ["company.updated.v1"] = CompanyUpdatedV1,

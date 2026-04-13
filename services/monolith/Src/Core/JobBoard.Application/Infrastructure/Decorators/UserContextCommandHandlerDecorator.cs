@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using JobBoard.Application.Interfaces.Configurations;
-using JobBoard.Application.Interfaces.Observability;
 using JobBoard.Application.Interfaces.Users;
 using JobBoard.Mcp.Common;
 
@@ -19,7 +18,7 @@ public class UserContextCommandHandlerDecorator<TRequest, TResult>(
             return await decorated.HandleAsync(request, cancellationToken);
 
         // Outbox processor: internal system user, skip DB sync and tracing
-        if (typeof(TRequest).Name == "ProcessOutboxMessageCommand")
+        if (string.Equals(typeof(TRequest).Name, "ProcessOutboxMessageCommand", StringComparison.Ordinal))
         {
             request.UserId = userAccessor.UserId;
             return await decorated.HandleAsync(request, cancellationToken);

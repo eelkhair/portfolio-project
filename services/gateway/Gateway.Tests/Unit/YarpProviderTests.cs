@@ -22,7 +22,7 @@ public class YarpProviderTests
     {
         // Act
         var routes = YarpProvider.GetRoutes();
-        var aiRoute = routes.SingleOrDefault(r => r.RouteId == "ai-v2");
+        var aiRoute = routes.SingleOrDefault(r => string.Equals(r.RouteId, "ai-v2", StringComparison.Ordinal));
 
         // Assert
         aiRoute.ShouldNotBeNull();
@@ -35,7 +35,7 @@ public class YarpProviderTests
     {
         // Act
         var routes = YarpProvider.GetRoutes();
-        var aiRoute = routes.Single(r => r.RouteId == "ai-v2");
+        var aiRoute = routes.Single(r => string.Equals(r.RouteId, "ai-v2", StringComparison.Ordinal));
 
         // Assert
         aiRoute.Transforms.ShouldNotBeNull();
@@ -48,7 +48,7 @@ public class YarpProviderTests
     {
         // Act
         var routes = YarpProvider.GetRoutes();
-        var publicRoute = routes.SingleOrDefault(r => r.RouteId == "public-api");
+        var publicRoute = routes.SingleOrDefault(r => string.Equals(r.RouteId, "public-api", StringComparison.Ordinal));
 
         // Assert
         publicRoute.ShouldNotBeNull();
@@ -62,7 +62,7 @@ public class YarpProviderTests
     {
         // Act
         var routes = YarpProvider.GetRoutes();
-        var adminRoute = routes.SingleOrDefault(r => r.RouteId == "admin-api");
+        var adminRoute = routes.SingleOrDefault(r => string.Equals(r.RouteId, "admin-api", StringComparison.Ordinal));
 
         // Assert
         adminRoute.ShouldNotBeNull();
@@ -78,7 +78,7 @@ public class YarpProviderTests
     {
         // Act
         var routes = YarpProvider.GetRoutes();
-        var monolithRoute = routes.SingleOrDefault(r => r.RouteId == "monolith-api");
+        var monolithRoute = routes.SingleOrDefault(r => string.Equals(r.RouteId, "monolith-api", StringComparison.Ordinal));
 
         // Assert
         monolithRoute.ShouldNotBeNull();
@@ -95,6 +95,7 @@ public class YarpProviderTests
         // Arrange
         var config = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
+(StringComparer.Ordinal)
             {
                 ["AiServiceUrl"] = "http://localhost:5010",
                 ["AdminApiUrl"] = "http://localhost:5020",
@@ -119,6 +120,7 @@ public class YarpProviderTests
         // Arrange
         var config = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
+(StringComparer.Ordinal)
             {
                 [configKey] = expectedAddress
             })
@@ -126,7 +128,7 @@ public class YarpProviderTests
 
         // Act
         var clusters = YarpProvider.GetClusters(config);
-        var cluster = clusters.SingleOrDefault(c => c.ClusterId == clusterId);
+        var cluster = clusters.SingleOrDefault(c => string.Equals(c.ClusterId, clusterId, StringComparison.Ordinal));
 
         // Assert
         cluster.ShouldNotBeNull();
@@ -139,20 +141,20 @@ public class YarpProviderTests
     {
         // Arrange
         var config = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?>())
+            .AddInMemoryCollection(new Dictionary<string, string?>(StringComparer.Ordinal))
             .Build();
 
         // Act
         var clusters = YarpProvider.GetClusters(config);
 
         // Assert
-        var aiCluster = clusters.Single(c => c.ClusterId == "ai-v2");
+        var aiCluster = clusters.Single(c => string.Equals(c.ClusterId, "ai-v2", StringComparison.Ordinal));
         aiCluster.Destinations!["default"].Address.ShouldBe("http://ai-service-v2:8080");
 
-        var adminCluster = clusters.Single(c => c.ClusterId == "admin");
+        var adminCluster = clusters.Single(c => string.Equals(c.ClusterId, "admin", StringComparison.Ordinal));
         adminCluster.Destinations!["default"].Address.ShouldBe("http://admin-api:8080");
 
-        var monolithCluster = clusters.Single(c => c.ClusterId == "monolith");
+        var monolithCluster = clusters.Single(c => string.Equals(c.ClusterId, "monolith", StringComparison.Ordinal));
         monolithCluster.Destinations!["default"].Address.ShouldBe("http://monolith-api:8080");
     }
 }

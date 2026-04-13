@@ -1,6 +1,6 @@
+using Elkhair.Common.Observability.Observability;
 using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Infrastructure.Diagnostics.Observability;
-using Elkhair.Common.Observability.Observability;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry.Metrics;
@@ -45,7 +45,7 @@ public static class DependencyInjection
                  {
                      // Suppress MCP SSE probe (GET / to MCP server ports)
                      if (msg.Method == HttpMethod.Get &&
-                         msg.RequestUri?.AbsolutePath == "/" &&
+string.Equals(msg.RequestUri?.AbsolutePath, "/", StringComparison.Ordinal) &&
                          msg.RequestUri?.Port is 3333 or 3334)
                          return false;
                      return baseFilter?.Invoke(msg) ?? true;

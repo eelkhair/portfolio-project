@@ -1,7 +1,6 @@
 using JobBoard.AI.API.Infrastructure.Authorization;
 using JobBoard.AI.Application.Actions.Jobs.ReEmbedAll;
 using JobBoard.AI.Application.Actions.Resumes.MatchExplanations;
-using JobBoard.AI.Application.Actions.Settings;
 using JobBoard.AI.Application.Actions.Settings.ApplicationMode;
 using JobBoard.AI.Application.Actions.Settings.FeatureFlags;
 using JobBoard.AI.Application.Actions.Settings.Provider;
@@ -21,9 +20,9 @@ public class SettingsController : BaseApiController
     /// <returns></returns>
     [HttpGet("provider")]
     [StandardApiResponses]
-    public async Task<IActionResult> GetProvider() 
+    public async Task<IActionResult> GetProvider()
         => await ExecuteQueryAsync(new GetProviderQuery(), Ok);
-    
+
 
     /// <summary>
     /// Update Settings for the application
@@ -35,16 +34,16 @@ public class SettingsController : BaseApiController
     [StandardApiResponses]
     public async Task<IActionResult> UpdateProvider(UpdateProviderRequest request)
         => await ExecuteCommandAsync(new UpdateProviderCommand(request), Ok);
-    
+
     /// <summary>
     /// Get current application mode
     /// </summary>
     /// <returns></returns>
     [HttpGet("mode")]
     [StandardApiResponses]
-    public async Task<IActionResult> GetApplicationMode() 
+    public async Task<IActionResult> GetApplicationMode()
         => await ExecuteQueryAsync(new GetApplicationModeQuery(), Ok);
-    
+
     /// <summary>
     /// Set application mode
     /// <param name="request"></param>

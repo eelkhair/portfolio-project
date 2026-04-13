@@ -15,7 +15,7 @@ namespace JobBoard.AI.API.Infrastructure.OpenApi;
 /// </summary>
 public static class DependencyInjection
 {
- 
+
     public static IServiceCollection AddConfiguredSwagger(
         this IServiceCollection services,
         IConfiguration configuration)
@@ -49,6 +49,7 @@ public static class DependencyInjection
             if (!string.IsNullOrEmpty(authority))
             {
                 var scopes = new Dictionary<string, string>
+(StringComparer.Ordinal)
                 {
                     { "openid", "OpenID" },
                     { "profile", "Profile" },
@@ -73,9 +74,9 @@ public static class DependencyInjection
 
                 c.AddSecurityRequirement(doc =>
                     new OpenApiSecurityRequirement
-                {
-                    [new OpenApiSecuritySchemeReference("oauth2", doc)] = new List<string>()
-                });
+                    {
+                        [new OpenApiSecuritySchemeReference("oauth2", doc)] = new List<string>()
+                    });
             }
 
             // TraceId response header (observability)
@@ -83,6 +84,7 @@ public static class DependencyInjection
 
             // Stable operation ordering
             var httpMethodOrder = new Dictionary<string, int>
+(StringComparer.Ordinal)
             {
                 { "GET", 1 },
                 { "POST", 2 },
@@ -122,6 +124,7 @@ public static class DependencyInjection
             options.SwaggerEndpoint("/swagger/v1/swagger.json", "JobBoard AI Service v2");
             options.RoutePrefix = "swagger";
             options.OAuthAdditionalQueryStringParams(new Dictionary<string, string>
+(StringComparer.Ordinal)
             {
                 { "prompt", "login" }
             });

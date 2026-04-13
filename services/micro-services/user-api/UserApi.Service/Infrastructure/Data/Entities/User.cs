@@ -1,4 +1,4 @@
-﻿using Elkhair.Dev.Common.Domain.Entities;
+using Elkhair.Dev.Common.Domain.Entities;
 
 namespace UserApi.Infrastructure.Data.Entities;
 
@@ -9,6 +9,6 @@ public class User : BaseAuditableEntity
     public required string Email { get; set; }
     public string? KeycloakUserId { get; set; }
 
-    public ICollection<UserCompany> UserCompanies { get; set; }
-    
+    public ICollection<UserCompany>? UserCompanies { get; set; }
+
 }

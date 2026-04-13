@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using JobBoard.AI.Application.Interfaces.Configurations;
-using JobBoard.AI.Application.Interfaces.Observability;
 
 namespace JobBoard.AI.Application.Infrastructure.Decorators;
 

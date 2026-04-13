@@ -1,11 +1,9 @@
-using System.Text.Json;
 using JobBoard.Application.Interfaces;
 using JobBoard.Domain.Entities.Infrastructure;
 using JobBoard.Infrastructure.Outbox;
 using JobBoard.IntegrationEvents;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
-using Shouldly;
 
 namespace JobBoard.Monolith.Tests.Unit.Infrastructure;
 

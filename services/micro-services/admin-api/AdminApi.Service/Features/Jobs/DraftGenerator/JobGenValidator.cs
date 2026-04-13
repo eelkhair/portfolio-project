@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using AdminAPI.Contracts.Models.Jobs.Requests;
 using FastEndpoints;
 using FluentValidation;

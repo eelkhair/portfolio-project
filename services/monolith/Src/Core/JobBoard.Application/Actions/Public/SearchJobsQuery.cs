@@ -2,7 +2,6 @@ using JobBoard.Application.Actions.Base;
 using JobBoard.Application.Interfaces;
 using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Application.Interfaces.Infrastructure;
-using JobBoard.Domain.Entities;
 using JobBoard.Monolith.Contracts.Jobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -53,7 +52,7 @@ public class SearchJobsQueryHandler(
             : rankedJobs)
             .Take(request.Limit)
             .ToList();
-        
+
         return orderedJobs.Select(job => new JobResponse
         {
             Id = job!.Id,
@@ -68,7 +67,7 @@ public class SearchJobsQueryHandler(
             Qualifications = job.Qualifications.Select(q => q.Value).ToList(),
             CreatedAt = job.CreatedAt,
             UpdatedAt = job.UpdatedAt
-            
+
         }).ToList();
     }
 }

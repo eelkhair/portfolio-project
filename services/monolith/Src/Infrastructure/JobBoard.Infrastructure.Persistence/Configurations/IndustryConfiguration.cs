@@ -1,4 +1,4 @@
-﻿using JobBoard.Domain.Entities;
+using JobBoard.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,18 +8,18 @@ public class IndustryConfiguration : IEntityTypeConfiguration<Industry>
 {
     public void Configure(EntityTypeBuilder<Industry> builder)
     {
-        builder.ToTable("Industries","Company");
+        builder.ToTable("Industries", "Company");
 
         builder.ConfigureBusinessEntity();
         builder.ConfigureAuditableProperties();
-        
+
         builder.Property(i => i.Name)
             .IsRequired()
             .HasMaxLength(250);
 
         builder.HasIndex(i => i.Name)
             .IsUnique();
-        
+
         builder.Metadata
             .FindNavigation(nameof(Industry.Companies))!
             .SetPropertyAccessMode(PropertyAccessMode.Field);

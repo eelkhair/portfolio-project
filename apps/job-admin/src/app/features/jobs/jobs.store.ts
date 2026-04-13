@@ -56,15 +56,14 @@ export class JobsStore {
   }
 
   generateDraft(payload: JobGenRequest) {
-    return this.jobService.generateDraft(this.selectedCompany()?.uId!, payload).pipe(tap(job => {
+    return this.jobService.generateDraft(this.selectedCompany()?.uId ?? '', payload).pipe(tap(job => {
       this.aiResponse.set(job.data)
     }));
   }
   saveDraft(payload: Draft) {
-    const companyId = this.selectedCompany()?.uId!;
+    const companyId = this.selectedCompany()?.uId ?? '';
     return this.jobService.saveDraft(companyId, payload).pipe(tap(job => {
-      let draft: JobGenResponse;
-      draft = {
+      const draft: JobGenResponse = {
         aboutRole: job.data?.aboutRole??'',
         id: job.data?.id,
         location: job.data?.location??'',
@@ -131,10 +130,10 @@ export class JobsStore {
 
     this.skillSuggestions = includeQuery ? [e.query, ...base] : base;
   }
-  getAllErrors(control: import('@angular/forms').AbstractControl, path: string = ''): Array<{
+  getAllErrors(control: import('@angular/forms').AbstractControl, path = ''): {
     path: string; validator: string; details: any;
-  }> {
-    const out: Array<{ path: string; validator: string; details: any }> = [];
+  }[] {
+    const out: { path: string; validator: string; details: any }[] = [];
 
     if (control.errors) {
       Object.entries(control.errors).forEach(([validator, details]) => {
@@ -206,7 +205,7 @@ export class JobsStore {
 
 
   deleteDraft(draftId: string) {
-    const companyId = this.selectedCompany()?.uId!;
+    const companyId = this.selectedCompany()?.uId ?? '';
     return this.jobService.deleteDraft(companyId, draftId).pipe(tap(() => {
       this.drafts.update(list => list.filter(d => d.id !== draftId));
       this.notificationService.success('Success', 'Draft deleted successfully.');

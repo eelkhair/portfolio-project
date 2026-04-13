@@ -1,9 +1,9 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Microsoft.AspNetCore.SignalR;
 
 namespace AdminApi.Infrastructure;
 
-public class NotificationsHub(ActivitySource activitySource): Hub
+public class NotificationsHub(ActivitySource activitySource) : Hub
 {
     public override async Task OnConnectedAsync()
     {

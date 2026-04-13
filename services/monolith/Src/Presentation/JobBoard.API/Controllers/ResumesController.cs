@@ -3,20 +3,20 @@ using JobBoard.API.Helpers;
 using JobBoard.API.Infrastructure.SignalR.ResumeParse;
 using JobBoard.Application.Actions.Jobs.MatchingJobs;
 using JobBoard.Application.Actions.Resumes.CompleteParse;
-using JobBoard.Application.Actions.Resumes.SectionParsed;
 using JobBoard.Application.Actions.Resumes.Delete;
 using JobBoard.Application.Actions.Resumes.Download;
 using JobBoard.Application.Actions.Resumes.FailParse;
 using JobBoard.Application.Actions.Resumes.GetParsedContent;
 using JobBoard.Application.Actions.Resumes.List;
 using JobBoard.Application.Actions.Resumes.ReEmbed;
+using JobBoard.Application.Actions.Resumes.SectionParsed;
 using JobBoard.Application.Actions.Resumes.SetDefault;
 using JobBoard.Application.Actions.Resumes.Upload;
 using JobBoard.Application.Infrastructure.Exceptions;
 using JobBoard.Application.Interfaces.Configurations;
+using JobBoard.Domain;
 using JobBoard.Mcp.Common;
 using JobBoard.Monolith.Contracts.Public;
-using JobBoard.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -173,7 +173,7 @@ public class ResumesController(IUserAccessor accessor, IResumeParseNotifier resu
 
         return Ok();
     }
-    
+
     /// <summary>
     /// Callback from AI service after resume embedding completes successfully.
     /// </summary>

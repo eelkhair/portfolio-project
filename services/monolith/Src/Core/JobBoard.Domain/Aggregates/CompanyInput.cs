@@ -1,4 +1,4 @@
-﻿namespace JobBoard.Domain.Aggregates;
+namespace JobBoard.Domain.Aggregates;
 
 public sealed record CompanyInput(
     int InternalId,

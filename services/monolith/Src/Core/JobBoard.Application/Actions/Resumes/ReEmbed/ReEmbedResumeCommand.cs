@@ -3,7 +3,6 @@ using JobBoard.Application.Actions.Base;
 using JobBoard.Application.Infrastructure.Exceptions;
 using JobBoard.Application.Interfaces;
 using JobBoard.Application.Interfaces.Configurations;
-using JobBoard.Application.Interfaces.Observability;
 using JobBoard.Domain.Entities.Users;
 using JobBoard.IntegrationEvents.Resume;
 using Microsoft.EntityFrameworkCore;

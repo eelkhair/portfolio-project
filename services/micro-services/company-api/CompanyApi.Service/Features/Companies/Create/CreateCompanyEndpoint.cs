@@ -22,7 +22,7 @@ public class CreateCompanyEndpoint(ICompanyCommandService service, ILogger<Creat
 
         logger.LogInformation("Creating Company: {Name}", request.Name);
         var company = await service.CreateAsync(request, User, ct);
-        await Send.OkAsync(company, cancellation:ct);
+        await Send.OkAsync(company, cancellation: ct);
     }
-    
+
 }

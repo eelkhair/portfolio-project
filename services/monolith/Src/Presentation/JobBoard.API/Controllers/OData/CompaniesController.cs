@@ -1,4 +1,4 @@
-﻿using JobBoard.Application.Actions.Companies.Get;
+using JobBoard.Application.Actions.Companies.Get;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Results;
@@ -23,7 +23,7 @@ public class CompaniesController : BaseODataController
     public async Task<IActionResult> Get()
     {
         var companies = await ExecuteODataQueryAsync(new GetCompaniesQuery());
-       
+
         return Ok(companies);
     }
 
@@ -36,9 +36,9 @@ public class CompaniesController : BaseODataController
     [HttpGet("odata/companies({id})")]
     public async Task<ActionResult> GetById(Guid id)
     {
-       var companies = await ExecuteODataQueryAsync(new GetCompaniesQuery());
-       var company = companies.FirstOrDefault(c => c.Id == id);
-       return Ok(company);
+        var companies = await ExecuteODataQueryAsync(new GetCompaniesQuery());
+        var company = companies.FirstOrDefault(c => c.Id == id);
+        return Ok(company);
     }
 
     /// <summary>
@@ -52,4 +52,4 @@ public class CompaniesController : BaseODataController
         var summaries = await ExecuteODataQueryAsync(new GetCompanyJobSummariesQuery());
         return Ok(summaries);
     }
-  }
+}

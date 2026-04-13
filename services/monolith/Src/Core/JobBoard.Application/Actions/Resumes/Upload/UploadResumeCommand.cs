@@ -2,7 +2,6 @@ using System.Diagnostics;
 using JobBoard.Application.Actions.Base;
 using JobBoard.Application.Interfaces;
 using JobBoard.Application.Interfaces.Configurations;
-using JobBoard.Application.Interfaces.Observability;
 using JobBoard.Application.Interfaces.Storage;
 using JobBoard.Domain.Aggregates;
 using JobBoard.Domain.Entities.Users;

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using ConnectorAPI.Interfaces.Clients;
 using ConnectorAPI.Mappers;
 using ConnectorAPI.Models;

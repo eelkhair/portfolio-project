@@ -1,4 +1,4 @@
-﻿using Dapr.Client;
+using Dapr.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -44,7 +44,7 @@ public sealed class ConfigurationWatcher : BackgroundService
         {
             try
             {
-                var featureFlags = new Dictionary<string, bool>();
+                var featureFlags = new Dictionary<string, bool>(StringComparer.Ordinal);
                 var config = await _daprClient.GetConfiguration(
                     storeName,
                     new List<string>(),
@@ -52,13 +52,13 @@ public sealed class ConfigurationWatcher : BackgroundService
 
                 foreach (var kvp in config.Items)
                 {
-                    if (!kvp.Key.StartsWith($"jobboard:config:{_serviceName}") &&
-                        !kvp.Key.StartsWith("jobboard:config:global"))
+                    if (!kvp.Key.StartsWith($"jobboard:config:{_serviceName}", StringComparison.Ordinal) &&
+                        !kvp.Key.StartsWith("jobboard:config:global", StringComparison.Ordinal))
                         continue;
 
                     var cleanedKey = CleanKey(kvp.Key, _serviceName);
 
-                    if (cleanedKey.StartsWith("FeatureFlags:"))
+                    if (cleanedKey.StartsWith("FeatureFlags:", StringComparison.Ordinal))
                     {
                         var isEnabled = bool.TryParse(kvp.Value.Value, out var enabled) && enabled;
                         featureFlags[cleanedKey.Replace("FeatureFlags:", "")] = isEnabled;
@@ -66,14 +66,14 @@ public sealed class ConfigurationWatcher : BackgroundService
 
                     _configuration[cleanedKey] = kvp.Value.Value;
                 }
-                
+
                 await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error while watching for configuration changes");
             }
-           
+
         }
     }
 

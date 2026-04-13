@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Elkhair.Common.Observability;
 using Gateway.Api.Infrastructure;
 using JobBoard.Infrastructure.RedisConfig;
@@ -6,7 +5,7 @@ using JobBoard.Infrastructure.Vault;
 const string CorsPolicy = "AllowJobAdmin";
 
 var builder = WebApplication.CreateBuilder(args);
-var isAspire = builder.Configuration["ASPIRE_MODE"] == "true";
+var isAspire = string.Equals(builder.Configuration["ASPIRE_MODE"], "true", StringComparison.Ordinal);
 if (!isAspire) builder.AddVaultSecrets("gateway");
 (await builder.AddRedisConfiguration("gateway", TimeSpan.FromSeconds(1)))
     .ConfigureLogging("gateway")

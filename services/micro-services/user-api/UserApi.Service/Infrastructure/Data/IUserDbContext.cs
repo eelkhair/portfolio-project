@@ -1,4 +1,3 @@
-﻿using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using UserApi.Infrastructure.Data.Entities;
 

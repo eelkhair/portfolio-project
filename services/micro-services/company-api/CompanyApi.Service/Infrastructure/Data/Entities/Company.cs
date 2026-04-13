@@ -1,4 +1,3 @@
-using Dapr.Client.Autogen.Grpc.v1;
 using Elkhair.Dev.Common.Domain.Entities;
 
 namespace CompanyApi.Infrastructure.Data.Entities;
@@ -16,7 +15,7 @@ public class Company : BaseAuditableEntity
     public string? Size { get; set; }
     public string? Logo { get; set; }
     public required string Status { get; set; }
-    
+
     public required int IndustryId { get; set; }
     public Industry Industry { get; set; } = null!;
 }

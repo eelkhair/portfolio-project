@@ -8,17 +8,17 @@ using StackExchange.Redis;
 
 namespace JobBoard.AI.Infrastructure.Configuration.Services;
 
-public class SettingsService(IRedisStore store, IConfiguration configuration, IConnectionMultiplexer mux): ISettingsService
+public class SettingsService(IRedisStore store, IConfiguration configuration, IConnectionMultiplexer mux) : ISettingsService
 {
     private const string ProviderKey = "jobboard:config:ai-service-v2:AIProvider";
     private const string ModelKey = "jobboard:config:ai-service-v2:AIModel";
     private const string IsMonolithKey = "jobboard:config:global:FeatureFlags:Monolith";
-    private int ConfigDb { get; } = int.TryParse(configuration["Redis:ConfigDb"], out var db) ? db : 1;
+    private int ConfigDb { get; } = int.TryParse(configuration["Redis:ConfigDb"], System.Globalization.CultureInfo.InvariantCulture, out var db) ? db : 1;
     public async Task<GetProviderResponse> GetProviderAsync()
     {
         var provider = await store.GetAsync<string>(ProviderKey, ConfigDb);
         var model = await store.GetAsync<string>(ModelKey, ConfigDb);
-        
+
         var result = new GetProviderResponse
         {
             Provider = provider ?? "openai",
@@ -35,7 +35,7 @@ public class SettingsService(IRedisStore store, IConfiguration configuration, IC
     {
         Activity.Current?.SetTag("ai.provider", request.Provider);
         Activity.Current?.SetTag("ai.model", request.Model);
-        
+
         await store.SetAsync(ProviderKey, request.Provider, ConfigDb);
         await store.SetAsync(ModelKey, request.Model, ConfigDb);
         return Unit.Value;
@@ -48,10 +48,11 @@ public class SettingsService(IRedisStore store, IConfiguration configuration, IC
         Activity.Current?.SetTag("isMonolith", isMonolith);
         return new ApplicationModeDto
         {
-            IsMonolith = isMonolith == "true"
+            IsMonolith = string.Equals(isMonolith, "true"
+, StringComparison.Ordinal)
         };
     }
-    
+
     public async Task<Unit> UpdateApplicationModeAsync(ApplicationModeDto request)
     {
         Activity.Current?.SetTag("isMonolith", request.IsMonolith);
@@ -75,11 +76,12 @@ public class SettingsService(IRedisStore store, IConfiguration configuration, IC
             flags.Add(new UpdateFeatureFlagRequest
             {
                 Name = name,
-                Enabled = value.HasValue && value.ToString() == "true"
+                Enabled = value.HasValue && string.Equals(value.ToString(), "true"
+, StringComparison.Ordinal)
             });
         }
 
-        return flags.OrderBy(f => f.Name).ToList();
+        return flags.OrderBy(f => f.Name, StringComparer.Ordinal).ToList();
     }
 
     public async Task<Unit> UpdateFeatureFlagAsync(UpdateFeatureFlagRequest request)

@@ -9,7 +9,6 @@ using JobBoard.Application.Actions.Public;
 using JobBoard.Monolith.Contracts.Drafts;
 using JobBoard.Monolith.Contracts.Jobs;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Server;
 
 namespace JobBoard.API.Mcp.Tools;

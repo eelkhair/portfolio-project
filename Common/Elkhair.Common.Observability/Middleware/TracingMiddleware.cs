@@ -14,14 +14,14 @@ public class TracingMiddleware(RequestDelegate next, ILogger<TracingMiddleware> 
     public async Task InvokeAsync(HttpContext context)
     {
         var path = context.Request.Path.Value ?? "";
-        var skip = path == "/" || SkipPaths.Any(p => path.StartsWith(p, StringComparison.OrdinalIgnoreCase));
+        var skip = string.Equals(path, "/", StringComparison.Ordinal) || SkipPaths.Any(p => path.StartsWith(p, StringComparison.OrdinalIgnoreCase));
 
         var activity = Activity.Current;
         if (activity is not null)
         {
             var mode = context.Request.Headers["x-mode"].FirstOrDefault();
             if (!string.IsNullOrEmpty(mode))
-                activity.SetTag("service", mode == "monolith" ? "Monolith" : "Microservices");
+                activity.SetTag("service", string.Equals(mode, "monolith", StringComparison.Ordinal) ? "Monolith" : "Microservices");
         }
 
         context.Response.OnStarting(() =>
@@ -46,6 +46,7 @@ public class TracingMiddleware(RequestDelegate next, ILogger<TracingMiddleware> 
         var operation = activity?.GetTagItem("operation")?.ToString();
 
         using (logger.BeginScope(new Dictionary<string, object?>
+(StringComparer.Ordinal)
         {
             ["HttpMethod"] = method,
             ["RequestPath"] = path,
@@ -96,7 +97,7 @@ public class TracingMiddleware(RequestDelegate next, ILogger<TracingMiddleware> 
     private static string ResolveEndpointName(HttpContext context, string path)
     {
         var endpoint = context.GetEndpoint();
-        if (endpoint?.DisplayName is { } display && !display.StartsWith("HTTP:"))
+        if (endpoint?.DisplayName is { } display && !display.StartsWith("HTTP:", StringComparison.Ordinal))
         {
             // FastEndpoints sets DisplayName to the fully qualified class name
             // Extract just the class name: "AdminApi.Features.Dashboard.GetDashboardEndpoint" -> "GetDashboardEndpoint"

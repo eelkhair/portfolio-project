@@ -15,8 +15,8 @@ public class RewriteDraftItemCommandValidatorTests
         {
             Field = "title",
             Value = "Senior Software Engineer",
-            Context = new Dictionary<string, object> { ["role"] = "Engineer" },
-            Style = new Dictionary<string, object> { ["tone"] = "professional" }
+            Context = new Dictionary<string, object>(StringComparer.Ordinal) { ["role"] = "Engineer" },
+            Style = new Dictionary<string, object>(StringComparer.Ordinal) { ["tone"] = "professional" }
         }
     };
 

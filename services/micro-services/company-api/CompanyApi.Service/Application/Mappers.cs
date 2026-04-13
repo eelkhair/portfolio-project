@@ -1,7 +1,7 @@
+using CompanyApi.Infrastructure.Data.Entities;
 using CompanyAPI.Contracts.Models.Companies.Requests;
 using CompanyAPI.Contracts.Models.Companies.Responses;
 using CompanyAPI.Contracts.Models.Industries.Responses;
-using CompanyApi.Infrastructure.Data.Entities;
 using Mapster;
 
 namespace CompanyApi.Application;
@@ -13,18 +13,18 @@ public class Mappers : IRegister
         #region Company
         config.NewConfig<Company, CompanyResponse>()
             .Map(dest => dest.IndustryUId, src => src.Industry.UId);
-        
-        
+
+
         config.NewConfig<CreateCompanyRequest, Company>()
-            .Map(dest => dest.Email, c=> c.CompanyEmail)
-            .Map(dest => dest.Website, c=> c.CompanyWebsite)
+            .Map(dest => dest.Email, c => c.CompanyEmail)
+            .Map(dest => dest.Website, c => c.CompanyWebsite)
             .Map(dest => dest.CreatedAt, _ => DateTime.UtcNow)
             .Map(dest => dest.UpdatedAt, _ => DateTime.UtcNow);
-        
+
         #endregion
-        
+
         #region Industry
-            config.NewConfig<Industry, IndustryResponse>();
+        config.NewConfig<Industry, IndustryResponse>();
         #endregion
     }
 }

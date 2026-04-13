@@ -1,16 +1,15 @@
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using AdminAPI.Contracts.Services;
 using AdminAPI.Contracts.Models.Jobs.Events;
 using AdminAPI.Contracts.Models.Jobs.Requests;
 using AdminAPI.Contracts.Models.Jobs.Responses;
+using AdminAPI.Contracts.Services;
 using Dapr.Client;
 using Elkhair.Dev.Common.Application;
 using Elkhair.Dev.Common.Dapr;
 using Elkhair.Dev.Common.Domain.Constants;
 using JobAPI.Contracts.Models.Jobs.Responses;
-using Microsoft.Extensions.Logging;
 
 namespace AdminApi.Application.Commands;
 
@@ -62,17 +61,23 @@ public partial class JobCommandService(DaprClient client, UserContextService acc
                 Success = true,
                 StatusCode = HttpStatusCode.OK
             };
-        }catch (Exception e)
+        }
+        catch (Exception e)
         {
             LogCreateDraftError(logger, e);
-            return new ApiResponse<JobDraftResponse> { Success = false, StatusCode = HttpStatusCode.InternalServerError, Exceptions = new ApiError()
+            return new ApiResponse<JobDraftResponse>
             {
-                Message = e.Message,
-                Errors = new Dictionary<string, string[]>()
+                Success = false,
+                StatusCode = HttpStatusCode.InternalServerError,
+                Exceptions = new ApiError()
+                {
+                    Message = e.Message,
+                    Errors = new Dictionary<string, string[]>(StringComparer.Ordinal)
                 {
                     {"Error", [e.Message]}
                 }
-            }};
+                }
+            };
         }
     }
     public async Task<ApiResponse<JobRewriteResponse>> RewriteItem(JobRewriteRequest request, CancellationToken ct)
@@ -111,14 +116,19 @@ public partial class JobCommandService(DaprClient client, UserContextService acc
         catch (Exception e)
         {
             LogRewriteItemError(logger, e);
-            return new ApiResponse<JobRewriteResponse> { Success = false, StatusCode = HttpStatusCode.InternalServerError, Exceptions = new ApiError()
+            return new ApiResponse<JobRewriteResponse>
             {
-                Message = e.Message,
-                Errors = new Dictionary<string, string[]>()
+                Success = false,
+                StatusCode = HttpStatusCode.InternalServerError,
+                Exceptions = new ApiError()
+                {
+                    Message = e.Message,
+                    Errors = new Dictionary<string, string[]>(StringComparer.Ordinal)
                 {
                     {"Error", [e.Message]}
                 }
-            }};
+                }
+            };
         }
     }
 
@@ -195,7 +205,7 @@ public partial class JobCommandService(DaprClient client, UserContextService acc
                 Exceptions = new ApiError
                 {
                     Message = e.Message,
-                    Errors = new Dictionary<string, string[]> { { "Error", [e.Message] } }
+                    Errors = new Dictionary<string, string[]>(StringComparer.Ordinal) { { "Error", [e.Message] } }
                 }
             };
         }

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using CompanyApi.Application.Commands.Interfaces;
 using CompanyAPI.Contracts.Models.Companies;
 using Elkhair.Dev.Common.Application;
@@ -10,16 +10,16 @@ using UserAPI.Contracts.Models.Events;
 namespace CompanyApi.Features.Companies.Events;
 
 
-public class ProvisionUserSuccessTopic(ICompanyCommandService service, IMessageSender sender, ActivitySource activitySource): Endpoint<EventDto<ProvisionUserEvent>>
+public class ProvisionUserSuccessTopic(ICompanyCommandService service, IMessageSender sender, ActivitySource activitySource) : Endpoint<EventDto<ProvisionUserEvent>>
 {
     public override void Configure()
     {
         Post("events/provision-user-success");
         AllowAnonymous();
-        Options(c => 
+        Options(c =>
             c.WithTopic(PubSubNames.RabbitMq, "provision.user.success"));
     }
-    
+
     public override async Task HandleAsync(EventDto<ProvisionUserEvent> request, CancellationToken ct)
     {
         Activity.Current?.SetTag("entity.type", "company");
@@ -32,7 +32,7 @@ public class ProvisionUserSuccessTopic(ICompanyCommandService service, IMessageS
 
         var activated = await service.ActivateAsync(request.Data?.CompanyUId ?? Guid.Empty,
             DaprExtensions.CreateUser(request.UserId), ct);
-        if (request.Data is not null && request.Data.SourceSystem == "AdminApi")
+        if (request.Data is not null && string.Equals(request.Data.SourceSystem, "AdminApi", StringComparison.Ordinal))
         {
             if (activated)
             {

@@ -1,4 +1,4 @@
-﻿namespace JobBoard.Monolith.Contracts.Drafts;
+namespace JobBoard.Monolith.Contracts.Drafts;
 
 public class DraftRewriteResponse
 {
@@ -9,9 +9,9 @@ public class DraftRewriteResponse
 
 public class DraftRewriteMetadata
 {
-    public string? Model{get;set;}
-    public int? PromptTokens{get;set;}
-    public int? CompletionTokens{get;set;}
-    public int? TotalTokens{get;set;}
-    public string? FinishReason{get;set;}
+    public string? Model { get; set; }
+    public int? PromptTokens { get; set; }
+    public int? CompletionTokens { get; set; }
+    public int? TotalTokens { get; set; }
+    public string? FinishReason { get; set; }
 }

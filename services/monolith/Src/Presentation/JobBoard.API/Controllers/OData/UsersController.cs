@@ -1,4 +1,4 @@
-﻿using JobBoard.Application.Actions.Users.Get;
+using JobBoard.Application.Actions.Users.Get;
 using JobBoard.Monolith.Contracts.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
@@ -40,7 +40,7 @@ public class UsersController : BaseODataController
     [EnableQuery]
     public async Task<SingleResult> GetUserById(Guid id)
     {
-        var users =  await ExecuteODataQueryAsync(new GetUsersQuery());
+        var users = await ExecuteODataQueryAsync(new GetUsersQuery());
 
         return SingleResult.Create(users.Where(c => c.Id == id));
     }

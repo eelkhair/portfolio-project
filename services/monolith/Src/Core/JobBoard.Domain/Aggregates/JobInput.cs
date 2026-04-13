@@ -1,4 +1,4 @@
-﻿using JobBoard.Monolith.Contracts.Jobs;
+using JobBoard.Monolith.Contracts.Jobs;
 
 namespace JobBoard.Domain.Aggregates;
 

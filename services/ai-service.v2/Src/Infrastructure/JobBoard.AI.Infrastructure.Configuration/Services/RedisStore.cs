@@ -45,7 +45,7 @@ public sealed class RedisConfigurationStore(IConnectionMultiplexer mux) : IRedis
 
         await _db.StringSetAsync(
             key,
-            typeof(T) != typeof(string) ? json: value.ToString(),
+            typeof(T) != typeof(string) ? json : value.ToString(),
             ttl ?? default(Expiration)
         );
     }
@@ -56,10 +56,11 @@ public sealed class RedisConfigurationStore(IConnectionMultiplexer mux) : IRedis
         return db.KeyExistsAsync(key);
     }
 
-    public Task RemoveAsync(string key, int dbId){
+    public Task RemoveAsync(string key, int dbId)
+    {
         var db = mux.GetDatabase(dbId);
         db.KeyDeleteAsync(key);
         return Task.CompletedTask;
     }
-            
+
 }

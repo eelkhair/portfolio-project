@@ -1,14 +1,13 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using JobApi.Application.Interfaces;
-using JobAPI.Contracts.Models.Companies.Requests;
 using JobApi.Infrastructure.Data;
 using JobApi.Infrastructure.Data.Entities;
+using JobAPI.Contracts.Models.Companies.Requests;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace JobApi.Application;
 
-public partial class CompanyCommandService(IJobDbContext context, ILogger<CompanyCommandService> logger): ICompanyCommandService
+public partial class CompanyCommandService(IJobDbContext context, ILogger<CompanyCommandService> logger) : ICompanyCommandService
 {
     public async Task CreateCompanyAsync(CreateCompanyRequest request, ClaimsPrincipal user, CancellationToken ct)
     {

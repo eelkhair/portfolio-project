@@ -25,7 +25,7 @@ public class HttpUserAccessorTests
         var accessor = CreateAccessor(
             authenticated: true,
             claims: [new Claim("sub", "claim-id")],
-            headers: new Dictionary<string, string> { ["x-user-id"] = "header-id" });
+            headers: new Dictionary<string, string>(StringComparer.Ordinal) { ["x-user-id"] = "header-id" });
 
         accessor.UserId.ShouldBe("header-id");
     }
@@ -94,7 +94,7 @@ public class HttpUserAccessorTests
         var accessor = CreateAccessor(
             authenticated: true,
             claims: [new Claim("sub", "user-1")],
-            headers: new Dictionary<string, string> { ["Authorization"] = "Bearer test-token" });
+            headers: new Dictionary<string, string>(StringComparer.Ordinal) { ["Authorization"] = "Bearer test-token" });
 
         accessor.Token.ShouldBe("Bearer test-token");
     }

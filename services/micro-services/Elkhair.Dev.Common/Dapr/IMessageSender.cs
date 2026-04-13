@@ -1,4 +1,4 @@
-﻿namespace Elkhair.Dev.Common.Dapr;
+namespace Elkhair.Dev.Common.Dapr;
 
 public interface IMessageSender
 {

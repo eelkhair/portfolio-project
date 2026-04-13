@@ -63,8 +63,9 @@ export class JobDrafts{
   ]
   constructor() {
     effect(()=>{
-      if (this.store.selectedCompany()){
-        this.store.loadDrafts(this.store.selectedCompany()?.uId!).subscribe();
+      const company = this.store.selectedCompany();
+      if (company){
+        this.store.loadDrafts(company.uId).subscribe();
       }
     })
   }

@@ -1,16 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace CompanyApi.Infrastructure.Data.Migrations
+namespace CompanyApi.Infrastructure.Data.Migrations;
+
+/// <inheritdoc />
+public partial class SeedIndustries : Migration
 {
     /// <inheritdoc />
-    public partial class SeedIndustries : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.Sql(@"
+        migrationBuilder.Sql(@"
                 MERGE [Company].[Industries] AS target
                 USING (VALUES
                     ('A1B2C3D4-0001-4000-8000-000000000001', 'Technology'),
@@ -37,12 +37,11 @@ namespace CompanyApi.Infrastructure.Data.Migrations
                     INSERT ([UId], [Name], [CreatedAt], [UpdatedAt], [CreatedBy], [UpdatedBy])
                     VALUES (source.[UId], source.[Name], SYSUTCDATETIME(), SYSUTCDATETIME(), 'seed', 'seed');
             ");
-        }
+    }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
 
-        }
     }
 }

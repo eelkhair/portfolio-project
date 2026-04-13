@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
 namespace CompanyAPI.Contracts.Models.Companies.Requests;
+
 public class CreateCompanyRequest
 {
     [Required]
@@ -16,8 +17,8 @@ public class CreateCompanyRequest
     [Required]
     public Guid IndustryUId { get; set; }
     public Guid? CompanyId { get; init; }
-    
+
     public string? UserId { get; set; }
-    
+
 }
-    
+

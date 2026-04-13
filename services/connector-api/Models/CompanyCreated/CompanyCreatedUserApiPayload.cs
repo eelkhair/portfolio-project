@@ -1,4 +1,4 @@
-﻿namespace ConnectorAPI.Models.CompanyCreated;
+namespace ConnectorAPI.Models.CompanyCreated;
 
 public class CompanyCreatedUserApiPayload
 {
@@ -11,5 +11,5 @@ public class CompanyCreatedUserApiPayload
     public Guid? UId { get; set; }
     public string KeycloakUserId { get; set; } = string.Empty;
     public string KeycloakGroupId { get; set; } = string.Empty;
-  
+
 }

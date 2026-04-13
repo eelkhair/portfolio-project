@@ -10,7 +10,6 @@ using ConnectorAPI.Sagas;
 using Dapr.Client;
 using JobBoard.IntegrationEvents.Company;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -78,7 +77,10 @@ public class CompanyUpdatedEndpointTests : IAsyncDisposable
                 Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(new CompanyUpdateCompanyResult
             {
-                Name = "TestCorp", Email = "t@t.com", Website = "https://t.com", IndustryUId = Guid.NewGuid()
+                Name = "TestCorp",
+                Email = "t@t.com",
+                Website = "https://t.com",
+                IndustryUId = Guid.NewGuid()
             });
     }
 

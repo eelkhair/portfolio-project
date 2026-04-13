@@ -12,8 +12,8 @@ public record JobCreatedV1Event(
     List<string> Responsibilities,
     List<string> Qualifications,
     string JobType
-): IIntegrationEvent
+) : IIntegrationEvent
 {
     public string EventType => "job.created.v1";
-    public string UserId { get; set; }
+    public string? UserId { get; set; }
 }

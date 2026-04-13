@@ -36,9 +36,16 @@ public class CompanyTools(
 
         return JsonSerializer.Serialize(new
         {
-            Id = company.UId, company.Name, company.Email, company.Description,
-            company.About, company.Website, company.Phone, company.Founded,
-            company.Size, company.EEO
+            Id = company.UId,
+            company.Name,
+            company.Email,
+            company.Description,
+            company.About,
+            company.Website,
+            company.Phone,
+            company.Founded,
+            company.Size,
+            company.EEO
         }, Json.Opts);
     }
 

@@ -1,4 +1,4 @@
-﻿using JobBoard.Domain.Entities.Users;
+using JobBoard.Domain.Entities.Users;
 
 namespace JobBoard.Domain.Entities;
 

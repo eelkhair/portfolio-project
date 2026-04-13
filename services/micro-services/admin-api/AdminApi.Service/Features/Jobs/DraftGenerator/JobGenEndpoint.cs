@@ -1,7 +1,7 @@
-﻿using System.Diagnostics;
-using AdminAPI.Contracts.Services;
+using System.Diagnostics;
 using AdminAPI.Contracts.Models.Jobs.Requests;
 using AdminAPI.Contracts.Models.Jobs.Responses;
+using AdminAPI.Contracts.Services;
 using Elkhair.Dev.Common.Application;
 using FastEndpoints;
 

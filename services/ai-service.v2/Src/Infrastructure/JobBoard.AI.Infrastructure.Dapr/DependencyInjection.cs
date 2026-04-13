@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Dapr.Client;
 using Dapr.Extensions.Configuration;
@@ -52,7 +52,7 @@ public static class DependencyInjection
             builder.Configuration.AddDaprSecretStore(
                 "vault",
                 new DaprClientBuilder().Build(),
-                new Dictionary<string, string>()
+                new Dictionary<string, string>(StringComparer.Ordinal)
             );
 
             var daprClient = new DaprClientBuilder().Build();
@@ -75,7 +75,7 @@ public static class DependencyInjection
         {
             // Dapr config store not available — fall back to appsettings.json
         }
-        
+
         return builder;
     }
 
@@ -85,7 +85,7 @@ public static class DependencyInjection
         string prefix,
         string serviceName)
     {
-        foreach (var item in cfg.Items.Where(k => k.Key.StartsWith(prefix)))
+        foreach (var item in cfg.Items.Where(k => k.Key.StartsWith(prefix, StringComparison.Ordinal)))
         {
             var cleanKey = CleanKey(item.Key, serviceName);
             config[cleanKey] = item.Value.Value;

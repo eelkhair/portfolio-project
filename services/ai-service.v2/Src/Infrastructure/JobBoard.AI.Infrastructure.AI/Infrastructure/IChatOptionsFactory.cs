@@ -2,7 +2,6 @@ using System.Diagnostics;
 using JobBoard.AI.Application.Actions.Chat;
 using JobBoard.AI.Application.Interfaces.AI;
 using JobBoard.AI.Application.Interfaces.Configurations;
-using JobBoard.AI.Application.Interfaces.Observability;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
@@ -107,67 +106,67 @@ public sealed class ChatOptionsFactory(
         switch (scope)
         {
             case ChatScope.SystemAdmin:
-            {
-                var isMonolith = IsMonolith();
+                {
+                    var isMonolith = IsMonolith();
 
-                var topologyTools =
-                    sp.GetRequiredKeyedService<IAiTools>(isMonolith ? "admin-monolith" : "admin-micro")
-                        .GetTools()
+                    var topologyTools =
+                        sp.GetRequiredKeyedService<IAiTools>(isMonolith ? "admin-monolith" : "admin-micro")
+                            .GetTools()
+                            .ToList();
+
+                    var aiTools =
+                        sp.GetRequiredKeyedService<IAiTools>("admin-ai")
+                            .GetTools()
+                            .ToList();
+
+                    var systemTools =
+                        sp.GetRequiredKeyedService<IAiTools>("system-admin-ai")
+                            .GetTools()
+                            .ToList();
+
+                    var allTools = topologyTools.Concat(aiTools).Concat(systemTools).ToList();
+
+                    var duplicates = allTools
+                        .GroupBy(t => t.Name, StringComparer.Ordinal)
+                        .Where(g => g.Count() > 1)
+                        .Select(g => g.Key)
                         .ToList();
 
-                var aiTools =
-                    sp.GetRequiredKeyedService<IAiTools>("admin-ai")
-                        .GetTools()
-                        .ToList();
+                    if (duplicates.Any())
+                        throw new InvalidOperationException(
+                            $"Duplicate AI tools detected: {string.Join(", ", duplicates)}");
 
-                var systemTools =
-                    sp.GetRequiredKeyedService<IAiTools>("system-admin-ai")
-                        .GetTools()
-                        .ToList();
-
-                var allTools = topologyTools.Concat(aiTools).Concat(systemTools).ToList();
-
-                var duplicates = allTools
-                    .GroupBy(t => t.Name)
-                    .Where(g => g.Count() > 1)
-                    .Select(g => g.Key)
-                    .ToList();
-
-                if (duplicates.Any())
-                    throw new InvalidOperationException(
-                        $"Duplicate AI tools detected: {string.Join(", ", duplicates)}");
-
-                return allTools;
-            }
+                    return allTools;
+                }
 
             case ChatScope.Admin:
-            {
-                var isMonolith = IsMonolith();
+                {
+                    var isMonolith = IsMonolith();
 
-                var topologyTools =
-                    sp.GetRequiredKeyedService<IAiTools>(isMonolith ? "admin-monolith" : "admin-micro")
-                        .GetTools()
+                    var topologyTools =
+                        sp.GetRequiredKeyedService<IAiTools>(isMonolith ? "admin-monolith" : "admin-micro")
+                            .GetTools()
+                            .ToList();
+
+                    var aiTools =
+                        sp.GetRequiredKeyedService<IAiTools>("admin-ai")
+                            .GetTools()
+                            .ToList();
+
+                    var allTools = topologyTools.Concat(aiTools).ToList();
+
+                    var duplicates = allTools
+                        .GroupBy(t => t.Name, StringComparer.Ordinal)
+                        .Where(g => g.Count() > 1)
+                        .Select(g => g.Key)
                         .ToList();
 
-                var aiTools =
-                    sp.GetRequiredKeyedService<IAiTools>("admin-ai")
-                        .GetTools()
-                        .ToList();
+                    if (duplicates.Any())
+                        throw new InvalidOperationException(
+                            $"Duplicate AI tools detected: {string.Join(", ", duplicates)}");
 
-                var allTools = topologyTools.Concat(aiTools).ToList();
-
-                var duplicates = allTools
-                    .GroupBy(t => t.Name)
-                    .Where(g => g.Count() > 1)
-                    .Select(g => g.Key)
-                    .ToList();
-
-                if (duplicates.Any())
-                    throw new InvalidOperationException(
-                        $"Duplicate AI tools detected: {string.Join(", ", duplicates)}");
-
-                return allTools;
-            }
+                    return allTools;
+                }
 
             case ChatScope.CompanyAdmin:
                 return sp.GetRequiredKeyedService<IAiTools>("company-admin")
@@ -175,33 +174,33 @@ public sealed class ChatOptionsFactory(
                     .ToList();
 
             case ChatScope.Public:
-            {
-                var isMonolith = IsMonolith();
+                {
+                    var isMonolith = IsMonolith();
 
-                var topologyTools =
-                    sp.GetRequiredKeyedService<IAiTools>(isMonolith ? "public-monolith" : "public-micro")
-                        .GetTools()
+                    var topologyTools =
+                        sp.GetRequiredKeyedService<IAiTools>(isMonolith ? "public-monolith" : "public-micro")
+                            .GetTools()
+                            .ToList();
+
+                    var aiTools =
+                        sp.GetRequiredKeyedService<IAiTools>("public-ai")
+                            .GetTools()
+                            .ToList();
+
+                    var allTools = topologyTools.Concat(aiTools).ToList();
+
+                    var duplicates = allTools
+                        .GroupBy(t => t.Name, StringComparer.Ordinal)
+                        .Where(g => g.Count() > 1)
+                        .Select(g => g.Key)
                         .ToList();
 
-                var aiTools =
-                    sp.GetRequiredKeyedService<IAiTools>("public-ai")
-                        .GetTools()
-                        .ToList();
+                    if (duplicates.Any())
+                        throw new InvalidOperationException(
+                            $"Duplicate AI tools detected: {string.Join(", ", duplicates)}");
 
-                var allTools = topologyTools.Concat(aiTools).ToList();
-
-                var duplicates = allTools
-                    .GroupBy(t => t.Name)
-                    .Where(g => g.Count() > 1)
-                    .Select(g => g.Key)
-                    .ToList();
-
-                if (duplicates.Any())
-                    throw new InvalidOperationException(
-                        $"Duplicate AI tools detected: {string.Join(", ", duplicates)}");
-
-                return allTools;
-            }
+                    return allTools;
+                }
 
             default:
                 return [];

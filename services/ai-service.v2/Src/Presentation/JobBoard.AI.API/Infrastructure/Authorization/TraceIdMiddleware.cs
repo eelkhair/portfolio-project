@@ -13,7 +13,7 @@ public class TraceIdMiddleware(RequestDelegate next)
     /// </summary>
     /// <param name="context"></param>
     public async Task InvokeAsync(HttpContext context)
-    { 
+    {
         var activity = Activity.Current;
 
         if (activity == null)

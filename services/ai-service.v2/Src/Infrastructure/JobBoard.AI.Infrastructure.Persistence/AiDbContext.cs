@@ -11,7 +11,7 @@ public sealed class AiDbContext : DbContext, IAiDbContext
     public DbSet<JobEmbedding> JobEmbeddings => Set<JobEmbedding>();
     public DbSet<ResumeEmbedding> ResumeEmbeddings => Set<ResumeEmbedding>();
     public DbSet<MatchExplanation> MatchExplanations => Set<MatchExplanation>();
-    
+
 
     public AiDbContext(DbContextOptions<AiDbContext> options)
         : base(options) { }

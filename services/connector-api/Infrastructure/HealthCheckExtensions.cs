@@ -16,7 +16,7 @@ internal static class HealthCheckExtensions
             StoreName = StateStores.Redis
         };
         builder.Services.AddSingleton(_ => new DaprStateStoreHealthCheck(new DaprClientBuilder().Build(), stateStore));
-       
+
         var secretStore = new SecretStoreOptions
         {
             StoreName = SecretStoreNames.Local
@@ -29,9 +29,9 @@ internal static class HealthCheckExtensions
             Postfix = string.Empty,
             PubSubName = PubSubNames.RabbitMq
         };
-        
+
         builder.Services.AddSingleton(_ => new DaprPubSubHealthCheck(new DaprClientBuilder().Build(), pubSub));
-        
+
         builder.Services
             .AddHealthChecks()
             .AddCheck("self", () => HealthCheckResult.Healthy())

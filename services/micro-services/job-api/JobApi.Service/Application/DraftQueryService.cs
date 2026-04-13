@@ -4,7 +4,6 @@ using JobApi.Application.Interfaces;
 using JobApi.Infrastructure.Data;
 using JobAPI.Contracts.Models.Drafts.Responses;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace JobApi.Application;
 

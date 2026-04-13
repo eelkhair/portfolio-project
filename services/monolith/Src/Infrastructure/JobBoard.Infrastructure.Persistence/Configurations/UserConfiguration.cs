@@ -1,4 +1,4 @@
-﻿using JobBoard.Domain.Entities;
+using JobBoard.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -20,12 +20,12 @@ public class UserCompanyConfiguration : IEntityTypeConfiguration<UserCompany>
             .WithMany()
             .HasForeignKey(uc => uc.UserId)
             .OnDelete(DeleteBehavior.Cascade);
-     
+
         builder.HasOne(uc => uc.Company)
             .WithMany()
             .HasForeignKey(uc => uc.CompanyId)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         builder.HasIndex(uc => uc.UserId);
         builder.HasIndex(uc => uc.CompanyId);
     }

@@ -1,4 +1,4 @@
-﻿using ConnectorAPI.Models;
+using ConnectorAPI.Models;
 using ConnectorAPI.Models.CompanyCreated;
 using ConnectorAPI.Models.CompanyUpdated;
 using ConnectorAPI.Models.Drafts;

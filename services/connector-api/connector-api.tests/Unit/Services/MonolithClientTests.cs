@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Net;
-using System.Net.Http.Json;
 using System.Text.Json;
 using ConnectorAPI.Models.CompanyCreated;
 using ConnectorAPI.Models.CompanyUpdated;
@@ -41,11 +40,17 @@ public class MonolithClientTests : IDisposable
         var adminId = Guid.NewGuid();
         var company = new CompanyCreateCompanyResult
         {
-            Name = "TestCorp", Email = "t@t.com", Website = "https://t.com", IndustryUId = Guid.NewGuid()
+            Name = "TestCorp",
+            Email = "t@t.com",
+            Website = "https://t.com",
+            IndustryUId = Guid.NewGuid()
         };
         var admin = new CompanyCreateUserResult
         {
-            Id = adminId, FirstName = "John", LastName = "Doe", Email = "j@t.com"
+            Id = adminId,
+            FirstName = "John",
+            LastName = "Doe",
+            Email = "j@t.com"
         };
 
         _handler.SetSequentialResponses(
@@ -148,14 +153,19 @@ public class MonolithClientTests : IDisposable
 
         var company = new CompanyCreateCompanyResult
         {
-            Name = "TestCorp", Email = "test@corp.com"
+            Name = "TestCorp",
+            Email = "test@corp.com"
         };
 
         var userApiResponse = new CompanyCreatedUserApiPayload
         {
-            KeycloakGroupId = "kc-group", KeycloakUserId = "kc-user",
-            CompanyName = "TestCorp", FirstName = "John", LastName = "Doe",
-            Email = "john@test.com", CompanyUId = eventData.CompanyUId
+            KeycloakGroupId = "kc-group",
+            KeycloakUserId = "kc-user",
+            CompanyName = "TestCorp",
+            FirstName = "John",
+            LastName = "Doe",
+            Email = "john@test.com",
+            CompanyUId = eventData.CompanyUId
         };
 
         await _sut.ActivateCompanyAsync(eventData, company, userApiResponse, CancellationToken.None);
@@ -182,14 +192,19 @@ public class MonolithClientTests : IDisposable
 
         var company = new CompanyCreateCompanyResult
         {
-            Name = "ActivateCorp", Email = "activate@corp.com"
+            Name = "ActivateCorp",
+            Email = "activate@corp.com"
         };
 
         var userApiResponse = new CompanyCreatedUserApiPayload
         {
-            KeycloakGroupId = "group-123", KeycloakUserId = "user-456",
-            CompanyName = "ActivateCorp", FirstName = "Jane", LastName = "Smith",
-            Email = "jane@test.com", CompanyUId = companyUId
+            KeycloakGroupId = "group-123",
+            KeycloakUserId = "user-456",
+            CompanyName = "ActivateCorp",
+            FirstName = "Jane",
+            LastName = "Smith",
+            Email = "jane@test.com",
+            CompanyUId = companyUId
         };
 
         await _sut.ActivateCompanyAsync(eventData, company, userApiResponse, CancellationToken.None);

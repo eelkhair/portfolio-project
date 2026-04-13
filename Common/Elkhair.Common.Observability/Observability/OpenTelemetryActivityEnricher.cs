@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Serilog.Core;
 using Serilog.Events;
 
@@ -9,7 +9,7 @@ public sealed class OpenTelemetryActivityEnricher : ILogEventEnricher
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {
         var activity = Activity.Current;
-        if (activity == null) 
+        if (activity == null)
             return;
 
         // Trace + Span identifiers
@@ -44,8 +44,8 @@ public sealed class OpenTelemetryActivityEnricher : ILogEventEnricher
         foreach (var ev in activity.Events)
         {
             logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty(
-                $"otel.event.{ev.Name}", 
-                ev.Tags.ToDictionary(t => t.Key, t => t.Value)
+                $"otel.event.{ev.Name}",
+                ev.Tags.ToDictionary(t => t.Key, t => t.Value, StringComparer.Ordinal)
             ));
         }
     }

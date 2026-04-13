@@ -4,7 +4,6 @@ using CompanyApi.Infrastructure.Data;
 using CompanyApi.Infrastructure.Data.Entities;
 using CompanyApi.Tests.Helpers;
 using CompanyAPI.Contracts.Models.Companies.Requests;
-using Mapster;
 using Elkhair.Dev.Common.Dapr;
 using JobBoard.IntegrationEvents.Company;
 using Microsoft.EntityFrameworkCore;
@@ -45,7 +44,9 @@ public class CompanyCommandServiceTests : IAsyncLifetime
     {
         var request = new CreateCompanyRequest
         {
-            Name = "Test Corp", CompanyEmail = "test@corp.com", IndustryUId = _industry.UId
+            Name = "Test Corp",
+            CompanyEmail = "test@corp.com",
+            IndustryUId = _industry.UId
         };
 
         var result = await _sut.CreateAsync(request, _user, CancellationToken.None);
@@ -59,7 +60,9 @@ public class CompanyCommandServiceTests : IAsyncLifetime
     {
         var request = new CreateCompanyRequest
         {
-            Name = "Test Corp", CompanyEmail = "test@corp.com", IndustryUId = _industry.UId
+            Name = "Test Corp",
+            CompanyEmail = "test@corp.com",
+            IndustryUId = _industry.UId
         };
 
         await _sut.CreateAsync(request, _user, CancellationToken.None);
@@ -73,8 +76,10 @@ public class CompanyCommandServiceTests : IAsyncLifetime
         var companyId = Guid.NewGuid();
         var request = new CreateCompanyRequest
         {
-            Name = "Test Corp", CompanyEmail = "test@corp.com",
-            IndustryUId = _industry.UId, CompanyId = companyId
+            Name = "Test Corp",
+            CompanyEmail = "test@corp.com",
+            IndustryUId = _industry.UId,
+            CompanyId = companyId
         };
 
         await _sut.CreateAsync(request, _user, CancellationToken.None);
@@ -88,8 +93,10 @@ public class CompanyCommandServiceTests : IAsyncLifetime
     {
         var request = new CreateCompanyRequest
         {
-            Name = "Test Corp", CompanyEmail = "test@corp.com",
-            IndustryUId = _industry.UId, UserId = "custom-user"
+            Name = "Test Corp",
+            CompanyEmail = "test@corp.com",
+            IndustryUId = _industry.UId,
+            UserId = "custom-user"
         };
 
         await _sut.CreateAsync(request, _user, CancellationToken.None);
@@ -104,7 +111,9 @@ public class CompanyCommandServiceTests : IAsyncLifetime
     {
         var request = new CreateCompanyRequest
         {
-            Name = "Test Corp", CompanyEmail = "test@corp.com", IndustryUId = _industry.UId
+            Name = "Test Corp",
+            CompanyEmail = "test@corp.com",
+            IndustryUId = _industry.UId
         };
 
         var result = await _sut.CreateAsync(request, _user, CancellationToken.None);
@@ -122,9 +131,16 @@ public class CompanyCommandServiceTests : IAsyncLifetime
 
         var request = new UpdateCompanyRequest
         {
-            Name = "New Name", CompanyEmail = "new@test.com", CompanyWebsite = "https://new.com",
-            Phone = "555-1234", Description = "Desc", About = "About", EEO = "EEO",
-            Founded = new DateTime(2020, 1, 1), Size = "50-100", Logo = "logo.png",
+            Name = "New Name",
+            CompanyEmail = "new@test.com",
+            CompanyWebsite = "https://new.com",
+            Phone = "555-1234",
+            Description = "Desc",
+            About = "About",
+            EEO = "EEO",
+            Founded = new DateTime(2020, 1, 1),
+            Size = "50-100",
+            Logo = "logo.png",
             IndustryUId = _industry.UId
         };
 
@@ -147,7 +163,9 @@ public class CompanyCommandServiceTests : IAsyncLifetime
 
         var request = new UpdateCompanyRequest
         {
-            Name = "Updated", CompanyEmail = "up@test.com", IndustryUId = _industry.UId
+            Name = "Updated",
+            CompanyEmail = "up@test.com",
+            IndustryUId = _industry.UId
         };
 
         await _sut.UpdateAsync(company.UId, request, _user, CancellationToken.None, publishEvent: true);
@@ -167,7 +185,9 @@ public class CompanyCommandServiceTests : IAsyncLifetime
 
         var request = new UpdateCompanyRequest
         {
-            Name = "Updated", CompanyEmail = "up@test.com", IndustryUId = _industry.UId
+            Name = "Updated",
+            CompanyEmail = "up@test.com",
+            IndustryUId = _industry.UId
         };
 
         await _sut.UpdateAsync(company.UId, request, _user, CancellationToken.None, publishEvent: false);

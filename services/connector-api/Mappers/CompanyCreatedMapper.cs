@@ -1,10 +1,10 @@
-﻿using ConnectorAPI.Models;
+using ConnectorAPI.Models;
 using ConnectorAPI.Models.CompanyCreated;
 using JobBoard.IntegrationEvents.Company;
 
 namespace ConnectorAPI.Mappers;
 
-public record CompanyCreatedPayloads(CompanyCreatedCompanyApiPayload Company, 
+public record CompanyCreatedPayloads(CompanyCreatedCompanyApiPayload Company,
     EventDto<CompanyCreatedJobApiPayload> Job,
     EventDto<CompanyCreatedUserApiPayload> User);
 
@@ -44,7 +44,7 @@ public static class CompanyCreatedMapper
         );
 
     }
-    
+
 }
 
 

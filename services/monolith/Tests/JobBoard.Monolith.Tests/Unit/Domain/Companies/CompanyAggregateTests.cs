@@ -1,7 +1,7 @@
-using Shouldly;
 using JobBoard.Domain.Aggregates;
 using JobBoard.Domain.Entities;
 using JobBoard.Domain.Exceptions;
+using Shouldly;
 
 namespace JobBoard.Monolith.Tests.Unit.Domain.Companies;
 

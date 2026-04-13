@@ -4,7 +4,6 @@ using AdminAPI.Contracts.Models.Jobs.Requests;
 using AdminAPI.Contracts.Services;
 using JobAPI.Contracts.Enums;
 using ModelContextProtocol.Server;
-using Microsoft.Extensions.Logging;
 
 namespace AdminApi.Mcp.Tools;
 

@@ -1,6 +1,6 @@
-using Shouldly;
 using JobBoard.Domain.Exceptions;
 using JobBoard.Domain.Helpers;
+using Shouldly;
 
 namespace JobBoard.Monolith.Tests.Unit.Domain.Shared;
 

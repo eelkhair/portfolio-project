@@ -16,7 +16,7 @@ public static class JobCreatedEndpointExtensions
     {
         app.MapPost("/sync/job-created",
             [Topic("rabbitmq.pubsub", "micro.job-created.v1")]
-            async (
+        async (
                 EventDto<MicroJobCreatedV1Event> @event,
                 MonolithHttpClient monolithClient,
                 ActivitySource activitySource,
@@ -57,7 +57,8 @@ public static class JobCreatedEndpointExtensions
                         stateKey,
                         "processing",
                         metadata: new Dictionary<string, string>
-                            { ["ttlInSeconds"] = IdempotencyOptions.PendingTTLSeconds.ToString() },
+(StringComparer.Ordinal)
+                        { ["ttlInSeconds"] = IdempotencyOptions.PendingTTLSeconds.ToString() },
                         cancellationToken: cancellationToken);
                 }
 
@@ -84,6 +85,7 @@ public static class JobCreatedEndpointExtensions
                         stateKey,
                         "done",
                         metadata: new Dictionary<string, string>
+(StringComparer.Ordinal)
                         {
                             ["ttlInSeconds"] = IdempotencyOptions.CompletedTTLSeconds.ToString()
                         },

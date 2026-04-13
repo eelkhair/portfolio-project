@@ -9,10 +9,10 @@ public sealed class Unit : IEquatable<Unit>
 
 
     public bool Equals(Unit? other)
-    { 
+    {
         return true;
     }
-    
+
     public override bool Equals(object? obj)
     {
         return obj is Unit;
@@ -23,7 +23,7 @@ public sealed class Unit : IEquatable<Unit>
     {
         return 0;
     }
-    
+
     public override string ToString()
     {
         return "()";
@@ -33,7 +33,7 @@ public sealed class Unit : IEquatable<Unit>
     {
         return first is null ? second is null : second is not null;
     }
-    
+
     public static bool operator !=(Unit? first, Unit? second)
     {
         return !(first == second);

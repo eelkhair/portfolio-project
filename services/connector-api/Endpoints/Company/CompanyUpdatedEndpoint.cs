@@ -14,7 +14,7 @@ public static class CompanyUpdatedEndpoint
     {
         app.MapPost("/connector/company-updated",
             [Topic("rabbitmq.pubsub", "monolith.company-updated.v1")]
-            async (
+        async (
                 EventDto<CompanyUpdatedV1Event> @event,
                 UpdateCompanySaga saga,
                 ActivitySource activitySource,
@@ -53,7 +53,7 @@ public static class CompanyUpdatedEndpoint
                         StateStores.Redis,
                         stateKey,
                         "processing",
-                        metadata: new Dictionary<string, string> { ["ttlInSeconds"] = IdempotencyOptions.PendingTTLSeconds.ToString() },
+                        metadata: new Dictionary<string, string>(StringComparer.Ordinal) { ["ttlInSeconds"] = IdempotencyOptions.PendingTTLSeconds.ToString() },
                         cancellationToken: cancellationToken);
                 }
 
@@ -78,6 +78,7 @@ public static class CompanyUpdatedEndpoint
                         stateKey,
                         "done",
                         metadata: new Dictionary<string, string>
+(StringComparer.Ordinal)
                         {
                             ["ttlInSeconds"] = IdempotencyOptions.CompletedTTLSeconds.ToString()
                         },

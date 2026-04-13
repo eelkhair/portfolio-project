@@ -21,13 +21,13 @@ public static class DataExtensions
         builder.Property<Guid>("Id")
             .IsRequired()
             .ValueGeneratedNever();
-        
+
         builder.ToTable(table, schema, tb =>
         {
             tb.IsTemporal();
         });
     }
-    
+
     public static void ConfigureAuditableProperties<TEntity>(this EntityTypeBuilder<TEntity> builder)
         where TEntity : class
     {

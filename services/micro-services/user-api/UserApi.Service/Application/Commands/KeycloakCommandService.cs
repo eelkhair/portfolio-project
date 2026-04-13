@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Net;
-using Microsoft.Extensions.Logging;
 using UserApi.Application.Commands.Interfaces;
 using UserApi.Infrastructure.Keycloak;
 using UserApi.Infrastructure.Keycloak.Interfaces;
@@ -76,6 +75,7 @@ public partial class KeycloakCommandService(ActivitySource activitySource, IKeyc
     {
         _resource ??= await factory.GetKeycloakResourceAsync(ct);
         var attributes = new Dictionary<string, List<string>>
+(StringComparer.Ordinal)
         {
             ["companyName"] = [user.CompanyName]
         };

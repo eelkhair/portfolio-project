@@ -14,7 +14,7 @@ public partial class UserEmail
     {
         if (string.IsNullOrEmpty(value)) value = string.Empty;
         value = value.Trim();
-        
+
         var errors = new List<Error>();
 
         if (string.IsNullOrWhiteSpace(value))
@@ -29,7 +29,7 @@ public partial class UserEmail
         {
             errors.Add(new Error("Email.InvalidFormat", "Email is not in a valid format."));
         }
-        return errors.Count > 0 ? Result<UserEmail>.Failure(errors) : 
+        return errors.Count > 0 ? Result<UserEmail>.Failure(errors) :
             Result<UserEmail>.Success(new UserEmail(value));
     }
 

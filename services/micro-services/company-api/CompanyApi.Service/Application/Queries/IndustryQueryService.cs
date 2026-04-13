@@ -1,10 +1,9 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using CompanyApi.Application.Queries.Interfaces;
-using CompanyAPI.Contracts.Models.Industries.Responses;
 using CompanyApi.Infrastructure.Data;
+using CompanyAPI.Contracts.Models.Industries.Responses;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace CompanyApi.Application.Queries;
 
@@ -23,7 +22,8 @@ public partial class IndustryQueryService(ICompanyDbContext companyDbContext, IL
             LogIndustriesFetched(logger, industries.Count);
             activity?.Stop();
             return industries.Adapt<List<IndustryResponse>>();
-        }catch (OperationCanceledException e)
+        }
+        catch (OperationCanceledException e)
         {
             activity?.SetStatus(ActivityStatusCode.Error, "canceled");
             throw;

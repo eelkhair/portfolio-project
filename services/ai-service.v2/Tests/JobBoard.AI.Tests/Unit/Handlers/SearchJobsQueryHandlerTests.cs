@@ -1,8 +1,6 @@
 using System.Diagnostics;
 using JobBoard.AI.Application.Actions.Jobs.Search;
-using JobBoard.AI.Application.Actions.Jobs.Similar;
 using JobBoard.AI.Application.Interfaces.AI;
-using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Application.Interfaces.Persistence;
 using Microsoft.Extensions.Logging;
 using NSubstitute;

@@ -1,4 +1,4 @@
-﻿namespace JobBoard.HealthChecks.Dtos;
+namespace JobBoard.HealthChecks.Dtos;
 
 public class ConfigurationStoreOptions
 {

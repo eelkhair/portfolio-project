@@ -14,5 +14,5 @@ public record DraftSavedV1Event(
 ) : IIntegrationEvent
 {
     public string EventType => "draft.saved.v1";
-    public string UserId { get; set; }
+    public string? UserId { get; set; }
 }

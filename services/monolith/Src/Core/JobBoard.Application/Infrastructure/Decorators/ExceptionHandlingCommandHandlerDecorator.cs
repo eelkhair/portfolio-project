@@ -36,6 +36,6 @@ public class ExceptionHandlingCommandHandlerDecorator<TRequest, TResult>(
                 $"A resource with the value '{propertyValue}' already exists. Please choose a different value.");
             throw new ValidationException([validationError]);
         }
-       
+
     }
 }

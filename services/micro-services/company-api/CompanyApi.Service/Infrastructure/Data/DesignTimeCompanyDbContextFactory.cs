@@ -1,10 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace CompanyApi.Infrastructure.Data;
 
-public class DesignTimeCompanyDbContextFactory :  IDesignTimeDbContextFactory<CompanyDbContext>
+public class DesignTimeCompanyDbContextFactory : IDesignTimeDbContextFactory<CompanyDbContext>
 {
     public CompanyDbContext CreateDbContext(string[] args)
     {

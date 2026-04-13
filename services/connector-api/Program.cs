@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using ConnectorAPI.Endpoints.Company;
 using ConnectorAPI.Endpoints.Draft;
 using ConnectorAPI.Endpoints.Job;
@@ -18,14 +17,14 @@ var builder = WebApplication.CreateBuilder(args);
     .AddApplicationServices();
 
 var app = builder.Build();
-    app.UseCors(CorsPolicy);
-    app.MapCompanyCreatedEndpoint()
-        .MapCompanyUpdatedEndpoint()
-        .MapJobCreatedEndpoint()
-        .MapDraftSavedEndpoint()
-        .MapDraftDeletedEndpoint()
-        .MapSubscribeHandler();
+app.UseCors(CorsPolicy);
+app.MapCompanyCreatedEndpoint()
+    .MapCompanyUpdatedEndpoint()
+    .MapJobCreatedEndpoint()
+    .MapDraftSavedEndpoint()
+    .MapDraftDeletedEndpoint()
+    .MapSubscribeHandler();
 
-    app.MapServices().Run();
+app.MapServices().Run();
 
 

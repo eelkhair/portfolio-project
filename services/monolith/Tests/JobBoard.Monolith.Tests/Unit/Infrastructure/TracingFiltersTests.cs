@@ -1,4 +1,3 @@
-using Elkhair.Common.Observability.Observability;
 using Microsoft.AspNetCore.Http;
 using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Instrumentation.Http;

@@ -32,6 +32,7 @@ public class KeycloakHealthCheck(
             return HealthCheckResult.Healthy(
                 $"Keycloak realm is reachable. Configured clients: {clients}.",
                 new Dictionary<string, object>
+(StringComparer.Ordinal)
                 {
                     { "authority", opts.Authority },
                     { "clients", opts.ClientIds }

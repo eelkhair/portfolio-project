@@ -117,7 +117,7 @@ public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<Mon
         }
     }
 
-    public async Task<ODataResponse<List<IndustryDto>>> ListIndustriesAsync(CancellationToken cancellationToken = default)
+    public async Task<ODataResponse<List<IndustryDto>>> ListIndustriesAsync(CancellationToken cancellationToken)
     {
         try
         {

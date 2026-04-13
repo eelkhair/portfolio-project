@@ -1,7 +1,7 @@
 using FastEndpoints;
 using FluentValidation;
-using JobAPI.Contracts.Models.Jobs.Requests;
 using JobApi.Infrastructure.Data;
+using JobAPI.Contracts.Models.Jobs.Requests;
 using Microsoft.EntityFrameworkCore;
 
 namespace JobApi.Features.Jobs.Create;
@@ -19,7 +19,7 @@ public class CreateJobValidator : Validator<CreateJobRequest>
     }
 
     private async Task<bool> CompanyExists(Guid uid, CancellationToken ct)
-    { 
+    {
         return await Resolve<IJobDbContext>().Companies.AnyAsync(c => c.UId == uid, ct);
     }
 }

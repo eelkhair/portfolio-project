@@ -1,4 +1,4 @@
-﻿using CompanyAPI.Contracts.Models.Industries.Responses;
+using CompanyAPI.Contracts.Models.Industries.Responses;
 
 namespace CompanyApi.Application.Queries.Interfaces;
 

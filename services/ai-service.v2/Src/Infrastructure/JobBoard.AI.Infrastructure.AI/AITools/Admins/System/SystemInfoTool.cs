@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using JobBoard.AI.Application.Actions.Settings.Provider;
 using JobBoard.AI.Application.Interfaces.Configurations;
-using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Infrastructure.AI.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.AI;

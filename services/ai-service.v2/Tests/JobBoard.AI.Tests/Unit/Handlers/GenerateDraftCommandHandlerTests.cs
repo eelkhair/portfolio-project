@@ -4,8 +4,6 @@ using JobBoard.AI.Application.Actions.Drafts;
 using JobBoard.AI.Application.Actions.Drafts.Generate;
 using JobBoard.AI.Application.Actions.Shared;
 using JobBoard.AI.Application.Interfaces.AI;
-using JobBoard.AI.Application.Interfaces.Configurations;
-using JobBoard.AI.Application.Interfaces.Observability;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Shouldly;

@@ -17,12 +17,12 @@ namespace JobBoard.API.Infrastructure.OpenApi;
 /// </summary>
 public static class DependencyInjection
 {
-  
+
     public static IServiceCollection AddODataServices(this IServiceCollection services)
     {
         const string odataRoutePrefix = "odata";
 
-        
+
         services.AddControllers(options =>
             {
                 options.Conventions.Add(new KebabCaseRoutingConvention());
@@ -31,7 +31,7 @@ public static class DependencyInjection
             })
             .AddOData(options =>
             {
-                
+
                 options
 
                     .Select()
@@ -59,7 +59,7 @@ public static class DependencyInjection
 
     public static IServiceCollection AddConfiguredSwagger(this IServiceCollection services, IConfiguration configuration)
     {
-      
+
         services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo
@@ -101,6 +101,7 @@ public static class DependencyInjection
             if (!string.IsNullOrEmpty(authority))
             {
                 var scopes = new Dictionary<string, string>
+(StringComparer.Ordinal)
                 {
                     { "openid", "OpenID" },
                     { "profile", "Profile" },
@@ -141,6 +142,7 @@ public static class DependencyInjection
 
 
             var httpMethodOrder = new Dictionary<string, int>
+(StringComparer.Ordinal)
             {
                 { "GET", 1 }, { "POST", 2 }, { "PUT", 3 }, { "DELETE", 4 }
             };
@@ -154,13 +156,13 @@ public static class DependencyInjection
                 var httpMethod = apiDesc.HttpMethod ?? "UNKNOWN";
                 var methodOrder = httpMethodOrder.GetValueOrDefault(httpMethod, 999);
 
-                return httpMethod == "GET" ? $"{sortKey}_{methodOrder}_{apiDesc.RelativePath}" : $"{sortKey}_{methodOrder}";
-            });  
+                return string.Equals(httpMethod, "GET", StringComparison.Ordinal) ? $"{sortKey}_{methodOrder}_{apiDesc.RelativePath}" : $"{sortKey}_{methodOrder}";
+            });
             var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
             c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
             c.ExampleFilters();
         });
-      
+
         services.AddSwaggerExamplesFromAssemblies(Assembly.GetEntryAssembly());
         services.AddTransient<StandardResponsesOperationFilter>(sp => new StandardResponsesOperationFilter(sp));
 
@@ -179,6 +181,7 @@ public static class DependencyInjection
             options.OAuthAppName("JobBoard API - Swagger UI");
             options.OAuthUsePkce();
             options.OAuthAdditionalQueryStringParams(new Dictionary<string, string>
+(StringComparer.Ordinal)
             {
                 { "prompt", "login" }
             });

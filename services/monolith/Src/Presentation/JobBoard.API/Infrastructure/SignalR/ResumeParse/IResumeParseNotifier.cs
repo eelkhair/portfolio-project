@@ -1,5 +1,3 @@
-using JobBoard.Monolith.Contracts.Public;
-
 namespace JobBoard.API.Infrastructure.SignalR.ResumeParse;
 
 public interface IResumeParseNotifier

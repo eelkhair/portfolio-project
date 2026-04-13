@@ -1,6 +1,6 @@
+using Elkhair.Common.Observability.Observability;
 using JobBoard.Application.Interfaces.Observability;
 using JobBoard.Infrastructure.Diagnostics.Observability;
-using Elkhair.Common.Observability.Observability;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry.Metrics;

@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using JobBoard.AI.Application.Interfaces.Configurations;
-using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Infrastructure.AI.Services;
 using Microsoft.Extensions.AI;
 
@@ -34,7 +33,7 @@ public static class TraceIdTool
                 var convo = await store.GetAsync<ConversationDto>(
                     $"conversations:{userId}:{conversationId}", conversationStore.AiDbId);
 
-                return new {convo?.LastTraceId, CurrentTraceId = Activity.Current?.TraceId.ToString()};
+                return new { convo?.LastTraceId, CurrentTraceId = Activity.Current?.TraceId.ToString() };
             },
             new AIFunctionFactoryOptions
             {

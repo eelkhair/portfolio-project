@@ -1,13 +1,13 @@
-﻿using Dapr.Client;
+using Dapr.Client;
 using Dapr.Extensions.Configuration;
 
 namespace UserApi.Infrastructure;
 
 public static class DaprExtensions
 {
-     public static async Task<WebApplicationBuilder> AddDaprServices(
-        this WebApplicationBuilder builder,
-        string serviceName)
+    public static async Task<WebApplicationBuilder> AddDaprServices(
+       this WebApplicationBuilder builder,
+       string serviceName)
     {
         builder.Services.AddDaprClient();
 
@@ -17,7 +17,7 @@ public static class DaprExtensions
             builder.Configuration.AddDaprSecretStore(
                 "vault",
                 new DaprClientBuilder().Build(),
-                new Dictionary<string, string>()
+                new Dictionary<string, string>(StringComparer.Ordinal)
             );
 
             var daprClient = new DaprClientBuilder().Build();
@@ -39,8 +39,8 @@ public static class DaprExtensions
 
                     foreach (var kvp in config.Items)
                     {
-                        if (!kvp.Key.StartsWith($"jobboard:config:{serviceName}")
-                            && !kvp.Key.StartsWith($"jobboard:config:global")) continue;
+                        if (!kvp.Key.StartsWith($"jobboard:config:{serviceName}", StringComparison.Ordinal)
+                            && !kvp.Key.StartsWith($"jobboard:config:global", StringComparison.Ordinal)) continue;
                         var cleanedKey = CleanKey(kvp.Key, serviceName);
                         builder.Configuration[cleanedKey] = kvp.Value.Value;
                     }
@@ -62,7 +62,7 @@ public static class DaprExtensions
         string prefix,
         string serviceName)
     {
-        foreach (var item in cfg.Items.Where(k => k.Key.StartsWith(prefix)))
+        foreach (var item in cfg.Items.Where(k => k.Key.StartsWith(prefix, StringComparison.Ordinal)))
         {
             var cleanKey = CleanKey(item.Key, serviceName);
             config[cleanKey] = item.Value.Value;

@@ -1,11 +1,9 @@
-﻿using FluentValidation;
+using FluentValidation;
 using JobBoard.Application.Actions.Base;
 using JobBoard.Application.Infrastructure.Decorators;
-using JobBoard.Application.Infrastructure.Exceptions;
 using JobBoard.Application.Infrastructure.UserSync;
 using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Application.Interfaces.Users;
-using JobBoard.Mcp.Common;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace JobBoard.Application;
@@ -19,7 +17,7 @@ public static class DependencyInjection
             .AddClasses(c => c.AssignableTo(typeof(IHandler<,>)))
             .AsImplementedInterfaces()
             .WithTransientLifetime());
-        
+
         services.AddValidatorsFromAssemblyContaining(typeof(IHandler<,>));
 
         services.Decorate(typeof(IHandler<,>), typeof(ExceptionHandlingCommandHandlerDecorator<,>));

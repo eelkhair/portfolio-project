@@ -1,4 +1,4 @@
-type Entry = { key: string; expiresAt: number };
+interface Entry { key: string; expiresAt: number }
 export class IdempotencyCache {
   private readonly ttlMs = 5 * 60 * 1000;
   private readonly map = new Map<string, Entry>();

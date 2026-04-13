@@ -1,12 +1,11 @@
-using AdminAPI.Contracts.Services;
 using AdminAPI.Contracts.Models.Companies.Requests;
+using AdminAPI.Contracts.Services;
 using CompanyAPI.Contracts.Models.Companies.Responses;
 using Dapr.Client;
 using Elkhair.Dev.Common.Application;
 using Elkhair.Dev.Common.Dapr;
 using Elkhair.Dev.Common.Domain.Constants;
 using JobBoard.IntegrationEvents.Company;
-using Microsoft.Extensions.Logging;
 using UserAPI.Contracts.Models.Events;
 
 namespace AdminApi.Application.Commands;
@@ -18,9 +17,9 @@ public partial class CompanyCommandService(DaprClient client, UserContextService
         LogCreatingCompany(logger, request.Name);
         var message = client.CreateInvokeMethodRequest(HttpMethod.Post, "company-api", "api/companies");
         message.Headers.Add("Authorization", accessor.GetHeader("Authorization"));
-        message.Content=  JsonContent.Create(request);
+        message.Content = JsonContent.Create(request);
         var company = await DaprExtensions.Process(() =>
-            client.InvokeMethodAsync<CompanyResponse>(message,cancellationToken: ct));
+            client.InvokeMethodAsync<CompanyResponse>(message, cancellationToken: ct));
 
         if (company.Success && company.Data is { } data)
         {

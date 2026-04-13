@@ -1,13 +1,12 @@
+using System.Diagnostics;
 using FluentValidation;
 using FluentValidation.Results;
 using JobBoard.Application.Infrastructure.Decorators;
 using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Application.Interfaces.Observability;
-using NSubstitute;
-using NSubstitute.ExceptionExtensions;
-using Shouldly;
-using System.Diagnostics;
 using JobBoard.Monolith.Tests.Unit.Application.Helpers;
+using NSubstitute;
+using Shouldly;
 
 namespace JobBoard.Monolith.Tests.Unit.Application.Decorators;
 

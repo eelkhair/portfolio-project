@@ -20,31 +20,31 @@ public partial class JobDbContext : DbContext, IJobDbContext
 {
     public JobDbContext()
     {
-        
+
     }
 
-    public JobDbContext(DbContextOptions options): base(options)
+    public JobDbContext(DbContextOptions options) : base(options)
     {
-        
+
     }
-    
+
     public JobDbContext(string connectionString) : base(GetOptions(connectionString))
     {
     }
-    
+
     private static DbContextOptions GetOptions(string connectionString)
     {
         return new DbContextOptionsBuilder().UseSqlServer(connectionString)
             .Options;
     }
-    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(JobDbContext).Assembly);
         modelBuilder.HasDefaultSchema("Jobs");
         //modelBuilder.SeedData();
     }
-    
+
 
     public Task<int> SaveChangesAsync(ClaimsPrincipal user, CancellationToken cancellationToken)
     {

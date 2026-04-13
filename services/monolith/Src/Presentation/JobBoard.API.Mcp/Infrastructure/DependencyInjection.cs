@@ -1,3 +1,4 @@
+using JobBoard.API.Mcp.Tools;
 using JobBoard.Application;
 using JobBoard.Infrastructure.BlobStorage;
 using JobBoard.Infrastructure.Diagnostics;
@@ -7,11 +8,7 @@ using JobBoard.Infrastructure.Outbox;
 using JobBoard.Infrastructure.Persistence;
 using JobBoard.Infrastructure.Smtp;
 using JobBoard.Mcp.Common;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using ModelContextProtocol.AspNetCore;
 using ModelContextProtocol.Protocol;
-using JobBoard.API.Mcp.Tools;
 
 namespace JobBoard.API.Mcp.Infrastructure;
 

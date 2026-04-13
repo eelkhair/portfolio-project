@@ -40,7 +40,7 @@ public class HttpUserAccessor : IUserAccessor
     /// <summary>
     /// Gets the first name.
     /// </summary>
-    public string? FirstName { get; set; } 
+    public string? FirstName { get; set; }
     /// <summary>
     /// Gets the last name.
     /// </summary>

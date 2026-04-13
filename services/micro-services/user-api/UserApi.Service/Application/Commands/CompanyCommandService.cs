@@ -1,19 +1,18 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 using UserApi.Application.Commands.Interfaces;
-using UserAPI.Contracts.Models.Requests;
 using UserApi.Infrastructure.Data;
 using UserApi.Infrastructure.Data.Entities;
+using UserAPI.Contracts.Models.Requests;
 
 namespace UserApi.Application.Commands;
 
-public partial class CompanyCommandService(IUserDbContext context, ILogger<CompanyCommandService> logger): ICompanyCommandService
+public partial class CompanyCommandService(IUserDbContext context, ILogger<CompanyCommandService> logger) : ICompanyCommandService
 {
     public async Task<int> CreateUser(CreateUserRequest request, string userId, CancellationToken ct)
     {
         LogCreatingUser(logger, request.Email);
 
-        var existing = await context.Users.SingleOrDefaultAsync(c=> c.Email == request.Email, ct);
+        var existing = await context.Users.SingleOrDefaultAsync(c => c.Email == request.Email, ct);
         if (existing is not null)
         {
             LogUserAlreadyExists(logger, request.Email, existing.Id);
@@ -68,7 +67,7 @@ public partial class CompanyCommandService(IUserDbContext context, ILogger<Compa
             CompanyId = companyId
         };
 
-        if(userCompanyUId != null)
+        if (userCompanyUId != null)
             userCompany.UId = userCompanyUId.Value;
 
         context.UserCompanies.Add(userCompany);

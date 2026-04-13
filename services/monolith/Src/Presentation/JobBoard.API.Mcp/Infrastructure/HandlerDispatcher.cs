@@ -1,5 +1,4 @@
 using JobBoard.Application.Interfaces.Configurations;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace JobBoard.API.Mcp.Infrastructure;
 

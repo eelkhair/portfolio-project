@@ -2,7 +2,6 @@ using System.Diagnostics;
 using JobBoard.AI.Application.Actions.Base;
 using JobBoard.AI.Application.Infrastructure.Decorators;
 using JobBoard.AI.Application.Interfaces.Configurations;
-using JobBoard.AI.Application.Interfaces.Observability;
 using NSubstitute;
 using Shouldly;
 

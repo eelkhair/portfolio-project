@@ -24,7 +24,7 @@ public class GenerateDraftPrompt : IAiPrompt<GenerateDraftRequest>
     public string BuildUserPrompt(GenerateDraftRequest request)
     {
         var jsonShape = JobGenJsonShape
-            .Replace("MAX_BULLETS", request.MaxBullets.ToString())
+            .Replace("MAX_BULLETS", request.MaxBullets.ToString(System.Globalization.CultureInfo.InvariantCulture))
             .Replace("ROLE_LEVEL", request.RoleLevel.ToString().ToLowerInvariant())
             .Replace("TONE", request.Tone.ToString().ToLowerInvariant());
 

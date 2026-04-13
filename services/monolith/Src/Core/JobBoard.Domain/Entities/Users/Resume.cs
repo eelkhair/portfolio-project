@@ -1,4 +1,3 @@
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using JobBoard.Domain.Aggregates;
 using JobBoard.Domain.Exceptions;
@@ -114,7 +113,7 @@ public class Resume : BaseAuditableEntity
     {
         var completed = (ParsedSections ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries);
         var failed = (FailedSections ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries);
-        return RequiredSections.All(s => completed.Contains(s) || failed.Contains(s));
+        return RequiredSections.All(s => completed.Contains(s, StringComparer.Ordinal) || failed.Contains(s, StringComparer.Ordinal));
     }
 
     public void MarkFullyParsed()

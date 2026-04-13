@@ -12,7 +12,7 @@ public class CompanyConfiguration : IEntityTypeConfiguration<Company>
         builder.ToTable("Companies");
         builder.ConfigureBaseAuditableEntity();
         builder.Property(c => c.Name).IsRequired().HasMaxLength(250);
-        builder.HasMany(c=>c.Jobs).WithOne(j=>j.Company).HasForeignKey(j=>j.CompanyId);
+        builder.HasMany(c => c.Jobs).WithOne(j => j.Company).HasForeignKey(j => j.CompanyId);
         builder.HasIndex(c => c.Name).IsUnique();
     }
 }

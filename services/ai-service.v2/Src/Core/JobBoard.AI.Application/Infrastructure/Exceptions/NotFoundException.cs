@@ -4,10 +4,10 @@
 namespace JobBoard.AI.Application.Infrastructure.Exceptions;
 
 public class NotFoundException : Exception
-{ 
+{
     public string? ResourceName { get; }
     public object? Key { get; }
-    
+
     public NotFoundException(string resourceName, object key)
         : base($"Resource '{resourceName}' with key '{key}' was not found.")
     {

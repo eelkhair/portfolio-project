@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using JobBoard.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -27,8 +27,8 @@ public class CreateCompanyCommandValidator : AbstractValidator<CreateCompanyComm
                              || Uri.IsWellFormedUriString(url, UriKind.Absolute))
                 .WithMessage("Company website is not a valid URL");
         });
-      
-       
+
+
 
         RuleFor(c => c.IndustryUId)
             .NotEmpty().WithMessage("Industry is required");
@@ -52,16 +52,16 @@ public class CreateCompanyCommandValidator : AbstractValidator<CreateCompanyComm
             if (emailExists)
                 ctx.AddFailure(nameof(model.CompanyEmail), "Company email already exists");
 
-            
+
             logger.LogInformation("Checking uniqueness of admin email {AdminEmail}", model.AdminEmail);
-            var userEmailExists =  await context.Users
+            var userEmailExists = await context.Users
                 .Where(i => EF.Property<DateTime>(i, "PeriodEnd") == DateTime.MaxValue)
 
                 .AnyAsync(x => x.Email == model.AdminEmail, ct);
 
             if (userEmailExists)
                 ctx.AddFailure(nameof(model.AdminEmail), "Admin email already exists");
-           
+
             if (model.IndustryUId != Guid.Empty)
             {
                 logger.LogInformation("Checking existence of industry {IndustryUId}", model.IndustryUId);

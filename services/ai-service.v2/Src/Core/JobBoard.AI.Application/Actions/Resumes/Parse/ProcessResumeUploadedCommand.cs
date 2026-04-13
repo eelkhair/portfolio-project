@@ -210,7 +210,7 @@ public class ProcessResumeUploadedCommandHandler(
                     sectionName, attempt, MaxSectionRetries, eventData.ResumeUId);
 
                 // Re-throw immediately for contact section (Phase 1 failure is fatal)
-                if (sectionName == "contact")
+                if (string.Equals(sectionName, "contact", StringComparison.Ordinal))
                     throw;
             }
         }

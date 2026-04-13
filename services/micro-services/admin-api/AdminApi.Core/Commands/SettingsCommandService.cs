@@ -2,11 +2,10 @@ using System.Diagnostics;
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using AdminAPI.Contracts.Services;
 using AdminAPI.Contracts.Models.Settings;
+using AdminAPI.Contracts.Services;
 using Dapr.Client;
 using Elkhair.Dev.Common.Application;
-using Microsoft.Extensions.Logging;
 
 namespace AdminApi.Application.Commands;
 
@@ -67,6 +66,7 @@ public partial class SettingsCommandService(DaprClient client, UserContextServic
                 {
                     Message = e.Message,
                     Errors = new Dictionary<string, string[]>
+(StringComparer.Ordinal)
                     {
                         { "Error", [e.Message] }
                     }
@@ -123,6 +123,7 @@ public partial class SettingsCommandService(DaprClient client, UserContextServic
                 {
                     Message = e.Message,
                     Errors = new Dictionary<string, string[]>
+(StringComparer.Ordinal)
                     {
                         { "Error", [e.Message] }
                     }
@@ -173,6 +174,7 @@ public partial class SettingsCommandService(DaprClient client, UserContextServic
                 {
                     Message = e.Message,
                     Errors = new Dictionary<string, string[]>
+(StringComparer.Ordinal)
                     {
                         { "Error", [e.Message] }
                     }
@@ -228,6 +230,7 @@ public partial class SettingsCommandService(DaprClient client, UserContextServic
                 {
                     Message = e.Message,
                     Errors = new Dictionary<string, string[]>
+(StringComparer.Ordinal)
                     {
                         { "Error", [e.Message] }
                     }
@@ -283,6 +286,7 @@ public partial class SettingsCommandService(DaprClient client, UserContextServic
                 {
                     Message = e.Message,
                     Errors = new Dictionary<string, string[]>
+(StringComparer.Ordinal)
                     {
                         { "Error", [e.Message] }
                     }

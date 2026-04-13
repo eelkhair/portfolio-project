@@ -1,13 +1,13 @@
-﻿using JobBoard.Domain.Exceptions;
+using JobBoard.Domain.Exceptions;
 
 namespace JobBoard.Domain.ValueObjects.Company;
 
 public class CompanyEEO
 {
     public string? Value { get; }
-    
+
     private CompanyEEO(string? value) { Value = value; }
-    
+
     public static Result<CompanyEEO> Create(string? value)
     {
         var errors = new List<Error>();
@@ -16,7 +16,7 @@ public class CompanyEEO
         {
             return Result<CompanyEEO>.Success(new CompanyEEO(value));
         }
-        
+
         value = value.Trim();
         if (value.Length > 500)
         {

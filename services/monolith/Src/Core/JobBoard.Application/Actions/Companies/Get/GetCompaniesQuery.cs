@@ -1,4 +1,4 @@
-﻿using JobBoard.Application.Actions.Base;
+using JobBoard.Application.Actions.Base;
 using JobBoard.Application.Interfaces;
 using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Monolith.Contracts.Companies;
@@ -13,9 +13,9 @@ public class GetCompaniesQueryHandler(IJobBoardDbContext context, ILogger<GetCom
 {
     public Task<IQueryable<CompanyDto>> HandleAsync(GetCompaniesQuery request, CancellationToken cancellationToken)
     {
-        var result = Context.Companies.Select(x=> new CompanyDto
+        var result = Context.Companies.Select(x => new CompanyDto
         {
-            Name= x.Name,
+            Name = x.Name,
             Description = x.Description,
             About = x.About,
             EEO = x.EEO,

@@ -17,7 +17,7 @@ namespace AdminApi.Tests.Unit.Queries;
 [Trait("Category", "Unit")]
 public class JobQueryServiceTests
 {
-    private static readonly JsonSerializerOptions JsonOpts = new()
+    private static readonly JsonSerializerOptions _jsonOpts = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
@@ -60,7 +60,7 @@ public class JobQueryServiceTests
             }
         };
 
-        var json = JsonSerializer.Serialize(jobs, JsonOpts);
+        var json = JsonSerializer.Serialize(jobs, _jsonOpts);
         var httpResponse = new HttpResponseMessage(HttpStatusCode.OK)
         {
             Content = new StringContent(json, System.Text.Encoding.UTF8, "application/json")
@@ -85,7 +85,7 @@ public class JobQueryServiceTests
     {
         // Arrange
         var companyUId = Guid.NewGuid();
-        var errorJson = JsonSerializer.Serialize(new ApiError { Message = "Not found" }, JsonOpts);
+        var errorJson = JsonSerializer.Serialize(new ApiError { Message = "Not found" }, _jsonOpts);
         var httpResponse = new HttpResponseMessage(HttpStatusCode.NotFound)
         {
             Content = new StringContent(errorJson, System.Text.Encoding.UTF8, "application/json")
@@ -133,7 +133,7 @@ public class JobQueryServiceTests
             ])
         };
 
-        var json = JsonSerializer.Serialize(summaries, JsonOpts);
+        var json = JsonSerializer.Serialize(summaries, _jsonOpts);
         var httpResponse = new HttpResponseMessage(HttpStatusCode.OK)
         {
             Content = new StringContent(json, System.Text.Encoding.UTF8, "application/json")

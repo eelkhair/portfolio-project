@@ -64,6 +64,7 @@ public class ApiResponseTests
         {
             Message = "Something went wrong",
             Errors = new Dictionary<string, string[]>
+(StringComparer.Ordinal)
             {
                 { "Name", new[] { "Name is required" } }
             }
@@ -136,6 +137,7 @@ public class ApiResponseTests
         {
             Message = "Validation failed",
             Errors = new Dictionary<string, string[]>
+(StringComparer.Ordinal)
             {
                 { "Name", new[] { "Name is required", "Name must be at least 3 characters" } },
                 { "Email", new[] { "Email is invalid" } }

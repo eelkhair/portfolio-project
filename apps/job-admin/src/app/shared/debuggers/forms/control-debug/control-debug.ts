@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 
 
-type DebugModel = {
+interface DebugModel {
   key: string;
   ready: WritableSignal<boolean>;
   show: WritableSignal<boolean>;
@@ -123,7 +123,7 @@ export class ControlDebugComponent  implements OnInit {
    * @param model - The DebugModel instance to initialize.
    * @param initialValue - The fallback value to use if neither localStorage nor the parent signal provides a value (default: false).
    */
-  private initialize(model: DebugModel, initialValue: boolean = false): void {
+  private initialize(model: DebugModel, initialValue = false): void {
     const stored = this.getStorageItem(model.key);
     model.show.set(
       stored != null
@@ -138,7 +138,7 @@ export class ControlDebugComponent  implements OnInit {
    * @param model - The DebugModel instance containing signals and key.
    */
   private syncWithParent(model: DebugModel) {
-    if (model.parentReady?.() !== undefined && model.parentReady?.()!) {
+    if (model.parentReady?.() !== undefined && model.parentReady?.()) {
       model.show.set(model.parentShow?.() ?? false);
       this.setStorageItem(model.key, model.parentShow?.() ? '1' : '0');
     }

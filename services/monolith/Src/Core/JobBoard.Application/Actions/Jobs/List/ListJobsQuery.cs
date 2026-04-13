@@ -17,8 +17,8 @@ public class ListJobsQueryHandler(IJobBoardQueryDbContext context, ILogger<ListJ
     public Task<IQueryable<JobResponse>> HandleAsync(ListJobsQuery request, CancellationToken cancellationToken)
     {
         logger.LogInformation("Fetching jobs from the database...");
-        
-        var result = Context.Jobs.Where(c=>c.Company.Id == request.CompanyUId).Select(job => new JobResponse
+
+        var result = Context.Jobs.Where(c => c.Company.Id == request.CompanyUId).Select(job => new JobResponse
         {
             Id = job.Id,
             CompanyUId = job.Company.Id,
@@ -32,9 +32,9 @@ public class ListJobsQueryHandler(IJobBoardQueryDbContext context, ILogger<ListJ
             Qualifications = job.Qualifications.Select(c => c.Value).ToList(),
             CreatedAt = job.CreatedAt,
             UpdatedAt = job.UpdatedAt
-            
+
         });
-        
+
         return Task.FromResult(result);
     }
 }

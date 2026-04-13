@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Text.Json;
 using JobBoard.Application.Interfaces;
 using JobBoard.Application.Interfaces.Messaging;
@@ -14,9 +14,9 @@ public class OutboxPublisher(IOutboxDbContext dbContext) : IOutboxPublisher
         var message = new OutboxMessage
         {
             EventType = integrationEvent.EventType,
-            Payload = JsonSerializer.Serialize(integrationEvent , integrationEvent.GetType()),
+            Payload = JsonSerializer.Serialize(integrationEvent, integrationEvent.GetType()),
             CreatedAt = DateTime.UtcNow,
-            TraceParent = Activity.Current?.Id 
+            TraceParent = Activity.Current?.Id
         };
 
         await dbContext.OutboxMessages.AddAsync(message, cancellationToken);

@@ -1,4 +1,4 @@
-﻿namespace AdminAPI.Contracts.Models.Jobs.Events;
+namespace AdminAPI.Contracts.Models.Jobs.Events;
 
 public class JobPublishedEvent
 {

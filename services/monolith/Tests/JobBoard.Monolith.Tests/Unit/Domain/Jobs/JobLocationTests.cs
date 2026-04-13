@@ -1,5 +1,5 @@
-using Shouldly;
 using JobBoard.Domain.ValueObjects.Job;
+using Shouldly;
 
 namespace JobBoard.Monolith.Tests.Unit.Domain.Jobs;
 

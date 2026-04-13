@@ -1,5 +1,3 @@
-﻿using System.Security.Claims;
-using Elkhair.Dev.Common.Application;
 using Elkhair.Dev.Common.Domain.Constants;
 using Elkhair.Dev.Common.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +10,7 @@ public partial class UserDbContext : DbContext, IUserDbContext
     public DbSet<User> Users { get; set; } = null!;
     public DbSet<Company> Companies { get; set; } = null!;
     public DbSet<UserCompany> UserCompanies { get; set; } = null!;
-    
+
     public UserDbContext(DbContextOptions<UserDbContext> options) : base(options) { }
 
 

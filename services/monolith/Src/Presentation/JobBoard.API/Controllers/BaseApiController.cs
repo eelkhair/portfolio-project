@@ -83,7 +83,7 @@ public abstract class BaseApiController : ControllerBase
         var handler = HttpContext.RequestServices.GetRequiredService(handlerType);
         return ((dynamic)handler).HandleAsync((dynamic)request, HttpContext.RequestAborted);
     }
-    
+
     private IActionResult HandleException(Exception exception)
     {
         if (exception is not (ValidationException or UnauthorizedAccessException
@@ -100,11 +100,11 @@ public abstract class BaseApiController : ControllerBase
                     "Validation failed",
                     HttpStatusCode.BadRequest,
                     vex.Errors
-                        .GroupBy(e => e.PropertyName)
+                        .GroupBy(e => e.PropertyName, StringComparer.Ordinal)
                         .ToDictionary(
                             g => g.Key,
                             g => g.Select(e => e.ErrorMessage).ToArray()
-                        )
+, StringComparer.Ordinal)
                 )
             ),
 

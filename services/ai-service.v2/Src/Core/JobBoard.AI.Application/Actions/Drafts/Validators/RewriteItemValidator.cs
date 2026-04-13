@@ -3,7 +3,7 @@ using JobBoard.AI.Application.Actions.Drafts.RewriteItem;
 
 namespace JobBoard.AI.Application.Actions.Drafts.Validators;
 
-public sealed class RewriteItemValidator 
+public sealed class RewriteItemValidator
     : AbstractValidator<RewriteItemRequest>
 {
     public RewriteItemValidator()

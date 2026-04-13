@@ -66,7 +66,7 @@ public static class DependencyInjection
                     var token = context.Request.Query["access_token"];
 
                     if (!string.IsNullOrEmpty(token) &&
-                        path.StartsWithSegments("/hubs/notifications"))
+                        path.StartsWithSegments("/hubs/notifications", StringComparison.Ordinal))
                     {
                         context.Token = token;
                     }
@@ -106,8 +106,8 @@ public static class DependencyInjection
     // Application Middleware Pipeline
     // -------------------------------------------------------------------------
     public static WebApplication UseApplicationServices(this WebApplication app)
-    { 
-    
+    {
+
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseStaticFiles();

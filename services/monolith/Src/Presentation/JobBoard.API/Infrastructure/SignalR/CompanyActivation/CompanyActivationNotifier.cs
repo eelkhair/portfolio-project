@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using JobBoard.Monolith.Contracts.Companies;
 using Microsoft.AspNetCore.SignalR;
 
@@ -37,13 +37,13 @@ public class CompanyActivationNotifier(
             act?.SetTag("messaging.system", "signalr");
             act?.SetTag("messaging.destination.name", "CompanyActivated");
             act?.SetTag("messaging.operation", "send");
-            var parent = Activity.Current; 
+            var parent = Activity.Current;
             await hub.Clients.Group(request.CreatedBy).SendAsync("CompanyActivated", new
             {
                 request.CompanyUId,
                 request.CompanyName,
-                TraceParent =parent?.Id,                 
-                TraceState =parent?.TraceStateString,    
+                TraceParent = parent?.Id,
+                TraceState = parent?.TraceStateString,
                 Message = $"“{request.CompanyName}” has been activated."
             }, cancellationToken);
             act?.SetTag("enduser.id", request.CreatedBy);

@@ -3,7 +3,6 @@ using System.Text.Json;
 using JobBoard.AI.Application.Actions.Base;
 using JobBoard.AI.Application.Actions.Jobs.Similar;
 using JobBoard.AI.Application.Interfaces.Configurations;
-using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Application.Interfaces.Persistence;
 using JobBoard.AI.Domain.Drafts;
 using Microsoft.EntityFrameworkCore;
@@ -217,7 +216,7 @@ public class ListMatchingJobsQueryHandler(
         return raw.Select(x => new ScoredJob(x.JobId, x.Score, x.FullSim, x.SkillsSim, x.ExperienceSim)).ToList();
     }
 
-    private static string F(double v) => v.ToString("F2");
+    private static string F(double v) => v.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
     private static string SW(double sim, double weight) => $"{sim:F2} @{weight * 100:F0}%";
 
     /// <summary>

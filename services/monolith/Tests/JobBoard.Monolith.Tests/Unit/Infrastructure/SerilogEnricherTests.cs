@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using Elkhair.Common.Observability.Observability;
 using Serilog.Core;
 using Serilog.Events;
 using Shouldly;

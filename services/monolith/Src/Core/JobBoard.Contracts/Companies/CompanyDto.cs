@@ -1,4 +1,4 @@
-﻿namespace JobBoard.Monolith.Contracts.Companies;
+namespace JobBoard.Monolith.Contracts.Companies;
 
 public class CompanyDto : BaseDto
 {
@@ -23,7 +23,7 @@ public class CompanyDto : BaseDto
     public string? Logo { get; set; }
 
     public string Status { get; set; } = string.Empty;
-    
+
     public IndustryDto? Industry { get; set; }
     public Guid IndustryUId { get; set; }
 }

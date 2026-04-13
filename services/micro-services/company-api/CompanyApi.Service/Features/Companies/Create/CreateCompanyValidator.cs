@@ -1,5 +1,5 @@
-using CompanyAPI.Contracts.Models.Companies.Requests;
 using CompanyApi.Infrastructure.Data;
+using CompanyAPI.Contracts.Models.Companies.Requests;
 using FastEndpoints;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -42,10 +42,10 @@ public class CreateCompanyValidator : Validator<CreateCompanyRequest>
                 .Select(x => new { x.Name, x.Email })
                 .ToListAsync(ct);
 
-            if (dup.Any(d => d.Name == model.Name))
+            if (dup.Any(d => string.Equals(d.Name, model.Name, StringComparison.Ordinal)))
                 ctx.AddFailure(nameof(model.Name), "Company name already exists");
 
-            if (dup.Any(d => d.Email == model.CompanyEmail))
+            if (dup.Any(d => string.Equals(d.Email, model.CompanyEmail, StringComparison.Ordinal)))
                 ctx.AddFailure(nameof(model.CompanyEmail), "Company email already exists");
 
             // 2) One query to verify Industry existence

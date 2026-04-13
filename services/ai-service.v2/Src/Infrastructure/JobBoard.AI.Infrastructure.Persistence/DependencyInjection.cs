@@ -12,11 +12,11 @@ public static class DependencyInjection
         services.AddDbContext<AiDbContext>(options =>
         {
             options.UseNpgsql(
-                configuration.GetConnectionString("ai-db"), o => o.UseVector()    );
+                configuration.GetConnectionString("ai-db"), o => o.UseVector());
         });
-        
+
         services.AddScoped<IAiDbContext, AiDbContext>();
-        
+
         return services;
     }
 }

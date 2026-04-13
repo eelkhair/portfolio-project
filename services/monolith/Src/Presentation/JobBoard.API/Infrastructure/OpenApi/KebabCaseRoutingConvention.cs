@@ -1,6 +1,5 @@
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.OData.Routing.Controllers;
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
@@ -17,7 +16,7 @@ public partial class KebabCaseRoutingConvention : IApplicationModelConvention
         {
 
             if (controller == null) continue;
-         
+
             foreach (var action in controller.Actions)
             {
 
@@ -61,7 +60,7 @@ public partial class KebabCaseRoutingConvention : IApplicationModelConvention
 
         return MyRegex().Replace(input, "-$1").ToLower();
     }
-    
+
     public partial class KebabCaseParameterTransformer : IOutboundParameterTransformer
     {
         public string? TransformOutbound(object? value)
@@ -69,16 +68,16 @@ public partial class KebabCaseRoutingConvention : IApplicationModelConvention
             if (value is not string val || string.IsNullOrEmpty(val))
             {
                 return null;
-            } 
-            
+            }
+
             return MyRegex().Replace(val, "-$1").ToLower();
         }
 
-        [GeneratedRegex("(?<!^)([A-Z])", RegexOptions.Compiled)]
+        [GeneratedRegex("(?<!^)([A-Z])", RegexOptions.Compiled | RegexOptions.ExplicitCapture)]
         // ReSharper disable once MemberHidesStaticFromOuterClass
         private static partial Regex MyRegex();
     }
 
-    [GeneratedRegex("(?<!^)([A-Z])", RegexOptions.Compiled)]
+    [GeneratedRegex("(?<!^)([A-Z])", RegexOptions.Compiled | RegexOptions.ExplicitCapture)]
     private static partial Regex MyRegex();
 }

@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using JobBoard.AI.Application.Interfaces.AI;
-using JobBoard.AI.Application.Interfaces.Observability;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,7 +32,7 @@ public class EmbeddingService(IEmbeddingProviderResolver resolver, IConfiguratio
                 Dimensions = 1536
             },
             cancellationToken);
-        
+
         activity?.SetTag("embedding.vector.length", embedding.Vector.Length);
         return embedding.Vector.ToArray();
     }

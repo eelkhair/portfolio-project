@@ -12,9 +12,9 @@ public abstract class BaseQueryHandler
     {
         Context = context;
         Logger = logger;
-        ((ITransactionDbContext)  Context).ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-    } 
+        ((ITransactionDbContext)Context).ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+    }
     protected IJobBoardQueryDbContext Context { get; }
     // ReSharper disable once UnusedAutoPropertyAccessor.Global
-    protected ILogger Logger { get; } 
+    protected ILogger Logger { get; }
 }

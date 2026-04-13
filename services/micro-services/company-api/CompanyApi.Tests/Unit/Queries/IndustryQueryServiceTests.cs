@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using CompanyApi.Application.Queries;
 using CompanyApi.Infrastructure.Data;
-using CompanyApi.Infrastructure.Data.Entities;
 using CompanyApi.Tests.Helpers;
 using Microsoft.Extensions.Logging;
 using NSubstitute;

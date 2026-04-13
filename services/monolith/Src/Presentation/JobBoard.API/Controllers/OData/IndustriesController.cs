@@ -1,4 +1,4 @@
-﻿using JobBoard.Application.Actions.Companies.Industries;
+using JobBoard.Application.Actions.Companies.Industries;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 
@@ -19,9 +19,9 @@ public class IndustriesController : BaseODataController
     public async Task<IActionResult> Get()
     {
         var industries = await ExecuteODataQueryAsync(new GetIndustriesQuery());
-       
+
         return Ok(industries);
     }
-    
-        
-  }
+
+
+}

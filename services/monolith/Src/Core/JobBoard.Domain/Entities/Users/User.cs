@@ -14,7 +14,7 @@ public class User : BaseAuditableEntity
         Email = string.Empty;
         ExternalId = string.Empty;
     }
-    
+
     private User(string firstName, string lastName, string email, string? externalId)
     {
         FirstName = firstName;
@@ -22,12 +22,12 @@ public class User : BaseAuditableEntity
         Email = email;
         ExternalId = externalId;
     }
-    
+
     public string FirstName { get; private set; }
     public string LastName { get; private set; }
     public string Email { get; private set; }
     public string? ExternalId { get; private set; }
-    
+
     public void SetFirstName(string firstName) =>
         FirstName = UserFirstName
             .Create(firstName)
@@ -47,7 +47,7 @@ public class User : BaseAuditableEntity
         ExternalId = UserExternalId
             .Create(externalId)
             .Ensure<UserExternalId, string?>("User.InvalidExternalId")!;
-    
+
     public static User Create(
         string firstName,
         string lastName,
@@ -65,11 +65,11 @@ public class User : BaseAuditableEntity
 
         return user;
     }
-    
+
     private static User ValidateAndCreate(
-        string firstName, 
-        string lastName, 
-        string email, 
+        string firstName,
+        string lastName,
+        string email,
         string? externalId)
     {
         var errors = new List<Error>();

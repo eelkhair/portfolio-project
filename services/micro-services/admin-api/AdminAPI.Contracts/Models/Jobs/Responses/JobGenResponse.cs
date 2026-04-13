@@ -1,4 +1,4 @@
-﻿namespace AdminAPI.Contracts.Models.Jobs.Responses;
+namespace AdminAPI.Contracts.Models.Jobs.Responses;
 
 public class JobGenResponse
 {

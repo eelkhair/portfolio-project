@@ -13,7 +13,7 @@ public class KeywordToolGroupSelector : IToolGroupSelector
         ["public"] = ["match", "matching", "recommend", "resume", "similar", "search", "find", "apply", "application"]
     };
 
-    public static readonly HashSet<string> AllGroups = [..GroupKeywords.Keys.Append("core")];
+    public static readonly HashSet<string> AllGroups = [.. GroupKeywords.Keys.Append("core")];
 
     public HashSet<string> SelectGroups(string userMessage, string? conversationSummary)
     {

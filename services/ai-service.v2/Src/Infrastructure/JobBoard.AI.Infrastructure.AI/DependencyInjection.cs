@@ -1,12 +1,10 @@
-﻿using System.ClientModel;
-using System.Diagnostics;
+using System.ClientModel;
 using Anthropic.SDK;
 using Azure.AI.OpenAI;
 using GeminiDotnet;
 using GeminiDotnet.Extensions.AI;
 using JobBoard.AI.Application.Interfaces.AI;
 using JobBoard.AI.Application.Interfaces.Configurations;
-using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Infrastructure.AI.AITools;
 using JobBoard.AI.Infrastructure.AI.AITools.Admins;
 using JobBoard.AI.Infrastructure.AI.Infrastructure;
@@ -15,7 +13,6 @@ using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using ModelContextProtocol.Client;
 using OpenAI.Chat;
 using OpenAI.Embeddings;
 

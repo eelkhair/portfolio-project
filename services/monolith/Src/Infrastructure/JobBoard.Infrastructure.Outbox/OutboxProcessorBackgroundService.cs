@@ -39,7 +39,7 @@ public sealed class OutboxProcessorBackgroundService(
                     .GetRequiredService<IHandler<ProcessOutboxMessageCommand, bool>>();
 
                 processedAny = await handler.HandleAsync(
-                    new ProcessOutboxMessageCommand(), 
+                    new ProcessOutboxMessageCommand(),
                     stoppingToken);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)

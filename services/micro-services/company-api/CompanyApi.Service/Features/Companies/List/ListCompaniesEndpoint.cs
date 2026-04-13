@@ -18,7 +18,7 @@ public class ListCompaniesEndpoint(ICompanyQueryService service) : EndpointWitho
         Activity.Current?.SetTag("entity.type", "company");
         Activity.Current?.SetTag("operation", "list");
 
-        var companies = await service.ListAsync( HttpContext, ct);
-        await Send.OkAsync( companies , cancellation: ct);
+        var companies = await service.ListAsync(HttpContext, ct);
+        await Send.OkAsync(companies, cancellation: ct);
     }
 }

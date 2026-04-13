@@ -9,7 +9,7 @@ namespace Elkhair.Common.Observability.Observability;
 public static class LoggingFilters
 {
     public static LoggerConfiguration ApplyStandardFilters(
-        this LoggerConfiguration logger, 
+        this LoggerConfiguration logger,
         IHostEnvironment env)
     {
         // ------------------------------------------------------------
@@ -41,7 +41,7 @@ public static class LoggingFilters
         logger = logger
             .Filter.ByExcluding(log =>
                 log.Properties.TryGetValue("RequestPath", out var path) &&
-                path.ToString().Contains("/health"));
+                path.ToString(null, System.Globalization.CultureInfo.InvariantCulture).Contains("/health"));
 
         // ------------------------------------------------------------
         // Development overrides (verbose EF)
@@ -56,7 +56,7 @@ public static class LoggingFilters
     }
     public static ILoggingBuilder AddFilters(this ILoggingBuilder builder)
     {
-        
+
         builder.AddFilter("Microsoft", LogLevel.Error);
         builder.AddFilter("System", LogLevel.Error);
 
@@ -96,7 +96,7 @@ public static class LoggingFilters
 
         // Default: warnings or higher
         builder.AddFilter("Default", LogLevel.Warning);
-        
+
         builder.AddFilter("JobBoard.Application", LogLevel.Information);
         builder.AddFilter("JobBoard.Infrastructure", LogLevel.Information);
         builder.AddFilter("Elkhair.Common.Observability.Middleware", LogLevel.Information);
@@ -135,7 +135,7 @@ public static class LoggingFilters
         builder.AddFilter("Microsoft.AspNetCore.DataProtection", LogLevel.Warning);
         builder.AddFilter("Microsoft.AspNetCore", LogLevel.Warning);
 
-// Dapr
+        // Dapr
         builder.AddFilter("Dapr", LogLevel.Warning);
         builder.AddFilter("Dapr.Client", LogLevel.Warning);
         builder.AddFilter("Dapr.Runtime", LogLevel.Warning);
@@ -144,13 +144,13 @@ public static class LoggingFilters
         builder.AddFilter("Dapr.Placement", LogLevel.Warning);
         builder.AddFilter("Dapr.Contrib", LogLevel.Warning);
 
-// Hide Dapr → ASP.NET Core internal pings
+        // Hide Dapr → ASP.NET Core internal pings
         builder.AddFilter("Microsoft.AspNetCore.Hosting.Internal", LogLevel.Warning);
         builder.AddFilter("Microsoft.AspNetCore.Hosting", LogLevel.Warning);
-  
+
         return builder;
     }
-    
+
 }
 public class ElasticTimestampEnricher : ILogEventEnricher
 {

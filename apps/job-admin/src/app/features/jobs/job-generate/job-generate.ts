@@ -127,7 +127,7 @@ export class JobGenerate implements OnInit {
   }
 
   validateStep(i: number | undefined) {
-    let errs: Array<{ path: string; validator: string; details: any }>;
+    let errs: { path: string; validator: string; details: any }[];
 
     switch(i){
       case 1:

@@ -1,12 +1,9 @@
 using AdminApi.Core;
+using AdminApi.Mcp.Tools;
 using Elkhair.Common.Observability;
 using Elkhair.Dev.Common.Dapr;
 using JobBoard.Mcp.Common;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using ModelContextProtocol.AspNetCore;
 using ModelContextProtocol.Protocol;
-using AdminApi.Mcp.Tools;
 
 namespace AdminApi.Mcp.Infrastructure;
 

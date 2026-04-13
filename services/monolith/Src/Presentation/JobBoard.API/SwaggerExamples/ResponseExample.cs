@@ -20,6 +20,7 @@ public class ValidationFailureResponseExample : IExamplesProvider<ApiResponse<ob
             message: "Validation failed.",
             status: System.Net.HttpStatusCode.BadRequest,
             errors: new Dictionary<string, string[]>
+(StringComparer.Ordinal)
             {
                 { "FieldName", new[] { "Error 1 details" } }
             }

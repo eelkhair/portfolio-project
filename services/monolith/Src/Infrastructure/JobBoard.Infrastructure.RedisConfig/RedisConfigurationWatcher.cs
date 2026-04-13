@@ -42,7 +42,7 @@ public sealed class RedisConfigurationWatcher : BackgroundService
                 var db = _redis.GetDatabase(_databaseId);
                 var server = _redis.GetServers().First();
 
-                var featureFlags = new Dictionary<string, bool>();
+                var featureFlags = new Dictionary<string, bool>(StringComparer.Ordinal);
                 var prefixes = new[]
                 {
                     "jobboard:config:global:",
@@ -59,7 +59,7 @@ public sealed class RedisConfigurationWatcher : BackgroundService
                         var cleanedKey = RedisConfigurationLoader.CleanKey(key!, _serviceName);
                         _configuration[cleanedKey] = value!;
 
-                        if (cleanedKey.StartsWith("FeatureFlags:"))
+                        if (cleanedKey.StartsWith("FeatureFlags:", StringComparison.Ordinal))
                         {
                             var isEnabled = bool.TryParse(value!, out var enabled) && enabled;
                             featureFlags[cleanedKey.Replace("FeatureFlags:", "")] = isEnabled;

@@ -8,7 +8,7 @@ using JobAPI.Contracts.Models.Jobs.Responses;
 
 namespace JobApi.Features.Jobs.Create;
 
-public class CreateJobEndpoint(IJobCommandService service) :  Endpoint<EventDto<CreateJobRequest>, JobResponse>
+public class CreateJobEndpoint(IJobCommandService service) : Endpoint<EventDto<CreateJobRequest>, JobResponse>
 {
     public override void Configure()
     {
@@ -22,9 +22,9 @@ public class CreateJobEndpoint(IJobCommandService service) :  Endpoint<EventDto<
         Activity.Current?.SetTag("entity.type", "job");
         Activity.Current?.SetTag("operation", "create");
 
-        var isForwardSync = HttpContext.Request.Headers["X-Sync-Source"].FirstOrDefault() == "forward";
+        var isForwardSync = string.Equals(HttpContext.Request.Headers["X-Sync-Source"].FirstOrDefault(), "forward", StringComparison.Ordinal);
         Activity.Current?.SetTag("job.isForwardSync", isForwardSync);
         var response = await service.CreateJobAsync(request.Data, DaprExtensions.CreateUser(request.UserId), ct, publishEvent: !isForwardSync);
-        await Send.OkAsync(response, cancellation:ct);
+        await Send.OkAsync(response, cancellation: ct);
     }
 }

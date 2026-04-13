@@ -2,7 +2,7 @@
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
-    .AddHealthChecksUI(s=> s.SetEvaluationTimeInSeconds(8))
+    .AddHealthChecksUI(s => s.SetEvaluationTimeInSeconds(8))
     .AddInMemoryStorage();
 
 builder.Logging.AddJsonConsole();

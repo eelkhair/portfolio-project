@@ -1,13 +1,13 @@
-﻿using System.Diagnostics;
-using AdminAPI.Contracts.Services;
+using System.Diagnostics;
 using AdminAPI.Contracts.Models.Jobs.Requests;
 using AdminAPI.Contracts.Models.Jobs.Responses;
+using AdminAPI.Contracts.Services;
 using Elkhair.Dev.Common.Application;
 using FastEndpoints;
 
 namespace AdminApi.Features.Jobs.DraftUpsert;
 
-public sealed class UpsertDraftEndpoint(IJobCommandService service):
+public sealed class UpsertDraftEndpoint(IJobCommandService service) :
     Endpoint<JobDraftRequest, ApiResponse<JobDraftResponse>>
 {
     private const string RouteTemplate = "jobs/{companyId}/save-draft";
@@ -32,6 +32,6 @@ public sealed class UpsertDraftEndpoint(IJobCommandService service):
 
 
     }
-    
+
 }
 

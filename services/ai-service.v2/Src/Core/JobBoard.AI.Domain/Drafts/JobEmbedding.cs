@@ -9,10 +9,10 @@ public sealed class JobEmbedding : Entity
 {
     private JobEmbedding() { }
     public Guid JobId { get; private set; }
-    
+
 
     public Vector VectorData { get; private set; } = default!;
-    
+
     public EmbeddingVector Vector => new(VectorData.ToArray());
 
     public ProviderName Provider { get; private set; } = default!;

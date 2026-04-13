@@ -3,7 +3,6 @@ using JobBoard.Application.Interfaces;
 using JobBoard.Application.Interfaces.Infrastructure;
 using JobBoard.Monolith.Contracts.Settings;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Shouldly;

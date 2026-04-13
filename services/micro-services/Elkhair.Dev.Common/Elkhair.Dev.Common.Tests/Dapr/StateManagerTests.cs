@@ -117,7 +117,7 @@ public class StateManagerTests
         // Arrange
         var store = "statestore";
         var query = "{\"filter\":{}}";
-        var metadata = new Dictionary<string, string> { { "key", "value" } };
+        var metadata = new Dictionary<string, string>(StringComparer.Ordinal) { { "key", "value" } };
         var ct = CancellationToken.None;
 
         // Act

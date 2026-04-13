@@ -139,7 +139,7 @@ public abstract class BaseApiController : ControllerBase
                     vex.Errors.ToDictionary(
                         e => e.PropertyName,
                         e => new[] { e.ErrorMessage }
-                    )
+, StringComparer.Ordinal)
                 )
             ),
 

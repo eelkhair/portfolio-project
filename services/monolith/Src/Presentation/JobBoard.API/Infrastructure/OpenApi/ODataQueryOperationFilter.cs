@@ -32,7 +32,7 @@ public class ODataQueryOperationFilter : IOperationFilter
             Description = "Specifies a subset of properties to return (e.g., $select=Name,UId).",
             Schema = new OpenApiSchema { Type = "string" }
         });
-        
+
         operation.Parameters.Add(new OpenApiParameter
         {
             Name = "$expand",
@@ -72,7 +72,7 @@ public class ODataQueryOperationFilter : IOperationFilter
             Description = "Skips the first n results.",
             Schema = new OpenApiSchema { Type = "integer" }
         });
-        
+
         operation.Parameters.Add(new OpenApiParameter
         {
             Name = "$count",
@@ -81,5 +81,5 @@ public class ODataQueryOperationFilter : IOperationFilter
             Schema = new OpenApiSchema { Type = "boolean" }
         });
     }
-    
+
 }

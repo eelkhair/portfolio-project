@@ -1,13 +1,12 @@
-﻿using JobApi.Application.Interfaces;
-using JobAPI.Contracts.Models.Jobs.Responses;
+using JobApi.Application.Interfaces;
 using JobApi.Infrastructure.Data;
+using JobAPI.Contracts.Models.Jobs.Responses;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace JobApi.Application;
 
-public partial class JobQueryService(IJobDbContext context, ILogger<JobQueryService> logger): IJobQueryService
+public partial class JobQueryService(IJobDbContext context, ILogger<JobQueryService> logger) : IJobQueryService
 {
     public async Task<List<JobResponse>> ListAsync(Guid companyUId, CancellationToken ct)
     {
@@ -15,9 +14,9 @@ public partial class JobQueryService(IJobDbContext context, ILogger<JobQueryServ
 
         var jobs = await context.Jobs.Where(c => c.Company.UId == companyUId)
 
-            .Include(c=>c.Company)
-            .Include(c=>c.Qualifications)
-            .Include(c=>c.Responsibilities)
+            .Include(c => c.Company)
+            .Include(c => c.Qualifications)
+            .Include(c => c.Responsibilities)
             .ToListAsync(ct);
 
         LogJobsListed(logger, companyUId, jobs.Count);

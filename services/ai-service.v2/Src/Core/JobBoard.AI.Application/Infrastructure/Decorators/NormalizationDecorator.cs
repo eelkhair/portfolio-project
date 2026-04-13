@@ -1,6 +1,5 @@
 using JobBoard.AI.Application.Actions.Drafts.RewriteItem;
 using JobBoard.AI.Application.Interfaces.Configurations;
-using JobBoard.AI.Application.Interfaces.Observability;
 using Microsoft.Extensions.Logging;
 
 namespace JobBoard.AI.Application.Infrastructure.Decorators;
@@ -16,9 +15,9 @@ public sealed partial class NormalizationCommandHandlerDecorator<TRequest, TResu
         CancellationToken cancellationToken)
     {
         LogNormalizingRequestRequest(logger, typeof(TRequest).Name);
-       
+
         Normalize(request);
-        
+
         LogNormalizedRequestRequest(logger, typeof(TRequest).Name);
         return await decorated.HandleAsync(request, cancellationToken);
     }

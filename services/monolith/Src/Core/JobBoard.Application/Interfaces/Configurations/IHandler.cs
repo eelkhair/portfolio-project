@@ -8,26 +8,25 @@ using Microsoft.Extensions.Logging;
 
 namespace JobBoard.Application.Interfaces.Configurations;
 
-    public interface IHandler<in TRequest, TResult> where TRequest : IRequest<TResult>
-    {
-        Task<TResult> HandleAsync(TRequest request, CancellationToken cancellationToken);
-    }
+public interface IHandler<in TRequest, TResult> where TRequest : IRequest<TResult>
+{
+    Task<TResult> HandleAsync(TRequest request, CancellationToken cancellationToken);
+}
 
-    public interface INoTransaction;
-    public interface IAnonymousRequest;
-    public interface IRequest<TResult>
-    {
-        public string UserId { get; set; }
-    }
-    
-    public interface IHandlerContext
-    {
-        IUnitOfWork UnitOfWork { get; }
-        IOutboxPublisher OutboxPublisher { get; }
-        IMetricsService MetricsService { get; }
-        IUnitOfWorkEvents UnitOfWorkEvents { get; }
-        ILoggerFactory LoggerFactory { get; }
-    }
+public interface INoTransaction;
+public interface IAnonymousRequest;
+public interface IRequest<TResult>
+{
+    public string UserId { get; set; }
+}
+
+public interface IHandlerContext
+{
+    IUnitOfWork UnitOfWork { get; }
+    IOutboxPublisher OutboxPublisher { get; }
+    IMetricsService MetricsService { get; }
+    IUnitOfWorkEvents UnitOfWorkEvents { get; }
+    ILoggerFactory LoggerFactory { get; }
+}
 
 
-    

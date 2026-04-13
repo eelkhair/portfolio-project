@@ -6,5 +6,5 @@ public abstract class BaseAuditableEntity : BaseEntity
     public string CreatedBy { get; set; } = string.Empty;
     public DateTime UpdatedAt { get; set; }
     public string UpdatedBy { get; set; } = string.Empty;
-    
+
 }

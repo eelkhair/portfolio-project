@@ -5,10 +5,8 @@ using System.Text.Json.Serialization;
 using JobBoard.API.Helpers;
 using JobBoard.Application.Actions.Companies.Create;
 using JobBoard.Domain.Entities;
-using JobBoard.Infrastructure.Persistence.Context;
 using JobBoard.Monolith.Contracts.Companies;
 using JobBoard.Monolith.Tests.Integration.Fixtures;
-using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 
 namespace JobBoard.Monolith.Tests.Integration.Api;

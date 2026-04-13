@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using AdminAPI.Contracts.Services;
 using CompanyAPI.Contracts.Models.Industries.Responses;
 using Elkhair.Dev.Common.Application;
@@ -20,6 +20,6 @@ public class ListIndustriesEndpoint(IIndustryQueryService service) : EndpointWit
         Activity.Current?.SetTag("entity.type", "industry");
         Activity.Current?.SetTag("operation", "list");
         var industries = await service.ListAsync(ct);
-        await Send.OkAsync( industries , cancellation: ct);
+        await Send.OkAsync(industries, cancellation: ct);
     }
 }

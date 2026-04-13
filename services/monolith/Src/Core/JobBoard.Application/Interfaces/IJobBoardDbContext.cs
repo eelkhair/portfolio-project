@@ -36,16 +36,16 @@ public interface IOutboxDbContext
 }
 
 public interface IUnitOfWork
-{ 
+{
     Task<(int id, Guid uid)> GetNextValueFromSequenceAsync(Type entityType, CancellationToken cancellationToken);
     Task<int> SaveChangesAsync(string userId, CancellationToken cancellationToken);
 }
 
 public interface ITransactionDbContext
 {
-    Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken); 
+    Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken);
     ChangeTracker ChangeTracker { get; }
-    
+
     DatabaseFacade Database { get; }
 }
 

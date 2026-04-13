@@ -11,7 +11,7 @@ public class QualificationConfiguration : IEntityTypeConfiguration<Qualification
     {
         builder.ToTable("Qualifications");
         builder.ConfigureBaseAuditableEntity();
-        builder.HasOne(c=> c.Job).WithMany(c=> c.Qualifications).HasForeignKey(c=>c.JobId);
-        builder.Property(c=> c.Value).HasMaxLength(250);
+        builder.HasOne(c => c.Job).WithMany(c => c.Qualifications).HasForeignKey(c => c.JobId);
+        builder.Property(c => c.Value).HasMaxLength(250);
     }
 }

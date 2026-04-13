@@ -1,4 +1,4 @@
-﻿using JobBoard.Domain.Entities;
+using JobBoard.Domain.Entities;
 
 namespace JobBoard.Domain.Aggregates;
 

@@ -1,4 +1,4 @@
-﻿using JobAPI.Contracts.Enums;
+using JobAPI.Contracts.Enums;
 
 namespace JobAPI.Contracts.Models.Jobs.Requests;
 

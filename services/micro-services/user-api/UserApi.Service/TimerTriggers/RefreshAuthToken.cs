@@ -12,7 +12,7 @@ public class RefreshAuthToken(
 ) : EndpointWithoutRequest<string>
 {
     private const string StateStoreName = StateStores.Redis;
-    private const string LockKey        = "keycloaktoken:refresh-lock";
+    private const string LockKey = "keycloaktoken:refresh-lock";
     private static readonly TimeSpan LockTtl = TimeSpan.FromSeconds(60);
 
     public override void Configure()
@@ -39,7 +39,7 @@ public class RefreshAuthToken(
             value: lockVal,
             etag: entry.ETag,            // ensure atomic write-if-unmodified
             stateOptions: null,
-            metadata: new Dictionary<string, string> { ["ttlInSeconds"] = ((int)LockTtl.TotalSeconds).ToString() },
+            metadata: new Dictionary<string, string>(StringComparer.Ordinal) { ["ttlInSeconds"] = ((int)LockTtl.TotalSeconds).ToString(System.Globalization.CultureInfo.InvariantCulture) },
             cancellationToken: ct);
 
         if (!acquired)
@@ -68,7 +68,7 @@ public class RefreshAuthToken(
             try
             {
                 var current = await dapr.GetStateEntryAsync<string>(StateStoreName, LockKey, cancellationToken: ct);
-                if (current.Value == lockVal)
+                if (string.Equals(current.Value, lockVal, StringComparison.Ordinal))
                 {
                     // ETag-aware delete to avoid clobbering if someone else changed it
                     var deleted = await dapr.TryDeleteStateAsync(

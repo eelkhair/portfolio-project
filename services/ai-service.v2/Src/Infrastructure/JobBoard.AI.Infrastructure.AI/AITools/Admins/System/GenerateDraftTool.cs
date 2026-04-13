@@ -6,7 +6,6 @@ using JobBoard.AI.Application.Actions.Drafts.Generate;
 using JobBoard.AI.Application.Interfaces.Clients;
 using JobBoard.AI.Application.Interfaces.Configurations;
 using JobBoard.AI.Application.Interfaces.Notifications;
-using JobBoard.AI.Application.Interfaces.Observability;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
 
@@ -81,6 +80,7 @@ public static class GenerateDraftTool
                         CorrelationId: null,
                         Timestamp: DateTimeOffset.UtcNow,
                         Metadata: new Dictionary<string, object>
+(StringComparer.Ordinal)
                         {
                             { "companyId", companyId },
                             { "companyName", companyName ?? string.Empty }

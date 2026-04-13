@@ -14,6 +14,6 @@ public class OutboxMessageConfiguration : IEntityTypeConfiguration<OutboxMessage
         builder.Property(e => e.EventType).HasMaxLength(250).IsRequired();
         builder.Property(e => e.Payload).IsRequired().HasMaxLength(4000);
         builder.Property(e => e.LastError).HasMaxLength(4000);
-        builder.Property(e=> e.TraceParent).HasMaxLength(250);
+        builder.Property(e => e.TraceParent).HasMaxLength(250);
     }
 }

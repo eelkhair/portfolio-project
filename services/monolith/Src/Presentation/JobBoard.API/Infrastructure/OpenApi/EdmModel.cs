@@ -20,14 +20,14 @@ public static class EdmModel
         var builder = new ODataConventionModelBuilder();
         builder.EnableLowerCamelCase();
         var companySet = builder.EntitySet<CompanyDto>("Companies");
-        
+
         var industrySet = builder.EntitySet<IndustryDto>("Industries");
         var userSet = builder.EntitySet<UserDto>("Users");
-        builder.EntitySet<JobResponse>("Jobs");   
+        builder.EntitySet<JobResponse>("Jobs");
 
-        
-        companySet.EntityType.HasRequired(c=>c.Industry);
-      
-       return builder.GetEdmModel();
+
+        companySet.EntityType.HasRequired(c => c.Industry);
+
+        return builder.GetEdmModel();
     }
 }

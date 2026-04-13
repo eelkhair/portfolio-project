@@ -10,6 +10,6 @@ public class JobRepository(IJobBoardQueryDbContext context) : BaseRepository(con
     {
         await Context.Jobs.AddAsync(job, cancellationToken);
     }
-    
-    
+
+
 }

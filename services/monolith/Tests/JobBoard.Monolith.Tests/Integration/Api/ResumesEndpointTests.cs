@@ -1,7 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using JobBoard.Domain.Entities;
 using JobBoard.Domain.Entities.Users;
 using JobBoard.IntegrationEvents.Resume;
 using JobBoard.Monolith.Contracts.Public;

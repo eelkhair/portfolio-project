@@ -1,7 +1,6 @@
 using HealthChecks.UI.Client;
 using JobBoard.HealthChecks;
 using JobBoard.Mcp.Common;
-using Microsoft.AspNetCore.Builder;
 
 namespace JobBoard.API.Mcp.Infrastructure;
 
@@ -21,7 +20,7 @@ public static class WebApplicationExtensions
         // Suppress MCP Streamable HTTP SSE probe (GET /) before it generates a trace span
         app.Use(async (context, next) =>
         {
-            if (context.Request.Method == "GET" && context.Request.Path == "/")
+            if (string.Equals(context.Request.Method, "GET", StringComparison.Ordinal) && context.Request.Path == "/")
             {
                 var activity = System.Diagnostics.Activity.Current;
                 if (activity != null)

@@ -1,4 +1,4 @@
-﻿using JobBoard.Application.Interfaces.Email;
+using JobBoard.Application.Interfaces.Email;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -13,7 +13,7 @@ public static class DependencyInjection
         services.Configure<SmtpSettings>(configuration.GetSection("SmtpSettings"));
         services.AddSingleton<IRazorLightEngine>(provider =>
         {
-     
+
             var hostEnvironment = provider.GetRequiredService<IHostEnvironment>();
             var templateFolderPath = Path.Combine(hostEnvironment.ContentRootPath, "Templates");
 

@@ -20,7 +20,7 @@ public class UploadResumeCommandValidator : AbstractValidator<UploadResumeComman
 
         RuleFor(x => x.ContentType)
             .NotEmpty().WithMessage("Content type is required.")
-            .Must(ct => AllowedContentTypes.Contains(ct))
+            .Must(ct => AllowedContentTypes.Contains(ct, StringComparer.Ordinal))
             .WithMessage("Only PDF, DOCX, and TXT files are allowed.");
 
         RuleFor(x => x.FileSize)

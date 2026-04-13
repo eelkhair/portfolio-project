@@ -26,7 +26,7 @@ public class DeleteDraftEndpoint(IDraftCommandService service) : Endpoint<Delete
         Activity.Current?.SetTag("entity.id", request.DraftUId);
         Activity.Current?.SetTag("operation", "delete");
 
-        var isForwardSync = HttpContext.Request.Headers["X-Sync-Source"].FirstOrDefault() == "forward";
+        var isForwardSync = string.Equals(HttpContext.Request.Headers["X-Sync-Source"].FirstOrDefault(), "forward", StringComparison.Ordinal);
         Activity.Current?.SetTag("draft.isForwardSync", isForwardSync);
 
         await service.DeleteDraftAsync(request.DraftUId, DaprExtensions.CreateUser(request.UserId ?? "system"), ct, publishEvent: !isForwardSync);

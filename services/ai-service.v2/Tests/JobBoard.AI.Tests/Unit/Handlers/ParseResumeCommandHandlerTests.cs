@@ -2,7 +2,6 @@ using System.Text;
 using JobBoard.AI.Application.Actions.Base;
 using JobBoard.AI.Application.Actions.Resumes.Parse;
 using JobBoard.AI.Application.Interfaces.AI;
-using JobBoard.AI.Application.Interfaces.Configurations;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Shouldly;

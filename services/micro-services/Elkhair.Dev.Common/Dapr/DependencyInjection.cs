@@ -1,4 +1,4 @@
-﻿using Dapr.Client;
+using Dapr.Client;
 using Elkhair.Dev.Common.Application;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,29 +12,29 @@ public static class DependencyInjection
     {
         // Method intentionally left empty.
     }
-     
+
     public static void AddMessageSender(this IServiceCollection services)
     {
         services.AddLogging();
         services.AddTransient<UserContextService>();
-        services.AddTransient<IMessageSender, MessageSender>( sp =>
+        services.AddTransient<IMessageSender, MessageSender>(sp =>
         {
             var logger = sp.GetRequiredService<ILogger<MessageSender>>();
             var accessor = sp.GetRequiredService<UserContextService>();
             var client = new DaprClientBuilder().Build();
-            
+
             return new MessageSender(logger, client, accessor);
         });
     }
-    
+
     public static void AddStateManager(this IServiceCollection services)
     {
         services.AddLogging();
-        services.AddTransient<IStateManager, StateManager>( sp =>
+        services.AddTransient<IStateManager, StateManager>(sp =>
         {
             var logger = sp.GetRequiredService<ILogger<StateManager>>();
             var client = new DaprClientBuilder().Build();
-            
+
             return new StateManager(logger, client);
         });
     }

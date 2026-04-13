@@ -2,7 +2,6 @@ using JobBoard.Application.Actions.Base;
 using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Domain;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 
 namespace JobBoard.API.Controllers.OData;

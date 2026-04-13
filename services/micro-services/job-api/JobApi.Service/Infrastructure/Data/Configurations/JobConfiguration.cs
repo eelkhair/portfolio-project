@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace JobApi.Infrastructure.Data.Configurations;
 
-public class JobConfiguration: IEntityTypeConfiguration<Job>
+public class JobConfiguration : IEntityTypeConfiguration<Job>
 {
     public void Configure(EntityTypeBuilder<Job> builder)
     {
         builder.ToTable("Jobs");
         builder.ConfigureBaseAuditableEntity();
-        builder.HasOne(c=> c.Company).WithMany(j=>j.Jobs).HasForeignKey(j=>j.CompanyId);
+        builder.HasOne(c => c.Company).WithMany(j => j.Jobs).HasForeignKey(j => j.CompanyId);
         builder.Property(c => c.Title).IsRequired().HasMaxLength(250);
         builder.Property(j => j.Location)
             .IsRequired()
@@ -28,6 +28,6 @@ public class JobConfiguration: IEntityTypeConfiguration<Job>
 
         builder.Property(j => j.SalaryRange)
             .HasMaxLength(100);
-        
+
     }
 }

@@ -34,7 +34,7 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
 
         // Derive a unique email per userId to prevent unique constraint violations
         // when UserContextDecorator auto-creates users with different external IDs
-        var email = userId == DefaultUserId ? DefaultEmail : $"{userId}@test.com";
+        var email = string.Equals(userId, DefaultUserId, StringComparison.Ordinal) ? DefaultEmail : $"{userId}@test.com";
 
         var claims = new List<Claim>
         {

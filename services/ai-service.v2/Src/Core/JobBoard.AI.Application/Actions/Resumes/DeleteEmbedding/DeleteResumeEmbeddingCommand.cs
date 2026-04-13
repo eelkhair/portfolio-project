@@ -2,7 +2,6 @@ using System.Diagnostics;
 using Elkhair.Dev.Common.Dapr;
 using JobBoard.AI.Application.Actions.Base;
 using JobBoard.AI.Application.Interfaces.Configurations;
-using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Application.Interfaces.Persistence;
 using JobBoard.IntegrationEvents.Resume;
 using Microsoft.EntityFrameworkCore;

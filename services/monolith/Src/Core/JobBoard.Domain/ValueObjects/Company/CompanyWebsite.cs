@@ -1,13 +1,13 @@
-﻿using JobBoard.Domain.Exceptions;
+using JobBoard.Domain.Exceptions;
 
 namespace JobBoard.Domain.ValueObjects.Company;
 
 public class CompanyWebsite
 {
     public string? Value { get; }
-    
+
     private CompanyWebsite(string? value) { Value = value; }
-    
+
     public static Result<CompanyWebsite> Create(string? value)
     {
         var errors = new List<Error>();
@@ -16,7 +16,7 @@ public class CompanyWebsite
         {
             return Result<CompanyWebsite>.Success(new CompanyWebsite(value));
         }
-        
+
         value = value.Trim();
         if (value.Length > 200)
         {

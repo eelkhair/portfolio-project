@@ -1,4 +1,4 @@
-﻿using CompanyApi.Infrastructure.Data.Entities;
+using CompanyApi.Infrastructure.Data.Entities;
 using Elkhair.Dev.Common.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

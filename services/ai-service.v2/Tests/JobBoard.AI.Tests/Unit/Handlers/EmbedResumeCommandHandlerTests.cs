@@ -4,8 +4,6 @@ using JobBoard.AI.Application.Actions.Base;
 using JobBoard.AI.Application.Actions.Resumes.Embed;
 using JobBoard.AI.Application.Interfaces.AI;
 using JobBoard.AI.Application.Interfaces.Clients;
-using JobBoard.AI.Application.Interfaces.Configurations;
-using AppUnit = JobBoard.AI.Application.Interfaces.Configurations.Unit;
 using JobBoard.AI.Application.Interfaces.Observability;
 using JobBoard.AI.Application.Interfaces.Persistence;
 using JobBoard.AI.Domain.Drafts;
@@ -15,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Shouldly;
+using AppUnit = JobBoard.AI.Application.Interfaces.Configurations.Unit;
 
 namespace JobBoard.AI.Tests.Unit.Handlers;
 
