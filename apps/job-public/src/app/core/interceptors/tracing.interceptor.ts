@@ -15,6 +15,7 @@ const oidcHost = (() => {
 const EXCLUDE: RegExp[] = [
   /\/v1\/traces$/i,
   /\/api\/v2\/spans$/i,
+  /jaeger-api/i,
   /^assets\//i,
   /\.woff2?$|\.png$|\.jpe?g$|\.svg$|\.css$|\.js$/i,
   /(^|\/)healthz(\?|$)/i,
@@ -59,7 +60,7 @@ export const tracingInterceptor: HttpInterceptorFn = (req, next) => {
             span.setStatus({ code: SpanStatusCode.ERROR });
           }
           const traceId = evt.headers.get('x-trace-id') || evt.headers.get('trace-id');
-          if (traceId) {
+          if (traceId && !urlStr.includes('jaeger-api')) {
             debugService.push({
               method: req.method,
               path: path(urlStr),

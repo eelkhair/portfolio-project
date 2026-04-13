@@ -15,14 +15,23 @@
 } @else {
   <div class="grid grid-cols-4 gap-4 items-start">
     @for (stage of store.stages(); track stage.status) {
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-3 min-h-48 rounded-lg p-2 transition-colors"
+           [class.bg-primary-50]="dragOverStage === stage.status"
+           [class.dark:bg-primary-900/10]="dragOverStage === stage.status"
+           (dragover)="onDragOver($event, stage.status)"
+           (dragleave)="dragOverStage = null"
+           (drop)="onDrop($event, stage.status)">
         <div class="flex items-center justify-between px-1">
           <p-tag [value]="stage.name" [severity]="stage.severity" />
           <span class="text-sm text-color-secondary font-semibold">{{ stage.candidates.length }}</span>
         </div>
 
         @for (candidate of stage.candidates; track candidate.id) {
-          <p-card styleClass="cursor-pointer hover:shadow-lg transition-shadow" (click)="store.selectApplication(candidate.id)">
+          <p-card styleClass="cursor-grab hover:shadow-lg transition-shadow"
+                  [attr.draggable]="true"
+                  (dragstart)="onDragStart($event, candidate.id, stage.status)"
+                  (dragend)="onDragEnd()"
+                  (click)="store.selectApplication(candidate.id)">
             <div class="flex gap-3 items-start">
               <p-avatar [label]="store.initials(candidate.applicantName)" shape="circle" size="normal" />
               <div class="flex-1 min-w-0">

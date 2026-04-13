@@ -25,8 +25,9 @@ services:
       - ASPNETCORE_ENVIRONMENT=dev
       - VAULT_ADDR=${VAULT_ADDR}
       - VAULT_TOKEN=${VAULT_TOKEN}
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.160:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
+      - JaegerApiUrl=http://192.168.1.160:16686
       - SEQ_URL=https://seq.eelkhair.net
     networks:
       - ai-job-board-net

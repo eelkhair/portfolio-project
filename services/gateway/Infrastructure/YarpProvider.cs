@@ -13,6 +13,22 @@ public static class YarpProvider
     {
         new RouteConfig
         {
+            RouteId = "jaeger-api",
+            ClusterId = "jaeger",
+            Match = new RouteMatch
+            {
+                Path = "/jaeger-api/{**catch-all}"
+            },
+            Transforms = new[]
+            {
+                new Dictionary<string, string>
+                {
+                    ["PathRemovePrefix"] = "/jaeger-api"
+                }
+            }
+        },
+        new RouteConfig
+        {
             RouteId = "ai-v2",
             ClusterId = "ai-v2",
             Match = new RouteMatch
@@ -107,6 +123,7 @@ public static class YarpProvider
     {
         return new[]
         {
+            Cluster("jaeger", config["JaegerApiUrl"] ?? "http://localhost:16686"),
             Cluster("ai-v2", config["AiServiceUrl"] ?? "http://ai-service-v2:8080"),
             Cluster("admin", config["AdminApiUrl"] ?? "http://admin-api:8080"),
             Cluster("monolith", config["MonolithUrl"] ?? "http://monolith-api:8080"),

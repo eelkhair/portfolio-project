@@ -19,7 +19,7 @@ import mermaid from 'mermaid';
       (visibleChange)="popup.visible.set($event)"
       position="right"
       [style]="{width: '85vw', maxWidth: '1100px'}"
-      (onHide)="popup.close()">
+      (onHide)="onClose()">
 
       <ng-template #header>
         <div class="flex items-center gap-2">
@@ -87,10 +87,8 @@ export class ArchitecturePopup {
 
   readonly jaegerUrl = environment.jaegerUrl;
   readonly grafanaUrl = environment.grafanaUrl;
-  // Proxy through Angular dev server locally (/jaeger-api/traces/), direct on prod
-  private readonly jaegerApiUrl = environment.jaegerUrl.includes('localhost')
-    ? '/jaeger-api/traces/'
-    : environment.jaegerUrl.replace('/trace/', '/api/traces/');
+  // Fetch traces through the gateway's /jaeger-api/ proxy route
+  private readonly jaegerApiUrl = `${environment.gatewayUrl}jaeger-api/api/traces/`;
 
   @ViewChild('diagramContainer') diagramContainer?: ElementRef;
 
@@ -420,4 +418,15 @@ export class ArchitecturePopup {
     }
   }
 
+  onClose() {
+    this.fetchAttempt++; // cancel pending retries
+    this.popup.close();
+    this.event.set(null);
+    this.services.set([]);
+    this.traceDuration.set(null);
+    this.diagramLoading.set(false);
+    if (this.diagramContainer?.nativeElement) {
+      this.diagramContainer.nativeElement.innerHTML = '';
+    }
+  }
 }

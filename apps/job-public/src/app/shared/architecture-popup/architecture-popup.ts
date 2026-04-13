@@ -13,7 +13,7 @@ import mermaid from 'mermaid';
     @if (popup.visible()) {
       <div class="fixed inset-0 z-50 flex items-start justify-center bg-black/40 backdrop-blur-sm animate-fade-in"
            (click)="onBackdropClick($event)">
-        <div class="mx-4 mt-16 w-full max-w-4xl rounded-xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-800 max-h-[85vh] overflow-y-auto"
+        <div class="mx-4 mt-16 w-full max-w-[90vw] rounded-xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-800 max-h-[85vh] overflow-y-auto"
              (click)="$event.stopPropagation()">
 
           <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700">
@@ -94,9 +94,8 @@ export class ArchitecturePopup {
 
   readonly jaegerUrl = (environment as any).jaegerUrl ?? '';
   readonly grafanaUrl = (environment as any).grafanaUrl ?? '';
-  private readonly jaegerApiUrl = ((environment as any).jaegerUrl ?? '').includes('localhost')
-    ? '/jaeger-api/traces/'
-    : ((environment as any).jaegerUrl ?? '').replace('/trace/', '/api/traces/');
+  // Fetch traces through the gateway's /jaeger-api/ proxy route
+  private readonly jaegerApiUrl = ((environment as any).apiUrl ?? '').replace('/api/', '/') + 'jaeger-api/api/traces/';
 
   @ViewChild('diagramContainer') diagramContainer?: ElementRef;
 
