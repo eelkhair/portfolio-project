@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 @Component({
   standalone: true,
   selector: 'app-auth-callback',
-  template: `<p>Signing you in...</p>`
+  templateUrl: './auth-callback.html'
 })
 export class AuthCallbackComponent implements OnInit {
   private oidc = inject(OidcSecurityService);

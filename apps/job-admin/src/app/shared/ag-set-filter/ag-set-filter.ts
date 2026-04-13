@@ -11,19 +11,7 @@ export interface AgSetFilterParams {
 @Component({
   selector: 'app-ag-set-filter',
   imports: [Select, FormsModule],
-  template: `
-    <div style="padding: 8px; min-width: 200px; min-height: 60px;">
-      <p-select
-        [options]="options"
-        [(ngModel)]="selected"
-        placeholder="All"
-        [showClear]="true"
-        (onChange)="onSelectionChange()"
-        appendTo="body"
-        [style]="{ width: '100%' }"
-      />
-    </div>
-  `,
+  templateUrl: './ag-set-filter.html',
 })
 export class AgSetFilter implements IFilterAngularComp {
   params!: IFilterParams & AgSetFilterParams;

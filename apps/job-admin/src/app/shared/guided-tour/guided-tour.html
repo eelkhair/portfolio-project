@@ -1,0 +1,45 @@
+@if (visible()) {
+  <div class="tour-overlay" [class.tour-fade-out]="fadingOut()" (click)="dismiss()">
+    <svg class="tour-backdrop" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <mask id="tour-mask">
+          <rect width="100%" height="100%" fill="white" />
+          @for (h of highlights(); track h.label) {
+            <rect
+              [attr.x]="h.rect.left - 6"
+              [attr.y]="h.rect.top - 6"
+              [attr.width]="h.rect.width + 12"
+              [attr.height]="h.rect.height + 12"
+              rx="8"
+              fill="black"
+            />
+          }
+        </mask>
+      </defs>
+      <rect width="100%" height="100%" fill="rgba(0,0,0,0.55)" mask="url(#tour-mask)" />
+    </svg>
+
+    @for (h of highlights(); track h.label) {
+      <!-- pulsing ring -->
+      <div class="tour-ring"
+           [style.left.px]="h.rect.left + h.rect.width / 2"
+           [style.top.px]="h.rect.top + h.rect.height / 2"
+           [style.width.px]="h.rect.width + 20"
+           [style.height.px]="h.rect.height + 20">
+      </div>
+
+      <!-- tooltip card -->
+      <div class="tour-tooltip"
+           [class.tour-tooltip-below]="h.position === 'below'"
+           [class.tour-tooltip-left]="h.position === 'left'"
+           [class.tour-tooltip-right]="h.position === 'right'"
+           [style.left.px]="tooltipLeft(h)"
+           [style.top.px]="tooltipTop(h)">
+        <div class="tour-tooltip-label">{{ h.label }}</div>
+        <div class="tour-tooltip-desc">{{ h.description }}</div>
+      </div>
+    }
+
+    <div class="tour-dismiss">Click anywhere to dismiss</div>
+  </div>
+}

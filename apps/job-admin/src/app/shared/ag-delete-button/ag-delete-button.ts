@@ -6,7 +6,7 @@ import {Button} from 'primeng/button';
 @Component({
   selector: 'app-ag-delete-button',
   imports: [Button],
-  template: `<div class="delete-btn-wrapper"><p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" (onClick)="params.click()" /></div>`,
+  templateUrl: './ag-delete-button.html',
   styles: [`:host { display: flex; align-items: center; justify-content: center; height: 100%; padding: 0 8px; } .delete-btn-wrapper { display: flex; align-items: center; justify-content: center; }`],
 })
 export class AgDeleteButton implements ICellRendererAngularComp {

@@ -1,0 +1,64 @@
+<p-drawer
+  [visible]="popup.visible()"
+  (visibleChange)="popup.visible.set($event)"
+  position="right"
+  [style]="{width: '85vw', maxWidth: '1100px'}"
+  (onHide)="onClose()">
+
+  <ng-template #header>
+    <div class="flex items-center gap-2">
+      <i class="pi pi-sitemap text-primary"></i>
+      <span class="font-semibold text-lg">What Just Happened?</span>
+    </div>
+  </ng-template>
+
+  @if (event()) {
+    <div class="flex flex-col gap-4">
+      <div>
+        <h3 class="text-xl font-bold m-0">{{ event()!.title }}</h3>
+        <p class="text-sm text-color-secondary mt-1">{{ event()!.description }}</p>
+      </div>
+
+      @if (traceDuration()) {
+        <div class="text-sm text-color-secondary">
+          <i class="pi pi-clock mr-1"></i> End-to-end: {{ traceDuration() }}ms
+        </div>
+      }
+
+      <!-- Services involved -->
+      <div class="flex flex-wrap gap-1">
+        @for (svc of services(); track svc) {
+          <p-tag [value]="svc" severity="info" />
+        }
+      </div>
+
+      <!-- Mermaid diagram -->
+      <div class="overflow-auto rounded-lg surface-ground p-3">
+        @if (diagramLoading()) {
+          <div class="flex justify-center py-8">
+            <p-progressSpinner strokeWidth="3" />
+          </div>
+        }
+        <div #diagramContainer></div>
+      </div>
+
+      <!-- Trace links -->
+      @if (popup.traceId()) {
+        <div class="flex gap-3">
+          <a class="flex items-center gap-1 text-sm font-semibold no-underline"
+             style="color: #B45309"
+             [href]="jaegerUrl + popup.traceId()"
+             target="_blank" rel="noopener">
+            <i class="pi pi-external-link"></i> View in Jaeger
+          </a>
+          <a class="flex items-center gap-1 text-sm font-semibold no-underline"
+             style="color: #E65100"
+             [href]="grafanaUrl + popup.traceId()"
+             target="_blank" rel="noopener">
+            <i class="pi pi-external-link"></i> View in Grafana
+          </a>
+        </div>
+      }
+    </div>
+  }
+</p-drawer>
