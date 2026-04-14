@@ -175,8 +175,15 @@ jobs:
           docker compose -f ~/docker-compose.yml -p job-board up -d --remove-orphans
 
           echo "Cleanup..."
-          docker system prune -a --volumes -f || true
-          docker builder prune -a -f || true
+          echo "Cleanup..."
+          # Remove dangling (untagged) images only
+          docker image prune -f || true
+          # Remove stopped containers and unused networks
+          docker container prune -f || true
+          docker network prune -f || true
+          # Keep build cache for layer reuse — only trim if over 20GB
+          docker builder prune --keep-storage 20gb -f || true
+
 
           echo "dev deploy complete!"
 
@@ -335,7 +342,12 @@ jobs:
           docker compose -f ~/docker-compose.yml -p job-board up -d --remove-orphans
 
           echo "Cleanup..."
-          docker system prune -a --volumes -f || true
-          docker builder prune -a -f || true
+          # Remove dangling (untagged) images only
+          docker image prune -f || true
+          # Remove stopped containers and unused networks
+          docker container prune -f || true
+          docker network prune -f || true
+          # Keep build cache for layer reuse — only trim if over 20GB
+          docker builder prune --keep-storage 20gb -f || true
 
           echo "prod deploy complete!"
