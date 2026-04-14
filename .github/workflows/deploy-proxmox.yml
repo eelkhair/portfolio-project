@@ -157,69 +157,35 @@ jobs:
           build-args: ${{ matrix.build_args || '' }}
 
   # ════════════════════════════════════════════════════════════════════════════
-  # Job 2: Deploy to target environments
-  # Runs on all self-hosted runners; each runner deploys based on its hostname
+  # Job 2: Deploy to Dev (auto — no approval needed)
   # ════════════════════════════════════════════════════════════════════════════
-  deploy:
+  deploy-dev:
     needs: build-and-push
+    if: github.event_name == 'push' || github.event.inputs.environment == 'dev' || github.event.inputs.environment == 'both'
     runs-on: self-hosted
-    strategy:
-      matrix:
-        include:
-          - env: dev
-            compose_file: scripts/docker-compose.dev.yml
-            hostname: job-board-dev
-          - env: prod
-            compose_file: scripts/docker-compose.prod.yml
-            hostname: khairoooon
     steps:
-      - name: Check if this runner should deploy ${{ matrix.env }}
+      - name: Check if this runner is the dev host
         id: check
         run: |
           ACTUAL=$(hostname)
-          if [ "$ACTUAL" = "${{ matrix.hostname }}" ]; then
+          if [ "$ACTUAL" = "job-board-dev" ]; then
             echo "match=true" >> $GITHUB_OUTPUT
-            echo "This runner ($ACTUAL) will deploy ${{ matrix.env }}"
           else
             echo "match=false" >> $GITHUB_OUTPUT
-            echo "Skipping — this runner ($ACTUAL) is not the ${{ matrix.env }} host (${{ matrix.hostname }})"
-          fi
-
-      - name: Check trigger applies to ${{ matrix.env }}
-        id: trigger
-        if: steps.check.outputs.match == 'true'
-        run: |
-          EVENT="${{ github.event_name }}"
-          ENV="${{ matrix.env }}"
-          INPUT="${{ inputs.environment }}"
-
-          if [ "$ENV" = "dev" ]; then
-            # Dev deploys on push or manual dev/both
-            if [ "$EVENT" = "push" ] || [ "$INPUT" = "dev" ] || [ "$INPUT" = "both" ]; then
-              echo "deploy=true" >> $GITHUB_OUTPUT
-            else
-              echo "deploy=false" >> $GITHUB_OUTPUT
-            fi
-          elif [ "$ENV" = "prod" ]; then
-            # Prod only on manual prod/both
-            if [ "$EVENT" = "workflow_dispatch" ] && ([ "$INPUT" = "prod" ] || [ "$INPUT" = "both" ]); then
-              echo "deploy=true" >> $GITHUB_OUTPUT
-            else
-              echo "deploy=false" >> $GITHUB_OUTPUT
-            fi
+            echo "Skipping — this runner ($ACTUAL) is not the dev host"
           fi
 
       - uses: actions/checkout@v4
-        if: steps.check.outputs.match == 'true' && steps.trigger.outputs.deploy == 'true'
+        if: steps.check.outputs.match == 'true'
 
-      - name: Deploy ${{ matrix.env }}
-        if: steps.check.outputs.match == 'true' && steps.trigger.outputs.deploy == 'true'
+      - name: Deploy dev
+        if: steps.check.outputs.match == 'true'
         env:
           REG_USER: ${{ secrets.REGISTRY_USERNAME }}
           REG_PASS: ${{ secrets.REGISTRY_PASSWORD }}
         run: |
           echo "Copying compose file..."
-          cp ${{ matrix.compose_file }} ~/docker-compose.yml
+          cp scripts/docker-compose.dev.yml ~/docker-compose.yml
 
           echo "Docker login..."
           echo "$REG_PASS" | docker login $REGISTRY -u $REG_USER --password-stdin
@@ -232,4 +198,49 @@ jobs:
           docker system prune -a --volumes -f || true
           docker builder prune -a -f || true
 
-          echo "${{ matrix.env }} deploy complete!"
+          echo "dev deploy complete!"
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # Job 3: Deploy to Prod (requires approval via GitHub Environment)
+  # ════════════════════════════════════════════════════════════════════════════
+  deploy-prod:
+    needs: build-and-push
+    if: github.event_name == 'push' || github.event.inputs.environment == 'prod' || github.event.inputs.environment == 'both'
+    runs-on: self-hosted
+    environment: prod
+    steps:
+      - name: Check if this runner is the prod host
+        id: check
+        run: |
+          ACTUAL=$(hostname)
+          if [ "$ACTUAL" = "khairoooon" ]; then
+            echo "match=true" >> $GITHUB_OUTPUT
+          else
+            echo "match=false" >> $GITHUB_OUTPUT
+            echo "Skipping — this runner ($ACTUAL) is not the prod host"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.check.outputs.match == 'true'
+
+      - name: Deploy prod
+        if: steps.check.outputs.match == 'true'
+        env:
+          REG_USER: ${{ secrets.REGISTRY_USERNAME }}
+          REG_PASS: ${{ secrets.REGISTRY_PASSWORD }}
+        run: |
+          echo "Copying compose file..."
+          cp scripts/docker-compose.prod.yml ~/docker-compose.yml
+
+          echo "Docker login..."
+          echo "$REG_PASS" | docker login $REGISTRY -u $REG_USER --password-stdin
+
+          echo "Pulling and starting stack..."
+          docker compose -f ~/docker-compose.yml -p job-board pull
+          docker compose -f ~/docker-compose.yml -p job-board up -d --remove-orphans
+
+          echo "Cleanup..."
+          docker system prune -a --volumes -f || true
+          docker builder prune -a -f || true
+
+          echo "prod deploy complete!"
