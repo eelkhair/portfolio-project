@@ -125,6 +125,7 @@ public static class YarpProvider
             Cluster("ai-v2", config["AiServiceUrl"] ?? "http://ai-service-v2:8080"),
             Cluster("admin", config["AdminApiUrl"] ?? "http://admin-api:8080"),
             Cluster("monolith", config["MonolithUrl"] ?? "http://monolith-api:8080"),
+            Cluster("landing-next", config["LandingNextUrl"] ?? "http://landing-next:3001"),
         };
     }
 

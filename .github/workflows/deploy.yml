@@ -199,6 +199,9 @@ jobs:
           - name: landing
             context: apps/landing
             dockerfile: apps/landing/Dockerfile
+          - name: landing-next
+            context: apps/landing-next
+            dockerfile: apps/landing-next/Dockerfile
     steps:
       - uses: actions/checkout@v4
 
