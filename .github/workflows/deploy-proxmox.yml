@@ -179,7 +179,8 @@ jobs:
   # Builds on proxmox-prod runner for local Docker cache
   # ════════════════════════════════════════════════════════════════════════════
   build-prod:
-    if: github.event_name == 'push' || github.event.inputs.environment == 'prod' || github.event.inputs.environment == 'both'
+    needs: deploy-dev
+    if: always() && (github.event_name == 'push' || github.event.inputs.environment == 'prod' || github.event.inputs.environment == 'both')
     runs-on: proxmox-prod
     strategy:
       fail-fast: false
