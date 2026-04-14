@@ -162,24 +162,11 @@ jobs:
   deploy-dev:
     needs: build-and-push
     if: github.event_name == 'push' || github.event.inputs.environment == 'dev' || github.event.inputs.environment == 'both'
-    runs-on: self-hosted
+    runs-on: proxmox-dev
     steps:
-      - name: Check if this runner is the dev host
-        id: check
-        run: |
-          ACTUAL=$(hostname)
-          if [ "$ACTUAL" = "job-board-dev" ]; then
-            echo "match=true" >> $GITHUB_OUTPUT
-          else
-            echo "match=false" >> $GITHUB_OUTPUT
-            echo "Skipping — this runner ($ACTUAL) is not the dev host"
-          fi
-
       - uses: actions/checkout@v4
-        if: steps.check.outputs.match == 'true'
 
       - name: Deploy dev
-        if: steps.check.outputs.match == 'true'
         env:
           REG_USER: ${{ secrets.REGISTRY_USERNAME }}
           REG_PASS: ${{ secrets.REGISTRY_PASSWORD }}
@@ -206,25 +193,12 @@ jobs:
   deploy-prod:
     needs: build-and-push
     if: github.event_name == 'push' || github.event.inputs.environment == 'prod' || github.event.inputs.environment == 'both'
-    runs-on: self-hosted
+    runs-on: proxmox-prod
     environment: prod
     steps:
-      - name: Check if this runner is the prod host
-        id: check
-        run: |
-          ACTUAL=$(hostname)
-          if [ "$ACTUAL" = "khairoooon" ]; then
-            echo "match=true" >> $GITHUB_OUTPUT
-          else
-            echo "match=false" >> $GITHUB_OUTPUT
-            echo "Skipping — this runner ($ACTUAL) is not the prod host"
-          fi
-
       - uses: actions/checkout@v4
-        if: steps.check.outputs.match == 'true'
 
       - name: Deploy prod
-        if: steps.check.outputs.match == 'true'
         env:
           REG_USER: ${{ secrets.REGISTRY_USERNAME }}
           REG_PASS: ${{ secrets.REGISTRY_PASSWORD }}
