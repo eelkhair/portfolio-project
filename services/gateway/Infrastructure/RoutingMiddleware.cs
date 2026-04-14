@@ -10,23 +10,6 @@ public class RoutingMiddleware(RequestDelegate next, IConfiguration configuratio
 {
     public async Task InvokeAsync(HttpContext context)
     {
-        // Landing page routing via feature flag
-        if (!context.Request.Path.StartsWithSegments("/api", StringComparison.Ordinal)
-            && !context.Request.Path.StartsWithSegments("/ai", StringComparison.Ordinal)
-            && !context.Request.Path.StartsWithSegments("/dapr", StringComparison.Ordinal)
-            && !context.Request.Path.StartsWithSegments("/jaeger-api", StringComparison.Ordinal)
-            && context.Request.Headers.ContainsKey("x-landing"))
-        {
-            var useNextjs = configuration.GetValue<bool>("FeatureFlags:NextjsLanding");
-            if (useNextjs)
-            {
-                context.Request.Headers["x-landing"] = "nextjs";
-                Activity.Current?.SetTag("service", "Landing Next.js");
-                await next(context);
-                return;
-            }
-        }
-
         if (context.Request.Path.StartsWithSegments("/ai/v2", StringComparison.Ordinal)
             || context.Request.Path.StartsWithSegments("/dapr/config", StringComparison.Ordinal)
             || context.Request.Path.StartsWithSegments("/dapr/subscribe", StringComparison.Ordinal))

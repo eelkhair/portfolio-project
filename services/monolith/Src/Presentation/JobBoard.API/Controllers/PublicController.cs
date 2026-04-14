@@ -15,8 +15,16 @@ namespace JobBoard.API.Controllers;
 /// All endpoints in this controller are accessible without authentication.
 /// </remarks>
 [AllowAnonymous]
-public class PublicController : BaseApiController
+public class PublicController(IConfiguration configuration) : BaseApiController
 {
+    [HttpGet("feature-flags")]
+    public IActionResult GetFeatureFlags()
+    {
+        var flags = configuration.GetSection("FeatureFlags")
+            .GetChildren()
+            .ToDictionary(c => c.Key, c => bool.TryParse(c.Value, out var b) && b, StringComparer.Ordinal);
+        return Ok(flags);
+    }
     /// <summary>
     /// Retrieves a list of publicly available jobs based on the specified filters.
     /// </summary>

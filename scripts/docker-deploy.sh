@@ -44,7 +44,7 @@ echo "Will deploy to: ${DEPLOY_TARGETS[*]}"
 # ===== CATEGORY SELECTION =====
 echo ""
 echo "Select categories to build (comma or space separated, e.g. 1,3,5):"
-echo "  1) FE         — landing, landing-next, job-admin, job-public"
+echo "  1) FE         — landing, job-admin, job-public"
 echo "  2) Monolith   — gateway, monolith-api, monolith-mcp"
 echo "  3) Micro      — gateway, admin-api, admin-api-mcp, company-api, job-api, user-api"
 echo "  4) Infra      — health-check, keycloak"
@@ -229,10 +229,7 @@ build_and_push_frontends() {
 
   # Landing pages: same image for all envs, build once
   if [[ -z "${BUILT_SERVICES[landing]+x}" ]]; then
-    build_one "landing" "../apps/landing" "default" || true
-  fi
-  if [[ -z "${BUILT_SERVICES[landing-next]+x}" ]]; then
-    build_one "landing-next" "../apps/landing-next" "default" || true
+    build_one "landing" "../apps/landing-next" "default" || true
   fi
 
   for name in "job-admin" "job-public"; do

@@ -1,0 +1,72 @@
+name: Deploy Landing Page
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'apps/landing-next/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        type: choice
+        options:
+          - dev
+          - prod
+          - both
+        default: dev
+
+env:
+  REGISTRY: registry.eelkhair.net
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: proxmox-dev
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to private registry
+        run: echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login $REGISTRY -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
+
+      - name: Build and Push
+        run: |
+          IMAGE="$REGISTRY/landing:latest"
+          echo "Building landing page..."
+          docker build -f apps/landing-next/Dockerfile -t $IMAGE apps/landing-next
+          echo "Pushing $IMAGE..."
+          docker push $IMAGE
+          echo "Done"
+
+  deploy-dev:
+    needs: build
+    if: github.event_name == 'push' || github.event.inputs.environment == 'dev' || github.event.inputs.environment == 'both'
+    runs-on: proxmox-dev
+    steps:
+      - name: Login and restart landing container
+        env:
+          REG_PASS: ${{ secrets.REGISTRY_PASSWORD }}
+        run: |
+          echo "$REG_PASS" | docker login ${{ env.REGISTRY }} -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
+          docker pull ${{ env.REGISTRY }}/landing:latest
+          docker compose -p job-board up -d --no-deps landing
+          docker image prune -f || true
+          echo "Landing page deployed to dev"
+
+  deploy-prod:
+    needs: build
+    if: github.event.inputs.environment == 'prod' || github.event.inputs.environment == 'both'
+    runs-on: proxmox-prod
+    environment: prod
+    steps:
+      - name: Login and restart landing container
+        env:
+          REG_PASS: ${{ secrets.REGISTRY_PASSWORD }}
+        run: |
+          echo "$REG_PASS" | docker login ${{ env.REGISTRY }} -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
+          docker pull ${{ env.REGISTRY }}/landing:latest
+          docker compose -p job-board up -d --no-deps landing
+          docker image prune -f || true
+          echo "Landing page deployed to prod"
