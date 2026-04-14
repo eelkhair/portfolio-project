@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Architecture Overview | Elkhair Elkhair</title>
+  <meta name="description" content="How a monolith, microservices, and a strangler-fig migration run side-by-side in one codebase with YARP gateway routing.">
+  <meta property="og:title" content="Architecture Overview | Elkhair Elkhair">
+  <meta property="og:description" content="How a monolith, microservices, and a strangler-fig migration run side-by-side in one codebase.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' width='48' height='48'><g transform='translate(24,24) rotate(45)'><rect x='-12' y='-12' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='-3.5' y='-12' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='5' y='-12' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='-12' y='-3.5' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='-3.5' y='-3.5' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='5' y='-3.5' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='-12' y='5' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='-3.5' y='5' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='5' y='5' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/></g><polygon points='24,8 27,18 38,18 29,25 32,36 24,30 16,36 19,25 10,18 21,18' fill='%230ea5e9' stroke='%230ea5e9' stroke-width='1.5'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="case-study.css">
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<header>
+  <nav aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="/" class="logo" aria-label="Home">EE</a>
+      <ul class="nav-links">
+        <li><a href="/">About Me</a></li>
+        <li><a href="/portfolio.html">Portfolio</a></li>
+        <li class="nav-dropdown">
+          <a href="/portfolio.html#deep-dives" aria-haspopup="true">Deep Dives</a>
+          <ul class="nav-dropdown-menu">
+            <li><a href="/architecture.html">Architecture</a></li>
+            <li><a href="/ai-orchestration.html">AI Orchestration</a></li>
+            <li><a href="/observability.html">Observability</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<main id="main">
+
+  <!-- ── Hero ─────────────────────────────────────────── -->
+  <section class="cs-hero" aria-labelledby="cs-heading">
+    <p class="section-title">Case Study</p>
+    <h1 id="cs-heading" class="cs-title">Architecture Overview</h1>
+    <p class="cs-summary">
+      How a monolith, microservices, and a strangler-fig migration run side-by-side in one codebase &mdash; toggled per session, routed by a single gateway.
+    </p>
+    <nav class="cs-toc" aria-label="Page sections">
+      <a href="#problem">Problem</a>
+      <a href="#solution">Solution</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#user-view">What You See</a>
+      <a href="#behind-scenes">Behind the Scenes</a>
+      <a href="#decisions">Key Decisions</a>
+      <a href="#tradeoffs">Tradeoffs</a>
+    </nav>
+  </section>
+
+  <!-- ── Problem ──────────────────────────────────────── -->
+  <section id="problem" class="cs-section">
+    <h2>The Problem</h2>
+    <p>
+      Most portfolio projects show one architecture style. But real systems evolve. Monoliths get decomposed. Services get extracted. Data has to stay in sync during the transition.
+    </p>
+    <p>
+      The question I wanted to answer: how do you demonstrate a monolith-to-microservices migration without a big-bang rewrite, and let someone switch between both paths to see the difference?
+    </p>
+  </section>
+
+  <!-- ── Solution ─────────────────────────────────────── -->
+  <section id="solution" class="cs-section section-alt">
+    <h2>The Solution</h2>
+    <p>
+      Three architectural paths running simultaneously in the same codebase:
+    </p>
+    <p>
+      A <strong>clean architecture monolith</strong> with DDD, CQRS, and a custom decorator pipeline. A set of <strong>decomposed microservices</strong> built with FastEndpoints across four bounded contexts. And a <strong>connector API</strong> implementing the strangler-fig pattern with bidirectional sync between both sides.
+    </p>
+    <p>
+      A YARP reverse proxy sits in front of everything. It reads an <code>x-mode</code> header on every request and routes to the monolith or microservices accordingly. Each user session picks its own path &mdash; no backend state change, no restart.
+    </p>
+    <figure class="cs-figure">
+      <div class="cs-placeholder">Screenshot: Admin toolbar showing monolith/micro toggle</div>
+      <figcaption>The admin toolbar lets visitors toggle between monolith and microservices mode per session</figcaption>
+    </figure>
+  </section>
+
+  <!-- ── Architecture ─────────────────────────────────── -->
+  <section id="architecture" class="cs-section">
+    <h2>Architecture</h2>
+    <p>
+      The gateway is the single entry point. It inspects the <code>x-mode</code> header &mdash; set by the frontend based on a localStorage toggle &mdash; and proxies to either the monolith API or the microservices cluster.
+    </p>
+    <p>
+      Both paths share the same databases (SQL Server for the monolith, PostgreSQL for microservices) and the same messaging infrastructure (RabbitMQ via Dapr pub/sub). The connector APIs handle bidirectional sync: when a company is created in the monolith, a saga fans out to provision it across all four microservices, and vice versa.
+    </p>
+    <figure class="cs-figure cs-figure-wide">
+      <div class="cs-placeholder">Screenshot: Jaeger trace showing YARP gateway routing to monolith or microservices</div>
+      <figcaption>A Jaeger trace showing the gateway routing a request through the monolith path</figcaption>
+    </figure>
+  </section>
+
+  <!-- ── What You See ─────────────────────────────────── -->
+  <section id="user-view" class="cs-section section-alt">
+    <h2>What You See</h2>
+    <p>
+      From the admin app, click the mode toggle in the toolbar. The UI stays the same &mdash; same forms, same pages, same data. But behind the scenes, the entire backend path changes.
+    </p>
+    <p>
+      Create a company in monolith mode, then switch to microservices mode. The company is there &mdash; the connector saga synced it. Open Jaeger and compare the two traces: one shows a single monolith span, the other shows the request fan out across four services.
+    </p>
+    <div class="cs-evidence-grid">
+      <figure class="cs-figure">
+        <div class="cs-placeholder">Screenshot: Jaeger trace of saga connector fan-out across services</div>
+        <figcaption>Saga orchestration fanning out a company creation across admin, company, job, and user APIs</figcaption>
+      </figure>
+      <figure class="cs-figure">
+        <div class="cs-placeholder">Screenshot: Dapr dashboard showing sidecar topology</div>
+        <figcaption>Dapr dashboard showing sidecar topology and component bindings across all services</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ── Behind the Scenes ────────────────────────────── -->
+  <section id="behind-scenes" class="cs-section">
+    <h2>Behind the Scenes</h2>
+    <p>
+      The monolith uses a <strong>transactional outbox</strong> to publish domain events reliably. Events are written to an outbox table in the same transaction as the domain change, then dispatched to RabbitMQ by a background processor. This guarantees at-least-once delivery without distributed transactions.
+    </p>
+    <p>
+      The connector API implements an <strong>orchestrated saga</strong> for cross-service provisioning. When a company is created in the monolith, the saga calls each microservice in sequence, tracks completion state, and handles compensating actions on failure. Redis idempotency keys prevent duplicate processing.
+    </p>
+    <p>
+      The reverse connector handles the opposite direction: microservice events flow back to the monolith. This bidirectional sync means both paths always have the same data, which is the key requirement for a strangler-fig migration &mdash; you can switch traffic gradually without data loss.
+    </p>
+  </section>
+
+  <!-- ── Key Decisions ────────────────────────────────── -->
+  <section id="decisions" class="cs-section section-alt">
+    <h2>Key Decisions</h2>
+    <div class="cs-decision-grid">
+      <div class="cs-decision">
+        <h3>YARP direct proxy over Dapr service invocation</h3>
+        <p><strong>Why:</strong> YARP gives full control over routing rules, header manipulation, and load balancing. Dapr invocation adds indirection that complicates debugging and doesn't support header-based routing natively.</p>
+        <p><strong>Alternative:</strong> Dapr service invocation with custom middleware. Rejected because it would require reimplementing routing logic that YARP handles out of the box.</p>
+      </div>
+      <div class="cs-decision">
+        <h3>Transactional outbox over direct event publishing</h3>
+        <p><strong>Why:</strong> Direct publishing to RabbitMQ from a command handler risks message loss if the process crashes after the database commit but before the publish completes. The outbox guarantees atomicity.</p>
+        <p><strong>Alternative:</strong> Change Data Capture (CDC) from the database transaction log. More complex to operate and requires database-specific tooling.</p>
+      </div>
+      <div class="cs-decision">
+        <h3>Orchestrated saga over choreography</h3>
+        <p><strong>Why:</strong> With four microservices involved in provisioning, choreography creates implicit coupling and makes failure handling opaque. An orchestrator makes the flow explicit and debuggable in traces.</p>
+        <p><strong>Alternative:</strong> Event choreography with each service reacting to the previous service's events. Simpler initially but harder to reason about as the number of services grows.</p>
+      </div>
+      <div class="cs-decision">
+        <h3>Docker Compose over Kubernetes</h3>
+        <p><strong>Why:</strong> For a portfolio running on a Proxmox homelab, Kubernetes adds operational overhead without proportional benefit. Docker Compose with Dapr sidecars provides service mesh capabilities at a fraction of the complexity.</p>
+        <p><strong>Alternative:</strong> K3s or MicroK8s. Would demonstrate Kubernetes experience but at the cost of maintaining a cluster for a single-developer project.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Tradeoffs ────────────────────────────────────── -->
+  <section id="tradeoffs" class="cs-section">
+    <h2>Tradeoffs &amp; Lessons Learned</h2>
+    <ul class="cs-tradeoff-list">
+      <li><strong>Repo complexity vs. breadth:</strong> Maintaining three architectural paths in one repo is unusual. It works here because it's a portfolio project with one developer. In a team setting, you'd pick one path and migrate incrementally.</li>
+      <li><strong>Eventual consistency window:</strong> The saga takes seconds to propagate changes across services. During that window, the microservices path may not reflect a change made via the monolith. Acceptable for a demo, but in production you'd need to communicate this to users.</li>
+      <li><strong>No auto-scaling:</strong> Docker Compose doesn't support horizontal scaling. The architecture is designed for it (stateless services, external state stores), but proving it would require Kubernetes or Azure Container Apps with scale rules.</li>
+      <li><strong>Operational overhead:</strong> 16 containers plus Dapr sidecars is a lot to monitor. The investment in observability (Jaeger, Grafana, health checks) pays for itself &mdash; without it, debugging cross-service issues would be guesswork.</li>
+    </ul>
+  </section>
+
+  <!-- ── Bottom Navigation ────────────────────────────── -->
+  <nav class="cs-bottom-nav" aria-label="Case study navigation">
+    <a href="/portfolio.html" class="btn btn-outline">Back to Portfolio</a>
+    <a href="/ai-orchestration.html" class="btn btn-primary">Next: AI Orchestration</a>
+  </nav>
+
+</main>
+
+<footer>
+  <p>
+    <a href="https://github.com/eelkhair/portfolio-project" target="_blank" rel="noopener noreferrer">GitHub</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://www.linkedin.com/in/elkhair-elkhair/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    &nbsp;&middot;&nbsp;
+    <a href="mailto:elkhair.elkhair@live.com">elkhair.elkhair@live.com</a>
+  </p>
+  <p class="mt-footer">Self-hosted on Proxmox &middot; Exposed via Cloudflare Tunnel &middot; Deployed with GitHub Actions</p>
+</footer>
+
+</body>
+</html>

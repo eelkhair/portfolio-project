@@ -24,10 +24,18 @@
         <li><a href="/">About Me</a></li>
         <li><a href="#portfolio">Project</a></li>
         <li><a href="#explore">Explore</a></li>
-        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="#architecture">System Design</a></li>
         <li><a href="#adrs">ADRs</a></li>
         <li><a href="#screenshots">Screenshots</a></li>
         <li><a href="#services">Live Demo</a></li>
+        <li class="nav-dropdown">
+          <a href="#deep-dives" aria-haspopup="true">Deep Dives</a>
+          <ul class="nav-dropdown-menu">
+            <li><a href="/architecture.html">Architecture</a></li>
+            <li><a href="/ai-orchestration.html">AI Orchestration</a></li>
+            <li><a href="/observability.html">Observability</a></li>
+          </ul>
+        </li>
       </ul>
     </div>
   </nav>
@@ -113,6 +121,32 @@
         <span class="skill-tag">MCP Protocol</span>
         <span class="skill-tag">.NET Aspire</span>
       </div>
+    </div>
+  </section>
+
+  <!-- ── Deep Dives ────────────────────────────────────────── -->
+  <section id="deep-dives" aria-labelledby="deep-dives-heading">
+    <p class="section-title">Deep Dives</p>
+    <h2 id="deep-dives-heading">Case Studies</h2>
+    <p class="section-text mb-3">
+      Each case study covers a specific engineering topic: the problem, the solution, architecture decisions, and tradeoffs.
+    </p>
+    <div class="card-grid">
+      <a href="/architecture.html" class="card">
+        <div class="card-icon" role="img" aria-hidden="true">&#x1F3D7;&#xFE0F;</div>
+        <h3>Architecture Overview</h3>
+        <p>Monolith vs microservices, YARP gateway routing, Dapr sidecars, and the strangler-fig migration strategy with bidirectional sync.</p>
+      </a>
+      <a href="/ai-orchestration.html" class="card">
+        <div class="card-icon" role="img" aria-hidden="true">&#x1F9E0;</div>
+        <h3>AI Orchestration</h3>
+        <p>Multi-provider LLM chat, MCP server tool discovery, scoped tool registries, and an event-driven resume RAG pipeline with pgvector.</p>
+      </a>
+      <a href="/observability.html" class="card">
+        <div class="card-icon" role="img" aria-hidden="true">&#x1F50D;</div>
+        <h3>Observability</h3>
+        <p>Distributed tracing with Jaeger, Grafana dashboards, Seq structured logging, and OpenTelemetry instrumentation across 16 services.</p>
+      </a>
     </div>
   </section>
 

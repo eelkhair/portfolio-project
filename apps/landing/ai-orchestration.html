@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Orchestration | Elkhair Elkhair</title>
+  <meta name="description" content="Multi-provider LLM chat with scoped tool registries, MCP server integration, and an event-driven resume RAG pipeline.">
+  <meta property="og:title" content="AI Orchestration | Elkhair Elkhair">
+  <meta property="og:description" content="Multi-provider LLM chat with scoped tool registries, MCP server integration, and a resume RAG pipeline.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' width='48' height='48'><g transform='translate(24,24) rotate(45)'><rect x='-12' y='-12' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='-3.5' y='-12' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='5' y='-12' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='-12' y='-3.5' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='-3.5' y='-3.5' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='5' y='-3.5' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='-12' y='5' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='-3.5' y='5' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='5' y='5' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/></g><polygon points='24,8 27,18 38,18 29,25 32,36 24,30 16,36 19,25 10,18 21,18' fill='%230ea5e9' stroke='%230ea5e9' stroke-width='1.5'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="case-study.css">
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<header>
+  <nav aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="/" class="logo" aria-label="Home">EE</a>
+      <ul class="nav-links">
+        <li><a href="/">About Me</a></li>
+        <li><a href="/portfolio.html">Portfolio</a></li>
+        <li class="nav-dropdown">
+          <a href="/portfolio.html#deep-dives" aria-haspopup="true">Deep Dives</a>
+          <ul class="nav-dropdown-menu">
+            <li><a href="/architecture.html">Architecture</a></li>
+            <li><a href="/ai-orchestration.html">AI Orchestration</a></li>
+            <li><a href="/observability.html">Observability</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<main id="main">
+
+  <!-- ── Hero ─────────────────────────────────────────── -->
+  <section class="cs-hero" aria-labelledby="cs-heading">
+    <p class="section-title">Case Study</p>
+    <h1 id="cs-heading" class="cs-title">AI Orchestration</h1>
+    <p class="cs-summary">
+      Multi-provider LLM chat with scoped tool registries, MCP server integration, and an event-driven resume RAG pipeline.
+    </p>
+    <nav class="cs-toc" aria-label="Page sections">
+      <a href="#problem">Problem</a>
+      <a href="#solution">Solution</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#user-view">What You See</a>
+      <a href="#behind-scenes">Behind the Scenes</a>
+      <a href="#decisions">Key Decisions</a>
+      <a href="#tradeoffs">Tradeoffs</a>
+    </nav>
+  </section>
+
+  <!-- ── Problem ──────────────────────────────────────── -->
+  <section id="problem" class="cs-section">
+    <h2>The Problem</h2>
+    <p>
+      Most AI integrations are tightly coupled to a single provider. Swap OpenAI for Claude and you're rewriting the integration layer. Tools are hardcoded in the AI service, so adding a new capability means redeploying the whole thing.
+    </p>
+    <p>
+      Meanwhile, resume parsing that blocks the upload request creates a poor user experience. The user stares at a spinner while an LLM processes their document &mdash; or worse, the request times out.
+    </p>
+  </section>
+
+  <!-- ── Solution ─────────────────────────────────────── -->
+  <section id="solution" class="cs-section section-alt">
+    <h2>The Solution</h2>
+    <p>
+      A provider-agnostic AI service built on <strong>Microsoft.Extensions.AI</strong>. The abstraction layer means switching between OpenAI, Claude, and Gemini is a configuration change, not a code change. Each provider is registered as a keyed <code>IChatClient</code> singleton.
+    </p>
+    <p>
+      Tools aren't hardcoded &mdash; they're discovered at runtime via the <strong>Model Context Protocol (MCP)</strong>. The monolith and microservices each expose their own MCP server. The AI service connects to whichever one matches the user's current session mode, discovering available tools dynamically.
+    </p>
+    <p>
+      Resume processing is fully async. Upload triggers an event, a background handler downloads and parses the resume, generates embeddings, and stores them in pgvector. The user gets real-time progress updates via SignalR.
+    </p>
+    <figure class="cs-figure">
+      <div class="cs-placeholder">Screenshot: Admin chat showing AI calling a tool (e.g., creating a company)</div>
+      <figcaption>The AI assistant creating a company through function calling, with tool invocation visible in the conversation</figcaption>
+    </figure>
+  </section>
+
+  <!-- ── Architecture ─────────────────────────────────── -->
+  <section id="architecture" class="cs-section">
+    <h2>Architecture</h2>
+    <p>
+      The AI service uses a <strong>scoped tool registry</strong> pattern. Four chat scopes (SystemAdmin, Admin, CompanyAdmin, Public) each get their own tool set. A <code>ChatOptionsFactory</code> resolves the correct registry based on the authenticated user's role and reads the <code>x-mode</code> header to select the right MCP topology.
+    </p>
+    <p>
+      The resume pipeline is a three-stage event-driven flow: <code>ResumeUploadedV1Event</code> triggers download and parsing, <code>ResumeParsedV1Event</code> triggers embedding generation, and <code>ResumeDeletedV1Event</code> triggers cleanup. Each stage communicates through Dapr pub/sub on RabbitMQ.
+    </p>
+    <figure class="cs-figure cs-figure-wide">
+      <div class="cs-placeholder">Screenshot: MCP Inspector showing available tools from the monolith MCP server</div>
+      <figcaption>MCP Inspector connected to the monolith server, showing the dynamically discovered tool registry</figcaption>
+    </figure>
+  </section>
+
+  <!-- ── What You See ─────────────────────────────────── -->
+  <section id="user-view" class="cs-section section-alt">
+    <h2>What You See</h2>
+    <p>
+      In the admin app, open the AI chat and ask it to create a company. Watch the conversation &mdash; you'll see the model decide which tool to call, the function invocation, and the result. Switch between monolith and microservices mode and ask the same question: the AI discovers different tools from different MCP servers.
+    </p>
+    <p>
+      In the public app, upload a resume. A progress indicator updates in real-time as the system downloads, parses, and embeds the document. Then ask the AI for job recommendations &mdash; it queries the pgvector embeddings to find semantic matches.
+    </p>
+    <div class="cs-evidence-grid">
+      <figure class="cs-figure">
+        <div class="cs-placeholder">Screenshot: Resume upload with real-time parsing progress via SignalR</div>
+        <figcaption>Real-time resume processing progress streamed to the browser via SignalR</figcaption>
+      </figure>
+      <figure class="cs-figure">
+        <div class="cs-placeholder">Screenshot: Provider switching configuration or metrics</div>
+        <figcaption>AI provider configuration &mdash; switching between OpenAI, Claude, and Gemini is a config change</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ── Behind the Scenes ────────────────────────────── -->
+  <section id="behind-scenes" class="cs-section">
+    <h2>Behind the Scenes</h2>
+    <p>
+      The <code>FunctionInvokingChatClient</code> from Microsoft.Extensions.AI handles the tool-calling loop automatically. When the model returns a tool call, the middleware invokes the matching <code>AIFunction</code>, feeds the result back, and lets the model decide whether to call another tool or respond to the user.
+    </p>
+    <p>
+      MCP tool discovery happens through <code>McpToolProvider</code>, which connects to the backend MCP servers via SSE transport. The provider resolves tools at startup and caches them. When the user's session mode changes, a different MCP topology is selected &mdash; the monolith exposes domain-level tools, while the microservices expose finer-grained tools per bounded context.
+    </p>
+    <p>
+      JWT tokens are forwarded through <code>AsyncLocal</code> storage so that tool calls from the AI service authenticate against the backend APIs with the original user's identity. This means authorization rules apply consistently &mdash; a CompanyAdmin can only create jobs in their own company, even through the AI chat.
+    </p>
+  </section>
+
+  <!-- ── Key Decisions ────────────────────────────────── -->
+  <section id="decisions" class="cs-section section-alt">
+    <h2>Key Decisions</h2>
+    <div class="cs-decision-grid">
+      <div class="cs-decision">
+        <h3>MCP servers over in-process tools</h3>
+        <p><strong>Why:</strong> In-process tools couple the AI service to domain logic. MCP servers let each backend expose its own tools independently, matching the microservices boundary. Adding a tool to the monolith doesn't require redeploying the AI service.</p>
+        <p><strong>Alternative:</strong> Shared NuGet package with tool definitions. Simpler but creates tight coupling and requires coordinated deployments.</p>
+      </div>
+      <div class="cs-decision">
+        <h3>Microsoft.Extensions.AI over direct SDK calls</h3>
+        <p><strong>Why:</strong> The abstraction lets us swap providers without changing application code. The decorator pipeline (logging, caching, rate limiting) applies uniformly regardless of which provider is active.</p>
+        <p><strong>Alternative:</strong> Semantic Kernel. More opinionated, heavier dependency, and the planner abstraction adds complexity we don't need.</p>
+      </div>
+      <div class="cs-decision">
+        <h3>pgvector over a dedicated vector database</h3>
+        <p><strong>Why:</strong> PostgreSQL was already in the stack for the microservices. Adding the pgvector extension avoids introducing another database to operate. For portfolio scale (thousands of resumes, not millions), it performs well.</p>
+        <p><strong>Alternative:</strong> Pinecone, Qdrant, or Weaviate. Better at scale but adds operational complexity and cost for a volume that PostgreSQL handles comfortably.</p>
+      </div>
+      <div class="cs-decision">
+        <h3>Three chat scopes with policy-based auth</h3>
+        <p><strong>Why:</strong> Different user roles need different capabilities. A SystemAdmin can change the global AI provider. An Admin can use domain tools. A public user gets job-seeker-focused tools. Scoping at the chat level prevents privilege escalation through the AI.</p>
+        <p><strong>Alternative:</strong> Single chat endpoint with runtime permission checks per tool. Simpler routing but harder to audit and reason about security boundaries.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Tradeoffs ────────────────────────────────────── -->
+  <section id="tradeoffs" class="cs-section">
+    <h2>Tradeoffs &amp; Lessons Learned</h2>
+    <ul class="cs-tradeoff-list">
+      <li><strong>MCP adds a network hop per tool call:</strong> Each tool invocation goes from AI service to MCP server to backend API and back. The latency is acceptable (tens of milliseconds) but visible in traces. In a latency-sensitive production system, you'd want to benchmark against in-process alternatives.</li>
+      <li><strong>pgvector limits:</strong> Cosine similarity search with 1536-dimension embeddings works well up to roughly a million vectors. Beyond that, you'd need approximate nearest neighbor indexes or a dedicated vector database. For this portfolio, the scale is well within PostgreSQL's comfort zone.</li>
+      <li><strong>Tool descriptions matter enormously:</strong> The LLM selects tools based on their descriptions. Vague descriptions cause N+1 tool calls (fetching items one at a time instead of using an aggregate tool). We saw 20x token savings by making descriptions explicit about when to use each tool.</li>
+      <li><strong>Redis conversation window:</strong> Chat history is stored in Redis and truncated at 40 messages. This keeps context windows manageable but means long conversations lose early context. A smarter approach would summarize older messages instead of dropping them.</li>
+    </ul>
+  </section>
+
+  <!-- ── Bottom Navigation ────────────────────────────── -->
+  <nav class="cs-bottom-nav" aria-label="Case study navigation">
+    <a href="/architecture.html" class="btn btn-outline">Previous: Architecture</a>
+    <a href="/observability.html" class="btn btn-primary">Next: Observability</a>
+  </nav>
+
+</main>
+
+<footer>
+  <p>
+    <a href="https://github.com/eelkhair/portfolio-project" target="_blank" rel="noopener noreferrer">GitHub</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://www.linkedin.com/in/elkhair-elkhair/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    &nbsp;&middot;&nbsp;
+    <a href="mailto:elkhair.elkhair@live.com">elkhair.elkhair@live.com</a>
+  </p>
+  <p class="mt-footer">Self-hosted on Proxmox &middot; Exposed via Cloudflare Tunnel &middot; Deployed with GitHub Actions</p>
+</footer>
+
+</body>
+</html>
