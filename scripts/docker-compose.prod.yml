@@ -1,17 +1,9 @@
 services:
-  # -- Landing Page -------------------------------------------
+  # -- Landing Page (Next.js) ---------------------------------
   landing:
     image: registry.eelkhair.net/landing:latest
     ports:
-      - "6090:80"
-    restart: unless-stopped
-    networks:
-      - ai-job-board-net
-
-  landing-next:
-    image: registry.eelkhair.net/landing-next:latest
-    ports:
-      - "6091:3001"
+      - "6090:3000"
     restart: unless-stopped
     networks:
       - ai-job-board-net
