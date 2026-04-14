@@ -20,6 +20,20 @@
   --radius: 12px;
   --max-width: 1100px;
 }
+html.light {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #f1f5f9;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f1f5f9;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --accent: #0284c7;
+  --accent-light: #0369a1;
+  --accent-glow: rgba(2, 132, 199, 0.1);
+  --border: #e2e8f0;
+  --green: #16a34a;
+}
 
 html { scroll-behavior: smooth; }
 
@@ -503,6 +517,42 @@ footer a:hover { color: var(--text-primary); }
 .sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+/* ── Theme Toggle ─────────────────────────────────── */
+.theme-toggle {
+  background: none; border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text-secondary); cursor: pointer; padding: 0.4rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; flex-shrink: 0;
+}
+.theme-toggle:hover { border-color: var(--accent); color: var(--text-primary); }
+.theme-toggle svg { width: 18px; height: 18px; }
+.theme-toggle .icon-sun { display: none; }
+.theme-toggle .icon-moon { display: block; }
+html.light .theme-toggle .icon-sun { display: block; }
+html.light .theme-toggle .icon-moon { display: none; }
+
+/* ── Light Mode Overrides ─────────────────────────── */
+html.light header nav {
+  background: rgba(248, 250, 252, 0.9);
+}
+html.light header nav .logo { color: var(--accent); }
+html.light header nav .nav-links a { color: var(--text-secondary); }
+html.light header nav .nav-links a:hover { color: var(--text-primary); }
+html.light .nav-dropdown-menu {
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+html.light .service-tooltip { background: #ffffff; }
+html.light .arch-node.arch-mcp { border-color: #7c3aed; background: rgba(124, 58, 237, 0.06); }
+html.light .arch-node.arch-mcp span { color: #7c3aed; }
+html.light .screenshot-modal { background: rgba(0, 0, 0, 0.6); }
+html.light .modal-nav {
+  background: rgba(0, 0, 0, 0.06); border-color: rgba(0, 0, 0, 0.12);
+}
+html.light .adr-content code {
+  background: var(--bg-secondary); color: var(--accent);
 }
 
 /* ── Focus Styles ──────────────────────────────────── */
