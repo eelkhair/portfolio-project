@@ -74,6 +74,9 @@ jobs:
           - name: landing
             context: apps/landing
             dockerfile: apps/landing/Dockerfile
+          - name: landing-next
+            context: apps/landing-next
+            dockerfile: apps/landing-next/Dockerfile
           - name: job-admin-dev
             context: apps/job-admin
             dockerfile: apps/job-admin/Dockerfile
@@ -241,6 +244,9 @@ jobs:
           - name: landing
             context: apps/landing
             dockerfile: apps/landing/Dockerfile
+          - name: landing-next
+            context: apps/landing-next
+            dockerfile: apps/landing-next/Dockerfile
           - name: job-admin
             context: apps/job-admin
             dockerfile: apps/job-admin/Dockerfile

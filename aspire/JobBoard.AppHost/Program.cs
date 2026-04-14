@@ -272,6 +272,10 @@ var jobPublic = builder.AddNpmApp("job-public", "../../apps/job-public", "start"
     .WaitFor(gateway)
     .WaitFor(keycloak);
 
+var landingNext = builder.AddNpmApp("landing-next", "../../apps/landing-next", "dev")
+    .WithHttpEndpoint(3001, isProxied: false)
+    .WaitFor(gateway);
+
 // ---------------------------------------------------------------------------
 // Dapr-dependent services
 // ---------------------------------------------------------------------------

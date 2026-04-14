@@ -7,6 +7,13 @@ services:
     restart: unless-stopped
     networks:
         - ai-job-board-net
+  landing-next:
+    image: registry.eelkhair.net/landing-next:latest
+    ports:
+        - "6091:3001"
+    restart: unless-stopped
+    networks:
+        - ai-job-board-net
   # -- Frontend ----------------------------------------------
   job-admin:
     image: registry.eelkhair.net/job-admin:dev

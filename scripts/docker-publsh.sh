@@ -67,6 +67,7 @@ BACKEND_SERVICES=(
   "health-check|../services/micro-services/HealthChecks|default"
   "keycloak|../infrastructure/keycloak|default"
   "landing|../apps/landing|default"
+  "landing-next|../apps/landing-next|default"
 )
 
 FAILED_BUILDS=()
