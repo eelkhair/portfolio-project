@@ -60,24 +60,55 @@ body {
 .mt-footer { margin-top: 0.5rem; }
 
 /* ── Navigation ───────────────────────────────────── */
-nav {
+header nav {
   position: fixed; top: 0; width: 100%; z-index: 100;
   background: rgba(12, 18, 34, 0.85);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
 }
-nav .nav-inner {
+header nav .nav-inner {
   max-width: var(--max-width); margin: 0 auto;
   padding: 0.75rem 1.5rem;
   display: flex; justify-content: space-between; align-items: center;
 }
-nav .logo { font-weight: 700; font-size: 1.1rem; color: var(--accent-light); text-decoration: none; }
-nav .nav-links { display: flex; gap: 1.5rem; list-style: none; }
-nav .nav-links a {
+header nav .logo { font-weight: 700; font-size: 1.1rem; color: var(--accent-light); text-decoration: none; }
+header nav .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+header nav .nav-links a {
   color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; font-weight: 500;
   transition: color 0.2s;
 }
-nav .nav-links a:hover { color: var(--text-primary); }
+header nav .nav-links a:hover { color: var(--text-primary); }
+
+/* ── Nav Dropdown ─────────────────────────────────── */
+.nav-dropdown { position: relative; }
+.nav-dropdown > a::after {
+  content: ''; display: inline-block; width: 4px; height: 4px;
+  border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg); margin-left: 4px; vertical-align: 1px;
+}
+/* Invisible bridge so hover isn't lost crossing the gap */
+.nav-dropdown::after {
+  content: ''; position: absolute; top: 100%; left: 0;
+  width: 100%; height: 0.75rem; background: transparent;
+}
+.nav-dropdown-menu {
+  position: absolute; top: calc(100% + 0.5rem); left: 50%; transform: translateX(-50%);
+  min-width: 180px; padding: 0.5rem 0;
+  background: rgba(12, 18, 34, 0.95); backdrop-filter: blur(12px);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  list-style: none; z-index: 101;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+}
+.nav-dropdown:hover .nav-dropdown-menu,
+.nav-dropdown:focus-within .nav-dropdown-menu {
+  opacity: 1; visibility: visible; pointer-events: auto;
+}
+.nav-dropdown-menu li a {
+  display: block; padding: 0.4rem 1rem; white-space: nowrap;
+}
+.nav-dropdown-menu li a:hover { color: var(--accent-light); }
 
 /* ── Sections & Typography ────────────────────────── */
 section { max-width: var(--max-width); margin: 0 auto; padding: 4rem 1.5rem; }
@@ -479,7 +510,7 @@ footer a:hover { color: var(--text-primary); }
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
-nav .nav-links a:focus-visible { border-radius: 4px; }
+header nav .nav-links a:focus-visible { border-radius: 4px; }
 .btn:focus-visible { outline-offset: 3px; }
 .card:focus-visible { outline-offset: -2px; }
 .service-card:focus-visible { outline-offset: -2px; }
@@ -493,7 +524,7 @@ nav .nav-links a:focus-visible { border-radius: 4px; }
   .hero-links { justify-content: center; }
   .hero h1 { font-size: 2rem; }
   .hero .subtitle { font-size: 1rem; }
-  nav .nav-links { gap: 1rem; }
+  header nav .nav-links { gap: 1rem; }
   .card-grid { grid-template-columns: 1fr; }
   .service-grid { grid-template-columns: 1fr 1fr; }
 
@@ -510,7 +541,7 @@ nav .nav-links a:focus-visible { border-radius: 4px; }
 }
 @media (max-width: 480px) {
   .service-grid { grid-template-columns: 1fr; }
-  nav .nav-links { display: none; }
+  header nav .nav-links { display: none; }
 }
 
 /* ── Reduced Motion ────────────────────────────────── */

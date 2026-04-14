@@ -44,7 +44,7 @@ echo "Will deploy to: ${DEPLOY_TARGETS[*]}"
 # ===== CATEGORY SELECTION =====
 echo ""
 echo "Select categories to build (comma or space separated, e.g. 1,3,5):"
-echo "  1) FE         — job-admin, job-public"
+echo "  1) FE         — landing, job-admin, job-public"
 echo "  2) Monolith   — gateway, monolith-api, monolith-mcp"
 echo "  3) Micro      — gateway, admin-api, admin-api-mcp, company-api, job-api, user-api"
 echo "  4) Infra      — health-check, keycloak"
@@ -122,7 +122,6 @@ MICRO_SERVICES=(
 INFRA_SERVICES=(
   "health-check|../services/micro-services/HealthChecks|default"
   "keycloak|../infrastructure/keycloak|default"
-  "landing|../apps/landing|default"
 )
 
 AI_SERVICES=(
@@ -227,6 +226,11 @@ build_and_push_frontends() {
   echo "=========================================="
   echo "🔨 Building frontends for $env_tag..."
   echo "=========================================="
+
+  # Landing page: same image for all envs, build once
+  if [[ -z "${BUILT_SERVICES[landing]+x}" ]]; then
+    build_one "landing" "../apps/landing" "default" || true
+  fi
 
   for name in "job-admin" "job-public"; do
     local image="registry.eelkhair.net/${name}:${env_tag}"

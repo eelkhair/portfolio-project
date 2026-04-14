@@ -1,0 +1,190 @@
+/* ══════════════════════════════════════════════════
+   Case Study Pages — Styles
+   ══════════════════════════════════════════════════ */
+
+/* ── Hero ─────────────────────────────────────────── */
+.cs-hero {
+  text-align: center;
+  padding-top: 7rem;
+  padding-bottom: 2rem;
+}
+.cs-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+.cs-summary {
+  font-size: 1.15rem;
+  color: var(--text-secondary);
+  max-width: 700px;
+  margin: 0 auto 2rem;
+  line-height: 1.7;
+}
+
+/* ── Table of Contents ────────────────────────────── */
+.cs-toc {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.cs-toc a {
+  font-size: 0.875rem;
+  padding: 0.35rem 0.75rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.cs-toc a:hover {
+  border-color: var(--accent);
+  color: var(--accent-light);
+}
+
+/* ── Section ──────────────────────────────────────── */
+.cs-section {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+.cs-section h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+.cs-section p {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.8;
+  margin-bottom: 1rem;
+}
+.cs-section p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Figures / Screenshots ────────────────────────── */
+.cs-figure {
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  margin: 1.5rem 0;
+}
+.cs-figure img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.cs-figure figcaption {
+  padding: 0.75rem 1rem;
+  background: var(--bg-card);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.cs-figure-wide {
+  max-width: 100%;
+}
+
+/* Placeholder for missing screenshots */
+.cs-figure .cs-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 16 / 9;
+  background: var(--bg-card);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* ── Evidence Grid (2-col screenshots) ────────────── */
+.cs-evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 1.5rem;
+}
+
+/* ── Decision Cards ───────────────────────────────── */
+.cs-decision-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+.cs-decision {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  transition: all 0.2s;
+}
+.cs-decision:hover {
+  border-color: var(--accent);
+  background: var(--bg-card-hover);
+}
+.cs-decision h3 {
+  color: var(--accent-light);
+  font-size: 1.05rem;
+  margin-bottom: 0.75rem;
+}
+.cs-decision p {
+  font-size: 0.925rem;
+  margin-bottom: 0.5rem;
+}
+.cs-decision strong {
+  color: var(--text-primary);
+}
+
+/* ── Tradeoffs List ───────────────────────────────── */
+.cs-tradeoff-list {
+  list-style: none;
+  padding: 0;
+}
+.cs-tradeoff-list li {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  padding: 0.3rem 0 0.3rem 1rem;
+  position: relative;
+}
+.cs-tradeoff-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.7rem;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+
+/* ── Bottom Navigation ────────────────────────────── */
+.cs-bottom-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+  border-top: 1px solid var(--border);
+}
+
+/* ── Responsive ───────────────────────────────────── */
+@media (max-width: 768px) {
+  .cs-title { font-size: 1.75rem; }
+  .cs-summary { font-size: 1rem; }
+  .cs-evidence-grid { grid-template-columns: 1fr; }
+  .cs-decision-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .cs-bottom-nav {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .cs-bottom-nav .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

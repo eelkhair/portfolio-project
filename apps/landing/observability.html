@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Observability | Elkhair Elkhair</title>
+  <meta name="description" content="End-to-end distributed tracing, structured logging, and dashboards across 16 services using OpenTelemetry, Jaeger, Grafana, and Seq.">
+  <meta property="og:title" content="Observability | Elkhair Elkhair">
+  <meta property="og:description" content="End-to-end distributed tracing, structured logging, and dashboards across 16 services.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' width='48' height='48'><g transform='translate(24,24) rotate(45)'><rect x='-12' y='-12' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='-3.5' y='-12' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='5' y='-12' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='-12' y='-3.5' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='-3.5' y='-3.5' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='5' y='-3.5' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='-12' y='5' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='-3.5' y='5' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='5' y='5' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/></g><polygon points='24,8 27,18 38,18 29,25 32,36 24,30 16,36 19,25 10,18 21,18' fill='%230ea5e9' stroke='%230ea5e9' stroke-width='1.5'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="case-study.css">
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<header>
+  <nav aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="/" class="logo" aria-label="Home">EE</a>
+      <ul class="nav-links">
+        <li><a href="/">About Me</a></li>
+        <li><a href="/portfolio.html">Portfolio</a></li>
+        <li class="nav-dropdown">
+          <a href="/portfolio.html#deep-dives" aria-haspopup="true">Deep Dives</a>
+          <ul class="nav-dropdown-menu">
+            <li><a href="/architecture.html">Architecture</a></li>
+            <li><a href="/ai-orchestration.html">AI Orchestration</a></li>
+            <li><a href="/observability.html">Observability</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<main id="main">
+
+  <!-- ── Hero ─────────────────────────────────────────── -->
+  <section class="cs-hero" aria-labelledby="cs-heading">
+    <p class="section-title">Case Study</p>
+    <h1 id="cs-heading" class="cs-title">Observability</h1>
+    <p class="cs-summary">
+      End-to-end distributed tracing, structured logging, and dashboards across 16 services &mdash; so every request is debuggable from browser to database.
+    </p>
+    <nav class="cs-toc" aria-label="Page sections">
+      <a href="#problem">Problem</a>
+      <a href="#solution">Solution</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#user-view">What You See</a>
+      <a href="#behind-scenes">Behind the Scenes</a>
+      <a href="#decisions">Key Decisions</a>
+      <a href="#tradeoffs">Tradeoffs</a>
+    </nav>
+  </section>
+
+  <!-- ── Problem ──────────────────────────────────────── -->
+  <section id="problem" class="cs-section">
+    <h2>The Problem</h2>
+    <p>
+      A single request in this system can touch five or more services: gateway, monolith or microservices, AI service, MCP server, and background processors. Without correlated telemetry, a failure in one service looks like a mystery in another.
+    </p>
+    <p>
+      Most portfolio projects treat logging as an afterthought &mdash; a few <code>console.log</code> statements or uncorrelated log files. That doesn't reflect how production distributed systems are actually operated.
+    </p>
+  </section>
+
+  <!-- ── Solution ─────────────────────────────────────── -->
+  <section id="solution" class="cs-section section-alt">
+    <h2>The Solution</h2>
+    <p>
+      Every service is instrumented with <strong>OpenTelemetry</strong>. Traces follow the <strong>W3C TraceContext</strong> standard, propagating through HTTP calls, Dapr pub/sub messages, and background processors. A single TraceId follows a request from the Angular frontend through the gateway, into whichever backend path is active, through messaging, and back.
+    </p>
+    <p>
+      <strong>Jaeger</strong> visualizes distributed traces. <strong>Grafana</strong> shows API latency, error rates, and throughput. <strong>Seq</strong> provides structured log search with TraceId correlation. <strong>Health checks</strong> monitor liveness and readiness for every service.
+    </p>
+    <figure class="cs-figure">
+      <div class="cs-placeholder">Screenshot: Full end-to-end Jaeger trace across multiple services</div>
+      <figcaption>A Jaeger trace showing a complete request flow from gateway through multiple backend services</figcaption>
+    </figure>
+  </section>
+
+  <!-- ── Architecture ─────────────────────────────────── -->
+  <section id="architecture" class="cs-section">
+    <h2>Architecture</h2>
+    <p>
+      Each .NET service configures OpenTelemetry through a shared extension method. The OTLP exporter sends traces and metrics to a centralized OpenTelemetry Collector, which fans out to Jaeger (traces) and Grafana (metrics via Prometheus).
+    </p>
+    <p>
+      Trace context propagation through messaging is the hard part. When a service publishes a Dapr event, the W3C <code>traceparent</code> header is included in the message metadata. The consuming service extracts it and creates a child span, maintaining the trace across async boundaries.
+    </p>
+    <figure class="cs-figure cs-figure-wide">
+      <div class="cs-placeholder">Screenshot: Trace showing context propagation through Dapr pub/sub messaging</div>
+      <figcaption>A trace spanning Dapr pub/sub &mdash; the trace context propagates from producer through RabbitMQ to consumer</figcaption>
+    </figure>
+  </section>
+
+  <!-- ── What You See ─────────────────────────────────── -->
+  <section id="user-view" class="cs-section section-alt">
+    <h2>What You See</h2>
+    <p>
+      Click "Create Company" in the admin app. The API response includes a <code>TraceId</code> header. Click the Jaeger link in the admin toolbar. You'll see the full trace: gateway to monolith, outbox dispatch, connector saga fanning out to three microservices, reverse connector syncing back.
+    </p>
+    <p>
+      Open Grafana and check the API dashboard. You'll see request latency percentiles, error rates by endpoint, and throughput over time. Filter by the TraceId to correlate a specific request's metrics with its trace. Open Seq and paste the same TraceId &mdash; every structured log entry from every service involved in that request appears, correlated and searchable.
+    </p>
+    <div class="cs-evidence-grid">
+      <figure class="cs-figure">
+        <div class="cs-placeholder">Screenshot: Grafana dashboard showing API latency, error rates, and throughput</div>
+        <figcaption>Grafana dashboard with request latency percentiles, error rates, and throughput across services</figcaption>
+      </figure>
+      <figure class="cs-figure">
+        <div class="cs-placeholder">Screenshot: Seq structured logs filtered by TraceId</div>
+        <figcaption>Seq log search filtered by TraceId, showing correlated entries across multiple services</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ── Behind the Scenes ────────────────────────────── -->
+  <section id="behind-scenes" class="cs-section">
+    <h2>Behind the Scenes</h2>
+    <p>
+      Custom <code>Activity</code> spans wrap the CQRS decorator pipeline. Instead of generic span names like "POST /api/companies", the traces show business-meaningful names like "CreateCompanyCommand" and "PublishOutboxEvents". This makes traces readable without needing to map HTTP paths back to domain operations.
+    </p>
+    <p>
+      The health check system separates concerns: <strong>liveness</strong> checks confirm the process is running, <strong>readiness</strong> checks confirm dependencies (database, Redis, RabbitMQ) are reachable. The health dashboard aggregates all services and shows which are ready to serve traffic.
+    </p>
+    <p>
+      The admin Angular app includes the TraceId from API responses in the toolbar, with a direct link to Jaeger. This closes the loop &mdash; a developer or visitor can go from a UI action to a full distributed trace in one click.
+    </p>
+  </section>
+
+  <!-- ── Key Decisions ────────────────────────────────── -->
+  <section id="decisions" class="cs-section section-alt">
+    <h2>Key Decisions</h2>
+    <div class="cs-decision-grid">
+      <div class="cs-decision">
+        <h3>OpenTelemetry over vendor-specific SDKs</h3>
+        <p><strong>Why:</strong> OpenTelemetry is vendor-neutral. The same instrumentation works whether you export to Jaeger, Datadog, or Azure Monitor. Switching backends is a configuration change, not a code change.</p>
+        <p><strong>Alternative:</strong> Application Insights SDK or Datadog APM. Both provide richer out-of-the-box dashboards but create vendor lock-in.</p>
+      </div>
+      <div class="cs-decision">
+        <h3>W3C TraceContext through messaging</h3>
+        <p><strong>Why:</strong> Without trace propagation through async messaging, traces break at the publisher. You see the API call but not the downstream processing. W3C TraceContext is the standard, and Dapr supports it natively for pub/sub.</p>
+        <p><strong>Alternative:</strong> Custom correlation IDs in message payloads. Simpler but doesn't integrate with the standard tracing ecosystem.</p>
+      </div>
+      <div class="cs-decision">
+        <h3>Business-named spans over framework defaults</h3>
+        <p><strong>Why:</strong> Default ASP.NET Core spans are named after HTTP methods and routes. That's fine for basic request tracing, but useless for understanding what the system is doing. "CreateCompanyCommand" tells you more than "POST /api/companies".</p>
+        <p><strong>Alternative:</strong> Rely on framework-generated spans only. Less work upfront but significantly harder to debug when something goes wrong.</p>
+      </div>
+      <div class="cs-decision">
+        <h3>Separated health checks by concern</h3>
+        <p><strong>Why:</strong> A service that can't reach its database shouldn't receive traffic, but it's still alive (don't restart it). Separating liveness from readiness prevents unnecessary restarts while still routing traffic away from unhealthy instances.</p>
+        <p><strong>Alternative:</strong> Single health endpoint that checks everything. Simpler but conflates "should restart" with "should stop receiving traffic".</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Tradeoffs ────────────────────────────────────── -->
+  <section id="tradeoffs" class="cs-section">
+    <h2>Tradeoffs &amp; Lessons Learned</h2>
+    <ul class="cs-tradeoff-list">
+      <li><strong>Instrumentation discipline:</strong> Every new service, every new handler, every new integration needs spans and structured logging. It's a habit that has to be enforced from day one. Retrofitting observability into an existing system is much harder than building it in.</li>
+      <li><strong>Trace storage costs at scale:</strong> Jaeger's in-memory storage works for a portfolio but wouldn't survive a restart in production. A real deployment would use Elasticsearch or Cassandra as a backend, which adds operational complexity.</li>
+      <li><strong>Span overhead:</strong> Each span adds 2-5ms of overhead. For most requests that's negligible, but for hot paths with many nested spans, it's measurable. Production systems typically use sampling to reduce this.</li>
+      <li><strong>Dashboard maintenance:</strong> Grafana dashboards drift unless someone owns them. Metrics change, services get renamed, thresholds need updating. Treating dashboards as code (provisioned from JSON) helps but doesn't eliminate the problem.</li>
+    </ul>
+  </section>
+
+  <!-- ── Bottom Navigation ────────────────────────────── -->
+  <nav class="cs-bottom-nav" aria-label="Case study navigation">
+    <a href="/ai-orchestration.html" class="btn btn-outline">Previous: AI Orchestration</a>
+    <a href="/portfolio.html" class="btn btn-primary">Back to Portfolio</a>
+  </nav>
+
+</main>
+
+<footer>
+  <p>
+    <a href="https://github.com/eelkhair/portfolio-project" target="_blank" rel="noopener noreferrer">GitHub</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://www.linkedin.com/in/elkhair-elkhair/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    &nbsp;&middot;&nbsp;
+    <a href="mailto:elkhair.elkhair@live.com">elkhair.elkhair@live.com</a>
+  </p>
+  <p class="mt-footer">Self-hosted on Proxmox &middot; Exposed via Cloudflare Tunnel &middot; Deployed with GitHub Actions</p>
+</footer>
+
+</body>
+</html>
