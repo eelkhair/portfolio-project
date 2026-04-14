@@ -28,9 +28,6 @@ jobs:
   build-dev:
     if: github.event_name == 'push' || github.event.inputs.environment == 'dev' || github.event.inputs.environment == 'both'
     runs-on: proxmox-dev
-    concurrency:
-      group: build-dev-${{ github.ref }}
-      cancel-in-progress: true
     strategy:
       fail-fast: false
       matrix:
@@ -191,9 +188,6 @@ jobs:
     needs: deploy-dev
     if: always() && (github.event_name == 'push' || github.event.inputs.environment == 'prod' || github.event.inputs.environment == 'both')
     runs-on: proxmox-prod
-    concurrency:
-      group: build-prod-${{ github.ref }}
-      cancel-in-progress: true
     strategy:
       fail-fast: false
       matrix:
