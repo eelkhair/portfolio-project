@@ -22,14 +22,17 @@ permissions:
 
 jobs:
   # ════════════════════════════════════════════════════════════════════════════
-  # Job 1: Build and Push Docker Images
+  # Dev: Build + Deploy (auto — no approval needed)
+  # Builds on proxmox-dev runner for local Docker cache
   # ════════════════════════════════════════════════════════════════════════════
-  build-and-push:
-    runs-on: self-hosted
+  build-dev:
+    if: github.event_name == 'push' || github.event.inputs.environment == 'dev' || github.event.inputs.environment == 'both'
+    runs-on: proxmox-dev
     strategy:
       fail-fast: false
       matrix:
         include:
+          # Backend services
           - name: monolith-api
             context: services/monolith
             dockerfile: services/monolith/Src/Presentation/JobBoard.API/Dockerfile
@@ -72,18 +75,11 @@ jobs:
           - name: landing
             context: apps/landing
             dockerfile: apps/landing/Dockerfile
-          - name: job-admin
-            context: apps/job-admin
-            dockerfile: apps/job-admin/Dockerfile
-            build_args: BUILD_CONFIG=production
+          # Dev frontends
           - name: job-admin-dev
             context: apps/job-admin
             dockerfile: apps/job-admin/Dockerfile
             build_args: BUILD_CONFIG=development
-          - name: job-public
-            context: apps/job-public
-            dockerfile: apps/job-public/Dockerfile
-            build_args: BUILD_CONFIG=production
           - name: job-public-dev
             context: apps/job-public
             dockerfile: apps/job-public/Dockerfile
@@ -134,14 +130,9 @@ jobs:
         run: |
           NAME="${{ matrix.name }}"
           if [[ "$NAME" == *"-dev" ]]; then
-            # Frontend dev builds: tag as :dev
             BASE_NAME="${NAME%-dev}"
             echo "image=$REGISTRY/${BASE_NAME}:dev" >> $GITHUB_OUTPUT
-          elif [[ "$NAME" == "job-admin" || "$NAME" == "job-public" ]]; then
-            # Frontend prod builds: tag as :prod
-            echo "image=$REGISTRY/${NAME}:prod" >> $GITHUB_OUTPUT
           else
-            # Backend services: tag with sha and latest
             echo "image=$REGISTRY/${NAME}:${{ github.sha }},$REGISTRY/${NAME}:latest" >> $GITHUB_OUTPUT
           fi
 
@@ -152,16 +143,12 @@ jobs:
           file: ${{ matrix.dockerfile }}
           push: true
           tags: ${{ steps.tag.outputs.image }}
-          cache-from: type=gha,scope=${{ matrix.name }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.name }}
+          cache-from: type=gha,scope=dev-${{ matrix.name }}
+          cache-to: type=gha,mode=max,scope=dev-${{ matrix.name }}
           build-args: ${{ matrix.build_args || '' }}
 
-  # ════════════════════════════════════════════════════════════════════════════
-  # Job 2: Deploy to Dev (auto — no approval needed)
-  # ════════════════════════════════════════════════════════════════════════════
   deploy-dev:
-    needs: build-and-push
-    if: github.event_name == 'push' || github.event.inputs.environment == 'dev' || github.event.inputs.environment == 'both'
+    needs: build-dev
     runs-on: proxmox-dev
     steps:
       - uses: actions/checkout@v4
@@ -188,11 +175,132 @@ jobs:
           echo "dev deploy complete!"
 
   # ════════════════════════════════════════════════════════════════════════════
-  # Job 3: Deploy to Prod (requires approval via GitHub Environment)
+  # Prod: Build + Deploy (requires approval via GitHub Environment)
+  # Builds on proxmox-prod runner for local Docker cache
   # ════════════════════════════════════════════════════════════════════════════
-  deploy-prod:
-    needs: build-and-push
+  build-prod:
     if: github.event_name == 'push' || github.event.inputs.environment == 'prod' || github.event.inputs.environment == 'both'
+    runs-on: proxmox-prod
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Backend services
+          - name: monolith-api
+            context: services/monolith
+            dockerfile: services/monolith/Src/Presentation/JobBoard.API/Dockerfile
+          - name: monolith-mcp
+            context: services/monolith
+            dockerfile: services/monolith/Src/Presentation/JobBoard.API.Mcp/Dockerfile
+          - name: gateway
+            context: services/gateway
+            dockerfile: services/gateway/Dockerfile
+          - name: ai-service-v2
+            context: services/ai-service.v2
+            dockerfile: services/ai-service.v2/Src/Presentation/JobBoard.AI.API/Dockerfile
+          - name: admin-api
+            context: services/micro-services/admin-api
+            dockerfile: services/micro-services/admin-api/Dockerfile
+          - name: admin-api-mcp
+            context: services/micro-services/admin-api
+            dockerfile: services/micro-services/admin-api/AdminApi.Mcp/Dockerfile
+          - name: company-api
+            context: services/micro-services/company-api
+            dockerfile: services/micro-services/company-api/Dockerfile
+          - name: job-api
+            context: services/micro-services/job-api
+            dockerfile: services/micro-services/job-api/Dockerfile
+          - name: user-api
+            context: services/micro-services/user-api
+            dockerfile: services/micro-services/user-api/Dockerfile
+          - name: connector-api
+            context: services/connector-api
+            dockerfile: services/connector-api/Dockerfile
+          - name: reverse-connector-api
+            context: services/reverse-connector-api
+            dockerfile: services/reverse-connector-api/Dockerfile
+          - name: health-check
+            context: services/micro-services/HealthChecks
+            dockerfile: services/micro-services/HealthChecks/Dockerfile
+          - name: keycloak
+            context: infrastructure/keycloak
+            dockerfile: infrastructure/keycloak/Dockerfile
+          - name: landing
+            context: apps/landing
+            dockerfile: apps/landing/Dockerfile
+          # Prod frontends
+          - name: job-admin
+            context: apps/job-admin
+            dockerfile: apps/job-admin/Dockerfile
+            build_args: BUILD_CONFIG=production
+          - name: job-public
+            context: apps/job-public
+            dockerfile: apps/job-public/Dockerfile
+            build_args: BUILD_CONFIG=production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to private registry
+        run: echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login $REGISTRY -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
+
+      - name: Prepare NuGet packages for Docker builds
+        run: |
+          for ctx in \
+            services/monolith \
+            services/ai-service.v2 \
+            services/gateway \
+            services/connector-api \
+            services/reverse-connector-api \
+            services/micro-services/admin-api \
+            services/micro-services/company-api \
+            services/micro-services/job-api \
+            services/micro-services/user-api; do
+            cp -r nupkgs "$ctx/nupkgs" 2>/dev/null || true
+          done
+
+          find services -name Dockerfile -exec grep -l "mkdir -p /nupkgs" {} \; | while read df; do
+            sed -i 's|RUN mkdir -p /nupkgs|COPY nupkgs/ /nupkgs/\nRUN mkdir -p /nupkgs|' "$df"
+          done
+
+          find services -name "Nuget.Config" -not -path "*/bin/*" -not -path "*/obj/*" | while read nc; do
+            cat > "$nc" << 'NUGETEOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <configuration>
+            <packageSources>
+              <clear />
+              <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
+              <add key="local" value="/nupkgs" />
+            </packageSources>
+          </configuration>
+          NUGETEOF
+          done
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Determine image tag
+        id: tag
+        run: |
+          NAME="${{ matrix.name }}"
+          if [[ "$NAME" == "job-admin" || "$NAME" == "job-public" ]]; then
+            echo "image=$REGISTRY/${NAME}:prod" >> $GITHUB_OUTPUT
+          else
+            echo "image=$REGISTRY/${NAME}:${{ github.sha }},$REGISTRY/${NAME}:latest" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and Push
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: ${{ steps.tag.outputs.image }}
+          cache-from: type=gha,scope=prod-${{ matrix.name }}
+          cache-to: type=gha,mode=max,scope=prod-${{ matrix.name }}
+          build-args: ${{ matrix.build_args || '' }}
+
+  deploy-prod:
+    needs: build-prod
     runs-on: proxmox-prod
     environment: prod
     steps:
