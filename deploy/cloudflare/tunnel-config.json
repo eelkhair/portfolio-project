@@ -20,16 +20,37 @@
     { "hostname": "mono-mcp.eelkhair.net", "service": "http://192.168.1.112:3333" },
     { "hostname": "job-admin-api.eelkhair.net", "service": "http://192.168.1.112:6062" },
     { "hostname": "micro-mcp.eelkhair.net", "service": "http://192.168.1.112:3334" },
-    { "hostname": "registry.eelkhair.net", "service": "http://192.168.1.150:5000" }
+    { "hostname": "registry.eelkhair.net", "service": "http://192.168.1.150:5000" },
+
+    { "hostname": "elkhair.tech", "service": "http://192.168.1.112:6090" },
+    { "hostname": "www.elkhair.tech", "service": "http://192.168.1.112:6090" },
+    { "hostname": "job-admin.elkhair.tech", "service": "http://192.168.1.112:6080" },
+    { "hostname": "jobs.elkhair.tech", "service": "http://192.168.1.112:6081" },
+    { "hostname": "job-gateway.elkhair.tech", "service": "http://192.168.1.112:5238" },
+    { "hostname": "job-health.elkhair.tech", "service": "http://192.168.1.112:5107" },
+    { "hostname": "job-ai-v2.elkhair.tech", "service": "http://192.168.1.112:5200" },
+    { "hostname": "job-monolith.elkhair.tech", "service": "http://192.168.1.112:5280" },
+    { "hostname": "otel.elkhair.tech", "service": "http://192.168.1.160:4318" },
+    { "hostname": "auth.elkhair.tech", "service": "http://192.168.1.112:9090" },
+    { "hostname": "grafana.elkhair.tech", "service": "http://192.168.1.115:3000" },
+    { "hostname": "jaeger.elkhair.tech", "service": "http://192.168.1.160:16686" },
+    { "hostname": "seq.elkhair.tech", "service": "http://192.168.1.112:5341" },
+    { "hostname": "inspector.elkhair.tech", "service": "http://192.168.1.115:6274" },
+    { "hostname": "mail.elkhair.tech", "service": "http://192.168.1.115:8025" },
+    { "hostname": "job-dapr.elkhair.tech", "service": "http://192.168.1.112:8080" },
+    { "hostname": "mono-mcp.elkhair.tech", "service": "http://192.168.1.112:3333" },
+    { "hostname": "job-admin-api.elkhair.tech", "service": "http://192.168.1.112:6062" },
+    { "hostname": "micro-mcp.elkhair.tech", "service": "http://192.168.1.112:3334" },
+    { "hostname": "registry.elkhair.tech", "service": "http://192.168.1.150:5000" }
   ],
   "block_rules": [
     {
       "description": "Block Keycloak admin console",
-      "expression": "(http.host eq \"auth.eelkhair.net\" and starts_with(http.request.uri.path, \"/admin/\"))"
+      "expression": "((http.host eq \"auth.eelkhair.net\" or http.host eq \"auth.elkhair.tech\") and starts_with(http.request.uri.path, \"/admin/\"))"
     },
     {
       "description": "Block Swagger UI pages but allow JSON specs",
-      "expression": "(http.request.uri.path contains \"/swagger\" and not http.request.uri.path contains \"swagger.json\" and http.host ne \"swagger.eelkhair.net\")"
+      "expression": "(http.request.uri.path contains \"/swagger\" and not http.request.uri.path contains \"swagger.json\" and http.host ne \"swagger.eelkhair.net\" and http.host ne \"swagger.elkhair.tech\")"
     }
   ]
 }
