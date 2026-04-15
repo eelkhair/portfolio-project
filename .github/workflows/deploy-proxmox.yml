@@ -192,7 +192,7 @@ jobs:
   # ════════════════════════════════════════════════════════════════════════════
   build-prod:
     needs: deploy-dev
-    if: always() && (github.event_name == 'push' || github.event.inputs.environment == 'prod' || github.event.inputs.environment == 'both')
+    if: "!cancelled() && (github.event_name == 'push' || github.event.inputs.environment == 'prod' || github.event.inputs.environment == 'both')"
     runs-on: proxmox-prod
     strategy:
       fail-fast: false
