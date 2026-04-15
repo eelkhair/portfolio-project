@@ -17,8 +17,11 @@ export async function fetchFeatureFlags(): Promise<FeatureFlags> {
     const res = await fetch(FLAG_URL, { next: { revalidate: 10 } });
     if (!res.ok) return defaults;
     const data: FeatureFlagsDto = await res.json();
+    const normalized = Object.fromEntries(
+      Object.entries(data).map(([k, v]) => [k.toLowerCase(), v])
+    );
     const flags: FeatureFlags = {
-      deepDives: data.DeepDives ?? defaults.deepDives,
+      deepDives: normalized["deepdives"] ?? defaults.deepDives,
     };
     console.log("[FeatureFlags] fetched:", flags);
     return flags;
