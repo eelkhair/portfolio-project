@@ -130,7 +130,7 @@ if [ -n "$EXISTING_RULE" ]; then
       -H "Content-Type: application/json" \
       -d '{
         "description": "Block Keycloak admin console",
-        "expression": "(http.host eq \"auth.eelkhair.net\" and starts_with(http.request.uri.path, \"/admin\"))",
+        "expression": "((http.host eq \"auth.eelkhair.net\" or http.host eq \"auth.elkhair.tech\") and starts_with(http.request.uri.path, \"/admin\"))",
         "action": "block"
       }')
 
@@ -154,7 +154,7 @@ else
       "rules": [
         {
           "description": "Block Keycloak admin console",
-          "expression": "(http.host eq \"auth.eelkhair.net\" and starts_with(http.request.uri.path, \"/admin\"))",
+          "expression": "((http.host eq \"auth.eelkhair.net\" or http.host eq \"auth.elkhair.tech\") and starts_with(http.request.uri.path, \"/admin\"))",
           "action": "block"
         }
       ]

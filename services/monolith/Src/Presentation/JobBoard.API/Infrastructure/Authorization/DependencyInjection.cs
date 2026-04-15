@@ -63,6 +63,17 @@ public static class DependencyInjection
         services
             .AddKeycloakJwtAuth(configuration, jwt =>
             {
+                // Accept tokens issued by either domain (eelkhair.net or elkhair.tech)
+                var authority = configuration["Keycloak:Authority"] ?? string.Empty;
+                var realmPath = authority.Contains("/realms/")
+                    ? authority[authority.IndexOf("/realms/", StringComparison.Ordinal)..]
+                    : "/realms/job-board";
+                jwt.TokenValidationParameters.ValidIssuers =
+                [
+                    $"https://auth.eelkhair.net{realmPath}",
+                    $"https://auth.elkhair.tech{realmPath}"
+                ];
+
                 // SignalR: read access_token from query string for WebSocket connections
                 jwt.Events!.OnMessageReceived = context =>
                 {

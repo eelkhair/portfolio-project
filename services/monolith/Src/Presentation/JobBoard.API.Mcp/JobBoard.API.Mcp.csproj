@@ -25,7 +25,7 @@
         <ProjectReference Include="..\..\Infrastructure\JobBoard.Infrastructure.RedisConfig\JobBoard.Infrastructure.RedisConfig.csproj" />
         <ProjectReference Include="..\..\Infrastructure\JobBoard.Infrastructure.Smtp\JobBoard.Infrastructure.Smtp.csproj" />
         <ProjectReference Include="..\..\Infrastructure\JobBoard.Infrastructure.Vault\JobBoard.Infrastructure.Vault.csproj" />
-        <PackageReference Include="JobBoard.Mcp.Common" Version="1.0.0" />
+        <PackageReference Include="JobBoard.Mcp.Common" Version="1.1.0" />
     </ItemGroup>
 
 </Project>

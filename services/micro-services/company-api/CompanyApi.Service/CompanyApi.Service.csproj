@@ -26,7 +26,7 @@
         <PackageReference Include="FastEndpoints.Swagger" Version="7.1.1" />
 
         <PackageReference Include="JobBoard.HealthChecks" Version="1.0.8" />
-        <PackageReference Include="JobBoard.Mcp.Common" Version="1.0.0" />
+        <PackageReference Include="JobBoard.Mcp.Common" Version="1.1.0" />
 
         <PackageReference Include="Mapster" Version="7.4.0" />
         <PackageReference Include="Mapster.Core" Version="1.2.1" />
