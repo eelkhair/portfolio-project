@@ -82,7 +82,7 @@ jobs:
             dockerfile: apps/job-public/Dockerfile
             build_args: BUILD_CONFIG=development
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Login to private registry
         run: echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login $REGISTRY -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
@@ -156,7 +156,7 @@ jobs:
     needs: build-dev
     runs-on: proxmox-dev
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Deploy dev
         env:
@@ -246,7 +246,7 @@ jobs:
             dockerfile: apps/job-public/Dockerfile
             build_args: BUILD_CONFIG=production
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Login to private registry
         run: echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login $REGISTRY -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
@@ -320,7 +320,7 @@ jobs:
     runs-on: proxmox-prod
     environment: prod
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Deploy prod
         env:
