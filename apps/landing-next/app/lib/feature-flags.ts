@@ -14,7 +14,7 @@ const defaults: FeatureFlags = {
 
 export async function fetchFeatureFlags(): Promise<FeatureFlags> {
   try {
-    const res = await fetch(FLAG_URL, { next: { revalidate: 10 } });
+    const res = await fetch(FLAG_URL, { cache: "no-store" });
     if (!res.ok) return defaults;
     const data: FeatureFlagsDto = await res.json();
     const normalized = Object.fromEntries(
