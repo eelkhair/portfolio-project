@@ -1,14 +1,14 @@
 #!/bin/bash
 # ============================================================================
-# Configure Cloudflare security settings for eelkhair.net
+# Configure Cloudflare security settings for a portfolio zone
 #
 # Disables aggressive security features that block legitimate traffic
 # to the portfolio homelab (Bot Fight Mode, Browser Integrity Check, etc.)
 #
-# Usage:
+# Run once per zone (eelkhair.net and elkhair.tech):
 #   export CLOUDFLARE_API_TOKEN="your-api-token"
-#   export CLOUDFLARE_ZONE_ID="your-zone-id"
-#   ./configure-security.sh
+#   CLOUDFLARE_ZONE_ID="<eelkhair.net-zone-id>" ./configure-security.sh
+#   CLOUDFLARE_ZONE_ID="<elkhair.tech-zone-id>" ./configure-security.sh
 # ============================================================================
 
 set -euo pipefail

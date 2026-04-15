@@ -64,85 +64,108 @@ jobs:
           fi
 
       # ──────────────────────────────────────────────────────────────────────
-      # Step 2: Sync DNS CNAME records
+      # Step 2: Sync DNS CNAME records (multi-zone)
       # ──────────────────────────────────────────────────────────────────────
       - name: Sync DNS CNAME records
         env:
           CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CF_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          CF_ZONE_ID_NET: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          CF_ZONE_ID_TECH: ${{ secrets.CLOUDFLARE_ZONE_ID_TECH }}
           CF_TUNNEL_ID: ${{ secrets.CLOUDFLARE_TUNNEL_ID }}
         run: |
           TUNNEL_TARGET="${CF_TUNNEL_ID}.cfargotunnel.com"
 
-          # Get desired hostnames from config
-          DESIRED_HOSTNAMES=$(echo '${{ steps.config.outputs.config }}' | jq -r '.services[].hostname')
+          # Zone mapping: root domain -> zone ID
+          declare -A ZONE_MAP
+          ZONE_MAP["eelkhair.net"]="$CF_ZONE_ID_NET"
+          ZONE_MAP["elkhair.tech"]="$CF_ZONE_ID_TECH"
 
-          # Get existing tunnel CNAME records (those pointing to *.cfargotunnel.com)
-          echo "Fetching existing DNS records..."
-          EXISTING_RECORDS=$(curl -s \
-            "$CF_API_BASE/zones/$CF_ZONE_ID/dns_records?type=CNAME&per_page=100" \
-            -H "Authorization: Bearer $CF_API_TOKEN" \
-            | jq -c '[.result[] | select(.content | endswith(".cfargotunnel.com"))]')
+          # Get all desired hostnames from config
+          ALL_HOSTNAMES=$(echo '${{ steps.config.outputs.config }}' | jq -r '.services[].hostname')
 
-          echo "Found $(echo "$EXISTING_RECORDS" | jq length) existing tunnel CNAME records"
+          for ROOT_DOMAIN in "${!ZONE_MAP[@]}"; do
+            ZONE_ID="${ZONE_MAP[$ROOT_DOMAIN]}"
+            echo ""
+            echo "══════════════════════════════════════════════"
+            echo "Syncing DNS for zone: $ROOT_DOMAIN"
+            echo "══════════════════════════════════════════════"
 
-          # Create missing CNAME records
-          for HOSTNAME in $DESIRED_HOSTNAMES; do
-            EXISTS=$(echo "$EXISTING_RECORDS" | jq -r --arg h "$HOSTNAME" '[.[] | select(.name == $h)] | length')
-            if [ "$EXISTS" -eq 0 ]; then
-              echo "Creating CNAME: $HOSTNAME -> $TUNNEL_TARGET"
-              CREATE_RESPONSE=$(curl -s -w "\n%{http_code}" \
-                -X POST \
-                "$CF_API_BASE/zones/$CF_ZONE_ID/dns_records" \
-                -H "Authorization: Bearer $CF_API_TOKEN" \
-                -H "Content-Type: application/json" \
-                -d "{
-                  \"type\": \"CNAME\",
-                  \"name\": \"$HOSTNAME\",
-                  \"content\": \"$TUNNEL_TARGET\",
-                  \"proxied\": true,
-                  \"comment\": \"Managed by GitHub Actions - Cloudflare Tunnel\"
-                }")
+            # Filter hostnames for this zone
+            DESIRED_HOSTNAMES=$(echo "$ALL_HOSTNAMES" | grep -E "(^|\.)"${ROOT_DOMAIN}"$")
 
-              HTTP_CODE=$(echo "$CREATE_RESPONSE" | tail -1)
-              if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
-                echo "  Created successfully"
+            if [ -z "$DESIRED_HOSTNAMES" ]; then
+              echo "No hostnames for $ROOT_DOMAIN, skipping"
+              continue
+            fi
+
+            # Get existing tunnel CNAME records for this zone
+            echo "Fetching existing DNS records..."
+            EXISTING_RECORDS=$(curl -s \
+              "$CF_API_BASE/zones/$ZONE_ID/dns_records?type=CNAME&per_page=100" \
+              -H "Authorization: Bearer $CF_API_TOKEN" \
+              | jq -c '[.result[] | select(.content | endswith(".cfargotunnel.com"))]')
+
+            echo "Found $(echo "$EXISTING_RECORDS" | jq length) existing tunnel CNAME records"
+
+            # Create missing CNAME records
+            for HOSTNAME in $DESIRED_HOSTNAMES; do
+              EXISTS=$(echo "$EXISTING_RECORDS" | jq -r --arg h "$HOSTNAME" '[.[] | select(.name == $h)] | length')
+              if [ "$EXISTS" -eq 0 ]; then
+                echo "Creating CNAME: $HOSTNAME -> $TUNNEL_TARGET"
+                CREATE_RESPONSE=$(curl -s -w "\n%{http_code}" \
+                  -X POST \
+                  "$CF_API_BASE/zones/$ZONE_ID/dns_records" \
+                  -H "Authorization: Bearer $CF_API_TOKEN" \
+                  -H "Content-Type: application/json" \
+                  -d "{
+                    \"type\": \"CNAME\",
+                    \"name\": \"$HOSTNAME\",
+                    \"content\": \"$TUNNEL_TARGET\",
+                    \"proxied\": true,
+                    \"comment\": \"Managed by GitHub Actions - Cloudflare Tunnel\"
+                  }")
+
+                HTTP_CODE=$(echo "$CREATE_RESPONSE" | tail -1)
+                if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+                  echo "  Created successfully"
+                else
+                  echo "::warning::Failed to create CNAME for $HOSTNAME (HTTP $HTTP_CODE)"
+                  echo "$CREATE_RESPONSE" | sed '$d' | jq .errors 2>/dev/null || true
+                fi
               else
-                echo "::warning::Failed to create CNAME for $HOSTNAME (HTTP $HTTP_CODE)"
-                echo "$CREATE_RESPONSE" | sed '$d' | jq .errors 2>/dev/null || true
+                echo "CNAME exists: $HOSTNAME"
               fi
+            done
+
+            # Delete stale tunnel CNAME records (exist in Cloudflare but not in config)
+            echo ""
+            echo "Checking for stale records..."
+            STALE_RECORDS=$(echo "$EXISTING_RECORDS" | jq -c --arg desired "$(echo "$DESIRED_HOSTNAMES" | tr '\n' '|' | sed 's/|$//')" \
+              '[.[] | select(.name as $n | ($desired | split("|") | map(select(. == $n))) | length == 0)]')
+
+            STALE_COUNT=$(echo "$STALE_RECORDS" | jq length)
+            if [ "$STALE_COUNT" -gt 0 ]; then
+              echo "Removing $STALE_COUNT stale tunnel CNAME records..."
+              echo "$STALE_RECORDS" | jq -r '.[].id' | while read RECORD_ID; do
+                RECORD_NAME=$(echo "$STALE_RECORDS" | jq -r --arg id "$RECORD_ID" '.[] | select(.id == $id) | .name')
+                echo "  Deleting: $RECORD_NAME ($RECORD_ID)"
+                curl -s -X DELETE \
+                  "$CF_API_BASE/zones/$ZONE_ID/dns_records/$RECORD_ID" \
+                  -H "Authorization: Bearer $CF_API_TOKEN" > /dev/null
+              done
             else
-              echo "CNAME exists: $HOSTNAME"
+              echo "No stale records to clean up"
             fi
           done
 
-          # Delete stale tunnel CNAME records (exist in Cloudflare but not in config)
-          echo ""
-          echo "Checking for stale records..."
-          STALE_RECORDS=$(echo "$EXISTING_RECORDS" | jq -c --arg desired "$(echo "$DESIRED_HOSTNAMES" | tr '\n' '|' | sed 's/|$//')" \
-            '[.[] | select(.name as $n | ($desired | split("|") | map(select(. == $n))) | length == 0)]')
-
-          STALE_COUNT=$(echo "$STALE_RECORDS" | jq length)
-          if [ "$STALE_COUNT" -gt 0 ]; then
-            echo "Removing $STALE_COUNT stale tunnel CNAME records..."
-            echo "$STALE_RECORDS" | jq -r '.[].id' | while read RECORD_ID; do
-              RECORD_NAME=$(echo "$STALE_RECORDS" | jq -r --arg id "$RECORD_ID" '.[] | select(.id == $id) | .name')
-              echo "  Deleting: $RECORD_NAME ($RECORD_ID)"
-              curl -s -X DELETE \
-                "$CF_API_BASE/zones/$CF_ZONE_ID/dns_records/$RECORD_ID" \
-                -H "Authorization: Bearer $CF_API_TOKEN" > /dev/null
-            done
-          else
-            echo "No stale records to clean up"
-          fi
-
       # ──────────────────────────────────────────────────────────────────────
-      # Step 3: Sync WAF block rules
+      # Step 3: Sync WAF block rules (multi-zone)
       # ──────────────────────────────────────────────────────────────────────
       - name: Sync WAF block rules
         env:
           CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CF_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          CF_ZONE_ID_NET: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          CF_ZONE_ID_TECH: ${{ secrets.CLOUDFLARE_ZONE_ID_TECH }}
         run: |
           # Read desired block rules from config
           BLOCK_RULES=$(echo '${{ steps.config.outputs.config }}' | jq -c '.block_rules // []')
@@ -153,90 +176,102 @@ jobs:
             exit 0
           fi
 
-          echo "Syncing $RULE_COUNT WAF block rules..."
+          # Sync WAF rules to both zones
+          declare -A ZONE_MAP
+          ZONE_MAP["eelkhair.net"]="$CF_ZONE_ID_NET"
+          ZONE_MAP["elkhair.tech"]="$CF_ZONE_ID_TECH"
 
-          # Find existing custom WAF ruleset
-          RULESETS=$(curl -s \
-            "$CF_API_BASE/zones/$CF_ZONE_ID/rulesets" \
-            -H "Authorization: Bearer $CF_API_TOKEN")
+          for ROOT_DOMAIN in "${!ZONE_MAP[@]}"; do
+            ZONE_ID="${ZONE_MAP[$ROOT_DOMAIN]}"
+            echo ""
+            echo "══════════════════════════════════════════════"
+            echo "Syncing $RULE_COUNT WAF block rules for $ROOT_DOMAIN..."
+            echo "══════════════════════════════════════════════"
 
-          RULESET_ID=$(echo "$RULESETS" | jq -r '.result[] | select(.phase == "http_request_firewall_custom") | .id')
-
-          if [ -z "$RULESET_ID" ] || [ "$RULESET_ID" = "null" ]; then
-            # No custom ruleset exists — create one with all rules
-            echo "Creating new WAF ruleset..."
-            RULES_JSON=$(echo "$BLOCK_RULES" | jq -c '[.[] | {description: .description, expression: .expression, action: "block"}]')
-            BODY=$(jq -n \
-              --argjson rules "$RULES_JSON" \
-              '{name: "Portfolio security rules", kind: "zone", phase: "http_request_firewall_custom", rules: $rules}')
-
-            RESPONSE=$(curl -s -w "\n%{http_code}" \
-              -X POST \
-              "$CF_API_BASE/zones/$CF_ZONE_ID/rulesets" \
-              -H "Authorization: Bearer $CF_API_TOKEN" \
-              -H "Content-Type: application/json" \
-              -d "$BODY")
-
-            HTTP_CODE=$(echo "$RESPONSE" | tail -1)
-            if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
-              echo "Created WAF ruleset with $RULE_COUNT rules"
-            else
-              echo "::warning::Failed to create WAF ruleset (HTTP $HTTP_CODE)"
-              echo "$RESPONSE" | sed '$d' | jq . 2>/dev/null || true
-            fi
-          else
-            # Ruleset exists — sync rules
-            echo "Found existing WAF ruleset: $RULESET_ID"
-
-            EXISTING_RULESET=$(curl -s \
-              "$CF_API_BASE/zones/$CF_ZONE_ID/rulesets/$RULESET_ID" \
+            # Find existing custom WAF ruleset
+            RULESETS=$(curl -s \
+              "$CF_API_BASE/zones/$ZONE_ID/rulesets" \
               -H "Authorization: Bearer $CF_API_TOKEN")
 
-            EXISTING_RULES=$(echo "$EXISTING_RULESET" | jq -c '.result.rules // []')
+            RULESET_ID=$(echo "$RULESETS" | jq -r '.result[] | select(.phase == "http_request_firewall_custom") | .id')
 
-            # Create missing rules
-            for i in $(seq 0 $((RULE_COUNT - 1))); do
-              DESC=$(echo "$BLOCK_RULES" | jq -r ".[$i].description")
-              EXPR=$(echo "$BLOCK_RULES" | jq -r ".[$i].expression")
+            if [ -z "$RULESET_ID" ] || [ "$RULESET_ID" = "null" ]; then
+              # No custom ruleset exists — create one with all rules
+              echo "Creating new WAF ruleset..."
+              RULES_JSON=$(echo "$BLOCK_RULES" | jq -c '[.[] | {description: .description, expression: .expression, action: "block"}]')
+              BODY=$(jq -n \
+                --argjson rules "$RULES_JSON" \
+                '{name: "Portfolio security rules", kind: "zone", phase: "http_request_firewall_custom", rules: $rules}')
 
-              HAS_RULE=$(echo "$EXISTING_RULES" | jq --arg d "$DESC" '[.[] | select(.description == $d)] | length')
-              if [ "$HAS_RULE" -gt 0 ]; then
-                echo "  Exists: $DESC"
+              RESPONSE=$(curl -s -w "\n%{http_code}" \
+                -X POST \
+                "$CF_API_BASE/zones/$ZONE_ID/rulesets" \
+                -H "Authorization: Bearer $CF_API_TOKEN" \
+                -H "Content-Type: application/json" \
+                -d "$BODY")
+
+              HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+              if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+                echo "Created WAF ruleset with $RULE_COUNT rules"
               else
-                echo "  Creating: $DESC"
-                RESPONSE=$(curl -s -w "\n%{http_code}" \
-                  -X POST \
-                  "$CF_API_BASE/zones/$CF_ZONE_ID/rulesets/$RULESET_ID/rules" \
-                  -H "Authorization: Bearer $CF_API_TOKEN" \
-                  -H "Content-Type: application/json" \
-                  -d "$(jq -n --arg desc "$DESC" --arg expr "$EXPR" \
-                    '{description: $desc, expression: $expr, action: "block"}')")
+                echo "::warning::Failed to create WAF ruleset (HTTP $HTTP_CODE)"
+                echo "$RESPONSE" | sed '$d' | jq . 2>/dev/null || true
+              fi
+            else
+              # Ruleset exists — sync rules
+              echo "Found existing WAF ruleset: $RULESET_ID"
 
-                HTTP_CODE=$(echo "$RESPONSE" | tail -1)
-                if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
-                  echo "    Created successfully"
+              EXISTING_RULESET=$(curl -s \
+                "$CF_API_BASE/zones/$ZONE_ID/rulesets/$RULESET_ID" \
+                -H "Authorization: Bearer $CF_API_TOKEN")
+
+              EXISTING_RULES=$(echo "$EXISTING_RULESET" | jq -c '.result.rules // []')
+
+              # Create missing rules
+              for i in $(seq 0 $((RULE_COUNT - 1))); do
+                DESC=$(echo "$BLOCK_RULES" | jq -r ".[$i].description")
+                EXPR=$(echo "$BLOCK_RULES" | jq -r ".[$i].expression")
+
+                HAS_RULE=$(echo "$EXISTING_RULES" | jq --arg d "$DESC" '[.[] | select(.description == $d)] | length')
+                if [ "$HAS_RULE" -gt 0 ]; then
+                  echo "  Exists: $DESC"
                 else
-                  echo "::warning::Failed to create rule '$DESC' (HTTP $HTTP_CODE)"
-                  echo "$RESPONSE" | sed '$d' | jq .errors 2>/dev/null || true
+                  echo "  Creating: $DESC"
+                  RESPONSE=$(curl -s -w "\n%{http_code}" \
+                    -X POST \
+                    "$CF_API_BASE/zones/$ZONE_ID/rulesets/$RULESET_ID/rules" \
+                    -H "Authorization: Bearer $CF_API_TOKEN" \
+                    -H "Content-Type: application/json" \
+                    -d "$(jq -n --arg desc "$DESC" --arg expr "$EXPR" \
+                      '{description: $desc, expression: $expr, action: "block"}')")
+
+                  HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+                  if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+                    echo "    Created successfully"
+                  else
+                    echo "::warning::Failed to create rule '$DESC' (HTTP $HTTP_CODE)"
+                    echo "$RESPONSE" | sed '$d' | jq .errors 2>/dev/null || true
+                  fi
                 fi
-              fi
-            done
+              done
 
-            # Delete stale rules (in Cloudflare but not in config)
-            DESIRED_DESCRIPTIONS=$(echo "$BLOCK_RULES" | jq -r '.[].description')
-            echo "$EXISTING_RULES" | jq -c '.[]' | while read -r RULE; do
-              RULE_DESC=$(echo "$RULE" | jq -r '.description')
-              RULE_ID=$(echo "$RULE" | jq -r '.id')
+              # Delete stale rules (in Cloudflare but not in config)
+              DESIRED_DESCRIPTIONS=$(echo "$BLOCK_RULES" | jq -r '.[].description')
+              echo "$EXISTING_RULES" | jq -c '.[]' | while read -r RULE; do
+                RULE_DESC=$(echo "$RULE" | jq -r '.description')
+                RULE_ID=$(echo "$RULE" | jq -r '.id')
 
-              if ! echo "$DESIRED_DESCRIPTIONS" | grep -qxF "$RULE_DESC"; then
-                echo "  Deleting stale rule: $RULE_DESC"
-                curl -s -X DELETE \
-                  "$CF_API_BASE/zones/$CF_ZONE_ID/rulesets/$RULESET_ID/rules/$RULE_ID" \
-                  -H "Authorization: Bearer $CF_API_TOKEN" > /dev/null
-              fi
-            done
-          fi
+                if ! echo "$DESIRED_DESCRIPTIONS" | grep -qxF "$RULE_DESC"; then
+                  echo "  Deleting stale rule: $RULE_DESC"
+                  curl -s -X DELETE \
+                    "$CF_API_BASE/zones/$ZONE_ID/rulesets/$RULESET_ID/rules/$RULE_ID" \
+                    -H "Authorization: Bearer $CF_API_TOKEN" > /dev/null
+                fi
+              done
+            fi
+          done
 
+          echo ""
           echo "WAF sync complete"
 
       # ──────────────────────────────────────────────────────────────────────
