@@ -23,6 +23,8 @@ receivers:
             - "https://job--dev.eelkhair.net"
             - "https://jobs.eelkhair.net"
             - "https://job.eelkhair.net"
+            - "https://job-admin.elkhair.tech"
+            - "https://jobs.elkhair.tech"
             - "http://localhost:*"
           allowed_headers:
             - "*"

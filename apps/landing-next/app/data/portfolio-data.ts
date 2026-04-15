@@ -17,21 +17,21 @@ export const techStack = [
 ];
 
 export const exploreCards = [
-  { href: "https://job-admin.eelkhair.net", title: "Admin App", desc: "Toggle between Monolith & Microservices, create companies & jobs, use AI chat with function calling, and check distributed traces in Jaeger." },
-  { href: "https://jobs.eelkhair.net", title: "Public App", desc: "Browse jobs, upload a resume and watch AI parse it in real-time via SignalR, apply to jobs, and ask the AI for job recommendations." },
-  { href: "https://jaeger.eelkhair.net", title: "Jaeger", desc: "View distributed traces across all 16 services. See complete request flows from gateway through monolith or microservices to the AI service." },
-  { href: "https://grafana.eelkhair.net", title: "Grafana", desc: "Dashboards for API latency, error rates, and throughput. Compare monolith vs microservices performance side-by-side." },
+  { href: "https://job-admin.elkhair.tech", title: "Admin App", desc: "Toggle between Monolith & Microservices, create companies & jobs, use AI chat with function calling, and check distributed traces in Jaeger." },
+  { href: "https://jobs.elkhair.tech", title: "Public App", desc: "Browse jobs, upload a resume and watch AI parse it in real-time via SignalR, apply to jobs, and ask the AI for job recommendations." },
+  { href: "https://jaeger.elkhair.tech", title: "Jaeger", desc: "View distributed traces across all 16 services. See complete request flows from gateway through monolith or microservices to the AI service." },
+  { href: "https://grafana.elkhair.tech", title: "Grafana", desc: "Dashboards for API latency, error rates, and throughput. Compare monolith vs microservices performance side-by-side." },
 ];
 
 export const services = [
-  { href: "https://job-admin.eelkhair.net", name: "Admin App", url: "job-admin.eelkhair.net", tooltip: "Angular 20 SPA for managing companies, jobs, and users. Per-session mode toggle to compare Monolith vs Microservices traces. AI Chat with scoped tool registries. SystemAdmin role for platform owner controls.", tooltipClass: "" },
-  { href: "https://jobs.eelkhair.net", name: "Public App", url: "jobs.eelkhair.net", tooltip: "Angular 21 SSR job-seeker app with Tailwind v4. Browse jobs, upload resumes (parsed by AI), and track applications.", tooltipClass: "" },
-  { href: "https://job-health.eelkhair.net", name: "Health Dashboard", url: "job-health.eelkhair.net", tooltip: "Centralized health checks for all 11 services plus dependencies (databases, messaging, config stores, LLM providers, Keycloak).", tooltipClass: "" },
-  { href: "https://grafana.eelkhair.net", name: "Grafana", url: "grafana.eelkhair.net", tooltip: 'Metrics dashboards for AI Service and Monolith. Includes "Find by TraceId" workflow.<br><br><strong>Login:</strong> username <strong>demo</strong> / password <strong>demo</strong>', tooltipClass: "service-tooltip-wide" },
-  { href: "https://jaeger.eelkhair.net", name: "Jaeger Tracing", url: "jaeger.eelkhair.net", tooltip: "Distributed trace visualization. Search traces by service, operation, or TraceId. See end-to-end request flow across all services.", tooltipClass: "" },
-  { href: "https://seq.eelkhair.net", name: "Seq Logs", url: "seq.eelkhair.net", tooltip: "Structured log aggregation. Filter by TraceId, service, log level, or any property. Correlated with OpenTelemetry spans.", tooltipClass: "" },
-  { href: "https://job-dapr.eelkhair.net", name: "Dapr Dashboard", url: "job-dapr.eelkhair.net", tooltip: "Dapr service mesh overview. See all running services, their sidecars, pub/sub components, state stores, and config sources.", tooltipClass: "" },
-  { href: "https://inspector.eelkhair.net", name: "MCP Inspector", url: "inspector.eelkhair.net", tooltip: '<strong>How to connect:</strong><br>1. Transport: <strong>Streamable HTTP</strong><br>2. URL: <strong>https://mono-mcp.eelkhair.net</strong><br>3. Connection Type: <strong>Direct</strong><br>4. Click <strong>Connect</strong><br>5. Go to the <strong>Tools</strong> tab to browse AI tools', tooltipClass: "service-tooltip-xl" },
+  { href: "https://job-admin.elkhair.tech", name: "Admin App", url: "job-admin.elkhair.tech", tooltip: "Angular 20 SPA for managing companies, jobs, and users. Per-session mode toggle to compare Monolith vs Microservices traces. AI Chat with scoped tool registries. SystemAdmin role for platform owner controls.", tooltipClass: "" },
+  { href: "https://jobs.elkhair.tech", name: "Public App", url: "jobs.elkhair.tech", tooltip: "Angular 21 SSR job-seeker app with Tailwind v4. Browse jobs, upload resumes (parsed by AI), and track applications.", tooltipClass: "" },
+  { href: "https://job-health.elkhair.tech", name: "Health Dashboard", url: "job-health.elkhair.tech", tooltip: "Centralized health checks for all 11 services plus dependencies (databases, messaging, config stores, LLM providers, Keycloak).", tooltipClass: "" },
+  { href: "https://grafana.elkhair.tech", name: "Grafana", url: "grafana.elkhair.tech", tooltip: 'Metrics dashboards for AI Service and Monolith. Includes "Find by TraceId" workflow.<br><br><strong>Login:</strong> username <strong>demo</strong> / password <strong>demo</strong>', tooltipClass: "service-tooltip-wide" },
+  { href: "https://jaeger.elkhair.tech", name: "Jaeger Tracing", url: "jaeger.elkhair.tech", tooltip: "Distributed trace visualization. Search traces by service, operation, or TraceId. See end-to-end request flow across all services.", tooltipClass: "" },
+  { href: "https://seq.elkhair.tech", name: "Seq Logs", url: "seq.elkhair.tech", tooltip: "Structured log aggregation. Filter by TraceId, service, log level, or any property. Correlated with OpenTelemetry spans.", tooltipClass: "" },
+  { href: "https://job-dapr.elkhair.tech", name: "Dapr Dashboard", url: "job-dapr.elkhair.tech", tooltip: "Dapr service mesh overview. See all running services, their sidecars, pub/sub components, state stores, and config sources.", tooltipClass: "" },
+  { href: "https://inspector.elkhair.tech", name: "MCP Inspector", url: "inspector.elkhair.tech", tooltip: '<strong>How to connect:</strong><br>1. Transport: <strong>Streamable HTTP</strong><br>2. URL: <strong>https://mono-mcp.elkhair.tech</strong><br>3. Connection Type: <strong>Direct</strong><br>4. Click <strong>Connect</strong><br>5. Go to the <strong>Tools</strong> tab to browse AI tools', tooltipClass: "service-tooltip-xl" },
 ];
 
 export const adrs = [

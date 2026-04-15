@@ -79,7 +79,9 @@ public static class DependencyInjection
                     "https://swagger-dev.eelkhair.net",
                     "https://job-admin.eelkhair.net",
                     "http://192.168.1.112:9000",
-                    "https://swagger.eelkhair.net")
+                    "https://swagger.eelkhair.net",
+
+                    "https://job-admin.elkhair.tech")
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials()

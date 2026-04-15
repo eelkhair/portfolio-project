@@ -44,7 +44,11 @@ public static class DependencyInjection
                         "https://job-admin.eelkhair.net",
                         "https://jobs.eelkhair.net",
                         "https://job.eelkhair.net",
-                        "http://127.0.0.1:5280"
+                        "http://127.0.0.1:5280",
+
+                        "https://job-admin.elkhair.tech",
+                        "https://jobs.elkhair.tech",
+                        "https://job.elkhair.tech"
                     )
                     .AllowAnyHeader()
                     .AllowAnyMethod()
