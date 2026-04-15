@@ -13,7 +13,7 @@ export const environment = {
   jaegerUrl: 'https://jaeger.eelkhair.net/trace/',
   seqUrl: 'https://seq.eelkhair.net/#/events?filter=TraceId%3D%22{traceId}%22',
   oidc: {
-    authority: 'https://auth.eelkhair.net/realms/job-board',
+    authority: 'https://auth.elkhair.tech/realms/job-board',
     redirectUrl: 'https://job-admin.eelkhair.net',
     clientId: 'angular-admin',
   },
