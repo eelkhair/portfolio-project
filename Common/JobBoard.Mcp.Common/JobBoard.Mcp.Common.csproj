@@ -6,7 +6,7 @@
         <Nullable>enable</Nullable>
         <PackageId>JobBoard.Mcp.Common</PackageId>
         <Authors>Elkhair Elkhair</Authors>
-        <Version>1.0.0</Version>
+        <Version>1.1.0</Version>
         <Description>Shared MCP authentication infrastructure: Keycloak JWT setup, IUserAccessor, HttpUserAccessor, ForwardedAuthMiddleware</Description>
         <IsPackable>true</IsPackable>
     </PropertyGroup>

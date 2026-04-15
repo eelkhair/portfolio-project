@@ -40,9 +40,19 @@ public static class KeycloakAuthExtensions
                 options.MapInboundClaims = false;
                 options.Authority = configuration["Keycloak:Authority"];
                 options.Audience = configuration["Keycloak:Audience"];
+                // Accept tokens issued by either domain (eelkhair.net or elkhair.tech)
+                var authority = configuration["Keycloak:Authority"] ?? string.Empty;
+                var realmPath = authority.Contains("/realms/")
+                    ? authority[authority.IndexOf("/realms/", StringComparison.Ordinal)..]
+                    : "/realms/job-board";
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
+                    ValidIssuers =
+                    [
+                        $"https://auth.eelkhair.net{realmPath}",
+                        $"https://auth.elkhair.tech{realmPath}"
+                    ],
                     ValidateAudience = true,
                     ValidateLifetime = true
                 };
