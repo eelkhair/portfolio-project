@@ -6,7 +6,7 @@ export interface FeatureFlags {
   deepDives: boolean;
 }
 
-const FLAG_URL = process.env.FEATURE_FLAGS_URL || "http://localhost:5000/api/public/feature-flags";
+const FLAG_URL = process.env.FEATURE_FLAGS_URL || "http://localhost:5280/api/public/feature-flags";
 
 const defaults: FeatureFlags = {
   deepDives: false,

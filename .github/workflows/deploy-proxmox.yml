@@ -3,6 +3,8 @@ name: Deploy to Proxmox
 on:
   push:
     branches: [master]
+    paths-ignore:
+      - 'apps/landing-next/**'
   workflow_dispatch:
     inputs:
       environment:

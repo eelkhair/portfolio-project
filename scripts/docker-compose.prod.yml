@@ -4,6 +4,8 @@ services:
     image: registry.eelkhair.net/landing:latest
     ports:
       - "6090:3000"
+    environment:
+      - FEATURE_FLAGS_URL=http://monolith-api:8080/api/public/feature-flags
     restart: unless-stopped
     networks:
       - ai-job-board-net
