@@ -48,6 +48,7 @@ ADR Index: [`docs/ADRs`](./ADRs)
 - Generate and rewrite job descriptions using multi-provider LLM support (OpenAI, Azure OpenAI, Claude, Gemini)
 - Trigger asynchronous workflows via pub/sub and trace them **end-to-end** across all services
 - Switch between monolith and microservices mode **per-session** via a toolbar toggle -- each visitor independently experiences both architectures and compares traces
+- **Contact form** on the landing page with Exchange Online SMTP, Cloudflare Turnstile captcha, server-side rate limiting, and feature flag control
 
 ---
 
@@ -56,6 +57,7 @@ ADR Index: [`docs/ADRs`](./ADRs)
 **Frontends**
 - **Admin UI** (Angular 20) -- SPA calling either the Monolith API or Admin API via mode toggle
 - **Public UI** (Angular 21 + SSR + Tailwind v4) -- Job-seeker facing application with Keycloak authentication
+- **Landing Page** (Next.js 15) -- Portfolio site with contact form, Cloudflare Turnstile captcha, and feature-flagged visibility
 
 **APIs**
 - **Monolith API** -- primary application for the monolith path

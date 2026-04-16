@@ -35,8 +35,10 @@ export default function Home() {
               <AvailableBadge />
               <h1 id="hero-heading">I build systems that <span className="accent">scale</span></h1>
               <p className="subtitle">
-                Staff-level engineer and founding team member who took a startup from zero to enterprise adoption.
-                15 years designing distributed platforms, integrating AI, and shipping production systems that handle real-world complexity.
+                I&apos;m a staff-level engineer and Founding Engineer with 13+ years of experience building production software.
+                My work focuses on distributed systems, platform architecture, observability, and modern backend design.
+                I&apos;ve helped take products from early-stage development to enterprise adoption while staying hands-on with code and architecture.
+                More recently, I&apos;ve been building AI-enabled workflows that are practical, traceable, and designed for real-world use.
               </p>
               <div className="hero-links">
                 <Link href="/portfolio" className="btn btn-primary"><BookIcon /> See My Work</Link>
