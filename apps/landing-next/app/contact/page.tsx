@@ -21,11 +21,12 @@ export default function ContactPage() {
       <main id="main">
         <section className="contact-section" aria-labelledby="contact-heading">
           <div className="container-center">
-            <h1 id="contact-heading" className="section-heading">
+            <h1 id="contact-heading" className="contact-heading">
               Get in <span className="accent">Touch</span>
             </h1>
             <p className="section-text" style={{ margin: "0 auto 2.5rem" }}>
-              Have a question, opportunity, or just want to connect? <br/>Send me a message and I&apos;ll get back to you.
+              Questions, feedback, opportunities, or want to talk about software architecture, AI-enabled systems, <br/>or platform modernization?
+              <br /><br/>Send me a message — I&apos;d be glad to connect.
             </p>
           </div>
           <div className="container">

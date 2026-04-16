@@ -731,6 +731,16 @@ html.light header nav .nav-links.open {
 }
 
 /* ── Contact Form ─────────────────────────────────── */
+.contact-heading {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.contact-heading .accent {
+  color: var(--accent-light);
+}
+
 .contact-section {
   padding: 6rem 1.5rem 4rem;
   min-height: calc(100vh - 80px);
