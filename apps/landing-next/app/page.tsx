@@ -37,6 +37,8 @@ export default function Home() {
               <p className="subtitle">
                 I&apos;m a staff-level engineer and Founding Engineer with 13+ years of experience building production software.
                 My work focuses on distributed systems, platform architecture, observability, and modern backend design.
+              </p>
+              <p className="subtitle">
                 I&apos;ve helped take products from early-stage development to enterprise adoption while staying hands-on with code and architecture.
                 More recently, I&apos;ve been building AI-enabled workflows that are practical, traceable, and designed for real-world use.
               </p>
