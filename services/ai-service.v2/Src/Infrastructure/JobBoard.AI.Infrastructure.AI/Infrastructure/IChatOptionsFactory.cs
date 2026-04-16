@@ -153,12 +153,7 @@ public sealed class ChatOptionsFactory(
                             .GetTools()
                             .ToList();
 
-                    var publicTools =
-                        sp.GetRequiredKeyedService<IAiTools>("public-ai")
-                            .GetTools()
-                            .ToList();
-
-                    var allTools = topologyTools.Concat(aiTools).Concat(publicTools).ToList();
+                    var allTools = topologyTools.Concat(aiTools).ToList();
 
                     var duplicates = allTools
                         .GroupBy(t => t.Name, StringComparer.Ordinal)
