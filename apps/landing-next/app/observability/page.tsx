@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { CaseStudyLayout, CsSection, CsDecisionGrid, CsTradeoffList, CsPlaceholder } from "../components/CaseStudyLayout";
+import { CaseStudyLayout, CsSection, CsDecisionGrid, CsTradeoffList, CsScreenshot } from "../components/CaseStudyLayout";
 
 export const metadata: Metadata = {
   title: "Observability",
-  description: "End-to-end distributed tracing, structured logging, and dashboards across 16 services using OpenTelemetry, Jaeger, Grafana, and Seq.",
+  description: "End-to-end distributed tracing, structured logging, and dashboards across 16 services using OpenTelemetry, Jaeger, and Grafana.",
 };
 
 const toc = [
@@ -34,24 +34,25 @@ export default function ObservabilityPage() {
       <CsSection id="solution" alt>
         <h2>The Solution</h2>
         <p>Every service is instrumented with <strong>OpenTelemetry</strong>. Traces follow the <strong>W3C TraceContext</strong> standard, propagating through HTTP calls, Dapr pub/sub messages, and background processors. A single TraceId follows a request from the Angular frontend through the gateway, into whichever backend path is active, through messaging, and back.</p>
-        <p><strong>Jaeger</strong> visualizes distributed traces. <strong>Grafana</strong> shows API latency, error rates, and throughput. <strong>Seq</strong> provides structured log search with TraceId correlation. <strong>Health checks</strong> monitor liveness and readiness for every service.</p>
-        <CsPlaceholder text="Screenshot: Full end-to-end Jaeger trace" caption="A Jaeger trace showing a complete request flow from gateway through multiple backend services" />
+        <p><strong>Jaeger</strong> visualizes distributed traces. <strong>Grafana</strong> shows API latency, error rates, throughput, and provides trace-to-logs correlation &mdash; click a trace span and see the structured logs from that service in context. <strong>Health checks</strong> monitor liveness and readiness for every service.</p>
+        <CsScreenshot src="/images/jaeger-trace.png" alt="Full end-to-end Jaeger trace across multiple services" caption="A Jaeger trace showing a complete request flow from gateway through multiple backend services" />
       </CsSection>
 
       <CsSection id="architecture">
         <h2>Architecture</h2>
         <p>Each .NET service configures OpenTelemetry through a shared extension method. The OTLP exporter sends traces and metrics to a centralized OpenTelemetry Collector, which fans out to Jaeger (traces) and Grafana (metrics via Prometheus).</p>
         <p>Trace context propagation through messaging is the hard part. When a service publishes a Dapr event, the W3C <code>traceparent</code> header is included in the message metadata. The consuming service extracts it and creates a child span, maintaining the trace across async boundaries.</p>
-        <CsPlaceholder text="Screenshot: Trace showing context propagation through Dapr pub/sub" caption="A trace spanning Dapr pub/sub &mdash; the trace context propagates from producer through RabbitMQ to consumer" />
+        <CsScreenshot src="/images/dapr-pubsub-trace.png" alt="Jaeger trace showing W3C TraceContext propagating through Dapr pub/sub from monolith outbox through connector saga to AI service" caption="A single trace spanning the full async pipeline — monolith outbox dispatch, Dapr pub/sub, connector saga fanning out to job-api, and event-driven embedding in the AI service" />
       </CsSection>
 
       <CsSection id="user-view" alt>
         <h2>What You See</h2>
         <p>Click &quot;Create Company&quot; in the admin app. The API response includes a <code>TraceId</code> header. Click the Jaeger link in the admin toolbar. You&apos;ll see the full trace: gateway to monolith, outbox dispatch, connector saga fanning out to three microservices, reverse connector syncing back.</p>
-        <p>Open Grafana and check the API dashboard. You&apos;ll see request latency percentiles, error rates by endpoint, and throughput over time. Filter by the TraceId to correlate a specific request&apos;s metrics with its trace. Open Seq and paste the same TraceId &mdash; every structured log entry from every service involved in that request appears, correlated and searchable.</p>
+        <p>Open Grafana and check the API dashboard. You&apos;ll see request latency percentiles, error rates by endpoint, and throughput over time. Filter by TraceId to correlate a specific request&apos;s metrics with its trace. Click into a trace span and Grafana shows the structured logs from that service in context &mdash; no context switching between tools.</p>
+        <p>The health checks dashboard shows the status of every service at a glance. Expand any service to see its individual checks: Dapr sidecar connectivity, pub/sub topic health, config store availability, secret vault access, Keycloak realm reachability, and MCP server status. Each check reports independently &mdash; you can tell the difference between &quot;the service is up but can&apos;t reach Redis&quot; and &quot;the service is down.&quot;</p>
         <div className="cs-evidence-grid">
-          <CsPlaceholder text="Screenshot: Grafana dashboard" caption="Grafana dashboard with request latency percentiles, error rates, and throughput across services" />
-          <CsPlaceholder text="Screenshot: Seq structured logs filtered by TraceId" caption="Seq log search filtered by TraceId, showing correlated entries across multiple services" />
+          <CsScreenshot src="/images/grafana-trace-logs.png" alt="Grafana trace-to-logs view showing a trace with correlated structured logs" caption="Grafana trace-to-logs correlation — click a trace span to see structured log entries from that service in context" />
+          <CsScreenshot src="/images/healthchecks-dashboard.png" alt="Health checks dashboard showing all services and Dapr components healthy" caption="Health checks dashboard — every service, Dapr sidecar, pub/sub, config store, secret vault, and MCP server monitored with liveness and readiness probes" />
         </div>
       </CsSection>
 

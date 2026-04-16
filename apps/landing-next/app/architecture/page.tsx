@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { CaseStudyLayout, CsSection, CsDecisionGrid, CsTradeoffList, CsPlaceholder } from "../components/CaseStudyLayout";
+import { CaseStudyLayout, CsSection, CsDecisionGrid, CsTradeoffList, CsScreenshot } from "../components/CaseStudyLayout";
 
 export const metadata: Metadata = {
   title: "Architecture Overview",
@@ -36,14 +36,14 @@ export default function ArchitecturePage() {
         <p>Three architectural paths running simultaneously in the same codebase:</p>
         <p>A <strong>clean architecture monolith</strong> with DDD, CQRS, and a custom decorator pipeline. A set of <strong>decomposed microservices</strong> built with FastEndpoints across four bounded contexts. And a <strong>connector API</strong> implementing the strangler-fig pattern with bidirectional sync between both sides.</p>
         <p>A YARP reverse proxy sits in front of everything. It reads an <code>x-mode</code> header on every request and routes to the monolith or microservices accordingly. Each user session picks its own path &mdash; no backend state change, no restart.</p>
-        <CsPlaceholder text="Screenshot: Admin toolbar showing monolith/micro toggle" caption="The admin toolbar lets visitors toggle between monolith and microservices mode per session" />
+        <CsScreenshot src="/images/admin-toolbar-toggle.png" alt="Admin toolbar with monolith/micro toggle button" caption="The admin toolbar lets visitors toggle between monolith and microservices mode per session" />
       </CsSection>
 
       <CsSection id="architecture">
         <h2>Architecture</h2>
         <p>The gateway is the single entry point. It inspects the <code>x-mode</code> header &mdash; set by the frontend based on a localStorage toggle &mdash; and proxies to either the monolith API or the microservices cluster.</p>
-        <p>Both paths share the same databases (SQL Server for the monolith, PostgreSQL for microservices) and the same messaging infrastructure (RabbitMQ via Dapr pub/sub). The connector APIs handle bidirectional sync: when a company is created in the monolith, a saga fans out to provision it across all four microservices, and vice versa.</p>
-        <CsPlaceholder text="Screenshot: Jaeger trace showing YARP gateway routing to monolith or microservices" caption="A Jaeger trace showing the gateway routing a request through the monolith path" />
+        <p>Both paths share SQL Server as their primary database and the same messaging infrastructure (RabbitMQ via Dapr pub/sub). PostgreSQL is used exclusively by the AI service for pgvector embeddings. A <strong>connector API</strong> and <strong>reverse connector API</strong> handle bidirectional sync: when a company is created in the monolith, the connector saga fans out to provision it across all four microservices. When created in microservices, the reverse connector syncs it back to the monolith.</p>
+        <CsScreenshot src="/images/gateway-routing-trace.png" alt="Jaeger traces comparing gateway routing to microservices (top) vs monolith (bottom)" caption="Jaeger traces side-by-side: microservices path fans out to admin-api and company-api (top), monolith path routes directly to monolith-api (bottom)" />
       </CsSection>
 
       <CsSection id="user-view" alt>
@@ -51,8 +51,8 @@ export default function ArchitecturePage() {
         <p>From the admin app, click the mode toggle in the toolbar. The UI stays the same &mdash; same forms, same pages, same data. But behind the scenes, the entire backend path changes.</p>
         <p>Create a company in monolith mode, then switch to microservices mode. The company is there &mdash; the connector saga synced it. Open Jaeger and compare the two traces: one shows a single monolith span, the other shows the request fan out across four services.</p>
         <div className="cs-evidence-grid">
-          <CsPlaceholder text="Screenshot: Jaeger trace of saga connector fan-out across services" caption="Saga orchestration fanning out a company creation across admin, company, job, and user APIs" />
-          <CsPlaceholder text="Screenshot: Dapr dashboard showing sidecar topology" caption="Dapr dashboard showing sidecar topology and component bindings across all services" />
+          <CsScreenshot src="/images/saga-trace.png" alt="Jaeger trace showing saga connector fanning out across services" caption="Saga orchestration fanning out a company creation across admin, company, job, and user APIs" />
+          <CsScreenshot src="/images/dapr-dashboard.png" alt="Dapr dashboard showing sidecar topology and component bindings" caption="Dapr dashboard showing sidecar topology and component bindings across all services" />
         </div>
       </CsSection>
 

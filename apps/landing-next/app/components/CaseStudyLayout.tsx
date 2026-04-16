@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
@@ -94,6 +95,18 @@ export function CsPlaceholder({ text, caption }: { text: string; caption: string
   return (
     <figure className="cs-figure">
       <div className="cs-placeholder">{text}</div>
+      <figcaption>{caption}</figcaption>
+    </figure>
+  );
+}
+
+export function CsScreenshot({ src, alt, caption }: { src: string; alt: string; caption: string }) {
+  return (
+    <figure className="cs-figure cs-figure-screenshot">
+      <a href={src} target="_blank" rel="noopener noreferrer" className="cs-screenshot-link">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={src} alt={alt} className="cs-screenshot-img" />
+      </a>
       <figcaption>{caption}</figcaption>
     </figure>
   );

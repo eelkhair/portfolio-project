@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { CaseStudyLayout, CsSection, CsDecisionGrid, CsTradeoffList, CsPlaceholder } from "../components/CaseStudyLayout";
+import { CaseStudyLayout, CsSection, CsDecisionGrid, CsTradeoffList, CsScreenshot } from "../components/CaseStudyLayout";
 
 export const metadata: Metadata = {
   title: "AI Orchestration",
@@ -36,14 +36,14 @@ export default function AiOrchestrationPage() {
         <p>A provider-agnostic AI service built on <strong>Microsoft.Extensions.AI</strong>. The abstraction layer means switching between OpenAI, Claude, and Gemini is a configuration change, not a code change. Each provider is registered as a keyed <code>IChatClient</code> singleton.</p>
         <p>Tools aren&apos;t hardcoded &mdash; they&apos;re discovered at runtime via the <strong>Model Context Protocol (MCP)</strong>. The monolith and microservices each expose their own MCP server. The AI service connects to whichever one matches the user&apos;s current session mode, discovering available tools dynamically.</p>
         <p>Resume processing is fully async. Upload triggers an event, a background handler downloads and parses the resume, generates embeddings, and stores them in pgvector. The user gets real-time progress updates via SignalR.</p>
-        <CsPlaceholder text="Screenshot: Admin chat showing AI calling a tool" caption="The AI assistant creating a company through function calling, with tool invocation visible in the conversation" />
+        <CsScreenshot src="/images/ai-chat-tool-calling.png" alt="AI chat creating a company with sequence diagram showing the full saga flow across 8 services" caption="AI assistant creating a company via function calling — the sequence diagram shows the full request flow across gateway, AI service, MCP server, and connector saga (2115ms end-to-end)" />
       </CsSection>
 
       <CsSection id="architecture">
         <h2>Architecture</h2>
         <p>The AI service uses a <strong>scoped tool registry</strong> pattern. Four chat scopes (SystemAdmin, Admin, CompanyAdmin, Public) each get their own tool set. A <code>ChatOptionsFactory</code> resolves the correct registry based on the authenticated user&apos;s role and reads the <code>x-mode</code> header to select the right MCP topology.</p>
         <p>The resume pipeline is a three-stage event-driven flow: <code>ResumeUploadedV1Event</code> triggers download and parsing, <code>ResumeParsedV1Event</code> triggers embedding generation, and <code>ResumeDeletedV1Event</code> triggers cleanup. Each stage communicates through Dapr pub/sub on RabbitMQ.</p>
-        <CsPlaceholder text="Screenshot: MCP Inspector showing available tools" caption="MCP Inspector connected to the monolith server, showing the dynamically discovered tool registry" />
+        <CsScreenshot src="/images/mcp-inspector.png" alt="MCP Inspector showing dynamically discovered tools from the monolith MCP server" caption="MCP Inspector connected to the monolith server — tools like company_list, draft_job, and finalize_job are discovered at runtime via SSE transport" />
       </CsSection>
 
       <CsSection id="user-view" alt>
@@ -51,8 +51,8 @@ export default function AiOrchestrationPage() {
         <p>In the admin app, open the AI chat and ask it to create a company. Watch the conversation &mdash; you&apos;ll see the model decide which tool to call, the function invocation, and the result. Switch between monolith and microservices mode and ask the same question: the AI discovers different tools from different MCP servers.</p>
         <p>In the public app, upload a resume. A progress indicator updates in real-time as the system downloads, parses, and embeds the document. Then ask the AI for job recommendations &mdash; it queries the pgvector embeddings to find semantic matches.</p>
         <div className="cs-evidence-grid">
-          <CsPlaceholder text="Screenshot: Resume upload with real-time parsing progress" caption="Real-time resume processing progress streamed to the browser via SignalR" />
-          <CsPlaceholder text="Screenshot: Provider switching configuration" caption="AI provider configuration &mdash; switching between OpenAI, Claude, and Gemini is a config change" />
+          <CsScreenshot src="/images/resume-parsing-progress.png" alt="Resume parsing progress showing 3/5 sections extracted with real-time section checklist" caption="Real-time resume processing progress streamed via SignalR — section-by-section extraction with live status updates" />
+          <CsScreenshot src="/images/ai-provider-settings.png" alt="AI Provider Settings page showing dropdown with Azure, OpenAI, Gemini, and Claude options" caption="AI provider configuration — switching between Azure, OpenAI, Gemini, and Claude is a dropdown change, not a code change" />
         </div>
       </CsSection>
 
