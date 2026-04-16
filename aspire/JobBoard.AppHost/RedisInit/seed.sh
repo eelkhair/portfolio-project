@@ -8,6 +8,7 @@ REDIS="redis-cli -h redis -p 6379 -n 1"
 $REDIS SET "jobboard:config:global:FeatureFlags:Monolith" "false" NX
 $REDIS SET "jobboard:config:global:FeatureFlags:PublicChat" "true" NX
 $REDIS SET "jobboard:config:global:FeatureFlags:DeepDives" "false" NX
+$REDIS SET "jobboard:config:global:FeatureFlags:ContactForm" "false" NX
 
 
 # SMTP (Mailpit)

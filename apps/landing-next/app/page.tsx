@@ -5,6 +5,7 @@ import { Footer } from "./components/Footer";
 import { BookIcon, GitHubIcon, LinkedInIcon } from "./components/Icons";
 import { aboutCards, experienceItems, skillCategories } from "./data/home-data";
 import { AvailableBadge } from "./components/AvailableBadge";
+import { ContactNavLink } from "./components/ContactGate";
 
 const homeNavLinks = [
   { href: "#about", label: "About" },
@@ -12,13 +13,12 @@ const homeNavLinks = [
   { href: "#skills", label: "Skills" },
   { href: "#education", label: "Education" },
   { href: "/portfolio", label: "Portfolio" },
-  { href: "/contact", label: "Contact" },
 ];
 
 export default function Home() {
   return (
     <>
-      <Header links={homeNavLinks} />
+      <Header links={homeNavLinks} dropdownSlot={<ContactNavLink />} />
       <main id="main">
         {/* Hero */}
         <section className="hero" id="home" aria-labelledby="hero-heading">

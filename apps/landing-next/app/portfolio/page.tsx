@@ -4,6 +4,7 @@ import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { ScreenshotSwiper } from "../components/ScreenshotSwiper";
 import { DeepDivesSection, DeepDivesDropdown } from "../components/DeepDivesSection";
+import { ContactNavLink } from "../components/ContactGate";
 import { archHighlights, techStack, exploreCards, services } from "../data/portfolio-data";
 
 export const metadata: Metadata = {
@@ -17,13 +18,12 @@ const portfolioNavLinks = [
   { href: "#architecture", label: "System Design" },
   { href: "#screenshots", label: "Screenshots" },
   { href: "#services", label: "Live Demo" },
-  { href: "/contact", label: "Contact" },
 ];
 
 export default function PortfolioPage() {
   return (
     <>
-      <Header links={portfolioNavLinks} dropdownSlot={<DeepDivesDropdown />} />
+      <Header links={portfolioNavLinks} dropdownSlot={<><DeepDivesDropdown /><ContactNavLink /></>} />
       <main id="main">
         {/* Portfolio Project */}
         <section id="portfolio" className="section-top" aria-labelledby="portfolio-heading" style={{ paddingTop: "6rem" }}>

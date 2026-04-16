@@ -3,11 +3,11 @@ import Link from "next/link";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { DeepDivesDropdown } from "./DeepDivesSection";
+import { ContactNavLink } from "./ContactGate";
 
 const caseStudyNavLinks = [
   { href: "/", label: "About Me" },
   { href: "/portfolio", label: "Portfolio" },
-  { href: "/contact", label: "Contact" },
 ];
 
 interface TocItem {
@@ -32,7 +32,7 @@ interface CaseStudyProps {
 export function CaseStudyLayout({ title, summary, toc, children, prevLink, nextLink }: CaseStudyProps) {
   return (
     <>
-      <Header links={caseStudyNavLinks} dropdownSlot={<DeepDivesDropdown />} />
+      <Header links={caseStudyNavLinks} dropdownSlot={<><DeepDivesDropdown /><ContactNavLink /></>} />
       <main id="main">
         <section className="cs-hero" aria-labelledby="cs-heading">
           <p className="section-title">Case Study</p>

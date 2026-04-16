@@ -5,11 +5,13 @@ import { createContext, useContext, ReactNode } from "react";
 interface FeatureFlags {
   deepDives: boolean;
   availableBadge: boolean;
+  contactForm: boolean;
 }
 
 const defaults: FeatureFlags = {
   deepDives: false,
   availableBadge: true,
+  contactForm: false,
 };
 
 const FeatureFlagsContext = createContext<FeatureFlags>(defaults);

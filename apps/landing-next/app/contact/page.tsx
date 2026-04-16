@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
-import { ContactForm } from "../components/ContactForm";
+import { ContactGate } from "../components/ContactGate";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -30,7 +30,7 @@ export default function ContactPage() {
             </p>
           </div>
           <div className="container">
-            <ContactForm />
+            <ContactGate />
           </div>
         </section>
       </main>

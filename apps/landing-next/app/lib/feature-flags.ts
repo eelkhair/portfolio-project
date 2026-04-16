@@ -5,6 +5,7 @@ export interface FeatureFlagsDto {
 export interface FeatureFlags {
   deepDives: boolean;
   availableBadge: boolean;
+  contactForm: boolean;
 }
 
 const FLAG_URL = process.env.FEATURE_FLAGS_URL || "http://localhost:5280/api/public/feature-flags";
@@ -12,6 +13,7 @@ const FLAG_URL = process.env.FEATURE_FLAGS_URL || "http://localhost:5280/api/pub
 const defaults: FeatureFlags = {
   deepDives: false,
   availableBadge: true,
+  contactForm: false,
 };
 
 export async function fetchFeatureFlags(): Promise<FeatureFlags> {
@@ -25,6 +27,7 @@ export async function fetchFeatureFlags(): Promise<FeatureFlags> {
     const flags: FeatureFlags = {
       deepDives: normalized["deepdives"] ?? defaults.deepDives,
       availableBadge: normalized["availablebadge"] ?? defaults.availableBadge,
+      contactForm: normalized["contactform"] ?? defaults.contactForm,
     };
     console.log("[FeatureFlags] fetched:", flags);
     return flags;
