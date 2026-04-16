@@ -9,6 +9,7 @@ export async function POST(req: NextRequest) {
   const now = Date.now();
   const lastSent = rateLimit.get(ip);
   if (lastSent && now - lastSent < RATE_LIMIT_MS) {
+    console.warn(`[Contact] Rate limited: ip=${ip}`);
     return NextResponse.json(
       { error: "Please wait before sending another message." },
       { status: 429 },
@@ -18,13 +19,15 @@ export async function POST(req: NextRequest) {
   let body: { name?: string; email?: string; subject?: string; message?: string; token?: string };
   try {
     body = await req.json();
-  } catch {
+  } catch (err) {
+    console.error("[Contact] Failed to parse request body:", err);
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
 
   const { name, email, subject, message, token } = body;
 
   if (!token) {
+    console.error("[Contact] Missing Turnstile token: ip=%s", ip);
     return NextResponse.json({ error: "Verification required." }, { status: 400 });
   }
 
@@ -39,6 +42,7 @@ export async function POST(req: NextRequest) {
   });
   const turnstileData = await turnstileRes.json();
   if (!turnstileData.success) {
+    console.error("[Contact] Turnstile verification failed: ip=%s, errors=%j", ip, turnstileData["error-codes"]);
     return NextResponse.json({ error: "Verification failed. Please try again." }, { status: 403 });
   }
 
@@ -82,9 +86,10 @@ export async function POST(req: NextRequest) {
     });
 
     rateLimit.set(ip, now);
+    console.log("[Contact] Email sent: from=%s, subject=%s", email, subject?.trim() || `Portfolio Contact: ${name}`);
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error("SMTP error:", err);
+    console.error("[Contact] SMTP error: from=%s, to=%s, error=%s", email, process.env.CONTACT_TO, err);
     return NextResponse.json(
       { error: "Failed to send message. Please try again later." },
       { status: 500 },
