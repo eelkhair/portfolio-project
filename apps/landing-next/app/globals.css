@@ -730,6 +730,102 @@ html.light header nav .nav-links.open {
   background: rgba(248, 250, 252, 0.97);
 }
 
+/* ── Contact Form ─────────────────────────────────── */
+.contact-section {
+  padding: 6rem 1.5rem 4rem;
+  min-height: calc(100vh - 80px);
+}
+
+.contact-form {
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  text-align: left;
+}
+
+.form-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 0.75rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.form-error {
+  color: #ef4444;
+  font-size: 0.875rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 6px;
+}
+
+.contact-submit {
+  align-self: flex-start;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+}
+
+.contact-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.contact-success {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.contact-success h2 {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+}
+
+.contact-success p {
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.contact-success .btn {
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+}
+
 /* ── Reduced Motion ────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

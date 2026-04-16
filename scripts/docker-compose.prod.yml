@@ -6,6 +6,12 @@ services:
       - "6090:3000"
     environment:
       - FEATURE_FLAGS_URL=http://monolith-api:8080/api/public/feature-flags
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - CONTACT_TO=${CONTACT_TO}
+      - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}
     restart: unless-stopped
     networks:
       - ai-job-board-net
