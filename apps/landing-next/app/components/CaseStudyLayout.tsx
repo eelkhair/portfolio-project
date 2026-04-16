@@ -7,6 +7,7 @@ import { DeepDivesDropdown } from "./DeepDivesSection";
 const caseStudyNavLinks = [
   { href: "/", label: "About Me" },
   { href: "/portfolio", label: "Portfolio" },
+  { href: "/contact", label: "Contact" },
 ];
 
 interface TocItem {

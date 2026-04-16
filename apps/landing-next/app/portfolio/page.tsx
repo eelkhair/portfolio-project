@@ -17,6 +17,7 @@ const portfolioNavLinks = [
   { href: "#architecture", label: "System Design" },
   { href: "#screenshots", label: "Screenshots" },
   { href: "#services", label: "Live Demo" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export default function PortfolioPage() {

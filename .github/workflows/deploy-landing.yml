@@ -35,7 +35,9 @@ jobs:
         run: |
           IMAGE="$REGISTRY/landing:latest"
           echo "Building landing page..."
-          docker build -f apps/landing-next/Dockerfile -t $IMAGE apps/landing-next
+          docker build \
+            --build-arg NEXT_PUBLIC_TURNSTILE_SITE_KEY=${{ secrets.TURNSTILE_SITE_KEY }} \
+            -f apps/landing-next/Dockerfile -t $IMAGE apps/landing-next
           echo "Pushing $IMAGE..."
           docker push $IMAGE
           echo "Done"

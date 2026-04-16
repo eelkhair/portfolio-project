@@ -12,6 +12,7 @@ const homeNavLinks = [
   { href: "#skills", label: "Skills" },
   { href: "#education", label: "Education" },
   { href: "/portfolio", label: "Portfolio" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export default function Home() {
