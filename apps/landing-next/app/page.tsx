@@ -4,6 +4,7 @@ import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 import { BookIcon, GitHubIcon, LinkedInIcon } from "./components/Icons";
 import { aboutCards, experienceItems, skillCategories } from "./data/home-data";
+import { AvailableBadge } from "./components/AvailableBadge";
 
 const homeNavLinks = [
   { href: "#about", label: "About" },
@@ -30,7 +31,7 @@ export default function Home() {
               priority
             />
             <div className="hero-content">
-              <span className="hero-label">Available for Staff+ / Architect roles</span>
+              <AvailableBadge />
               <h1 id="hero-heading">I build systems that <span className="accent">scale</span></h1>
               <p className="subtitle">
                 Staff-level engineer and founding team member who took a startup from zero to enterprise adoption.

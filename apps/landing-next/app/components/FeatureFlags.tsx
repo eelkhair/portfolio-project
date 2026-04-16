@@ -4,10 +4,12 @@ import { createContext, useContext, ReactNode } from "react";
 
 interface FeatureFlags {
   deepDives: boolean;
+  availableBadge: boolean;
 }
 
 const defaults: FeatureFlags = {
   deepDives: false,
+  availableBadge: true,
 };
 
 const FeatureFlagsContext = createContext<FeatureFlags>(defaults);
@@ -23,4 +25,9 @@ export function FeatureFlagsProvider({ children, flags }: { children: ReactNode;
 
 export function useFeatureFlags() {
   return useContext(FeatureFlagsContext);
+}
+
+export function FeatureGate({ flag, children }: { flag: keyof FeatureFlags; children: ReactNode }) {
+  const flags = useFeatureFlags();
+  return flags[flag] ? <>{children}</> : null;
 }

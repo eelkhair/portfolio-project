@@ -4,7 +4,7 @@ import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { ScreenshotSwiper } from "../components/ScreenshotSwiper";
 import { DeepDivesSection, DeepDivesDropdown } from "../components/DeepDivesSection";
-import { archHighlights, techStack, exploreCards, services, adrs } from "../data/portfolio-data";
+import { archHighlights, techStack, exploreCards, services } from "../data/portfolio-data";
 
 export const metadata: Metadata = {
   title: "Portfolio - JobBoard Distributed Systems Platform",
@@ -15,7 +15,6 @@ const portfolioNavLinks = [
   { href: "#portfolio", label: "Project" },
   { href: "#explore", label: "Explore" },
   { href: "#architecture", label: "System Design" },
-  { href: "#adrs", label: "ADRs" },
   { href: "#screenshots", label: "Screenshots" },
   { href: "#services", label: "Live Demo" },
 ];
@@ -147,33 +146,9 @@ export default function PortfolioPage() {
                 <div className="arch-node arch-obs">OpenTelemetry</div>
                 <div className="arch-node arch-obs">Jaeger</div>
                 <div className="arch-node arch-obs">Grafana</div>
-                <div className="arch-node arch-obs">Seq</div>
+                <div className="arch-node arch-obs">Health Checks</div>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* ADRs */}
-        <section id="adrs" aria-labelledby="adrs-heading">
-          <p className="section-title">Architecture Decision Records</p>
-          <h2 id="adrs-heading">20 ADRs Documenting Every Trade-Off</h2>
-          <p className="section-text mb-3">
-            Every significant architectural decision is documented with context, alternatives considered,
-            and rationale. These show how I think about trade-offs, not just what I built.
-          </p>
-          <div className="adr-list">
-            {adrs.map((adr) => (
-              <details className="adr-item" key={adr.number}>
-                <summary>
-                  <span className="adr-number">{adr.number}</span>
-                  <div>
-                    <div className="adr-title">{adr.title}</div>
-                    <div className="adr-summary">{adr.summary}</div>
-                  </div>
-                </summary>
-                <div className="adr-content" dangerouslySetInnerHTML={{ __html: adr.content }} />
-              </details>
-            ))}
           </div>
         </section>
 

@@ -28,7 +28,12 @@ export function DeepDivesSection() {
         <Link href="/observability" className="card">
           <div className="card-icon" role="img" aria-hidden="true">{"\u{1F50D}"}</div>
           <h3>Observability</h3>
-          <p>Distributed tracing with Jaeger, Grafana dashboards, Seq structured logging, and OpenTelemetry instrumentation across 16 services.</p>
+          <p>Distributed tracing with Jaeger, Grafana dashboards, health checks, and OpenTelemetry instrumentation across 16 services.</p>
+        </Link>
+        <Link href="/adrs" className="card">
+          <div className="card-icon" role="img" aria-hidden="true">{"\u{1F4DD}"}</div>
+          <h3>Architecture Decision Records</h3>
+          <p>20 ADRs documenting every significant trade-off: context, alternatives considered, and rationale for each decision.</p>
         </Link>
       </div>
     </section>
@@ -46,6 +51,7 @@ export function DeepDivesDropdown() {
         <li><Link href="/architecture">Architecture</Link></li>
         <li><Link href="/ai-orchestration">AI Orchestration</Link></li>
         <li><Link href="/observability">Observability</Link></li>
+        <li><Link href="/adrs">ADRs</Link></li>
       </ul>
     </li>
   );
