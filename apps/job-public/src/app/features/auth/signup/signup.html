@@ -1,0 +1,164 @@
+<section class="flex min-h-[80vh] items-center justify-center bg-slate-50 px-4 py-12 dark:bg-slate-900">
+  <div class="w-full max-w-md rounded-2xl bg-white p-8 shadow-xl dark:bg-slate-800">
+    <div class="mb-5 flex items-center justify-center gap-3">
+      <img src="logo-icon.svg" alt="" class="h-10 w-10" />
+      <span class="text-2xl font-bold text-slate-900 dark:text-white">JobBoard</span>
+    </div>
+    <h1 class="mb-1 text-center text-2xl font-bold text-slate-900 dark:text-white">Create your account</h1>
+    <p class="mb-6 text-center text-sm text-slate-500 dark:text-slate-400">Sign up to apply for jobs and track your applications.</p>
+
+    @if (success()) {
+      <div class="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800 dark:border-green-900 dark:bg-green-900/20 dark:text-green-300">
+        Account created! Redirecting to sign in&hellip;
+      </div>
+    } @else {
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="space-y-4">
+        @if (topError(); as msg) {
+          <div class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-900/20 dark:text-red-300">
+            {{ msg }}
+          </div>
+        }
+
+        <div>
+          <label for="username" class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200">Username</label>
+          <input
+            id="username"
+            type="text"
+            autocomplete="username"
+            formControlName="username"
+            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
+            placeholder="e.g. jane_doe"
+          />
+          @if (form.controls.username.invalid && form.controls.username.touched) {
+            @if (form.controls.username.errors?.['required']) {
+              <p class="mt-1 text-xs text-red-600">Username is required.</p>
+            } @else if (form.controls.username.errors?.['minlength']) {
+              <p class="mt-1 text-xs text-red-600">Username must be at least 3 characters.</p>
+            } @else if (form.controls.username.errors?.['maxlength']) {
+              <p class="mt-1 text-xs text-red-600">Username must be at most 32 characters.</p>
+            } @else if (form.controls.username.errors?.['pattern']) {
+              <p class="mt-1 text-xs text-red-600">Only letters, digits, and . _ - are allowed.</p>
+            }
+          }
+          @if (fieldErrors()?.['Username']; as errs) {
+            @for (e of errs; track $index) {
+              <p class="mt-1 text-xs text-red-600">{{ e }}</p>
+            }
+          }
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="firstName" class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200">First name</label>
+            <input
+              id="firstName"
+              type="text"
+              autocomplete="given-name"
+              formControlName="firstName"
+              class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
+            />
+            @if (form.controls.firstName.invalid && form.controls.firstName.touched) {
+              <p class="mt-1 text-xs text-red-600">First name is required.</p>
+            }
+            @if (fieldErrors()?.['FirstName']; as errs) {
+              @for (e of errs; track $index) {
+                <p class="mt-1 text-xs text-red-600">{{ e }}</p>
+              }
+            }
+          </div>
+          <div>
+            <label for="lastName" class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200">Last name</label>
+            <input
+              id="lastName"
+              type="text"
+              autocomplete="family-name"
+              formControlName="lastName"
+              class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
+            />
+            @if (form.controls.lastName.invalid && form.controls.lastName.touched) {
+              <p class="mt-1 text-xs text-red-600">Last name is required.</p>
+            }
+            @if (fieldErrors()?.['LastName']; as errs) {
+              @for (e of errs; track $index) {
+                <p class="mt-1 text-xs text-red-600">{{ e }}</p>
+              }
+            }
+          </div>
+        </div>
+
+        <div>
+          <label for="email" class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200">Email</label>
+          <input
+            id="email"
+            type="email"
+            autocomplete="email"
+            formControlName="email"
+            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
+          />
+          @if (form.controls.email.invalid && form.controls.email.touched) {
+            <p class="mt-1 text-xs text-red-600">A valid email is required.</p>
+          }
+          @if (fieldErrors()?.['Email']; as errs) {
+            @for (e of errs; track $index) {
+              <p class="mt-1 text-xs text-red-600">{{ e }}</p>
+            }
+          }
+        </div>
+
+        <div>
+          <label for="password" class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200">Password</label>
+          <input
+            id="password"
+            type="password"
+            autocomplete="new-password"
+            formControlName="password"
+            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
+          />
+          @if (form.controls.password.invalid && form.controls.password.touched) {
+            <p class="mt-1 text-xs text-red-600">Password must be at least 8 characters.</p>
+          }
+          @if (fieldErrors()?.['Password']; as errs) {
+            @for (e of errs; track $index) {
+              <p class="mt-1 text-xs text-red-600">{{ e }}</p>
+            }
+          }
+        </div>
+
+        <div>
+          <label for="confirmPassword" class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200">Confirm password</label>
+          <input
+            id="confirmPassword"
+            type="password"
+            autocomplete="new-password"
+            formControlName="confirmPassword"
+            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
+          />
+          @if (form.controls.confirmPassword.touched) {
+            @if (form.controls.confirmPassword.errors?.['required']) {
+              <p class="mt-1 text-xs text-red-600">Please re-enter your password.</p>
+            } @else if (form.controls.confirmPassword.errors?.['passwordMismatch']) {
+              <p class="mt-1 text-xs text-red-600">Passwords do not match.</p>
+            }
+          }
+        </div>
+
+        <div class="flex justify-center py-2">
+          <div #turnstileHost></div>
+        </div>
+
+        <button
+          type="submit"
+          [disabled]="submitting() || !turnstileToken() || form.invalid"
+          class="w-full rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 dark:disabled:bg-slate-600 dark:disabled:text-slate-400"
+        >
+          @if (submitting()) { Creating account&hellip; } @else { Create account }
+        </button>
+
+        <p class="text-center text-sm text-slate-500 dark:text-slate-400">
+          Already have an account?
+          <a href="javascript:void(0)" (click)="goToLogin()" class="font-medium text-primary-600 hover:underline dark:text-primary-400">Sign in</a>
+        </p>
+      </form>
+    }
+  </div>
+</section>

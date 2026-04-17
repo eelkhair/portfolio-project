@@ -19,6 +19,13 @@
       <app-footer></app-footer>
     </footer>
   </div>
+  <!-- Post-auth overlays — gated on hasInitialized so anonymous routes (e.g. /signup,
+       the brief Keycloak redirect bounce) stay free of the AI chat and debug sidebar. -->
+  <app-getting-started />
+  <app-ai-chat></app-ai-chat>
+  <app-debug-sidebar></app-debug-sidebar>
+  <app-guided-tour />
+  <app-architecture-popup />
 } @else {
   <!-- Chromeless shell for anonymous routes (e.g. /signup) — no header/nav/footer since
        the visitor isn't authenticated yet and the guarded shell would require a login round-trip. -->
@@ -27,8 +34,3 @@
   </div>
 }
 <p-toast position="bottom-right"/>
-<app-getting-started />
-<app-ai-chat></app-ai-chat>
-<app-debug-sidebar></app-debug-sidebar>
-<app-guided-tour />
-<app-architecture-popup />

@@ -31,8 +31,13 @@ export class RealtimeNotificationsService {
   constructor() {
     // Bootstrap: connect to monolith hub first to receive initial feature flags.
     // Once flags arrive, the effect reconnects to the correct topology-specific hub.
+    // Skip the bootstrap start on anonymous routes (e.g. /signup) — the hub requires an
+    // access token, so eager-connecting on unauthenticated pages surfaces a "Realtime
+    // offline" toast. Once the user authenticates, app.ts's auth effect calls start().
     this.currentTopology = 'monolith';
-    void this.start();
+    if (this.account.isAuthenticated()) {
+      void this.start();
+    }
 
     effect(()=>{
       if (!this.featureFlagService.featureFlags()) return;

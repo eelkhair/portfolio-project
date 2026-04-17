@@ -1,8 +1,9 @@
 import { Component, DestroyRef, inject, Injector, OnInit, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { OidcSecurityService } from 'angular-auth-oidc-client';
-import { filter, map, switchMap, take } from 'rxjs';
+import { filter, map, startWith, switchMap, take } from 'rxjs';
 import { Header } from './layout/header/header';
 import { Footer } from './layout/footer/footer';
 import { Chat } from './shared/chat/chat';
@@ -23,6 +24,20 @@ export class App implements OnInit {
   private readonly injector = inject(Injector);
   private readonly resumeRt = inject(ResumeRealtimeService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router);
+
+  /**
+   * True for anonymous/chromeless routes (currently just /signup). Used by the template
+   * to hide post-auth overlays like the debug sidebar on those pages.
+   */
+  protected readonly isAnonymousRoute = toSignal(
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+      map(e => e.urlAfterRedirects.startsWith('/signup')),
+      startWith(this.router.url.startsWith('/signup')),
+    ),
+    { initialValue: false }
+  );
 
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;

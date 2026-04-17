@@ -1,0 +1,143 @@
+<div class="signup-page">
+  <div class="signup-card">
+    <div class="signup-logo-wrap">
+      <img src="logo.svg" alt="Job Board" class="signup-logo" />
+    </div>
+    <h1 class="signup-title">Create Admin Account</h1>
+    <p class="signup-sub">
+      Sign up to explore the Job Board admin portal.
+    </p>
+
+    @if (success()) {
+      <p-message severity="success" text="Account created! Redirecting to sign in…" styleClass="w-full"></p-message>
+    } @else {
+      <form [formGroup]="form" (ngSubmit)="submit()" class="signup-form" novalidate>
+        @if (topError(); as msg) {
+          <p-message severity="error" [text]="msg" styleClass="w-full"></p-message>
+        }
+
+        <div class="field">
+          <label for="username">Username<span class="req">*</span></label>
+          <input pInputText id="username" type="text" autocomplete="username" formControlName="username" placeholder="e.g. jane_doe" />
+          @if (form.controls.username.invalid && form.controls.username.touched) {
+            @if (form.controls.username.errors?.['required']) {
+              <small class="err">Username is required.</small>
+            } @else if (form.controls.username.errors?.['minlength']) {
+              <small class="err">Username must be at least 3 characters.</small>
+            } @else if (form.controls.username.errors?.['maxlength']) {
+              <small class="err">Username must be at most 32 characters.</small>
+            } @else if (form.controls.username.errors?.['pattern']) {
+              <small class="err">Only letters, digits, and . _ - are allowed.</small>
+            }
+          }
+          @if (fieldErrors()?.['Username']; as errs) {
+            @for (e of errs; track $index) {
+              <small class="err">{{ e }}</small>
+            }
+          }
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="firstName">First name<span class="req">*</span></label>
+            <input pInputText id="firstName" type="text" autocomplete="given-name" formControlName="firstName" />
+            @if (form.controls.firstName.invalid && form.controls.firstName.touched) {
+              <small class="err">First name is required.</small>
+            }
+            @if (fieldErrors()?.['FirstName']; as errs) {
+              @for (e of errs; track $index) {
+                <small class="err">{{ e }}</small>
+              }
+            }
+          </div>
+          <div class="field">
+            <label for="lastName">Last name<span class="req">*</span></label>
+            <input pInputText id="lastName" type="text" autocomplete="family-name" formControlName="lastName" />
+            @if (form.controls.lastName.invalid && form.controls.lastName.touched) {
+              <small class="err">Last name is required.</small>
+            }
+            @if (fieldErrors()?.['LastName']; as errs) {
+              @for (e of errs; track $index) {
+                <small class="err">{{ e }}</small>
+              }
+            }
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="email">Email<span class="req">*</span></label>
+          <input pInputText id="email" type="email" autocomplete="email" formControlName="email" />
+          @if (form.controls.email.invalid && form.controls.email.touched) {
+            <small class="err">A valid email is required.</small>
+          }
+          @if (fieldErrors()?.['Email']; as errs) {
+            @for (e of errs; track $index) {
+              <small class="err">{{ e }}</small>
+            }
+          }
+        </div>
+
+        <div class="field">
+          <label for="password">Password<span class="req">*</span></label>
+          <p-password
+            inputId="password"
+            formControlName="password"
+            [toggleMask]="true"
+            [feedback]="true"
+            promptLabel="Choose a password"
+            weakLabel="Weak"
+            mediumLabel="Medium"
+            strongLabel="Strong"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+          ></p-password>
+          @if (form.controls.password.invalid && form.controls.password.touched) {
+            <small class="err">Password must be at least 8 characters.</small>
+          }
+          @if (fieldErrors()?.['Password']; as errs) {
+            @for (e of errs; track $index) {
+              <small class="err">{{ e }}</small>
+            }
+          }
+        </div>
+
+        <div class="field">
+          <label for="confirmPassword">Confirm password<span class="req">*</span></label>
+          <p-password
+            inputId="confirmPassword"
+            formControlName="confirmPassword"
+            [toggleMask]="true"
+            [feedback]="false"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+          ></p-password>
+          @if (form.controls.confirmPassword.touched) {
+            @if (form.controls.confirmPassword.errors?.['required']) {
+              <small class="err">Please re-enter your password.</small>
+            } @else if (form.controls.confirmPassword.errors?.['passwordMismatch']) {
+              <small class="err">Passwords do not match.</small>
+            }
+          }
+        </div>
+
+        <div class="turnstile-wrap">
+          <div #turnstileHost></div>
+        </div>
+
+        <p-button
+          type="submit"
+          label="Create account"
+          icon="pi pi-user-plus"
+          [loading]="submitting()"
+          [disabled]="submitting() || !turnstileToken() || form.invalid"
+          styleClass="w-full"
+        ></p-button>
+
+        <p class="signup-footer">
+          Already have an account?
+          <a href="javascript:void(0)" (click)="goToLogin()">Sign in</a>
+        </p>
+      </form>
+    }
+  </div>
+</div>
