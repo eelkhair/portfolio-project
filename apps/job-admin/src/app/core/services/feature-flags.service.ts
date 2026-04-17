@@ -3,6 +3,21 @@ import {FeatureFlagsDto} from '../types/Dtos/FeatureFlagsDto';
 
 const MODE_STORAGE_KEY = 'job-admin-mode-override';
 
+/**
+ * Lowercase every key in a flags dict so downstream lookups are case-insensitive.
+ * Redis stores flags with mixed casing (e.g. `Monolith`, `ContactForm`, `deepDives`);
+ * the monolith's JSON serializer applies camelCase by default, but this lets the
+ * admin app stay correct regardless of how the server ever shapes the payload.
+ */
+function normalizeFlags(flags: FeatureFlagsDto | null): FeatureFlagsDto | null {
+  if (!flags) return flags;
+  const out: FeatureFlagsDto = {};
+  for (const [k, v] of Object.entries(flags)) {
+    out[k.toLowerCase()] = v;
+  }
+  return out;
+}
+
 @Injectable({ providedIn: 'root' })
 export class FeatureFlagsService {
   private readonly _featureFlags = signal<FeatureFlagsDto|null>(null);
@@ -13,20 +28,20 @@ export class FeatureFlagsService {
 
   readonly hasLocalOverride = computed(() => this._localOverride() !== null);
 
-  readonly globalDefault = computed(() => this._featureFlags()?.['Monolith'] ?? false);
+  readonly globalDefault = computed(() => this._featureFlags()?.['monolith'] ?? false);
 
   readonly isMonolith = computed(() => {
     const override = this._localOverride();
     if (override !== null) return override;
     if (!this._loaded()) return false;
-    return this._featureFlags()?.['Monolith'] ?? false;
+    return this._featureFlags()?.['monolith'] ?? false;
   });
 
   /** Whether the in-app contact form is enabled. Gates the nav link + route guard. */
-  readonly contactForm = computed(() => this._featureFlags()?.['ContactForm'] ?? false);
+  readonly contactForm = computed(() => this._featureFlags()?.['contactform'] ?? false);
 
   setFlags(flags: FeatureFlagsDto) {
-    this._featureFlags.set(flags);
+    this._featureFlags.set(normalizeFlags(flags));
     this._loaded.set(true);
   }
 
