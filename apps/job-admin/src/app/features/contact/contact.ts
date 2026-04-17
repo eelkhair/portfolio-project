@@ -144,8 +144,16 @@ export class Contact implements AfterViewInit, OnDestroy {
   sendAnother(): void {
     this.success.set(false);
     this.form.reset();
-    this.resetTurnstile();
-    queueMicrotask(() => this.subjectInput()?.nativeElement.focus());
+    // The form (and turnstile host div) unmounted while success was true —
+    // viewChild now references a brand-new empty host on re-render. The
+    // previous widget is orphaned; drop the stale ID and render a fresh
+    // widget once Angular has re-mounted the form.
+    this.turnstileToken.set('');
+    this.turnstileWidgetId = null;
+    setTimeout(() => {
+      this.renderWidget();
+      this.subjectInput()?.nativeElement.focus();
+    }, 0);
   }
 
   private loadTurnstile(): void {
