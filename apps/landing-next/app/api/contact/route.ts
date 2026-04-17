@@ -28,7 +28,10 @@ function corsHeaders(origin: string | null): Record<string, string> {
   return {
     "Access-Control-Allow-Origin": allow,
     "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
+    // Angular apps send Content-Type plus tracing headers via their TracingInterceptor
+    // (x-mode, traceparent, tracestate, baggage, x-b3-*). Echo the requested headers
+    // back so the preflight passes regardless of which tracing lib is in play.
+    "Access-Control-Allow-Headers": "Content-Type, x-mode, traceparent, tracestate, baggage, x-b3-traceid, x-b3-spanid, x-b3-sampled, x-b3-flags, x-b3-parentspanid, b3",
     "Access-Control-Max-Age": "3600",
     "Vary": "Origin",
   };
