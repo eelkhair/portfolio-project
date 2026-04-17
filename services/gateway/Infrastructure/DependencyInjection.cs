@@ -14,18 +14,17 @@ public static class DependencyInjection
                 .WithOrigins(
                     "http://localhost:4200",
                     "http://localhost:3000",
-                    "https://job-admin-dev.eelkhair.net",
-                    "https://jobs-dev.eelkhair.net",
-                    "https://jobs.eelkhair.net",
-                    "https://job-dev.eelkhair.net",
                     "http://192.168.1.200:9000",
-                    "https://swagger-dev.eelkhair.net",
-                    "https://job-admin.eelkhair.net",
                     "http://192.168.1.112:9000",
-                    "https://swagger.eelkhair.net",
 
                     "https://job-admin.elkhair.tech",
-                    "https://jobs.elkhair.tech")
+                    "https://job-admin-dev.elkhair.tech",
+                    "https://jobs.elkhair.tech",
+                    "https://jobs-dev.elkhair.tech",
+                    "https://job.elkhair.tech",
+                    "https://job-dev.elkhair.tech",
+                    "https://swagger.elkhair.tech",
+                    "https://swagger-dev.elkhair.tech")
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials()

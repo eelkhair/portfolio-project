@@ -69,14 +69,13 @@ public static class DependencyInjection
             options.AddPolicy(CorsPolicy, p => p
                 .WithOrigins(
                     "http://localhost:4200",
-                    "https://job-admin-dev.eelkhair.net",
                     "http://192.168.1.200:9000",
-                    "https://swagger-dev.eelkhair.net",
-                    "https://job-admin.eelkhair.net",
                     "http://192.168.1.112:9000",
-                    "https://swagger.eelkhair.net",
 
-                    "https://job-admin.elkhair.tech")
+                    "https://job-admin.elkhair.tech",
+                    "https://job-admin-dev.elkhair.tech",
+                    "https://swagger.elkhair.tech",
+                    "https://swagger-dev.elkhair.tech")
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials()

@@ -1,8 +1,6 @@
-// Derive base domain from the current hostname so both eelkhair.net and elkhair.tech work
-const host = typeof window !== 'undefined' ? window.location.hostname : '';
-const baseDomain = host.endsWith('.elkhair.tech') ? 'elkhair.tech'
-  : host.endsWith('.eelkhair.net') ? 'eelkhair.net'
-  : 'elkhair.tech'; // fallback
+// Single public domain: elkhair.tech. All URLs built from one base for
+// easy future moves.
+const baseDomain = 'elkhair.tech';
 
 export const environment = {
   production: true,

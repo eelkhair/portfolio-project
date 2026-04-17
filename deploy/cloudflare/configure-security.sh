@@ -5,9 +5,8 @@
 # Disables aggressive security features that block legitimate traffic
 # to the portfolio homelab (Bot Fight Mode, Browser Integrity Check, etc.)
 #
-# Run once per zone (eelkhair.net and elkhair.tech):
+# Run once per zone:
 #   export CLOUDFLARE_API_TOKEN="your-api-token"
-#   CLOUDFLARE_ZONE_ID="<eelkhair.net-zone-id>" ./configure-security.sh
 #   CLOUDFLARE_ZONE_ID="<elkhair.tech-zone-id>" ./configure-security.sh
 # ============================================================================
 
@@ -20,7 +19,7 @@ if [ -z "${CLOUDFLARE_API_TOKEN:-}" ]; then
   echo "Error: CLOUDFLARE_API_TOKEN is not set"
   exit 1
 fi
-ZONE_ID="${CLOUDFLARE_ZONE_ID:-fd8cabfeb7708e503bdacccb209fe126}"
+ZONE_ID="${CLOUDFLARE_ZONE_ID:?Error: CLOUDFLARE_ZONE_ID must be set}"
 AUTH_HEADER="Authorization: Bearer $CLOUDFLARE_API_TOKEN"
 
 echo "Configuring Cloudflare security for zone: $ZONE_ID"
@@ -130,7 +129,7 @@ if [ -n "$EXISTING_RULE" ]; then
       -H "Content-Type: application/json" \
       -d '{
         "description": "Block Keycloak admin console",
-        "expression": "((http.host eq \"auth.eelkhair.net\" or http.host eq \"auth.elkhair.tech\") and starts_with(http.request.uri.path, \"/admin\"))",
+        "expression": "(http.host eq \"auth.elkhair.tech\" and starts_with(http.request.uri.path, \"/admin\"))",
         "action": "block"
       }')
 
@@ -154,7 +153,7 @@ else
       "rules": [
         {
           "description": "Block Keycloak admin console",
-          "expression": "((http.host eq \"auth.eelkhair.net\" or http.host eq \"auth.elkhair.tech\") and starts_with(http.request.uri.path, \"/admin\"))",
+          "expression": "(http.host eq \"auth.elkhair.tech\" and starts_with(http.request.uri.path, \"/admin\"))",
           "action": "block"
         }
       ]

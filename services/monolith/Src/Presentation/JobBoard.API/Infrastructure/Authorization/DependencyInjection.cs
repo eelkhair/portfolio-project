@@ -32,23 +32,18 @@ public static class DependencyInjection
                         "http://localhost:5280",
                         "https://localhost:5280",
                         "http://127.0.0.1:4200",
-
-                        "https://job-admin-dev.eelkhair.net",
-                        "https://jobs-dev.eelkhair.net",
-                        "https://job-dev.eelkhair.net",
-                        "http://192.168.1.200:9000",
-                        "https://swagger-dev.eelkhair.net",
-
-                        "http://192.168.1.112:9000",
-                        "https://swagger.eelkhair.net",
-                        "https://job-admin.eelkhair.net",
-                        "https://job.eelkhair.net",
-                        "https://jobs.eelkhair.net",
                         "http://127.0.0.1:5280",
+                        "http://192.168.1.200:9000",
+                        "http://192.168.1.112:9000",
 
                         "https://job-admin.elkhair.tech",
+                        "https://job-admin-dev.elkhair.tech",
                         "https://jobs.elkhair.tech",
-                        "https://job.elkhair.tech"
+                        "https://jobs-dev.elkhair.tech",
+                        "https://job.elkhair.tech",
+                        "https://job-dev.elkhair.tech",
+                        "https://swagger.elkhair.tech",
+                        "https://swagger-dev.elkhair.tech"
                     )
                     .AllowAnyHeader()
                     .AllowAnyMethod()
@@ -63,14 +58,12 @@ public static class DependencyInjection
         services
             .AddKeycloakJwtAuth(configuration, jwt =>
             {
-                // Accept tokens issued by either domain (eelkhair.net or elkhair.tech)
                 var authority = configuration["Keycloak:Authority"] ?? string.Empty;
                 var realmPath = authority.Contains("/realms/")
                     ? authority[authority.IndexOf("/realms/", StringComparison.Ordinal)..]
                     : "/realms/job-board";
                 jwt.TokenValidationParameters.ValidIssuers =
                 [
-                    $"https://auth.eelkhair.net{realmPath}",
                     $"https://auth.elkhair.tech{realmPath}"
                 ];
 

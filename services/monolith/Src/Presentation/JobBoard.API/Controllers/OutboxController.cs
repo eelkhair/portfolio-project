@@ -26,7 +26,7 @@ public class OutboxController(IUserAccessor accessor) : BaseApiController
         accessor.UserId = "OutboxProcessor";
         accessor.FirstName = "OutboxProcessor";
         accessor.LastName = "OutboxProcessor";
-        accessor.Email = "OutboxProcessor@eelkhair.net";
+        accessor.Email = "OutboxProcessor@elkhair.tech";
         accessor.Roles = new List<string> { "OutboxProcessor" };
         await ExecuteCommandAsync(new ProcessOutboxMessageCommand(), Ok);
         return Ok();

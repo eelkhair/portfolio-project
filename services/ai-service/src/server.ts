@@ -26,7 +26,7 @@ export async function startServer(config: any) {
     app.register(cors, {
         origin: [
             "http://192.168.1.112:9000",
-            "https://swagger.eelkhair.net"
+            "https://swagger.elkhair.tech"
         ],
         methods: ["GET", "POST", "PUT", "DELETE"],
         allowedHeaders: ["Content-Type", "Authorization"]

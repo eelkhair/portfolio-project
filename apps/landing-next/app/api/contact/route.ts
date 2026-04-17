@@ -36,15 +36,10 @@ function pruneRateLimit(now: number): void {
 // post cross-origin and need CORS allow-list + credential pass-through.
 const ALLOWED_ORIGINS = new Set([
   "https://elkhair.tech",
-  "https://eelkhair.net",
   "https://job-admin.elkhair.tech",
   "https://job-admin-dev.elkhair.tech",
-  "https://job-admin.eelkhair.net",
-  "https://job-admin-dev.eelkhair.net",
   "https://jobs.elkhair.tech",
   "https://jobs-dev.elkhair.tech",
-  "https://jobs.eelkhair.net",
-  "https://jobs-dev.eelkhair.net",
   "http://localhost:4200",
   "http://localhost:3000",
 ]);

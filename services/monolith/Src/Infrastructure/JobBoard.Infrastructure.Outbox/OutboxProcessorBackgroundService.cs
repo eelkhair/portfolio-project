@@ -32,7 +32,7 @@ public sealed class OutboxProcessorBackgroundService(
                 accessor.UserId = "OutboxProcessor";
                 accessor.FirstName = "OutboxProcessor";
                 accessor.LastName = "OutboxProcessor";
-                accessor.Email = "OutboxProcessor@eelkhair.net";
+                accessor.Email = "OutboxProcessor@elkhair.tech";
                 accessor.Roles = ["OutboxProcessor"];
 
                 var handler = scope.ServiceProvider
