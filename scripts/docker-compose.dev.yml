@@ -95,6 +95,7 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
       - SEQ_URL=https://seq.eelkhair.net
+      - Turnstile__SecretKey=${TURNSTILE_SECRET_KEY}
     networks:
       - ai-job-board-net
 
@@ -125,6 +126,7 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
       - SEQ_URL=https://seq.eelkhair.net
+      - Turnstile__SecretKey=${TURNSTILE_SECRET_KEY}
     networks:
       - ai-job-board-net
 

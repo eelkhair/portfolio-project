@@ -186,8 +186,10 @@ html.pf-v5-theme-dark .pf-v5-c-login__main {
 }
 
 /* ---------- Logo: centered above the title, height 3.5rem like signup cards ----------
-   PF4: background-image on .card-pf with padding-top to make room.
-   PF5: ::after on .pf-v5-c-login__main (since card-pf doesn't exist in PF5). */
+   PF4: background-image on .card-pf (background-image is reliable across cascades).
+   PF5: ::after on .pf-v5-c-login__main (since .card-pf doesn't exist in PF5).
+   Dark mode: swap to logo-dark.svg (light-text variant) rather than trying to
+   CSS-filter the dark-text logo, which is unreliable across PatternFly versions. */
 .card-pf {
   background-image: url("../img/logo.svg");
   background-repeat: no-repeat;
@@ -211,26 +213,18 @@ html.pf-v5-theme-dark .pf-v5-c-login__main {
   pointer-events: none;
 }
 
-/* Dark mode: invert the logo so its dark text fill reads on a dark card */
+/* Dark mode — PF 5 (Keycloak 26+): html.pf-v5-theme-dark class */
 html.pf-v5-theme-dark .pf-v5-c-login__main::after {
-  filter: invert(1) hue-rotate(180deg);
+  background-image: url("../img/logo-dark.svg");
 }
+
+/* Dark mode — PF 4 (Keycloak 24, prod): prefers-color-scheme media query */
 @media (prefers-color-scheme: dark) {
   .card-pf {
-    background-image: none;
+    background-image: url("../img/logo-dark.svg");
   }
-  .card-pf::after {
-    content: "";
-    position: absolute;
-    top: 2.25rem;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 12rem;
-    height: 3.5rem;
-    background: url("../img/logo.svg") no-repeat center center;
-    background-size: contain;
-    filter: invert(1) hue-rotate(180deg);
-    pointer-events: none;
+  .pf-v5-c-login__main::after {
+    background-image: url("../img/logo-dark.svg");
   }
 }
 
