@@ -174,15 +174,21 @@ export default function PortfolioPage() {
               All services are running on a self-hosted Proxmox homelab, exposed via Cloudflare Tunnel.
             </p>
             <div className="coming-soon-banner" role="status">
-              <span className="coming-soon-icon" aria-hidden="true">{"\u{1F6A7}"}</span>
+              <span className="coming-soon-icon" aria-hidden="true">{"\u2728"}</span>
               <div>
-                <div className="coming-soon-title">Live Demo Coming Soon</div>
-                <div className="coming-soon-desc">Public demo access is being configured. Check back shortly.</div>
+                <div className="coming-soon-title">The demo is live — register and try it out</div>
+                <div className="coming-soon-desc">
+                  Create an account on the{" "}
+                  <a href="https://job-admin.elkhair.tech/signup" target="_blank" rel="noopener noreferrer" className="service-register-link">Admin app</a>
+                  {" "}to post jobs and explore the admin experience, or on the{" "}
+                  <a href="https://jobs.elkhair.tech/signup" target="_blank" rel="noopener noreferrer" className="service-register-link">Public app</a>
+                  {" "}to apply as a candidate. Feel free to poke around.
+                </div>
               </div>
             </div>
-            <div className="service-grid disabled" aria-label="Service links (currently unavailable)">
+            <div className="service-grid" aria-label="Service links">
               {services.map((s) => (
-                <a href={s.href} target="_blank" rel="noopener noreferrer" className="service-card" aria-disabled="true" tabIndex={-1} key={s.name}>
+                <a href={s.href} target="_blank" rel="noopener noreferrer" className="service-card" key={s.name}>
                   <span className="service-dot" aria-hidden="true"></span>
                   <div>
                     <div className="service-name">{s.name}</div>

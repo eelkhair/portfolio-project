@@ -492,6 +492,14 @@ a.card:hover h3 { color: var(--text-primary); }
 .coming-soon-icon { font-size: 1.25rem; }
 .coming-soon-title { font-weight: 600; color: var(--accent-light); margin-bottom: 0.2rem; }
 .coming-soon-desc { font-size: 0.85rem; color: var(--text-secondary); }
+.service-register-link {
+  color: var(--accent-light);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+.service-register-link:hover { color: var(--accent); }
 
 /* ── Portfolio CTA Section ────────────────────────── */
 .portfolio-cta-title { margin-bottom: 0.75rem; font-size: 2rem; }

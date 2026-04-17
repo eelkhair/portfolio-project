@@ -20,7 +20,7 @@ export const exploreCards = [
   { href: "https://job-admin.elkhair.tech", title: "Admin App", desc: "Toggle between Monolith & Microservices, create companies & jobs, use AI chat with function calling, and check distributed traces in Jaeger." },
   { href: "https://jobs.elkhair.tech", title: "Public App", desc: "Browse jobs, upload a resume and watch AI parse it in real-time via SignalR, apply to jobs, and ask the AI for job recommendations." },
   { href: "https://jaeger.elkhair.tech", title: "Jaeger", desc: "View distributed traces across all 16 services. See complete request flows from gateway through monolith or microservices to the AI service." },
-  { href: "https://grafana.elkhair.tech", title: "Grafana", desc: "Dashboards for API latency, error rates, and throughput. Compare monolith vs microservices performance side-by-side." },
+  { href: "https://grafana.elkhair.tech", title: "Grafana", desc: "Dashboards for API latency, error rates, and throughput. Compare monolith vs microservices performance side-by-side. Log in with username demo / password demo." },
 ];
 
 export const services = [
