@@ -10,6 +10,12 @@ services:
         - EMAIL_FROM=${EMAIL_FROM}
         - CONTACT_EMAIL=${CONTACT_EMAIL}
         - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}
+        # OpenTelemetry — HTTP OTLP to collector (port 4318, not gRPC 4317).
+        # Traces land in Jaeger at jaeger.eelkhair.net tagged service=landing.
+        - OTEL_SERVICE_NAME=landing
+        - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.160:4318
+        - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+        - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
     restart: unless-stopped
     networks:
         - ai-job-board-net
