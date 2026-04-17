@@ -31,38 +31,6 @@ function pruneRateLimit(now: number): void {
   }
 }
 
-/**
- * Resolve a single, stable client IP for rate-limiting.
- *
- * Order of preference:
- *  1. `CF-Connecting-IP` — Cloudflare-set, always a single trusted IP.
- *  2. First IP in `X-Forwarded-For` — picks the original client when chained
- *     through multiple proxies. Using the raw comma-separated string as a key
- *     was the previous bug: CF can rotate edge IPs inside the chain between
- *     requests, changing the key and making the rate-limit state inconsistent.
- *  3. `X-Real-IP` — generic proxy-set header.
- *  4. `"unknown"` — last resort; all unknown callers share a bucket.
- */
-function clientIp(req: NextRequest): string {
-  const cf = req.headers.get("cf-connecting-ip");
-  if (cf) return cf.trim();
-  const xff = req.headers.get("x-forwarded-for");
-  if (xff) {
-    const first = xff.split(",")[0]?.trim();
-    if (first) return first;
-  }
-  const real = req.headers.get("x-real-ip");
-  if (real) return real.trim();
-  return "unknown";
-}
-
-/** Prune entries older than the rate-limit window so the Map can't grow forever. */
-function pruneRateLimit(now: number): void {
-  for (const [ip, last] of rateLimit) {
-    if (now - last >= RATE_LIMIT_MS) rateLimit.delete(ip);
-  }
-}
-
 // Allowed origins that may POST to this endpoint from another domain.
 // The landing page itself calls it same-origin; the Angular admin and public apps
 // post cross-origin and need CORS allow-list + credential pass-through.
