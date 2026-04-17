@@ -41,7 +41,18 @@
     { "hostname": "mono-mcp.elkhair.tech", "service": "http://192.168.1.112:3333" },
     { "hostname": "job-admin-api.elkhair.tech", "service": "http://192.168.1.112:6062" },
     { "hostname": "micro-mcp.elkhair.tech", "service": "http://192.168.1.112:3334" },
-    { "hostname": "registry.elkhair.tech", "service": "http://192.168.1.150:5000" }
+    { "hostname": "registry.elkhair.tech", "service": "http://192.168.1.150:5000" },
+
+    { "hostname": "job-admin-dev.elkhair.tech", "service": "http://192.168.1.200:6080" },
+    { "hostname": "jobs-dev.elkhair.tech", "service": "http://192.168.1.200:6081" },
+    { "hostname": "job-gateway-dev.elkhair.tech", "service": "http://192.168.1.200:5238" },
+    { "hostname": "job-health-dev.elkhair.tech", "service": "http://192.168.1.200:5107" },
+    { "hostname": "job-ai-v2-dev.elkhair.tech", "service": "http://192.168.1.200:5200" },
+    { "hostname": "job-monolith-dev.elkhair.tech", "service": "http://192.168.1.200:5280" },
+    { "hostname": "job-dapr-dev.elkhair.tech", "service": "http://192.168.1.200:8080" },
+    { "hostname": "job-admin-api-dev.elkhair.tech", "service": "http://192.168.1.200:6062" },
+    { "hostname": "mono-mcp-dev.elkhair.tech", "service": "http://192.168.1.200:3333" },
+    { "hostname": "micro-mcp-dev.elkhair.tech", "service": "http://192.168.1.200:3334" }
   ],
   "block_rules": [
     {
