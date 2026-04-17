@@ -48,7 +48,9 @@ public class SignupAdminEndpoint(
             Password = request.Password
         };
 
-        var msg = daprClient.CreateInvokeMethodRequest(System.Net.Http.HttpMethod.Post, "user-api", "account/signup/admin");
+        // user-api has `c.Endpoints.RoutePrefix = "api"` — the `api/` prefix is required
+        // or Dapr returns 404 Not Found (confirmed via Jaeger trace).
+        var msg = daprClient.CreateInvokeMethodRequest(System.Net.Http.HttpMethod.Post, "user-api", "api/account/signup/admin");
         msg.Content = JsonContent.Create(forward);
 
         var result = await DaprExtensions.Process(() =>
