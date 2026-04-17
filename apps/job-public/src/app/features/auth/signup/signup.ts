@@ -112,6 +112,15 @@ export class Signup implements AfterViewInit, OnDestroy {
   );
   protected readonly topError = signal<string | undefined>(undefined);
   protected readonly turnstileToken = signal<string>('');
+  protected readonly showPassword = signal(false);
+  protected readonly showConfirmPassword = signal(false);
+
+  protected togglePassword(): void {
+    this.showPassword.update(v => !v);
+  }
+  protected toggleConfirmPassword(): void {
+    this.showConfirmPassword.update(v => !v);
+  }
 
   constructor() {
     // Focus the username input on mount. We do this in afterNextRender so it runs

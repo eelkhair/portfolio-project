@@ -186,12 +186,12 @@ html.pf-v5-theme-dark .pf-v5-c-login__main {
 }
 
 /* ---------- Logo: centered above the title, height 3.5rem like signup cards ----------
-   PF4: background-image on .card-pf (background-image is reliable across cascades).
-   PF5: ::after on .pf-v5-c-login__main (since .card-pf doesn't exist in PF5).
-   Dark mode: swap to logo-dark.svg (light-text variant) rather than trying to
-   CSS-filter the dark-text logo, which is unreliable across PatternFly versions. */
+   Keycloak v2 theme renders a dark card by default in this project's deployed versions,
+   so we use logo-dark.svg (light-text variant) unconditionally. Media queries for
+   prefers-color-scheme were unreliable because Keycloak's v2 dark styling doesn't
+   correlate cleanly with the OS color-scheme pref. */
 .card-pf {
-  background-image: url("../img/logo.svg");
+  background-image: url("../img/logo-dark.svg");
   background-repeat: no-repeat;
   background-position: center 2.25rem;
   background-size: auto 3.5rem;
@@ -208,24 +208,9 @@ html.pf-v5-theme-dark .pf-v5-c-login__main {
   transform: translateX(-50%);
   width: 12rem;
   height: 3.5rem;
-  background: url("../img/logo.svg") no-repeat center center;
+  background: url("../img/logo-dark.svg") no-repeat center center;
   background-size: contain;
   pointer-events: none;
-}
-
-/* Dark mode — PF 5 (Keycloak 26+): html.pf-v5-theme-dark class */
-html.pf-v5-theme-dark .pf-v5-c-login__main::after {
-  background-image: url("../img/logo-dark.svg");
-}
-
-/* Dark mode — PF 4 (Keycloak 24, prod): prefers-color-scheme media query */
-@media (prefers-color-scheme: dark) {
-  .card-pf {
-    background-image: url("../img/logo-dark.svg");
-  }
-  .pf-v5-c-login__main::after {
-    background-image: url("../img/logo-dark.svg");
-  }
 }
 
 /* ---------- Typography (matches .signup-title exactly: 1.6rem, 600, centered) ---------- */
