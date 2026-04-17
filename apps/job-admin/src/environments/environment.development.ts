@@ -6,6 +6,7 @@ export const environment = {
   monolithUrl: 'https://job-monolith-dev.eelkhair.net/',
   microserviceUrl: 'https://job-admin-api-dev.eelkhair.net/',
   aiServiceUrl: 'https://job-ai-v2-dev.eelkhair.net/',
+  landingUrl: 'https://elkhair.tech/',
   otel: 'https://otel.eelkhair.net/v1/traces',
   otelAspire: undefined as string | undefined,
   otelZipkin: 'https://otel.eelkhair.net/api/v2/spans',

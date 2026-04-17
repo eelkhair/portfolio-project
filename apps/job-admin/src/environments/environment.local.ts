@@ -6,6 +6,7 @@ export const environment = {
   monolithUrl: 'http://localhost:5280/',
   microserviceUrl: 'http://localhost:5262/',
   aiServiceUrl: 'http://localhost:5200/',
+  landingUrl: 'http://localhost:3001/',
   otel: '/v1/traces',
   otelAspire: '/aspire/v1/traces',
   otelZipkin: '',

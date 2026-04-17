@@ -4,7 +4,45 @@ import nodemailer from "nodemailer";
 const rateLimit = new Map<string, number>();
 const RATE_LIMIT_MS = 60_000;
 
+// Allowed origins that may POST to this endpoint from another domain.
+// The landing page itself calls it same-origin; the Angular admin and public apps
+// post cross-origin and need CORS allow-list + credential pass-through.
+const ALLOWED_ORIGINS = new Set([
+  "https://elkhair.tech",
+  "https://eelkhair.net",
+  "https://job-admin.elkhair.tech",
+  "https://job-admin-dev.elkhair.tech",
+  "https://job-admin.eelkhair.net",
+  "https://job-admin-dev.eelkhair.net",
+  "https://jobs.elkhair.tech",
+  "https://jobs-dev.elkhair.tech",
+  "https://jobs.eelkhair.net",
+  "https://jobs-dev.eelkhair.net",
+  "http://localhost:4200",
+  "http://localhost:3000",
+]);
+
+function corsHeaders(origin: string | null): Record<string, string> {
+  const allow = origin && ALLOWED_ORIGINS.has(origin) ? origin : "";
+  if (!allow) return {};
+  return {
+    "Access-Control-Allow-Origin": allow,
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Max-Age": "3600",
+    "Vary": "Origin",
+  };
+}
+
+export async function OPTIONS(req: NextRequest) {
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeaders(req.headers.get("origin")),
+  });
+}
+
 export async function POST(req: NextRequest) {
+  const cors = corsHeaders(req.headers.get("origin"));
   const ip = req.headers.get("x-forwarded-for") ?? "unknown";
   const now = Date.now();
   const lastSent = rateLimit.get(ip);
@@ -12,7 +50,7 @@ export async function POST(req: NextRequest) {
     console.warn(`[Contact] Rate limited: ip=${ip}`);
     return NextResponse.json(
       { error: "Please wait before sending another message." },
-      { status: 429 },
+      { status: 429, headers: cors },
     );
   }
 
@@ -21,14 +59,14 @@ export async function POST(req: NextRequest) {
     body = await req.json();
   } catch (err) {
     console.error("[Contact] Failed to parse request body:", err);
-    return NextResponse.json({ error: "Invalid request." }, { status: 400 });
+    return NextResponse.json({ error: "Invalid request." }, { status: 400, headers: cors });
   }
 
   const { name, email, subject, message, token } = body;
 
   if (!token) {
     console.error("[Contact] Missing Turnstile token: ip=%s", ip);
-    return NextResponse.json({ error: "Verification required." }, { status: 400 });
+    return NextResponse.json({ error: "Verification required." }, { status: 400, headers: cors });
   }
 
   const turnstileRes = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
@@ -43,19 +81,19 @@ export async function POST(req: NextRequest) {
   const turnstileData = await turnstileRes.json();
   if (!turnstileData.success) {
     console.error("[Contact] Turnstile verification failed: ip=%s, errors=%j", ip, turnstileData["error-codes"]);
-    return NextResponse.json({ error: "Verification failed. Please try again." }, { status: 403 });
+    return NextResponse.json({ error: "Verification failed. Please try again." }, { status: 403, headers: cors });
   }
 
   if (!name?.trim() || !email?.trim() || !message?.trim()) {
     return NextResponse.json(
       { error: "Name, email, and message are required." },
-      { status: 400 },
+      { status: 400, headers: cors },
     );
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    return NextResponse.json({ error: "Invalid email address." }, { status: 400 });
+    return NextResponse.json({ error: "Invalid email address." }, { status: 400, headers: cors });
   }
 
   const transporter = nodemailer.createTransport({
@@ -68,9 +106,15 @@ export async function POST(req: NextRequest) {
     },
   });
 
+  // `from` must be an address on a domain verified with the SMTP provider
+  // (for Resend: a record at your verified sending domain). `SMTP_USER` works
+  // for Exchange where the auth user IS the sender, but providers like Resend
+  // use a literal "resend" auth user — hence the dedicated MAIL_FROM fallback.
+  const fromAddress = process.env.MAIL_FROM ?? process.env.SMTP_USER;
+
   try {
     await transporter.sendMail({
-      from: process.env.SMTP_USER,
+      from: fromAddress,
       to: process.env.CONTACT_TO,
       replyTo: email,
       subject: subject?.trim() || `Portfolio Contact: ${name}`,
@@ -87,12 +131,12 @@ export async function POST(req: NextRequest) {
 
     rateLimit.set(ip, now);
     console.log("[Contact] Email sent: from=%s, subject=%s", email, subject?.trim() || `Portfolio Contact: ${name}`);
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true }, { headers: cors });
   } catch (err) {
     console.error("[Contact] SMTP error: from=%s, to=%s, error=%s", email, process.env.CONTACT_TO, err);
     return NextResponse.json(
       { error: "Failed to send message. Please try again later." },
-      { status: 500 },
+      { status: 500, headers: cors },
     );
   }
 }

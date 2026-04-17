@@ -10,6 +10,7 @@ export const environment = {
   apiUrl: `https://job-gateway.${baseDomain}/api/`,
   aiUrl: `https://job-ai-v2.${baseDomain}/`,
   monolithUrl: `https://job-monolith.${baseDomain}/`,
+  landingUrl: `https://${baseDomain}/`,
   otel: `https://otel.${baseDomain}/v1/traces`,
   otelZipkin: `https://otel.${baseDomain}/api/v2/spans`,
   jaegerUrl: `https://jaeger.${baseDomain}/trace/`,

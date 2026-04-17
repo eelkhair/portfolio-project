@@ -7,6 +7,7 @@ export const environment = {
   monolithUrl: '${GATEWAY_URL}/',
   microserviceUrl: '${GATEWAY_URL}/',
   aiServiceUrl: '${GATEWAY_URL}/ai/v2/',
+  landingUrl: '${LANDING_URL}/',
   otel: undefined as string | undefined,
   otelAspire: undefined as string | undefined,
   otelZipkin: undefined as string | undefined,

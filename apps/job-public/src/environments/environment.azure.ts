@@ -6,6 +6,7 @@ export const environment = {
   apiUrl: '${GATEWAY_URL}/api/',
   aiUrl: '${GATEWAY_URL}/ai/v2/',
   monolithUrl: '${GATEWAY_URL}/',
+  landingUrl: '${LANDING_URL}/',
   otel: undefined as string | undefined,
   otelZipkin: undefined as string | undefined,
   oidc: {

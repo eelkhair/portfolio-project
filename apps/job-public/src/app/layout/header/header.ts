@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { ThemeService } from '../../core/services/theme.service';
 import { AccountService } from '../../core/services/account.service';
+import { FeatureFlagsService } from '../../core/services/feature-flags.service';
 import { HelpPanelService } from '../../shared/help-panel/help-panel.service';
 import { environment } from '../../../environments/environment';
 
@@ -37,6 +38,16 @@ import { environment } from '../../../environments/environment';
           >
             Companies
           </a>
+          @if (account.isAuthenticated() && featureFlags.contactForm()) {
+            <a
+              routerLink="/contact"
+              routerLinkActive="text-white"
+              [routerLinkActiveOptions]="{ exact: false }"
+              class="text-sm font-medium text-slate-300 transition-colors hover:text-white"
+            >
+              Contact
+            </a>
+          }
 
           <button
             (click)="help.visible.set(true)"
@@ -131,6 +142,7 @@ import { environment } from '../../../environments/environment';
 export class Header {
   protected readonly theme = inject(ThemeService);
   protected readonly account = inject(AccountService);
+  protected readonly featureFlags = inject(FeatureFlagsService);
   protected readonly help = inject(HelpPanelService);
   protected readonly menuOpen = signal(false);
   protected readonly envName = environment.envName;

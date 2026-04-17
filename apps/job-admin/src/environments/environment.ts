@@ -12,6 +12,7 @@ export const environment = {
   monolithUrl: `https://job-monolith.${baseDomain}/`,
   microserviceUrl: `https://job-admin-api.${baseDomain}/`,
   aiServiceUrl: `https://job-ai-v2.${baseDomain}/`,
+  landingUrl: `https://${baseDomain}/`,
   otel: `https://otel.${baseDomain}/v1/traces`,
   otelAspire: undefined as string | undefined,
   otelZipkin: `https://otel.${baseDomain}/api/v2/spans`,

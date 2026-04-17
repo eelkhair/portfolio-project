@@ -4,6 +4,7 @@ export const environment = {
   apiUrl: 'http://localhost:5280/api/',
   aiUrl: 'http://localhost:5200/',
   monolithUrl: 'http://localhost:5280/',
+  landingUrl: 'http://localhost:3001/',
   otel: '/v1/traces',
   otelZipkin: 'api/v2/spans',
   jaegerUrl: 'http://localhost:16686/trace/',

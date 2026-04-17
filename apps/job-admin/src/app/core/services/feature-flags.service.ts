@@ -22,6 +22,9 @@ export class FeatureFlagsService {
     return this._featureFlags()?.['Monolith'] ?? false;
   });
 
+  /** Whether the in-app contact form is enabled. Gates the nav link + route guard. */
+  readonly contactForm = computed(() => this._featureFlags()?.['ContactForm'] ?? false);
+
   setFlags(flags: FeatureFlagsDto) {
     this._featureFlags.set(flags);
     this._loaded.set(true);
