@@ -1,27 +1,6 @@
 {
   "tunnel_name": "proxmox-homelab",
   "services": [
-    { "hostname": "eelkhair.net", "service": "http://192.168.1.112:6090" },
-    { "hostname": "www.eelkhair.net", "service": "http://192.168.1.112:6090" },
-    { "hostname": "job-admin.eelkhair.net", "service": "http://192.168.1.112:6080" },
-    { "hostname": "jobs.eelkhair.net", "service": "http://192.168.1.112:6081" },
-    { "hostname": "job-gateway.eelkhair.net", "service": "http://192.168.1.112:5238" },
-    { "hostname": "job-health.eelkhair.net", "service": "http://192.168.1.112:5107" },
-    { "hostname": "job-ai-v2.eelkhair.net", "service": "http://192.168.1.112:5200" },
-    { "hostname": "job-monolith.eelkhair.net", "service": "http://192.168.1.112:5280" },
-    { "hostname": "otel.eelkhair.net", "service": "http://192.168.1.160:4318" },
-    { "hostname": "auth.eelkhair.net", "service": "http://192.168.1.112:9090" },
-    { "hostname": "grafana.eelkhair.net", "service": "http://192.168.1.115:3000" },
-    { "hostname": "jaeger.eelkhair.net", "service": "http://192.168.1.160:16686" },
-    { "hostname": "seq.eelkhair.net", "service": "http://192.168.1.112:5341" },
-    { "hostname": "inspector.eelkhair.net", "service": "http://192.168.1.115:6274" },
-    { "hostname": "mail.eelkhair.net", "service": "http://192.168.1.115:8025" },
-    { "hostname": "job-dapr.eelkhair.net", "service": "http://192.168.1.112:8080" },
-    { "hostname": "mono-mcp.eelkhair.net", "service": "http://192.168.1.112:3333" },
-    { "hostname": "job-admin-api.eelkhair.net", "service": "http://192.168.1.112:6062" },
-    { "hostname": "micro-mcp.eelkhair.net", "service": "http://192.168.1.112:3334" },
-    { "hostname": "registry.eelkhair.net", "service": "http://192.168.1.150:5000" },
-
     { "hostname": "elkhair.tech", "service": "http://192.168.1.112:6090" },
     { "hostname": "www.elkhair.tech", "service": "http://192.168.1.112:6090" },
     { "hostname": "job-admin.elkhair.tech", "service": "http://192.168.1.112:6080" },
@@ -58,11 +37,21 @@
   "block_rules": [
     {
       "description": "Block Keycloak admin console",
-      "expression": "((http.host eq \"auth.eelkhair.net\" or http.host eq \"auth.elkhair.tech\") and starts_with(http.request.uri.path, \"/admin/\"))"
+      "expression": "(http.host eq \"auth.elkhair.tech\" and starts_with(http.request.uri.path, \"/admin/\"))"
     },
     {
       "description": "Block Swagger UI pages but allow JSON specs",
-      "expression": "(http.request.uri.path contains \"/swagger\" and not http.request.uri.path contains \"swagger.json\" and http.host ne \"swagger.eelkhair.net\" and http.host ne \"swagger.elkhair.tech\")"
+      "expression": "(http.request.uri.path contains \"/swagger\" and not http.request.uri.path contains \"swagger.json\" and http.host ne \"swagger.elkhair.tech\")"
+    }
+  ],
+  "redirect_rules": [
+    {
+      "zone": "eelkhair.net",
+      "description": "Permanent redirect eelkhair.net (all subdomains) to elkhair.tech",
+      "expression": "http.host eq \"eelkhair.net\" or ends_with(http.host, \".eelkhair.net\")",
+      "target_expression": "concat(\"https://\", regex_replace(http.host, \"eelkhair\\.net$\", \"elkhair.tech\"), http.request.uri.path)",
+      "status_code": 301,
+      "preserve_query_string": true
     }
   ]
 }

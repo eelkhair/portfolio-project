@@ -69,7 +69,6 @@ jobs:
       - name: Sync DNS CNAME records
         env:
           CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CF_ZONE_ID_NET: ${{ secrets.CLOUDFLARE_ZONE_ID }}
           CF_ZONE_ID_TECH: ${{ secrets.CLOUDFLARE_ZONE_ID_TECH }}
           CF_TUNNEL_ID: ${{ secrets.CLOUDFLARE_TUNNEL_ID }}
         run: |
@@ -77,7 +76,6 @@ jobs:
 
           # Zone mapping: root domain -> zone ID
           declare -A ZONE_MAP
-          ZONE_MAP["eelkhair.net"]="$CF_ZONE_ID_NET"
           ZONE_MAP["elkhair.tech"]="$CF_ZONE_ID_TECH"
 
           # Get all desired hostnames from config
@@ -164,7 +162,6 @@ jobs:
       - name: Sync WAF block rules
         env:
           CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CF_ZONE_ID_NET: ${{ secrets.CLOUDFLARE_ZONE_ID }}
           CF_ZONE_ID_TECH: ${{ secrets.CLOUDFLARE_ZONE_ID_TECH }}
         run: |
           # Read desired block rules from config
@@ -176,9 +173,7 @@ jobs:
             exit 0
           fi
 
-          # Sync WAF rules to both zones
           declare -A ZONE_MAP
-          ZONE_MAP["eelkhair.net"]="$CF_ZONE_ID_NET"
           ZONE_MAP["elkhair.tech"]="$CF_ZONE_ID_TECH"
 
           for ROOT_DOMAIN in "${!ZONE_MAP[@]}"; do
@@ -275,16 +270,114 @@ jobs:
           echo "WAF sync complete"
 
       # ──────────────────────────────────────────────────────────────────────
+      # Step 3b: Sync redirect rules (legacy zones → primary zone)
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Sync redirect rules
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ZONE_ID_NET: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+        run: |
+          REDIRECT_RULES=$(echo '${{ steps.config.outputs.config }}' | jq -c '.redirect_rules // []')
+          RULE_COUNT=$(echo "$REDIRECT_RULES" | jq length)
+
+          if [ "$RULE_COUNT" -eq 0 ]; then
+            echo "No redirect rules defined, skipping"
+            exit 0
+          fi
+
+          # Map redirect zones → zone IDs (extend if adding more legacy zones)
+          declare -A REDIRECT_ZONE_MAP
+          REDIRECT_ZONE_MAP["eelkhair.net"]="$CF_ZONE_ID_NET"
+
+          # Group rules by zone
+          ZONES=$(echo "$REDIRECT_RULES" | jq -r '[.[].zone] | unique | .[]')
+
+          for ZONE_DOMAIN in $ZONES; do
+            ZONE_ID="${REDIRECT_ZONE_MAP[$ZONE_DOMAIN]:-}"
+            if [ -z "$ZONE_ID" ]; then
+              echo "::warning::No zone ID configured for $ZONE_DOMAIN (expected REDIRECT_ZONE_MAP entry), skipping"
+              continue
+            fi
+
+            echo ""
+            echo "══════════════════════════════════════════════"
+            echo "Syncing redirect rules for $ZONE_DOMAIN"
+            echo "══════════════════════════════════════════════"
+
+            ZONE_RULES=$(echo "$REDIRECT_RULES" | jq -c --arg z "$ZONE_DOMAIN" '[.[] | select(.zone == $z)]')
+            ZONE_RULE_COUNT=$(echo "$ZONE_RULES" | jq length)
+
+            # Build CF-shaped rules from config
+            RULES_JSON=$(echo "$ZONE_RULES" | jq -c '[.[] | {
+              description: .description,
+              expression: .expression,
+              action: "redirect",
+              action_parameters: {
+                from_value: {
+                  target_url: { expression: .target_expression },
+                  status_code: (.status_code // 301),
+                  preserve_query_string: (.preserve_query_string // true)
+                }
+              }
+            }]')
+
+            # Find existing http_request_dynamic_redirect ruleset on this zone
+            RULESETS=$(curl -s \
+              "$CF_API_BASE/zones/$ZONE_ID/rulesets" \
+              -H "Authorization: Bearer $CF_API_TOKEN")
+            RULESET_ID=$(echo "$RULESETS" | jq -r \
+              '.result[] | select(.phase == "http_request_dynamic_redirect" and .kind == "zone") | .id')
+
+            if [ -z "$RULESET_ID" ] || [ "$RULESET_ID" = "null" ]; then
+              echo "Creating new redirect ruleset..."
+              BODY=$(jq -n --argjson rules "$RULES_JSON" \
+                '{name: "Portfolio redirect rules", kind: "zone", phase: "http_request_dynamic_redirect", rules: $rules}')
+              RESPONSE=$(curl -s -w "\n%{http_code}" \
+                -X POST \
+                "$CF_API_BASE/zones/$ZONE_ID/rulesets" \
+                -H "Authorization: Bearer $CF_API_TOKEN" \
+                -H "Content-Type: application/json" \
+                -d "$BODY")
+
+              HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+              if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+                echo "  Created ruleset with $ZONE_RULE_COUNT redirect rule(s)"
+              else
+                echo "::warning::Failed to create redirect ruleset for $ZONE_DOMAIN (HTTP $HTTP_CODE)"
+                echo "$RESPONSE" | sed '$d' | jq . 2>/dev/null || true
+              fi
+            else
+              echo "Found existing redirect ruleset: $RULESET_ID — replacing rules..."
+              BODY=$(jq -n --argjson rules "$RULES_JSON" '{rules: $rules}')
+              RESPONSE=$(curl -s -w "\n%{http_code}" \
+                -X PUT \
+                "$CF_API_BASE/zones/$ZONE_ID/rulesets/$RULESET_ID" \
+                -H "Authorization: Bearer $CF_API_TOKEN" \
+                -H "Content-Type: application/json" \
+                -d "$BODY")
+
+              HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+              if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+                echo "  Updated to $ZONE_RULE_COUNT redirect rule(s)"
+              else
+                echo "::warning::Failed to update redirect ruleset for $ZONE_DOMAIN (HTTP $HTTP_CODE)"
+                echo "$RESPONSE" | sed '$d' | jq . 2>/dev/null || true
+              fi
+            fi
+          done
+
+          echo ""
+          echo "Redirect sync complete"
+
+      # ──────────────────────────────────────────────────────────────────────
       # Step 4: Configure zone security settings (multi-zone)
       # ──────────────────────────────────────────────────────────────────────
       - name: Configure zone security settings
         env:
           CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CF_ZONE_ID_NET: ${{ secrets.CLOUDFLARE_ZONE_ID }}
           CF_ZONE_ID_TECH: ${{ secrets.CLOUDFLARE_ZONE_ID_TECH }}
         run: |
           declare -A ZONE_MAP
-          ZONE_MAP["eelkhair.net"]="$CF_ZONE_ID_NET"
           ZONE_MAP["elkhair.tech"]="$CF_ZONE_ID_TECH"
 
           for ROOT_DOMAIN in "${!ZONE_MAP[@]}"; do
