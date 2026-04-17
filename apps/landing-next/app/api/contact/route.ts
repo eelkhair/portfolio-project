@@ -1,8 +1,67 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
+// In-memory rate limit: one successful submit per IP per window.
+// Behind Cloudflare + tunnel, real client IP arrives as `cf-connecting-ip`;
+// `x-forwarded-for` is a comma-separated chain whose first entry is the client.
+// Process memory is per-container — deployments/restarts reset the map.
 const rateLimit = new Map<string, number>();
-const RATE_LIMIT_MS = 60_000;
+const RATE_LIMIT_MS = 30_000;
+
+/** Best-effort client IP extraction for rate-limit bucketing. */
+function clientIp(req: NextRequest): string {
+  const cf = req.headers.get("cf-connecting-ip");
+  if (cf) return cf.trim();
+  const xff = req.headers.get("x-forwarded-for");
+  if (xff) {
+    const first = xff.split(",")[0]?.trim();
+    if (first) return first;
+  }
+  const real = req.headers.get("x-real-ip");
+  if (real) return real.trim();
+  return "unknown";
+}
+
+/** Periodic sweep: drop entries older than 2× the rate-limit window. */
+function pruneRateLimit(now: number): void {
+  if (rateLimit.size < 100) return; // cheap threshold; avoid churn
+  const cutoff = now - RATE_LIMIT_MS * 2;
+  for (const [k, t] of rateLimit) {
+    if (t < cutoff) rateLimit.delete(k);
+  }
+}
+
+/**
+ * Resolve a single, stable client IP for rate-limiting.
+ *
+ * Order of preference:
+ *  1. `CF-Connecting-IP` — Cloudflare-set, always a single trusted IP.
+ *  2. First IP in `X-Forwarded-For` — picks the original client when chained
+ *     through multiple proxies. Using the raw comma-separated string as a key
+ *     was the previous bug: CF can rotate edge IPs inside the chain between
+ *     requests, changing the key and making the rate-limit state inconsistent.
+ *  3. `X-Real-IP` — generic proxy-set header.
+ *  4. `"unknown"` — last resort; all unknown callers share a bucket.
+ */
+function clientIp(req: NextRequest): string {
+  const cf = req.headers.get("cf-connecting-ip");
+  if (cf) return cf.trim();
+  const xff = req.headers.get("x-forwarded-for");
+  if (xff) {
+    const first = xff.split(",")[0]?.trim();
+    if (first) return first;
+  }
+  const real = req.headers.get("x-real-ip");
+  if (real) return real.trim();
+  return "unknown";
+}
+
+/** Prune entries older than the rate-limit window so the Map can't grow forever. */
+function pruneRateLimit(now: number): void {
+  for (const [ip, last] of rateLimit) {
+    if (now - last >= RATE_LIMIT_MS) rateLimit.delete(ip);
+  }
+}
 
 // Allowed origins that may POST to this endpoint from another domain.
 // The landing page itself calls it same-origin; the Angular admin and public apps
@@ -46,11 +105,13 @@ export async function OPTIONS(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const cors = corsHeaders(req.headers.get("origin"));
-  const ip = req.headers.get("x-forwarded-for") ?? "unknown";
+  const ip = clientIp(req);
   const now = Date.now();
+  pruneRateLimit(now);
   const lastSent = rateLimit.get(ip);
   if (lastSent && now - lastSent < RATE_LIMIT_MS) {
-    console.warn(`[Contact] Rate limited: ip=${ip}`);
+    const waitMs = RATE_LIMIT_MS - (now - lastSent);
+    console.warn(`[Contact] Rate limited: ip=${ip}, wait=${waitMs}ms`);
     return NextResponse.json(
       { error: "Please wait before sending another message." },
       { status: 429, headers: cors },
