@@ -1,10 +1,19 @@
+// Derive landing base from current hostname so the contact form posts same-zone
+// (jobs-dev.eelkhair.net → eelkhair.net/api/contact; jobs-dev.elkhair.tech →
+// elkhair.tech/api/contact). Avoids cross-zone cert mismatches and keeps CORS
+// identical to the document origin. Defaults to elkhair.tech for SSR/unknown hosts.
+const landingHost = typeof window !== 'undefined' ? window.location.hostname : '';
+const landingBaseDomain = landingHost.endsWith('.elkhair.tech') ? 'elkhair.tech'
+  : landingHost.endsWith('.eelkhair.net') ? 'eelkhair.net'
+  : 'elkhair.tech';
+
 export const environment = {
   production: false,
   envName: 'DEV',
   apiUrl: 'https://job-gateway-dev.eelkhair.net/api/',
   aiUrl: 'https://job-ai-v2-dev.eelkhair.net/',
   monolithUrl: 'https://job-monolith-dev.eelkhair.net/',
-  landingUrl: 'https://elkhair.tech/',
+  landingUrl: `https://${landingBaseDomain}/`,
   otel: 'https://otel.eelkhair.net/v1/traces',
   otelZipkin: 'https://otel.eelkhair.net/api/v2/spans',
   jaegerUrl: 'https://jaeger.eelkhair.net/trace/',
