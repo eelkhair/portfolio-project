@@ -1,0 +1,82 @@
+<div class="contact-page">
+  <div class="contact-card">
+    <div class="contact-logo-wrap">
+      <img src="logo.svg" alt="Job Board" class="contact-logo" />
+    </div>
+    <h1 class="contact-title">Get in <span class="accent">Touch</span></h1>
+    <p class="contact-sub">
+      Questions, feedback, opportunities, or want to talk about software
+      architecture, AI-enabled systems, or platform modernization? Send me a
+      message — I'd be glad to connect.
+    </p>
+
+    @if (success()) {
+      <p-message severity="success" text="Message sent! Thanks for reaching out — I'll get back to you soon." styleClass="w-full"></p-message>
+      <div class="success-actions">
+        <p-button
+          type="button"
+          label="Send another message"
+          icon="pi pi-pencil"
+          severity="secondary"
+          (onClick)="sendAnother()"
+        ></p-button>
+      </div>
+    } @else {
+      <form [formGroup]="form" (ngSubmit)="submit()" class="contact-form" novalidate>
+        @if (topError(); as msg) {
+          <p-message severity="error" [text]="msg" styleClass="w-full"></p-message>
+        }
+
+        <div class="field-row">
+          <div class="field">
+            <label>From</label>
+            <div class="readonly">{{ fromName() }}</div>
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <div class="readonly">{{ fromEmail() }}</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="subject">Subject<span class="req">*</span></label>
+          <input pInputText id="subject" type="text" formControlName="subject" maxlength="200" placeholder="What is your message about?" #subjectInput />
+          @if (form.controls.subject.invalid && form.controls.subject.touched) {
+            @if (form.controls.subject.errors?.['required']) {
+              <small class="err">Subject is required.</small>
+            } @else if (form.controls.subject.errors?.['maxlength']) {
+              <small class="err">Subject must be at most 200 characters.</small>
+            }
+          }
+        </div>
+
+        <div class="field">
+          <label for="message">Message<span class="req">*</span></label>
+          <textarea pTextarea id="message" formControlName="message" rows="8" maxlength="5000" placeholder="Share feedback, questions, or report an issue."></textarea>
+          @if (form.controls.message.invalid && form.controls.message.touched) {
+            @if (form.controls.message.errors?.['required']) {
+              <small class="err">Message is required.</small>
+            } @else if (form.controls.message.errors?.['minlength']) {
+              <small class="err">Message must be at least 10 characters.</small>
+            } @else if (form.controls.message.errors?.['maxlength']) {
+              <small class="err">Message must be at most 5000 characters.</small>
+            }
+          }
+        </div>
+
+        <div class="turnstile-wrap">
+          <div #turnstileHost></div>
+        </div>
+
+        <p-button
+          type="submit"
+          label="Send Message"
+          icon="pi pi-send"
+          [loading]="submitting()"
+          [disabled]="submitting() || !turnstileToken() || form.invalid"
+          styleClass="w-full"
+        ></p-button>
+      </form>
+    }
+  </div>
+</div>

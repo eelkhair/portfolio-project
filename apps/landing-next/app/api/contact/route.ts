@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
 const rateLimit = new Map<string, number>();
 const RATE_LIMIT_MS = 60_000;
@@ -96,28 +96,29 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid email address." }, { status: 400, headers: cors });
   }
 
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT),
-    secure: false,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
+  // Resend SDK (not SMTP) — matches the official Next.js example env var names:
+  // RESEND_API_KEY, EMAIL_FROM, CONTACT_EMAIL.
+  // EMAIL_FROM must be on a domain verified in the Resend dashboard.
+  const resendApiKey = process.env.RESEND_API_KEY;
+  const emailFrom = process.env.EMAIL_FROM;
+  const contactEmail = process.env.CONTACT_EMAIL;
+  if (!resendApiKey || !emailFrom || !contactEmail) {
+    console.error("[Contact] Missing env: RESEND_API_KEY/EMAIL_FROM/CONTACT_EMAIL");
+    return NextResponse.json(
+      { error: "Mail is not configured." },
+      { status: 500, headers: cors },
+    );
+  }
 
-  // `from` must be an address on a domain verified with the SMTP provider
-  // (for Resend: a record at your verified sending domain). `SMTP_USER` works
-  // for Exchange where the auth user IS the sender, but providers like Resend
-  // use a literal "resend" auth user — hence the dedicated MAIL_FROM fallback.
-  const fromAddress = process.env.MAIL_FROM ?? process.env.SMTP_USER;
+  const resend = new Resend(resendApiKey);
+  const resolvedSubject = subject?.trim() || `Portfolio Contact: ${name}`;
 
   try {
-    await transporter.sendMail({
-      from: fromAddress,
-      to: process.env.CONTACT_TO,
+    const { data, error } = await resend.emails.send({
+      from: emailFrom,
+      to: contactEmail,
       replyTo: email,
-      subject: subject?.trim() || `Portfolio Contact: ${name}`,
+      subject: resolvedSubject,
       text: `Name: ${name}\nEmail: ${email}\n\n${message}`,
       html: `
         <h3>New Contact Form Submission</h3>
@@ -129,11 +130,19 @@ export async function POST(req: NextRequest) {
       `,
     });
 
+    if (error) {
+      console.error("[Contact] Resend error: from=%s, to=%s, error=%j", email, contactEmail, error);
+      return NextResponse.json(
+        { error: "Failed to send message. Please try again later." },
+        { status: 502, headers: cors },
+      );
+    }
+
     rateLimit.set(ip, now);
-    console.log("[Contact] Email sent: from=%s, subject=%s", email, subject?.trim() || `Portfolio Contact: ${name}`);
-    return NextResponse.json({ success: true }, { headers: cors });
+    console.log("[Contact] Email sent: id=%s, from=%s, subject=%s", data?.id, email, resolvedSubject);
+    return NextResponse.json({ success: true, id: data?.id }, { headers: cors });
   } catch (err) {
-    console.error("[Contact] SMTP error: from=%s, to=%s, error=%s", email, process.env.CONTACT_TO, err);
+    console.error("[Contact] Resend exception: from=%s, to=%s, error=%s", email, contactEmail, err);
     return NextResponse.json(
       { error: "Failed to send message. Please try again later." },
       { status: 500, headers: cors },

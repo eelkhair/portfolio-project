@@ -1,0 +1,120 @@
+<section class="flex min-h-[80vh] items-start justify-center bg-slate-50 px-4 py-12 dark:bg-slate-900">
+  <div class="w-full max-w-xl rounded-2xl bg-white p-9 shadow-xl dark:bg-slate-800">
+    <div class="mb-5 flex items-center justify-center gap-3">
+      <img src="logo-icon.svg" alt="" class="h-12 w-12" />
+      <span class="text-3xl font-bold text-slate-900 dark:text-white">JobBoard</span>
+    </div>
+    <h1 class="mb-1 text-center text-2xl font-bold text-slate-900 dark:text-white">
+      Get in <span class="text-primary-600 dark:text-primary-400">Touch</span>
+    </h1>
+    <p class="mb-6 text-center text-sm text-slate-500 dark:text-slate-400">
+      Questions, feedback, opportunities, or want to talk about software
+      architecture, AI-enabled systems, or platform modernization?
+      Send me a message &mdash; I'd be glad to connect.
+    </p>
+
+    @if (success()) {
+      <div class="flex flex-col items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-6 text-center text-sm text-green-800 dark:border-green-900 dark:bg-green-900/20 dark:text-green-300">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+          <polyline points="22 4 12 14.01 9 11.01" />
+        </svg>
+        <h2 class="text-base font-semibold">Message sent!</h2>
+        <p>Thanks for reaching out. I'll get back to you soon.</p>
+      </div>
+      <div class="mt-5 flex justify-center">
+        <button
+          type="button"
+          (click)="sendAnother()"
+          class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
+        >
+          Send another message
+        </button>
+      </div>
+    } @else {
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="space-y-4">
+        @if (topError(); as msg) {
+          <div class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-900/20 dark:text-red-300">
+            {{ msg }}
+          </div>
+        }
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">From</label>
+            <div class="truncate rounded-lg border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-700 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200">
+              {{ fromName() }}
+            </div>
+          </div>
+          <div>
+            <label class="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">Email</label>
+            <div class="truncate rounded-lg border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-700 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200">
+              {{ fromEmail() }}
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label for="subject" class="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">
+            Subject<span class="ml-0.5 text-red-500">*</span>
+          </label>
+          <input
+            id="subject"
+            #subjectInput
+            type="text"
+            maxlength="200"
+            formControlName="subject"
+            placeholder="What is your message about?"
+            class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
+          />
+          @if (form.controls.subject.invalid && form.controls.subject.touched) {
+            @if (form.controls.subject.errors?.['required']) {
+              <p class="mt-1 text-xs text-red-600">Subject is required.</p>
+            } @else if (form.controls.subject.errors?.['maxlength']) {
+              <p class="mt-1 text-xs text-red-600">Subject must be at most 200 characters.</p>
+            }
+          }
+        </div>
+
+        <div>
+          <label for="message" class="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">
+            Message<span class="ml-0.5 text-red-500">*</span>
+          </label>
+          <textarea
+            id="message"
+            rows="8"
+            maxlength="5000"
+            formControlName="message"
+            placeholder="Share feedback, questions, or report an issue."
+            class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
+          ></textarea>
+          @if (form.controls.message.invalid && form.controls.message.touched) {
+            @if (form.controls.message.errors?.['required']) {
+              <p class="mt-1 text-xs text-red-600">Message is required.</p>
+            } @else if (form.controls.message.errors?.['minlength']) {
+              <p class="mt-1 text-xs text-red-600">Message must be at least 10 characters.</p>
+            } @else if (form.controls.message.errors?.['maxlength']) {
+              <p class="mt-1 text-xs text-red-600">Message must be at most 5000 characters.</p>
+            }
+          }
+        </div>
+
+        <div class="flex justify-center py-2">
+          <div #turnstileHost></div>
+        </div>
+
+        <button
+          type="submit"
+          [disabled]="submitting() || !turnstileToken() || form.invalid"
+          class="flex w-full items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 dark:disabled:bg-slate-600 dark:disabled:text-slate-400"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+          @if (submitting()) { Sending&hellip; } @else { Send Message }
+        </button>
+      </form>
+    }
+  </div>
+</section>
