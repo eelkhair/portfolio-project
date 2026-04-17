@@ -3,8 +3,9 @@
  *
  * The signup URL is derived from the redirect_uri query parameter that Keycloak
  * receives when a client (angular-admin or angular-public) initiates OIDC auth.
- * This means one script works across every client + realm combination without
- * per-environment configuration.
+ * One script works across every client + realm combination without per-environment
+ * configuration: whatever origin the user came from is the origin they'll be sent
+ * back to for /signup.
  */
 (function () {
   function getSignupUrl() {

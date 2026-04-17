@@ -75,10 +75,16 @@ var keycloak = builder.AddKeycloak("keycloak", 9999, adminPassword: keycloakPass
     .WithDataVolume()
     .WithLifetime(ContainerLifetime.Persistent)
     .WithRealmImport("./KeycloakRealm")
-    // Mount the custom "jobboard" theme (login + email) from user-api so Keycloak picks it up.
+    // Mount the custom "jobboard" email theme (email templates only).
     .WithBindMount(
         "../../services/micro-services/user-api/UserApi.Service/EmailTemplates/jobboard",
         "/opt/keycloak/themes/jobboard",
+        isReadOnly: true)
+    // Mount the custom "job-board" login theme — same directory that is baked into the
+    // prod Keycloak image via infrastructure/keycloak/Dockerfile, so local dev matches prod.
+    .WithBindMount(
+        "../../infrastructure/keycloak/themes/job-board",
+        "/opt/keycloak/themes/job-board",
         isReadOnly: true)
     .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
 
