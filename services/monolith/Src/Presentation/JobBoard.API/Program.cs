@@ -11,8 +11,10 @@ using JobBoard.Infrastructure.BlobStorage;
 using JobBoard.Infrastructure.Configuration;
 using JobBoard.Infrastructure.Diagnostics;
 using JobBoard.Infrastructure.HttpClients;
+using JobBoard.Infrastructure.Keycloak;
 using JobBoard.Infrastructure.Messaging;
 using JobBoard.Infrastructure.Outbox;
+using JobBoard.Infrastructure.Turnstile;
 using JobBoard.Infrastructure.Persistence;
 using JobBoard.Infrastructure.Persistence.Context;
 using JobBoard.Infrastructure.RedisConfig;
@@ -62,6 +64,8 @@ builder.Services
     .AddAuthorizationService(builder.Configuration)
     .AddSmtpServices(builder.Configuration)
     .AddBlobStorageServices(builder.Configuration)
+    .AddKeycloakAdminClient()
+    .AddTurnstileVerifier()
     .AddConfiguredSwagger(builder.Configuration)
     .AddDiagnosticsServices(builder.Configuration, "monolith-api")
     .AddSignalR();

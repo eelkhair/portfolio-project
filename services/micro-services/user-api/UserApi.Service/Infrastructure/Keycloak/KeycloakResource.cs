@@ -73,7 +73,8 @@ public class KeycloakResource(HttpClient http, string adminApiBaseUrl) : IKeyclo
 
     public async Task<ApiResponse<KeycloakUser>> CreateUserAsync(
         string email, string firstName, string lastName,
-        Dictionary<string, List<string>>? attributes, CancellationToken ct)
+        Dictionary<string, List<string>>? attributes, CancellationToken ct,
+        string? password = null, string? username = null)
     {
         try
         {
@@ -97,10 +98,16 @@ public class KeycloakResource(HttpClient http, string adminApiBaseUrl) : IKeyclo
                 return OkResult(existingUser);
             }
 
-            // Create new user
+            // Resolve Keycloak username: caller-supplied (self-signup) or email (legacy).
+            var resolvedUsername = string.IsNullOrWhiteSpace(username) ? email : username.Trim();
+
+            // Create new user. When a password is supplied by the caller (self-signup),
+            // it is set as permanent so the user can log in immediately.
+            // Otherwise, a random temporary password is generated (legacy provisioning path).
+            var isUserSuppliedPassword = !string.IsNullOrWhiteSpace(password);
             var newUser = new KeycloakUser
             {
-                Username = email,
+                Username = resolvedUsername,
                 Email = email,
                 FirstName = firstName,
                 LastName = lastName,
@@ -108,7 +115,12 @@ public class KeycloakResource(HttpClient http, string adminApiBaseUrl) : IKeyclo
                 EmailVerified = false,
                 Credentials = new List<KeycloakCredential>
                 {
-                    new() { Type = "password", Value = Guid.NewGuid().ToString("N")[..16], Temporary = true }
+                    new()
+                    {
+                        Type = "password",
+                        Value = isUserSuppliedPassword ? password! : Guid.NewGuid().ToString("N")[..16],
+                        Temporary = !isUserSuppliedPassword
+                    }
                 },
                 Attributes = attributes
             };

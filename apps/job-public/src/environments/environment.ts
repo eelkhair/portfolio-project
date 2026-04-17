@@ -20,4 +20,6 @@ export const environment = {
     redirectUrl: `https://jobs.${baseDomain}`,
     clientId: 'angular-public',
   },
+  // Replaced at build time via GitHub Actions; see deploy workflow. Falls back to Turnstile test key.
+  turnstileSiteKey: '${TURNSTILE_SITE_KEY}',
 };

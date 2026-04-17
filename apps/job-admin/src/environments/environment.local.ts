@@ -17,4 +17,6 @@ export const environment = {
     redirectUrl: 'http://localhost:4200',
     clientId: 'angular-admin',
   },
+  // Cloudflare Turnstile test site key — always passes verification locally.
+  turnstileSiteKey: '1x00000000000000000000AA',
 };

@@ -75,6 +75,11 @@ var keycloak = builder.AddKeycloak("keycloak", 9999, adminPassword: keycloakPass
     .WithDataVolume()
     .WithLifetime(ContainerLifetime.Persistent)
     .WithRealmImport("./KeycloakRealm")
+    // Mount the custom "jobboard" theme (login + email) from user-api so Keycloak picks it up.
+    .WithBindMount(
+        "../../services/micro-services/user-api/UserApi.Service/EmailTemplates/jobboard",
+        "/opt/keycloak/themes/jobboard",
+        isReadOnly: true)
     .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
 
 var jaeger = builder.AddContainer("jaeger", "jaegertracing/all-in-one", "1.64.0")
@@ -230,6 +235,10 @@ var monolith = builder.AddProject<Projects.JobBoard_API>("monolith-api")
     .WithEnvironment("Keycloak__Authority", keycloakAuthority)
     .WithEnvironment("Keycloak__Audience", keycloakAudience)
     .WithEnvironment("Keycloak__SwaggerClientId", keycloakSwaggerClientId)
+    .WithEnvironment("Keycloak__TokenUrl", keycloakTokenUrl)
+    .WithEnvironment("Keycloak__ServiceClientId", keycloakServiceClientId)
+    .WithEnvironment("Keycloak__ServiceClientSecret", keycloakServiceClientSecret)
+    .WithEnvironment("Turnstile__SecretKey", "1x0000000000000000000000000000000AA")
     .WaitFor(seedRunner)
     .WaitFor(rabbitMq)
     .WaitFor(keycloak);
@@ -308,6 +317,7 @@ if (useDapr)
         .WithEnvironment("ConnectionStrings__AdminDbContext", microSqlConn)
         .WithEnvironment("Keycloak__Authority", keycloakAuthority)
         .WithEnvironment("Keycloak__Audience", keycloakAudience)
+        .WithEnvironment("Turnstile__SecretKey", "1x0000000000000000000000000000000AA")
         .WithDaprSidecar(DaprOptions("admin-api"))
         .WaitFor(seedRunner)
         .WaitFor(rabbitMq)

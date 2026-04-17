@@ -2489,7 +2489,7 @@
     "envelopeFrom": "",
     "ssl": "false"
   },
-  "loginTheme": "",
+  "loginTheme": "jobboard",
   "accountTheme": "",
   "adminTheme": "",
   "emailTheme": "jobboard",

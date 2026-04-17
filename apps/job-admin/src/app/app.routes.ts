@@ -2,6 +2,8 @@ import { Routes } from '@angular/router';
 import { AutoLoginPartialRoutesGuard } from 'angular-auth-oidc-client';
 import {AuthCallbackComponent} from './shared/auth-callback/auth-callback';
 export const routes: Routes = [
+  // Public (anonymous) routes — must be registered before the guarded block.
+  { path: 'signup', title: 'Sign Up', loadComponent: () => import('./features/auth/signup/signup').then(m => m.Signup) },
   {
     path: '',
     canActivate: [AutoLoginPartialRoutesGuard],

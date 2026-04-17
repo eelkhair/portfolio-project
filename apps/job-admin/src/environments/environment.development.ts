@@ -17,4 +17,6 @@ export const environment = {
     redirectUrl: 'https://job-admin-dev.eelkhair.net',
     clientId: 'angular-admin',
   },
+  // Real Cloudflare Turnstile site key — fill from the Cloudflare dashboard for dev.
+  turnstileSiteKey: '1x00000000000000000000AA',
 };

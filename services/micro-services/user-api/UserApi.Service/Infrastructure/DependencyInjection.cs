@@ -85,6 +85,7 @@ public static class DependencyInjection
 
         services.AddHttpClient("keycloak");
         services.AddScoped<IKeycloakCommandService, KeycloakCommandService>();
+        services.AddScoped<ISignupCommandService, SignupCommandService>();
         services.AddSingleton<IKeycloakTokenService, KeycloakTokenService>();
         services.AddTransient<IKeycloakFactory, DefaultKeycloakFactory>();
         services.AddHostedService<KeycloakTokenStartupService>();

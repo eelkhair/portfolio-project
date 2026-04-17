@@ -19,6 +19,12 @@
       <app-footer></app-footer>
     </footer>
   </div>
+} @else {
+  <!-- Chromeless shell for anonymous routes (e.g. /signup) — no header/nav/footer since
+       the visitor isn't authenticated yet and the guarded shell would require a login round-trip. -->
+  <div class="min-h-dvh bg-gray-100 dark:bg-surface-700">
+    <router-outlet></router-outlet>
+  </div>
 }
 <p-toast position="bottom-right"/>
 <app-getting-started />

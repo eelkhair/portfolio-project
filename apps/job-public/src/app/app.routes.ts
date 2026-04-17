@@ -4,6 +4,7 @@ import { AuthCallbackComponent } from './shared/auth-callback/auth-callback';
 
 export const routes: Routes = [
   { path: '', title: 'Home', loadComponent: () => import('./features/home/home/home').then((m) => m.Home) },
+  { path: 'signup', title: 'Sign Up', loadComponent: () => import('./features/auth/signup/signup').then((m) => m.Signup) },
   { path: 'jobs', title: 'Jobs', loadComponent: () => import('./features/jobs/jobs/jobs').then((m) => m.Jobs) },
   {
     path: 'jobs/:id',

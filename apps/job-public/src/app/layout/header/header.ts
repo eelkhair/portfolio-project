@@ -110,6 +110,12 @@ import { environment } from '../../../environments/environment';
               }
             </div>
           } @else {
+            <a
+              routerLink="/signup"
+              class="text-sm font-medium text-slate-300 transition-colors hover:text-white"
+            >
+              Sign Up
+            </a>
             <button
               (click)="account.login()"
               class="rounded-lg bg-primary-600 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-primary-700"

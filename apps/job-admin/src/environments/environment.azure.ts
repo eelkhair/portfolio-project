@@ -18,4 +18,6 @@ export const environment = {
     redirectUrl: '${JOB_ADMIN_URL}',
     clientId: 'angular-admin',
   },
+  // Replaced at build time via GitHub Actions; see deploy workflows.
+  turnstileSiteKey: '${TURNSTILE_SITE_KEY}',
 };

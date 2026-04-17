@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using AdminApi.Core;
+using AdminApi.Infrastructure.Turnstile;
 using Elkhair.Common.Observability;
 using Elkhair.Dev.Common.Dapr;
 using FastEndpoints;
@@ -24,6 +25,9 @@ public static class DependencyInjection
         services.AddSignalR();
         services.AddHttpContextAccessor();
         services.AddAdminApiCoreServices();
+
+        // Cloudflare Turnstile (captcha) — typed HttpClient + verifier service
+        services.AddHttpClient<ITurnstileVerifier, TurnstileVerifier>();
 
         services.AddFastEndpoints()
             .SwaggerDocument(o =>
