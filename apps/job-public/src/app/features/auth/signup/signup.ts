@@ -13,6 +13,7 @@ import {
   Component,
   ElementRef,
   OnDestroy,
+  afterNextRender,
   inject,
   signal,
   viewChild,
@@ -65,6 +66,8 @@ export class Signup implements AfterViewInit, OnDestroy {
 
   private readonly turnstileHost =
     viewChild<ElementRef<HTMLDivElement>>('turnstileHost');
+  private readonly usernameInput =
+    viewChild<ElementRef<HTMLInputElement>>('usernameInput');
   private turnstileWidgetId: string | null = null;
 
   protected readonly form = new FormGroup(
@@ -109,6 +112,22 @@ export class Signup implements AfterViewInit, OnDestroy {
   );
   protected readonly topError = signal<string | undefined>(undefined);
   protected readonly turnstileToken = signal<string>('');
+
+  constructor() {
+    // Focus the username input on mount. We do this in afterNextRender so it runs
+    // after Angular's initial paint + hydration, AND schedule a fallback via
+    // setTimeout so we beat Angular Router's post-navigation focus reset on SPA
+    // navigation (e.g. clicking "Sign Up" in the header). HTML autofocus handles
+    // direct page loads; these handle SPA nav.
+    afterNextRender(() => {
+      const focusUsername = () => this.usernameInput()?.nativeElement.focus();
+      focusUsername();
+      // Belt-and-suspenders: re-focus after the task queue drains in case the
+      // router or another effect steals focus during hydration.
+      setTimeout(focusUsername, 0);
+      setTimeout(focusUsername, 100);
+    });
+  }
 
   ngAfterViewInit(): void {
     if (typeof window === 'undefined') return; // SSR guard

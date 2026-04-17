@@ -18,7 +18,7 @@
 
         <div class="field">
           <label for="username">Username<span class="req">*</span></label>
-          <input pInputText id="username" type="text" autocomplete="username" formControlName="username" placeholder="e.g. jane_doe" />
+          <input pInputText id="username" type="text" autocomplete="username" autofocus formControlName="username" placeholder="e.g. jane_doe" #usernameInput />
           @if (form.controls.username.invalid && form.controls.username.touched) {
             @if (form.controls.username.errors?.['required']) {
               <small class="err">Username is required.</small>

@@ -83,6 +83,8 @@ export class Signup implements AfterViewInit, OnDestroy {
 
   private readonly turnstileHost =
     viewChild<ElementRef<HTMLDivElement>>('turnstileHost');
+  private readonly usernameInput =
+    viewChild<ElementRef<HTMLInputElement>>('usernameInput');
   private turnstileWidgetId: string | null = null;
 
   protected readonly form = new FormGroup(
@@ -130,6 +132,9 @@ export class Signup implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.loadTurnstile();
+    // Autofocus username field on entry (next tick so PrimeNG's Password wrapper
+    // has finished hydrating and won't grab focus back).
+    queueMicrotask(() => this.usernameInput()?.nativeElement.focus());
   }
 
   ngOnDestroy(): void {

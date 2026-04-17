@@ -1,15 +1,390 @@
-/* Replace realm name text with logo */
-#kc-header-wrapper {
-  font-size: 0 !important;
-  padding: 20px 0 !important;
+/* ============================================================================
+   JobBoard Keycloak login theme overrides
+   Parent: keycloak.v2
+
+   Works on BOTH PatternFly generations because local (Keycloak 26) uses PF v5
+   selectors (.pf-v5-c-*) while prod (Keycloak 24) uses PF 4 (.pf-c-*, .card-pf).
+   Dark mode detection matches both: PF5's html.pf-v5-theme-dark class AND the
+   prefers-color-scheme media query.
+
+   Scheme: light slate + indigo accent — matches both apps' signup cards.
+   ============================================================================ */
+
+/* ---------- Palette: light (default) ---------- */
+:root {
+  --jb-bg:              #f8fafc; /* slate-50 */
+  --jb-card-bg:         #ffffff;
+  --jb-card-border:     #e2e8f0; /* slate-200 */
+  --jb-text:            #0f172a; /* slate-900 */
+  --jb-text-heading:    #0f172a;
+  --jb-text-muted:      #64748b; /* slate-500 */
+  --jb-input-bg:        #ffffff;
+  --jb-input-border:    #cbd5e1; /* slate-300 */
+
+  /* Indigo — shared primary across both Angular apps */
+  --jb-accent:          #4f46e5; /* indigo-600 */
+  --jb-accent-hover:    #4338ca; /* indigo-700 */
+  --jb-accent-soft:     #6366f1; /* indigo-500 */
+  --jb-accent-contrast: #ffffff;
+  --jb-link:            #4f46e5;
+
+  --jb-danger-bg:       #fef2f2;
+  --jb-danger-border:   #fecaca;
+  --jb-danger-text:     #991b1b;
+
+  /* PatternFly global overrides — ripple accent to components we don't selector-target */
+  --pf-global--primary-color--100:        var(--jb-accent);
+  --pf-global--primary-color--200:        var(--jb-accent-hover);
+  --pf-global--link--Color:               var(--jb-link);
+  --pf-global--link--Color--hover:        var(--jb-accent-hover);
+  --pf-global--BackgroundColor--100:      var(--jb-card-bg);
+  --pf-global--Color--100:                var(--jb-text);
+  --pf-global--BorderColor--100:          var(--jb-card-border);
+
+  /* PatternFly v5 equivalents (Keycloak 26+) */
+  --pf-v5-global--primary-color--100:     var(--jb-accent);
+  --pf-v5-global--primary-color--200:     var(--jb-accent-hover);
+  --pf-v5-global--link--Color:            var(--jb-link);
+  --pf-v5-global--BackgroundColor--100:   var(--jb-card-bg);
+  --pf-v5-global--Color--100:             var(--jb-text);
 }
 
-#kc-header-wrapper::before {
+/* ---------- Palette: dark ---------- */
+/* PF v5: Keycloak 26 sets `pf-v5-theme-dark` on <html> based on OS/prefer-color-scheme. */
+html.pf-v5-theme-dark {
+  --jb-bg:            #0f172a; /* slate-900 */
+  --jb-card-bg:       #1e293b; /* slate-800 */
+  --jb-card-border:   #334155; /* slate-700 */
+  --jb-text:          #f1f5f9; /* slate-100 */
+  --jb-text-heading:  #ffffff;
+  --jb-text-muted:    #94a3b8; /* slate-400 */
+  --jb-input-bg:      #0f172a;
+  --jb-input-border:  #334155;
+
+  --jb-accent:        #6366f1; /* indigo-500 — slightly lighter on dark */
+  --jb-accent-hover:  #4f46e5;
+  --jb-accent-soft:   #818cf8;
+  --jb-link:          #818cf8; /* indigo-400 */
+
+  --jb-danger-bg:     rgba(127, 29, 29, 0.25);
+  --jb-danger-border: #7f1d1d;
+  --jb-danger-text:   #fecaca;
+}
+
+/* PF 4 (Keycloak 24, prod): no theme class, rely on prefers-color-scheme */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --jb-bg:            #0f172a;
+    --jb-card-bg:       #1e293b;
+    --jb-card-border:   #334155;
+    --jb-text:          #f1f5f9;
+    --jb-text-heading:  #ffffff;
+    --jb-text-muted:    #94a3b8;
+    --jb-input-bg:      #0f172a;
+    --jb-input-border:  #334155;
+    --jb-accent:        #6366f1;
+    --jb-accent-hover:  #4f46e5;
+    --jb-accent-soft:   #818cf8;
+    --jb-link:          #818cf8;
+    --jb-danger-bg:     rgba(127, 29, 29, 0.25);
+    --jb-danger-border: #7f1d1d;
+    --jb-danger-text:   #fecaca;
+  }
+}
+
+/* ---------- Hide PatternFly's brand header (we're putting the logo inside the card) ---------- */
+/* IMPORTANT: do NOT hide .pf-v5-c-login__main-header — that's the wrapper for
+   #kc-page-title ("Sign in to your account"), not the brand area. Brand is .pf-v5-c-login__header. */
+/* PF 4 */
+.login-pf-page-header,
+#kc-header,
+#kc-header-wrapper,
+/* PF 5 */
+.pf-v5-c-login__header {
+  display: none !important;
+}
+
+/* ---------- Page background + centered card layout ---------- */
+/* Gradient matches apps/job-admin/.../signup.css exactly:
+   blue #3b82f6 at top-left corner, emerald #10b981 at bottom-right. */
+body.login-pf,
+body#keycloak-bg,
+.login-pf-page,
+.pf-v5-c-login {
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(59, 130, 246, 0.15), transparent 60%),
+    radial-gradient(1200px 600px at 100% 110%, rgba(16, 185, 129, 0.12), transparent 60%),
+    var(--jb-bg) !important;
+  color: var(--jb-text);
+  min-height: 100vh;
+}
+.login-pf body {
+  background: transparent;
+}
+
+/* Center the card horizontally + vertically.
+   PF5 renders a .pf-v5-c-login > .pf-v5-c-login__container layout that defaults
+   to a two-column split; flex-centering flattens it to a centered single column.
+   PF4 puts the card inside .login-pf-page-content. */
+body.login-pf,
+body#keycloak-bg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.pf-v5-c-login,
+.pf-v5-c-login__container,
+.login-pf-page,
+.login-pf-page-content {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 1.5rem !important;
+}
+
+/* ---------- Login card ----------
+   Dimensions and shadow match apps/job-admin/.../signup.css .signup-card exactly:
+   max-width: 480px; padding: 2.25rem 2rem; border-radius: 14px;
+   box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.2);
+   No accent stripe — neither signup page has one. */
+.card-pf,
+.pf-v5-c-login__main {
+  background: var(--jb-card-bg) !important;
+  border: none;
+  border-radius: 14px !important;
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.2);
+  padding: 2.25rem 2rem !important;
+  width: 100% !important;
+  max-width: 480px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  position: relative;
+}
+
+html.pf-v5-theme-dark .card-pf,
+html.pf-v5-theme-dark .pf-v5-c-login__main {
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+}
+@media (prefers-color-scheme: dark) {
+  .card-pf,
+  .pf-v5-c-login__main {
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* Remove the PatternFly accent stripe (::before) — signup cards don't have it. */
+.card-pf::before,
+.pf-v5-c-login__main::before {
+  display: none !important;
+  background: transparent !important;
+}
+
+/* ---------- Logo: centered above the title, height 3.5rem like signup cards ----------
+   PF4: background-image on .card-pf with padding-top to make room.
+   PF5: ::after on .pf-v5-c-login__main (since card-pf doesn't exist in PF5). */
+.card-pf {
+  background-image: url("../img/logo.svg");
+  background-repeat: no-repeat;
+  background-position: center 2.25rem;
+  background-size: auto 3.5rem;
+  padding-top: 7rem !important;
+}
+.pf-v5-c-login__main {
+  padding-top: 7rem !important;
+}
+.pf-v5-c-login__main::after {
   content: "";
-  display: block;
-  width: 200px;
-  height: 60px;
-  margin: 0 auto;
+  position: absolute;
+  top: 2.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12rem;
+  height: 3.5rem;
   background: url("../img/logo.svg") no-repeat center center;
   background-size: contain;
+  pointer-events: none;
+}
+
+/* Dark mode: invert the logo so its dark text fill reads on a dark card */
+html.pf-v5-theme-dark .pf-v5-c-login__main::after {
+  filter: invert(1) hue-rotate(180deg);
+}
+@media (prefers-color-scheme: dark) {
+  .card-pf {
+    background-image: none;
+  }
+  .card-pf::after {
+    content: "";
+    position: absolute;
+    top: 2.25rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12rem;
+    height: 3.5rem;
+    background: url("../img/logo.svg") no-repeat center center;
+    background-size: contain;
+    filter: invert(1) hue-rotate(180deg);
+    pointer-events: none;
+  }
+}
+
+/* ---------- Typography (matches .signup-title exactly: 1.6rem, 600, centered) ---------- */
+#kc-page-title {
+  color: var(--jb-text-heading);
+  font-weight: 600;
+  font-size: 1.6rem;
+  margin: 0 0 1.5rem;
+  text-align: center;
+}
+.pf-c-form__label, .pf-v5-c-form__label, label {
+  color: var(--jb-text);
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+.pf-c-form__helper-text, .pf-v5-c-form__helper-text {
+  color: var(--jb-text-muted);
+}
+
+/* Form spacing — mirrors signup form's gap: 1rem between fields, 0.375rem within a field */
+#kc-form-login .pf-c-form,
+#kc-form-login .pf-v5-c-form,
+#kc-form-login > form,
+#kc-form-login {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.pf-c-form__group, .pf-v5-c-form__group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+/* ---------- Inputs ---------- */
+.pf-c-form-control,
+.pf-v5-c-form-control,
+#kc-form-login input[type="text"],
+#kc-form-login input[type="password"],
+#kc-form-login input[type="email"] {
+  background: var(--jb-input-bg) !important;
+  border: 1px solid var(--jb-input-border) !important;
+  color: var(--jb-text) !important;
+  border-radius: 8px !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.pf-c-form-control:focus,
+.pf-v5-c-form-control:focus,
+#kc-form-login input:focus {
+  border-color: var(--jb-accent) !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+  outline: none;
+}
+.pf-c-form-control::placeholder,
+.pf-v5-c-form-control::placeholder,
+#kc-form-login input::placeholder {
+  color: var(--jb-text-muted);
+}
+
+/* Chrome/Edge autofill — keep bg + text intact */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--jb-text) !important;
+  -webkit-box-shadow: 0 0 0 1000px var(--jb-input-bg) inset !important;
+  caret-color: var(--jb-text);
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+/* ---------- Password show/hide toggle ---------- */
+.pf-c-input-group .pf-c-button.pf-m-control,
+.pf-v5-c-input-group .pf-v5-c-button.pf-m-control,
+button[aria-label^="Show password"],
+button[aria-label^="Hide password"] {
+  background: transparent !important;
+  border: 1px solid var(--jb-input-border) !important;
+  border-left: none !important;
+  color: var(--jb-text-muted) !important;
+}
+.pf-c-input-group .pf-c-button.pf-m-control:hover,
+.pf-v5-c-input-group .pf-v5-c-button.pf-m-control:hover,
+button[aria-label^="Show password"]:hover,
+button[aria-label^="Hide password"]:hover {
+  color: var(--jb-accent) !important;
+  background: rgba(99, 102, 241, 0.06) !important;
+}
+
+/* ---------- Primary button ---------- */
+#kc-login,
+.pf-c-button.pf-m-primary,
+.pf-v5-c-button.pf-m-primary {
+  background: var(--jb-accent) !important;
+  border-color: var(--jb-accent) !important;
+  color: var(--jb-accent-contrast) !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  padding: 0.65rem 1rem !important;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+}
+#kc-login:hover,
+.pf-c-button.pf-m-primary:hover,
+.pf-v5-c-button.pf-m-primary:hover {
+  background: var(--jb-accent-hover) !important;
+  border-color: var(--jb-accent-hover) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -6px rgba(99, 102, 241, 0.5);
+}
+#kc-login:focus,
+.pf-c-button.pf-m-primary:focus,
+.pf-v5-c-button.pf-m-primary:focus {
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.35) !important;
+  outline: none;
+}
+
+/* ---------- Links ---------- */
+a {
+  color: var(--jb-link);
+}
+a:hover, a:focus {
+  color: var(--jb-accent-hover);
+  text-decoration: underline;
+}
+#kc-registration-container a,
+#kc-info-wrapper a,
+#jobboard-signup-link a {
+  color: var(--jb-link);
+  font-weight: 500;
+}
+
+/* ---------- Remember me checkbox ---------- */
+#kc-form-options input[type="checkbox"] {
+  accent-color: var(--jb-accent);
+  width: 1rem;
+  height: 1rem;
+}
+#kc-form-options label {
+  color: var(--jb-text-muted);
+  font-weight: 400;
+}
+
+/* ---------- Alerts ---------- */
+.pf-c-alert.pf-m-danger,
+.pf-v5-c-alert.pf-m-danger,
+.alert.alert-error,
+#kc-content .alert-error {
+  background: var(--jb-danger-bg) !important;
+  border: 1px solid var(--jb-danger-border) !important;
+  color: var(--jb-danger-text) !important;
+  border-radius: 8px !important;
+}
+.pf-c-alert.pf-m-danger .pf-c-alert__title,
+.pf-v5-c-alert.pf-m-danger .pf-v5-c-alert__title,
+.alert.alert-error .kc-feedback-text {
+  color: var(--jb-danger-text) !important;
 }

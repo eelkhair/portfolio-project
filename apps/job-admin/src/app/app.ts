@@ -7,6 +7,7 @@ import {AccountService} from './core/services/account.service';
 import {ToastModule} from 'primeng/toast';
 import {RealtimeNotificationsService} from './core/services/realtime-notifications.service';
 import {AiRealtimeService} from './core/services/ai-realtime.service';
+import {ThemeService} from './core/services/theme.service';
 import {AiChat} from './shared/ai-chat/ai-chat';
 import {DebugSidebar} from './shared/debug-sidebar/debug-sidebar';
 import {OidcSecurityService} from 'angular-auth-oidc-client';
@@ -36,6 +37,9 @@ export class App {
   destroyRef = inject(DestroyRef);
   protected rt = inject(RealtimeNotificationsService);
   protected aiRt = inject(AiRealtimeService);
+  // Force ThemeService to initialize at app root so the .dark class is applied
+  // even on anonymous routes (like /signup) where the header/nav aren't rendered.
+  protected theme = inject(ThemeService);
 
   private signalRStarted = false;
   constructor() {
