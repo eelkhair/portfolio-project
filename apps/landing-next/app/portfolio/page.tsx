@@ -14,10 +14,10 @@ export const metadata: Metadata = {
 const portfolioNavLinks = [
   { href: "/", label: "About Me" },
   { href: "#portfolio", label: "Project" },
+  { href: "#services", label: "Live Demo" },
   { href: "#explore", label: "Explore" },
   { href: "#architecture", label: "System Design" },
   { href: "#screenshots", label: "Screenshots" },
-  { href: "#services", label: "Live Demo" },
 ];
 
 export default function PortfolioPage() {
@@ -50,6 +50,42 @@ export default function PortfolioPage() {
             <h3 className="mb-2">Tech Stack</h3>
             <div className="skill-tags mb-2">
               {techStack.map((t) => <span className="skill-tag" key={t}>{t}</span>)}
+            </div>
+          </div>
+        </section>
+
+        {/* Live Services */}
+        <section id="services" className="section-alt" aria-labelledby="services-heading">
+          <div className="container">
+            <p className="section-title">Live Demo</p>
+            <h2 id="services-heading">Running Services</h2>
+            <p className="section-text mb-3">
+              All services are running on a self-hosted Proxmox homelab, exposed via Cloudflare Tunnel.
+            </p>
+            <div className="coming-soon-banner" role="status">
+              <span className="coming-soon-icon" aria-hidden="true">{"\u2728"}</span>
+              <div>
+                <div className="coming-soon-title">The demo is live — register and try it out</div>
+                <div className="coming-soon-desc">
+                  Create an account on the{" "}
+                  <a href="https://job-admin.elkhair.tech/signup" target="_blank" rel="noopener noreferrer" className="service-register-link">Admin app</a>
+                  {" "}to post jobs and explore the admin experience, or on the{" "}
+                  <a href="https://jobs.elkhair.tech/signup" target="_blank" rel="noopener noreferrer" className="service-register-link">Public app</a>
+                  {" "}to apply as a candidate. Feel free to poke around.
+                </div>
+              </div>
+            </div>
+            <div className="service-grid" aria-label="Service links">
+              {services.map((s) => (
+                <a href={s.href} target="_blank" rel="noopener noreferrer" className="service-card" key={s.name}>
+                  <span className="service-dot" aria-hidden="true"></span>
+                  <div>
+                    <div className="service-name">{s.name}</div>
+                    <div className="service-url">{s.url}</div>
+                  </div>
+                  <div className={`service-tooltip${s.tooltipClass ? ` ${s.tooltipClass}` : ""}`} dangerouslySetInnerHTML={{ __html: s.tooltip }} />
+                </a>
+              ))}
             </div>
           </div>
         </section>
@@ -163,42 +199,6 @@ export default function PortfolioPage() {
             </p>
           </div>
           <ScreenshotSwiper />
-        </section>
-
-        {/* Live Services */}
-        <section id="services" className="section-alt" aria-labelledby="services-heading">
-          <div className="container">
-            <p className="section-title">Live Demo</p>
-            <h2 id="services-heading">Running Services</h2>
-            <p className="section-text mb-3">
-              All services are running on a self-hosted Proxmox homelab, exposed via Cloudflare Tunnel.
-            </p>
-            <div className="coming-soon-banner" role="status">
-              <span className="coming-soon-icon" aria-hidden="true">{"\u2728"}</span>
-              <div>
-                <div className="coming-soon-title">The demo is live — register and try it out</div>
-                <div className="coming-soon-desc">
-                  Create an account on the{" "}
-                  <a href="https://job-admin.elkhair.tech/signup" target="_blank" rel="noopener noreferrer" className="service-register-link">Admin app</a>
-                  {" "}to post jobs and explore the admin experience, or on the{" "}
-                  <a href="https://jobs.elkhair.tech/signup" target="_blank" rel="noopener noreferrer" className="service-register-link">Public app</a>
-                  {" "}to apply as a candidate. Feel free to poke around.
-                </div>
-              </div>
-            </div>
-            <div className="service-grid" aria-label="Service links">
-              {services.map((s) => (
-                <a href={s.href} target="_blank" rel="noopener noreferrer" className="service-card" key={s.name}>
-                  <span className="service-dot" aria-hidden="true"></span>
-                  <div>
-                    <div className="service-name">{s.name}</div>
-                    <div className="service-url">{s.url}</div>
-                  </div>
-                  <div className={`service-tooltip${s.tooltipClass ? ` ${s.tooltipClass}` : ""}`} dangerouslySetInnerHTML={{ __html: s.tooltip }} />
-                </a>
-              ))}
-            </div>
-          </div>
         </section>
       </main>
       <Footer />

@@ -126,6 +126,19 @@ export default function Home() {
             <p className="section-meta">
               20 ADRs &middot; Saga orchestration &middot; Strangler-fig migration &middot; Dapr &middot; OpenTelemetry &middot; Bicep IaC &middot; GitHub Actions CI/CD
             </p>
+            <div className="coming-soon-banner" role="status">
+              <span className="coming-soon-icon" aria-hidden="true">{"\u2728"}</span>
+              <div>
+                <div className="coming-soon-title">The demo is live — register and try it out</div>
+                <div className="coming-soon-desc">
+                  Create an account on the{" "}
+                  <a href="https://job-admin.elkhair.tech/signup" target="_blank" rel="noopener noreferrer" className="service-register-link">Admin app</a>
+                  {" "}to post jobs and explore the admin experience, or on the{" "}
+                  <a href="https://jobs.elkhair.tech/signup" target="_blank" rel="noopener noreferrer" className="service-register-link">Public app</a>
+                  {" "}to apply as a candidate. Feel free to poke around.
+                </div>
+              </div>
+            </div>
             <Link href="/portfolio" className="btn btn-primary btn-lg"><BookIcon /> Explore the Architecture</Link>
           </div>
         </section>
