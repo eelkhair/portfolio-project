@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { headers } from "next/headers";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { FeatureFlagsProvider } from "./components/FeatureFlags";
 import { FaroProvider } from "./components/FaroProvider";
@@ -37,12 +38,18 @@ export default async function RootLayout({
     process.env.NODE_ENV ??
     "local";
 
+  // Cloudflare adds CF-IPCountry on every request through the tunnel.
+  // ISO 3166-1 alpha-2 (e.g. "US", "DE"), or "XX" for unknown / Tor.
+  // Falls back to "XX" when running outside Cloudflare (local dev).
+  const h = await headers();
+  const country = (h.get("cf-ipcountry") ?? "XX").toUpperCase();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider>
           <FeatureFlagsProvider flags={flags}>
-            <FaroProvider env={faroEnv}>
+            <FaroProvider env={faroEnv} country={country}>
               <a href="#main" className="skip-link">Skip to main content</a>
               {children}
             </FaroProvider>

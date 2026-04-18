@@ -1,0 +1,51 @@
+# Portainer stack for 192.168.1.160 — Alloy (Faro receiver) + Prometheus.
+#
+# Prerequisites on the host (192.168.1.160):
+#   - Existing OTel Collector container is running and exposes 4318 on the host
+#     (your current stack does, via -p "4318:4318")
+#   - /home/eelkhair/alloy/config.alloy exists (copy from deploy/alloy/config.alloy)
+#   - /home/eelkhair/alloy/prometheus.yml exists (copy from deploy/alloy/prometheus.yml)
+#   - Your existing OTel Collector config has the `spanmetrics` connector
+#     enabled (see deploy/alloy/otel-collector-spanmetrics-patch.yaml for the
+#     diff to apply to your inlined OTEL_CONFIG env)
+#
+# Host networking is used so Alloy reaches the OTel Collector via localhost,
+# and Prometheus scrapes both otel-collector:8889 and prometheus self on
+# localhost without joining the existing stack's compose network.
+
+services:
+  alloy:
+    image: grafana/alloy:latest
+    container_name: alloy
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /home/eelkhair/alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - alloy-data:/var/lib/alloy/data
+    environment:
+      OTEL_HTTP_ENDPOINT: http://localhost:4318
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - --storage.path=/var/lib/alloy/data
+      - --stability.level=experimental
+      - /etc/alloy/config.alloy
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /home/eelkhair/alloy/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=30d
+      - --storage.tsdb.retention.size=10GB
+      - --web.listen-address=0.0.0.0:9090
+
+volumes:
+  alloy-data:
+  prometheus-data:

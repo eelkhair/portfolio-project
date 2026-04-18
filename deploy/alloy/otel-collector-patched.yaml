@@ -1,3 +1,14 @@
+# Drop-in replacement for the OTEL_CONFIG env var on the existing
+# `jaeger-otel-collector-1` container on 192.168.1.160.
+#
+# Diff vs current:
+#   - NEW: `connectors:` block with spanmetrics
+#   - CHANGED: traces pipeline exporters now includes `spanmetrics`
+#   - CHANGED: metrics pipeline receivers now includes `spanmetrics`
+#
+# Apply via Portainer: edit the jaeger stack -> OTEL_CONFIG env -> replace
+# with this content -> Update the stack.
+
 receivers:
   otlp:
     protocols:
@@ -5,6 +16,19 @@ receivers:
         endpoint: 0.0.0.0:4317
       http:
         endpoint: 0.0.0.0:4318
+        cors:
+          allowed_origins:
+            - "https://job-admin.eelkhair.net"
+            - "https://job-admin-dev.eelkhair.net"
+            - "https://job-admin.elkhair.tech"
+            - "https://jobs.elkhair.tech"
+            - "https://jobs.eelkhair.net"
+            - "https://jobs-dev.eelkhair.net"
+            - "https://job.eelkhair.net"
+            - "http://localhost:*"
+          allowed_headers:
+            - "*"
+
 processors:
   filter/dapr:
     error_mode: ignore
@@ -26,11 +50,9 @@ processors:
         - 'IsMatch(name, "/v1\\.0/publish/.*/healthCheckTopic")'
         - 'attributes["url.full"] != nil and attributes["url.full"] == "http://localhost:3500/v1.0/healthz"'
         - 'attributes["user_agent.original"] != nil and IsMatch(attributes["user_agent.original"], "Uptime-Kuma.*")'
-        - 'attributes["url.full"] != nil and IsMatch(attributes["url.full"], ".*localhost:9200.*")'
-        - 'attributes["url.path"] != nil and attributes["url.path"] == "/dapr/config"'
-        - 'attributes["user_agent.original"] != nil and attributes["user_agent.original"] == "Go-http-client/1.1"'
-        - 'attributes["url.full"] != nil and IsMatch(attributes["url.full"], ".*/v1/sys/health")'
+        - 'attributes["server.port"] != nil and attributes["server.port"] == 9200'
   batch:
+
 connectors:
   spanmetrics:
     histogram:
@@ -49,18 +71,20 @@ connectors:
     metrics_flush_interval: 15s
     exemplars:
       enabled: true
+
 exporters:
   otlp/jaeger:
     endpoint: jaeger:4317
     tls:
       insecure: true
   otlphttp/seq:
-    endpoint: http://seq:80/ingest/otlp
+    endpoint: https://seq.eelkhair.net/ingest/otlp
   prometheus:
     endpoint: 0.0.0.0:8889
     metric_expiration: 5m
     resource_to_telemetry_conversion:
       enabled: true
+
 service:
   pipelines:
     traces:

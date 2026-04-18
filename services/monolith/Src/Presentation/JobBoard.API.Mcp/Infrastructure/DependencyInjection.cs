@@ -7,6 +7,7 @@ using JobBoard.Infrastructure.Messaging;
 using JobBoard.Infrastructure.Outbox;
 using JobBoard.Infrastructure.Persistence;
 using JobBoard.Infrastructure.Smtp;
+using JobBoard.Infrastructure.Turnstile;
 using JobBoard.Mcp.Common;
 using ModelContextProtocol.Protocol;
 
@@ -24,6 +25,7 @@ public static class DependencyInjection
             .AddOutboxPublisher()
             .AddMassTransitMessaging(cfg)
             .AddSmtpServices(cfg)
+            .AddTurnstileVerifier()
             .AddBlobStorageServices(cfg)
             .AddAiServiceHttpClient(cfg)
             .AddHttpContextAccessor()
