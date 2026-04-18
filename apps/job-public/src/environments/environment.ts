@@ -4,6 +4,7 @@ const baseDomain = host.endsWith('.elkhair.tech') ? 'elkhair.tech'
   : host.endsWith('.eelkhair.net') ? 'eelkhair.net'
   : 'elkhair.tech'; // fallback
 
+console.log(host, baseDomain);
 export const environment = {
   production: true,
   envName: 'PROD',

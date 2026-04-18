@@ -2,7 +2,7 @@ const host = typeof window !== 'undefined' ? window.location.hostname : '';
 const baseDomain = host.endsWith('.elkhair.tech') ? 'elkhair.tech'
   : host.endsWith('.eelkhair.net') ? 'eelkhair.net'
   : 'elkhair.tech';
-
+console.log(host, baseDomain);
 export const environment = {
   production: false,
   envName: 'DEV',
