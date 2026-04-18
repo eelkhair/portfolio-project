@@ -13,3 +13,4 @@ PLAN.md
 devserver
 devserver.pub
 scripts/restore-remote-dbs.sh
+scripts/.deploy.env

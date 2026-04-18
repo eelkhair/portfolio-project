@@ -2,6 +2,22 @@
 set -uo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# ===== LOAD LOCAL DEPLOY ENV FILE =====
+# Values here mirror what the GitHub Actions workflows pull from secrets/vars
+# (TURNSTILE_SITE_KEY, FARO_URL, FARO_APP_NAME). They're baked into the
+# landing image at build time; without them Faro + Turnstile silently no-op.
+# See scripts/.deploy.env.example for the expected shape.
+if [ -f "${SCRIPT_DIR}/.deploy.env" ]; then
+  set -a
+  # shellcheck source=/dev/null
+  . "${SCRIPT_DIR}/.deploy.env"
+  set +a
+else
+  echo "⚠️  scripts/.deploy.env not found."
+  echo "    Copy scripts/.deploy.env.example → scripts/.deploy.env and fill values."
+  echo "    Landing image will be built without Faro/Turnstile env baked in."
+fi
+
 # ===== ENVIRONMENT SELECTION =====
 echo "Select environment:"
 echo "  1) dev"
@@ -66,7 +82,8 @@ BACKEND_SERVICES=(
   "reverse-connector-api|../services/reverse-connector-api|default"
   "health-check|../services/micro-services/HealthChecks|default"
   "keycloak|../infrastructure/keycloak|default"
-  "landing|../apps/landing-next|default"
+  # landing is built separately via build_and_push_landing() so it can
+  # receive the NEXT_PUBLIC_* build args (Faro + Turnstile) from .deploy.env.
 )
 
 FAILED_BUILDS=()
@@ -131,6 +148,43 @@ build_and_push_backends() {
     IFS='|' read -r name context dockerfile_flag <<< "$entry"
     build_one "$name" "$context" "$dockerfile_flag" || true
   done
+}
+
+# ===== HELPER: build & push landing (with Faro + Turnstile baked in) =====
+# Mirrors .github/workflows/deploy-landing.yml: the NEXT_PUBLIC_* values must
+# be build args, not runtime env — Next.js inlines them at build time, so
+# missing values cause dead-code-elimination of the Faro init block.
+build_and_push_landing() {
+  local name="landing"
+  local image="registry.eelkhair.net/${name}:latest"
+
+  echo ""
+  echo "🔨 Building landing (with Faro + Turnstile args)..."
+
+  docker build \
+    --build-arg NEXT_PUBLIC_TURNSTILE_SITE_KEY="${TURNSTILE_SITE_KEY:-}" \
+    --build-arg NEXT_PUBLIC_FARO_URL="${FARO_URL:-}" \
+    --build-arg NEXT_PUBLIC_FARO_APP_NAME="${FARO_APP_NAME:-landing}" \
+    -t "$image" "../apps/landing-next"
+
+  if [ $? -ne 0 ]; then
+    echo "❌ BUILD FAILED: $name"
+    FAILED_BUILDS+=("$name")
+    return 1
+  fi
+
+  echo "📤 Pushing $image..."
+  docker push "$image"
+
+  if [ $? -ne 0 ]; then
+    echo "❌ PUSH FAILED: $name"
+    FAILED_BUILDS+=("$name")
+    return 1
+  fi
+
+  SUCCESSFUL_BUILDS+=("$name")
+  echo "✅ $name done"
+  echo "-----------------------------"
 }
 
 # ===== HELPER: build & push Angular apps (env-specific tags) =====
@@ -251,6 +305,7 @@ echo "=========================================="
 echo "🔨 Building backend services (shared)..."
 echo "=========================================="
 build_and_push_backends
+build_and_push_landing
 
 # 2. Per-environment: build frontends, push, deploy
 for target in "${DEPLOY_TARGETS[@]}"; do

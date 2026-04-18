@@ -2,6 +2,22 @@
 set -uo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# ===== LOAD LOCAL DEPLOY ENV FILE =====
+# Values here mirror what the GitHub Actions workflows pull from secrets/vars
+# (TURNSTILE_SITE_KEY, FARO_URL, FARO_APP_NAME). Baked into the landing image
+# at build time; without them Faro + Turnstile silently no-op.
+# See scripts/.deploy.env.example for the expected shape.
+if [ -f "${SCRIPT_DIR}/.deploy.env" ]; then
+  set -a
+  # shellcheck source=/dev/null
+  . "${SCRIPT_DIR}/.deploy.env"
+  set +a
+else
+  echo "⚠️  scripts/.deploy.env not found."
+  echo "    Copy scripts/.deploy.env.example → scripts/.deploy.env and fill values."
+  echo "    Landing image will be built without Faro/Turnstile env baked in."
+fi
+
 # ===== ENVIRONMENT SELECTION =====
 echo "Select environment:"
 echo "  1) dev"
@@ -227,9 +243,27 @@ build_and_push_frontends() {
   echo "🔨 Building frontends for $env_tag..."
   echo "=========================================="
 
-  # Landing pages: same image for all envs, build once
+  # Landing pages: same image for all envs, build once. Mirrors
+  # .github/workflows/deploy-landing.yml — NEXT_PUBLIC_* are build args,
+  # not runtime env (Next.js inlines them at build time).
   if [[ -z "${BUILT_SERVICES[landing]+x}" ]]; then
-    build_one "landing" "../apps/landing-next" "default" || true
+    BUILT_SERVICES[landing]=1
+    local landing_image="registry.eelkhair.net/landing:latest"
+    echo ""
+    echo "🔨 Building landing (with Faro + Turnstile args)..."
+    docker build \
+      --build-arg NEXT_PUBLIC_TURNSTILE_SITE_KEY="${TURNSTILE_SITE_KEY:-}" \
+      --build-arg NEXT_PUBLIC_FARO_URL="${FARO_URL:-}" \
+      --build-arg NEXT_PUBLIC_FARO_APP_NAME="${FARO_APP_NAME:-landing}" \
+      -t "$landing_image" "../apps/landing-next"
+    if [ $? -eq 0 ]; then
+      echo "📤 Pushing $landing_image..."
+      docker push "$landing_image" && SUCCESSFUL_BUILDS+=("landing") && echo "✅ landing done"
+    else
+      FAILED_BUILDS+=("landing")
+      echo "❌ BUILD FAILED: landing"
+    fi
+    echo "-----------------------------"
   fi
 
   for name in "job-admin" "job-public"; do
