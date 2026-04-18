@@ -94,6 +94,36 @@ export function FaroProvider({
 
     initialized = true;
     faro.api.pushLog(["Faro initialized"], { level: LogLevel.INFO });
+
+    // Emit a page-view log with geo + page context. Flows through
+    // Faro → Alloy → OTel Collector → Seq and (for FE services) → ES,
+    // where the Find by Trace Id dashboard can correlate it with the span.
+    const pageViewCtx = {
+      url: typeof window !== "undefined" ? window.location.href : "",
+      path: typeof window !== "undefined" ? window.location.pathname : "",
+      referrer: typeof document !== "undefined" ? document.referrer : "",
+      country: geo.country,
+      city: geo.city || undefined,
+      region: geo.region || undefined,
+    };
+    console.info("[landing] page view", pageViewCtx);
+
+    // Log route changes for SPA navigation. The Next.js App Router fires
+    // popstate on back/forward and updates history.pushState on link clicks.
+    if (typeof window !== "undefined") {
+      const origPush = history.pushState.bind(history);
+      history.pushState = function (...args) {
+        const result = origPush(...args);
+        console.info("[landing] route change", {
+          from: document.referrer || undefined,
+          to: window.location.pathname,
+        });
+        return result;
+      };
+      window.addEventListener("popstate", () => {
+        console.info("[landing] route back/forward", { to: window.location.pathname });
+      });
+    }
   }, [env, geo]);
 
   return <>{children}</>;

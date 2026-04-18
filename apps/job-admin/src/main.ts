@@ -3,7 +3,6 @@ import { appConfig } from './app/app.config';
 import { App } from './app/app';
 
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
-import './otel'
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 bootstrapApplication(App, appConfig)

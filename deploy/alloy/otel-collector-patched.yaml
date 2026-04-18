@@ -1,10 +1,17 @@
 # Drop-in replacement for the OTEL_CONFIG env var on the existing
 # `jaeger-otel-collector-1` container on 192.168.1.160.
 #
-# Diff vs current:
-#   - NEW: `connectors:` block with spanmetrics
-#   - CHANGED: traces pipeline exporters now includes `spanmetrics`
-#   - CHANGED: metrics pipeline receivers now includes `spanmetrics`
+# Diff vs prior version:
+#   - NEW: `elasticsearch/fe` exporter for frontend logs, separate index
+#   - NEW: `filter/fe_only` processor — only service.name in (landing, admin-fe, public-fe)
+#   - NEW: `logs/es-fe` pipeline — fans out FE Faro logs to Elasticsearch
+#   - `logs` pipeline (unchanged behavior) still sends everything to Seq
+#
+# Frontend logs arrive via Alloy's Loki→OTel bridge. Backend (.NET) services
+# continue to write directly to Elasticsearch via Serilog sink — they do NOT
+# flow through the `logs/es-fe` pipeline (filter excludes non-FE services).
+# ES ingest pipeline `fe-otel-to-serilog` remaps field names to match what
+# the Find by Trace Id dashboard queries (`fields.TraceId`).
 #
 # Apply via Portainer: edit the jaeger stack -> OTEL_CONFIG env -> replace
 # with this content -> Update the stack.
@@ -51,6 +58,22 @@ processors:
         - 'attributes["url.full"] != nil and attributes["url.full"] == "http://localhost:3500/v1.0/healthz"'
         - 'attributes["user_agent.original"] != nil and IsMatch(attributes["user_agent.original"], "Uptime-Kuma.*")'
         - 'attributes["server.port"] != nil and attributes["server.port"] == 9200'
+  # Normalize service name: Alloy's Loki→OTel bridge puts Faro's meta.app.name
+  # into the log record as resource.attributes["app"]. Copy it onto the canonical
+  # service.name attribute so downstream filters and consumers see it.
+  transform/fe_service_name:
+    error_mode: ignore
+    log_statements:
+      - context: resource
+        statements:
+          - set(attributes["service.name"], attributes["app"]) where attributes["app"] != nil and attributes["service.name"] == nil
+  # Route only FE services to the ES logs pipeline so we don't duplicate
+  # backend logs that Serilog already writes directly to Elasticsearch.
+  filter/fe_only:
+    error_mode: ignore
+    logs:
+      log_record:
+        - 'not (resource.attributes["service.name"] == "landing" or resource.attributes["service.name"] == "admin-fe" or resource.attributes["service.name"] == "public-fe")'
   batch:
 
 connectors:
@@ -88,6 +111,17 @@ exporters:
     metric_expiration: 5m
     resource_to_telemetry_conversion:
       enabled: true
+  # Frontend Faro logs go here, remapped via ES ingest pipeline to match
+  # the Serilog field shape (`fields.TraceId`) the dashboards expect.
+  # ES runs in a separate Docker network (kibana-elastic-search_elastic) so
+  # we can't resolve it by service name from jaeger_default. Host IP works
+  # because ES publishes :9200 on the host.
+  elasticsearch/fe:
+    endpoints: [http://192.168.1.160:9200]
+    logs_index: fe-logs
+    pipeline: fe-otel-to-serilog
+    mapping:
+      mode: raw
 
 service:
   pipelines:
@@ -99,6 +133,10 @@ service:
       receivers: [otlp]
       processors: [batch]
       exporters: [otlphttp/seq]
+    logs/es-fe:
+      receivers: [otlp]
+      processors: [transform/fe_service_name, filter/fe_only, batch]
+      exporters: [elasticsearch/fe]
     metrics:
       receivers: [otlp, spanmetrics]
       processors: [batch]

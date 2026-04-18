@@ -18,6 +18,7 @@ import {DialogService} from 'primeng/dynamicdialog';
 import {authInterceptor, provideAuth, LogLevel, OidcSecurityService} from 'angular-auth-oidc-client';
 import {environment} from '../environments/environment';
 import {firstValueFrom} from 'rxjs';
+import {initFaro} from '../faro';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -74,6 +75,13 @@ export const appConfig: ApplicationConfig = {
       provide: APP_INITIALIZER,
       useFactory: (oidc: OidcSecurityService) => () => firstValueFrom(oidc.checkAuth()),
       deps: [OidcSecurityService],
+      multi: true,
+    },
+    {
+      // Initialize Grafana Faro RUM. Returns Promise<void> and never blocks
+      // app startup on Faro/geo failures (initFaro swallows errors internally).
+      provide: APP_INITIALIZER,
+      useFactory: () => () => initFaro(),
       multi: true,
     },
   ]

@@ -19,6 +19,11 @@ export const environment = {
   otel: 'https://otel.eelkhair.net/v1/traces',
   otelAspire: undefined as string | undefined,
   otelZipkin: 'https://otel.eelkhair.net/api/v2/spans',
+  // Grafana Faro RUM — POSTs through Cloudflare to Alloy on .160.
+  faroUrl: 'https://faro-dev.elkhair.tech/collect',
+  // Landing's /api/geo endpoint (cross-origin), enriches Faro spans with
+  // visitor country/city/region/lat/lon.
+  geoApiUrl: `https://${landingBaseDomain}/api/geo`,
   grafanaUrl: 'https://grafana.eelkhair.net/d/bf5m5dwukfncwd/find-by-trace-id?orgId=1&var-TraceId=',
   jaegerUrl: 'https://jaeger.eelkhair.net/trace/',
   seqUrl: 'https://seq.eelkhair.net/#/events?filter=TraceId%3D%22{traceId}%22',

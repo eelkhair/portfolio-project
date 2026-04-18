@@ -17,6 +17,7 @@ import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { tracingInterceptor } from './core/interceptors/tracing.interceptor';
 import { TracingErrorHandler } from './core/error-handler/tracing-error-handler';
 import { environment } from '../environments/environment';
+import { initFaro } from '../faro';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -47,6 +48,13 @@ export const appConfig: ApplicationConfig = {
             provide: APP_INITIALIZER,
             useFactory: (oidc: OidcSecurityService) => () => firstValueFrom(oidc.checkAuth()),
             deps: [OidcSecurityService],
+            multi: true,
+          },
+          {
+            // Initialize Grafana Faro RUM (browser-only). Returns Promise<void>
+            // and never blocks app startup on Faro/geo failures.
+            provide: APP_INITIALIZER,
+            useFactory: () => () => initFaro(),
             multi: true,
           },
         ]

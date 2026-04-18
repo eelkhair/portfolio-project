@@ -1,20 +1,16 @@
-// Grafana Alloy config — pure Faro→OTLP bridge.
+// Grafana Alloy config — Faro → OTLP bridge.
 //
-// Receives Faro events (errors, web vitals, traces) from browsers via the
-// Faro JSON receiver and forwards traces to the existing OTel Collector.
-// The OTel Collector handles fan-out to Jaeger, Seq, and Prometheus
-// (via its built-in spanmetrics connector + :8889 exporter).
-//
-// Faro logs (console capture) are intentionally dropped at this hop because
-// Alloy's faro.receiver emits Loki-format logs and there is no Loki backend
-// in this stack. Errors still surface as trace span events. Console capture
-// can be re-enabled later by adding loki.write or an OTel-Loki bridge.
+// Receives Faro events (errors, web vitals, traces, captured console logs)
+// from browsers via the Faro JSON receiver, converts the Loki-style log
+// stream to OTLP, and forwards both traces and logs to the existing OTel
+// Collector. The OTel Collector handles fan-out to Jaeger + Seq + Prometheus
+// (traces) and Seq + Elasticsearch (logs).
 //
 // Used in two contexts:
 //   - Aspire local dev: bind-mounted into the alloy container,
 //     OTEL_HTTP_ENDPOINT=http://otel-collector:4318
-//   - Portainer prod (192.168.1.160): file at /opt/alloy/config.alloy with
-//     host networking, OTEL_HTTP_ENDPOINT=http://localhost:4318
+//   - Portainer prod (192.168.1.160): file at /home/eelkhair/alloy/config.alloy
+//     with host networking, OTEL_HTTP_ENDPOINT=http://localhost:4318
 
 faro.receiver "default" {
 	server {
@@ -27,17 +23,40 @@ faro.receiver "default" {
 			"https://dev.elkhair.tech",
 			"https://eelkhair.net",
 			"https://www.eelkhair.net",
+			"https://job-admin.elkhair.tech",
+			"https://job-admin-dev.elkhair.tech",
+			"https://job-admin.eelkhair.net",
+			"https://job-admin-dev.eelkhair.net",
+			"https://jobs.elkhair.tech",
+			"https://jobs-dev.elkhair.tech",
+			"https://jobs.eelkhair.net",
+			"https://jobs-dev.eelkhair.net",
 			"http://localhost:3000",
 			"http://localhost:3001",
+			"http://localhost:4200",
+			"http://localhost:3100",
 		]
 	}
 
 	output {
-		logs   = []
+		// Loki-format log stream → Loki→OTel bridge below
+		logs   = [otelcol.receiver.loki.default.receiver]
+		// OTLP traces → existing OTel Collector
 		traces = [otelcol.exporter.otlphttp.collector.input]
 	}
 }
 
+// Convert Faro's Loki-format log records into OTLP logs so they can flow
+// through the OTel Collector pipeline alongside everything else.
+otelcol.receiver.loki "default" {
+	output {
+		logs = [otelcol.exporter.otlphttp.collector.input]
+	}
+}
+
+// Single exporter pushes both traces AND logs to the existing OTel Collector.
+// The collector's pipelines fan out: traces → Jaeger + Seq + spanmetrics;
+// logs → Seq + Elasticsearch (for Find-by-TraceId dashboard).
 otelcol.exporter.otlphttp "collector" {
 	client {
 		endpoint = sys.env("OTEL_HTTP_ENDPOINT")

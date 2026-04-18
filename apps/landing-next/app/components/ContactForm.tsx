@@ -62,11 +62,13 @@ export function ContactForm() {
     e.preventDefault();
 
     if (!turnstileToken) {
+      console.warn("[landing] contact submit blocked: missing turnstile token");
       setStatus("error");
       setErrorMsg("Please complete the verification.");
       return;
     }
 
+    console.info("[landing] contact submit start", { hasEmail: !!email, subjectLen: subject.length, messageLen: message.length });
     setStatus("sending");
     setErrorMsg("");
 
@@ -80,6 +82,7 @@ export function ContactForm() {
       const data = await res.json();
 
       if (!res.ok) {
+        console.error("[landing] contact submit failed", { status: res.status, error: data.error });
         setStatus("error");
         setErrorMsg(data.error || "Something went wrong.");
         if (widgetIdRef.current !== null && window.turnstile) {
@@ -89,13 +92,15 @@ export function ContactForm() {
         return;
       }
 
+      console.info("[landing] contact submit success", { id: data.id });
       setStatus("success");
       setName("");
       setEmail("");
       setSubject("");
       setMessage("");
       setTurnstileToken("");
-    } catch {
+    } catch (err) {
+      console.error("[landing] contact submit network error", { err: String(err) });
       setStatus("error");
       setErrorMsg("Network error. Please try again.");
     }

@@ -1,364 +1,746 @@
 {
-  "uid": "jobboard-landing-rum",
-  "title": "JobBoard \u2014 Landing Page RUM",
-  "tags": ["jobboard", "landing", "rum", "faro"],
-  "timezone": "browser",
-  "editable": true,
-  "refresh": "30s",
-  "schemaVersion": 39,
-  "time": { "from": "now-1h", "to": "now" },
-  "templating": {
+  "annotations": {
     "list": [
       {
-        "name": "environment",
-        "label": "Environment",
-        "type": "custom",
-        "query": "local",
-        "options": [
-          { "selected": true, "text": "local", "value": "local" }
-        ],
-        "includeAll": false,
-        "multi": false,
-        "current": { "text": "local", "value": "local" }
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
       }
     ]
   },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
   "panels": [
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
       "id": 1,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "sum(increase(traces_span_metrics_calls_total{service_name=~\"$service\", deployment_environment=~\"$environment\"}[$__range]))",
+          "refId": "A"
+        }
+      ],
       "title": "Page loads",
-      "type": "stat",
-      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-      "targets": [
-        {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-          "expr": "sum(increase(traces_span_metrics_calls_total{service_name=\"landing\", deployment_environment=~\"$environment\"}[$__range]))",
-          "refId": "A"
-        }
-      ],
-      "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
-        "textMode": "value",
-        "colorMode": "value",
-        "graphMode": "area"
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
       },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0,
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "blue", "value": null }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 10
+              }
             ]
-          },
-          "decimals": 0
-        }
-      }
-    },
-    {
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
       "id": 2,
-      "title": "Errors",
-      "type": "stat",
-      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.4.0",
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-          "expr": "sum(increase(traces_span_metrics_calls_total{service_name=\"landing\", status_code=\"STATUS_CODE_ERROR\", deployment_environment=~\"$environment\"}[$__range])) or vector(0)",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "sum(increase(traces_span_metrics_calls_total{service_name=~\"$service\", status_code=\"STATUS_CODE_ERROR\", deployment_environment=~\"$environment\"}[$__range])) or vector(0)",
           "refId": "A"
         }
       ],
-      "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
-        "textMode": "value",
-        "colorMode": "value",
-        "graphMode": "area"
+      "title": "Errors",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
       },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 1 },
-              { "color": "red", "value": 10 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 500
+              },
+              {
+                "color": "red",
+                "value": 2000
+              }
             ]
           },
-          "decimals": 0
-        }
-      }
-    },
-    {
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
       "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(traces_span_metrics_duration_milliseconds_bucket{service_name=~\"$service\", deployment_environment=~\"$environment\"}[$__rate_interval])))",
+          "refId": "A"
+        }
+      ],
       "title": "p95 latency",
-      "type": "stat",
-      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-      "targets": [
-        {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(traces_span_metrics_duration_milliseconds_bucket{service_name=\"landing\", deployment_environment=~\"$environment\"}[$__rate_interval])))",
-          "refId": "A"
-        }
-      ],
-      "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
-        "textMode": "value",
-        "colorMode": "value",
-        "graphMode": "area"
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "ms",
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 500 },
-              { "color": "red", "value": 2000 }
+              {
+                "color": "blue",
+                "value": null
+              }
             ]
-          }
-        }
-      }
-    },
-    {
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
       "id": 4,
-      "title": "Throughput (req/s)",
-      "type": "stat",
-      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.4.0",
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-          "expr": "sum(rate(traces_span_metrics_calls_total{service_name=\"landing\", deployment_environment=~\"$environment\"}[$__rate_interval]))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "sum(rate(traces_span_metrics_calls_total{service_name=~\"$service\", deployment_environment=~\"$environment\"}[$__rate_interval]))",
           "refId": "A"
         }
       ],
-      "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
-        "textMode": "value",
-        "colorMode": "value",
-        "graphMode": "area"
+      "title": "Throughput (req/s)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "reqps",
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "blue", "value": null }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
             ]
-          }
-        }
-      }
-    },
-    {
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 4
+      },
       "id": 5,
-      "title": "Span rate by name (top 10)",
-      "type": "timeseries",
-      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 4 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-          "expr": "topk(10, sum by (span_name) (rate(traces_span_metrics_calls_total{service_name=\"landing\", deployment_environment=~\"$environment\"}[$__rate_interval])))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "topk(10, sum by (span_name) (rate(traces_span_metrics_calls_total{service_name=~\"$service\", deployment_environment=~\"$environment\"}[$__rate_interval])))",
           "legendFormat": "{{span_name}}",
           "refId": "A"
         }
       ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "reqps",
-          "custom": {
-            "drawStyle": "line",
-            "lineInterpolation": "smooth",
-            "fillOpacity": 10
-          }
-        }
-      }
+      "title": "Span rate by name (top 10)",
+      "type": "timeseries"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 5,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 4
+      },
       "id": 6,
-      "title": "Latency p50 / p95 / p99",
-      "type": "timeseries",
-      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 4 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-          "expr": "histogram_quantile(0.50, sum by (le) (rate(traces_span_metrics_duration_milliseconds_bucket{service_name=\"landing\", deployment_environment=~\"$environment\"}[$__rate_interval])))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "histogram_quantile(0.50, sum by (le) (rate(traces_span_metrics_duration_milliseconds_bucket{service_name=~\"$service\", deployment_environment=~\"$environment\"}[$__rate_interval])))",
           "legendFormat": "p50",
           "refId": "A"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(traces_span_metrics_duration_milliseconds_bucket{service_name=\"landing\", deployment_environment=~\"$environment\"}[$__rate_interval])))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(traces_span_metrics_duration_milliseconds_bucket{service_name=~\"$service\", deployment_environment=~\"$environment\"}[$__rate_interval])))",
           "legendFormat": "p95",
           "refId": "B"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-          "expr": "histogram_quantile(0.99, sum by (le) (rate(traces_span_metrics_duration_milliseconds_bucket{service_name=\"landing\", deployment_environment=~\"$environment\"}[$__rate_interval])))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "histogram_quantile(0.99, sum by (le) (rate(traces_span_metrics_duration_milliseconds_bucket{service_name=~\"$service\", deployment_environment=~\"$environment\"}[$__rate_interval])))",
           "legendFormat": "p99",
           "refId": "C"
         }
       ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "ms",
-          "custom": {
-            "drawStyle": "line",
-            "lineInterpolation": "smooth",
-            "fillOpacity": 5
-          }
-        }
-      }
+      "title": "Latency p50 / p95 / p99",
+      "type": "timeseries"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 13
+      },
       "id": 7,
-      "title": "Error rate by route",
-      "type": "timeseries",
-      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 13 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-          "expr": "sum by (span_name) (rate(traces_span_metrics_calls_total{service_name=\"landing\", status_code=\"STATUS_CODE_ERROR\", deployment_environment=~\"$environment\"}[$__rate_interval]))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "sum by (span_name) (rate(traces_span_metrics_calls_total{service_name=~\"$service\", status_code=\"STATUS_CODE_ERROR\", deployment_environment=~\"$environment\"}[$__rate_interval]))",
           "legendFormat": "{{span_name}}",
           "refId": "A"
         }
       ],
+      "title": "Error rate by route",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
       "fieldConfig": {
         "defaults": {
-          "unit": "reqps",
-          "color": { "mode": "palette-classic" },
           "custom": {
-            "drawStyle": "line",
-            "lineInterpolation": "smooth",
-            "fillOpacity": 15
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
           }
-        }
-      }
-    },
-    {
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 13
+      },
       "id": 8,
-      "title": "Top routes",
-      "type": "table",
-      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 13 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-      "targets": [
-        {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-          "expr": "topk(10, sum by (span_name) (increase(traces_span_metrics_calls_total{service_name=\"landing\", deployment_environment=~\"$environment\"}[$__range])))",
-          "format": "table",
-          "instant": true,
-          "refId": "A"
-        }
-      ],
-      "transformations": [
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": { "Time": true },
-            "renameByName": { "Value": "Hits", "span_name": "Span" }
-          }
-        }
-      ]
-    },
-    {
-      "id": 10,
-      "title": "Top countries",
-      "type": "table",
-      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 22 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-      "targets": [
-        {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-          "expr": "topk(20, sum by (geo_country_code) (increase(traces_span_metrics_calls_total{service_name=\"landing\", deployment_environment=~\"$environment\"}[$__range])))",
-          "format": "table",
-          "instant": true,
-          "refId": "A"
-        }
-      ],
-      "transformations": [
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": { "Time": true },
-            "renameByName": { "Value": "Hits", "geo_country_code": "Country" }
-          }
-        }
-      ]
-    },
-    {
-      "id": 11,
-      "title": "Visitors by country",
-      "type": "geomap",
-      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 22 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-      "targets": [
-        {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-          "expr": "sum by (geo_country_code) (increase(traces_span_metrics_calls_total{service_name=\"landing\", deployment_environment=~\"$environment\"}[$__range]))",
-          "format": "table",
-          "instant": true,
-          "refId": "A"
-        }
-      ],
-      "transformations": [
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": { "Time": true },
-            "renameByName": { "Value": "Hits", "geo_country_code": "country" }
-          }
-        }
-      ],
       "options": {
-        "view": { "id": "zero", "lat": 20, "lon": 0, "zoom": 1.5 },
-        "controls": { "showZoom": true, "mouseWheelZoom": true, "showAttribution": true },
-        "basemap": { "type": "default" },
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "10.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "topk(10, sum by (span_name) (increase(traces_span_metrics_calls_total{service_name=~\"$service\", deployment_environment=~\"$environment\"}[$__range])))",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Top routes",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "Value": "Hits",
+              "span_name": "Span"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 22
+      },
+      "id": 13,
+      "options": {
+        "basemap": {
+          "type": "default"
+        },
+        "controls": {
+          "mouseWheelZoom": true,
+          "showAttribution": true,
+          "showZoom": true
+        },
         "layers": [
           {
-            "type": "markers",
-            "name": "Visitors",
             "config": {
+              "showLegend": true,
               "style": {
-                "color": { "fixed": "blue" },
-                "opacity": 0.6,
-                "size": { "field": "Hits", "fixed": 5, "min": 4, "max": 30 }
-              },
-              "showLegend": true
+                "color": {
+                  "fixed": "orange"
+                },
+                "opacity": 0.7,
+                "size": {
+                  "field": "Hits",
+                  "fixed": 6,
+                  "max": 30,
+                  "min": 4
+                },
+                "text": {
+                  "field": "city",
+                  "fixed": ""
+                },
+                "textConfig": {
+                  "fontSize": 11,
+                  "offsetY": -14,
+                  "textAlign": "center",
+                  "textBaseline": "alphabetic"
+                }
+              }
             },
-            "location": { "mode": "lookup", "lookup": "country", "gazetteer": "public/gazetteer/countries.json" }
+            "location": {
+              "latitude": "lat",
+              "longitude": "lon",
+              "mode": "coords"
+            },
+            "name": "Cities",
+            "type": "markers"
           }
-        ]
-      }
-    },
-    {
-      "id": 13,
-      "title": "Visitors by city",
-      "type": "geomap",
-      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 31 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+        ],
+        "view": {
+          "id": "zero",
+          "lat": 20,
+          "lon": 0,
+          "zoom": 1.5
+        }
+      },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-          "expr": "sum by (geo_city, geo_country_code, geo_lat, geo_lon) (increase(traces_span_metrics_calls_total{service_name=\"landing\", deployment_environment=~\"$environment\", geo_city!=\"\", geo_lat!=\"\"}[$__range]))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "sum by (geo_city, geo_country_code, geo_lat, geo_lon) (increase(traces_span_metrics_calls_total{service_name=~\"$service\", deployment_environment=~\"$environment\", geo_city!=\"\", geo_lat!=\"\"}[$__range]))",
           "format": "table",
           "instant": true,
           "refId": "A"
         }
       ],
+      "title": "Visitors by city",
       "transformations": [
         {
           "id": "organize",
           "options": {
-            "excludeByName": { "Time": true },
+            "excludeByName": {
+              "Time": true
+            },
             "renameByName": {
               "Value": "Hits",
               "geo_city": "city",
@@ -372,114 +754,89 @@
           "id": "convertFieldType",
           "options": {
             "conversions": [
-              { "targetField": "lat", "destinationType": "number" },
-              { "targetField": "lon", "destinationType": "number" }
+              {
+                "destinationType": "number",
+                "targetField": "lat"
+              },
+              {
+                "destinationType": "number",
+                "targetField": "lon"
+              }
             ]
           }
         }
       ],
-      "options": {
-        "view": { "id": "zero", "lat": 20, "lon": 0, "zoom": 1.5 },
-        "controls": { "showZoom": true, "mouseWheelZoom": true, "showAttribution": true },
-        "basemap": { "type": "default" },
-        "layers": [
-          {
-            "type": "markers",
-            "name": "Cities",
-            "config": {
-              "style": {
-                "color": { "fixed": "orange" },
-                "opacity": 0.7,
-                "size": { "field": "Hits", "fixed": 6, "min": 4, "max": 30 },
-                "textConfig": { "fontSize": 11, "offsetY": -14, "textAlign": "center", "textBaseline": "alphabetic" },
-                "text": { "field": "city", "fixed": "" }
-              },
-              "showLegend": true
-            },
-            "location": { "mode": "coords", "latitude": "lat", "longitude": "lon" }
-          }
-        ]
-      }
-    },
-    {
-      "id": 12,
-      "title": "Top cities",
-      "type": "table",
-      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 43 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-      "targets": [
-        {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-          "expr": "topk(20, sum by (geo_country_code, geo_region, geo_city) (increase(traces_span_metrics_calls_total{service_name=\"landing\", deployment_environment=~\"$environment\", geo_city!=\"\"}[$__range])))",
-          "format": "table",
-          "instant": true,
-          "refId": "A"
-        }
-      ],
-      "transformations": [
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": { "Time": true },
-            "renameByName": {
-              "Value": "Hits",
-              "geo_country_code": "Country",
-              "geo_region": "Region",
-              "geo_city": "City"
-            },
-            "indexByName": { "geo_city": 0, "geo_region": 1, "geo_country_code": 2, "Value": 3 }
-          }
-        }
-      ]
-    },
-    {
-      "id": 14,
-      "title": "Recent visits by location",
-      "type": "table",
-      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 52 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-      "targets": [
-        {
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-          "expr": "topk(50, sum by (geo_city, geo_region, geo_country_code, span_name) (increase(traces_span_metrics_calls_total{service_name=\"landing\", deployment_environment=~\"$environment\", geo_city!=\"\"}[$__range])))",
-          "format": "table",
-          "instant": true,
-          "refId": "A"
-        }
-      ],
-      "transformations": [
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": { "Time": true },
-            "renameByName": {
-              "Value": "Hits",
-              "geo_city": "City",
-              "geo_region": "State",
-              "geo_country_code": "Country",
-              "span_name": "Span"
-            },
-            "indexByName": { "geo_city": 0, "geo_region": 1, "geo_country_code": 2, "span_name": 3, "Value": 4 }
-          }
-        }
-      ]
-    },
-    {
-      "id": 9,
-      "title": "Recent traces",
-      "type": "table",
-      "gridPos": { "h": 11, "w": 24, "x": 0, "y": 61 },
-      "datasource": { "type": "jaeger", "uid": "jaeger" },
-      "targets": [
-        {
-          "datasource": { "type": "jaeger", "uid": "jaeger" },
-          "queryType": "search",
-          "service": "landing",
-          "tags": "deployment.environment=\"$environment\"",
-          "limit": 25,
-          "refId": "A"
-        }
-      ]
+      "type": "geomap"
     }
-  ]
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": [
+    "jobboard",
+    "rum",
+    "faro"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "landing",
+          "value": "landing"
+        },
+        "includeAll": false,
+        "label": "Service",
+        "multi": false,
+        "name": "service",
+        "options": [
+          {
+            "selected": true,
+            "text": "landing",
+            "value": "landing"
+          },
+          {
+            "selected": false,
+            "text": "admin-fe",
+            "value": "admin-fe"
+          },
+          {
+            "selected": false,
+            "text": "public-fe",
+            "value": "public-fe"
+          }
+        ],
+        "query": "landing,admin-fe,public-fe",
+        "type": "custom"
+      },
+      {
+        "current": {
+          "text": "local",
+          "value": "local"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "Environment",
+        "multi": false,
+        "name": "environment",
+        "options": [
+          {
+            "selected": true,
+            "text": "local",
+            "value": "local"
+          }
+        ],
+        "query": "local",
+        "skipUrlSync": false,
+        "type": "custom"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "JobBoard \u2014 Web App RUM",
+  "uid": "jobboard-landing-rum",
+  "weekStart": ""
 }
