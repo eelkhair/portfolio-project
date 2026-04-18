@@ -43,15 +43,5 @@
       "description": "Block Swagger UI pages but allow JSON specs",
       "expression": "(http.request.uri.path contains \"/swagger\" and not http.request.uri.path contains \"swagger.json\" and http.host ne \"swagger.elkhair.tech\")"
     }
-  ],
-  "redirect_rules": [
-    {
-      "zone": "eelkhair.net",
-      "description": "Permanent redirect eelkhair.net (all subdomains) to elkhair.tech",
-      "expression": "http.host eq \"eelkhair.net\" or ends_with(http.host, \".eelkhair.net\")",
-      "target_expression": "concat(\"https://\", regex_replace(http.host, \"eelkhair\\.net$\", \"elkhair.tech\"), http.request.uri.path)",
-      "status_code": 301,
-      "preserve_query_string": true
-    }
   ]
 }
