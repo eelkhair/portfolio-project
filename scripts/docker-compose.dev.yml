@@ -3,22 +3,22 @@ services:
   landing:
     image: registry.eelkhair.net/landing:latest
     ports:
-        - "6090:3000"
+      - "6090:3000"
     environment:
-        - FEATURE_FLAGS_URL=http://monolith-api:8080/api/public/feature-flags
-        - RESEND_API_KEY=${RESEND_API_KEY}
-        - EMAIL_FROM=${EMAIL_FROM}
-        - CONTACT_EMAIL=${CONTACT_EMAIL}
-        - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}
-        # OpenTelemetry — HTTP OTLP to the same public collector the Angular apps use.
-        # Traces land in Jaeger at jaeger.eelkhair.net tagged service=landing.
-        - OTEL_SERVICE_NAME=landing
-        - OTEL_EXPORTER_OTLP_ENDPOINT=https://otel.eelkhair.net
-        - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
-        - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
+      - FEATURE_FLAGS_URL=http://monolith-api:8080/api/public/feature-flags
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - EMAIL_FROM=${EMAIL_FROM}
+      - CONTACT_EMAIL=${CONTACT_EMAIL}
+      - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}
+      # OpenTelemetry — HTTP OTLP to the same public collector the Angular apps use.
+      # Traces land in Jaeger at jaeger.eelkhair.net tagged service=landing.
+      - OTEL_SERVICE_NAME=landing
+      - OTEL_EXPORTER_OTLP_ENDPOINT=https://otel.eelkhair.net
+      - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+      - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
     restart: unless-stopped
     networks:
-        - ai-job-board-net
+      - ai-job-board-net
   # -- Frontend ----------------------------------------------
   job-admin:
     image: registry.eelkhair.net/job-admin:dev
@@ -48,7 +48,6 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.160:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
       - JaegerApiUrl=http://192.168.1.160:16686
-      - SEQ_URL=https://seq.eelkhair.net
     networks:
       - ai-job-board-net
 
@@ -63,7 +62,6 @@ services:
       - McpServer__MicroUrl=http://admin-api-mcp:3334
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.160:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
-      - SEQ_URL=https://seq.eelkhair.net
     networks:
       - ai-job-board-net
 
@@ -98,7 +96,6 @@ services:
       - VAULT_TOKEN=${VAULT_TOKEN}
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.160:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
-      - SEQ_URL=https://seq.eelkhair.net
       - Turnstile__SecretKey=${TURNSTILE_SECRET_KEY}
     networks:
       - ai-job-board-net
@@ -114,7 +111,6 @@ services:
       - VAULT_TOKEN=${VAULT_TOKEN}
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.160:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
-      - SEQ_URL=https://seq.eelkhair.net
     networks:
       - ai-job-board-net
 
@@ -129,7 +125,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.160:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
-      - SEQ_URL=https://seq.eelkhair.net
       - Turnstile__SecretKey=${TURNSTILE_SECRET_KEY}
     networks:
       - ai-job-board-net
@@ -162,7 +157,6 @@ services:
       - ASPNETCORE_URLS=http://+:3334
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.160:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
-      - SEQ_URL=https://seq.eelkhair.net
     networks:
       - ai-job-board-net
 
@@ -195,7 +189,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.160:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
-      - SEQ_URL=https://seq.eelkhair.net
     networks:
       - ai-job-board-net
 
@@ -227,7 +220,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.160:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
-      - SEQ_URL=https://seq.eelkhair.net
     networks:
       - ai-job-board-net
 
@@ -260,7 +252,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.160:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
-      - SEQ_URL=https://seq.eelkhair.net
     networks:
       - ai-job-board-net
 
@@ -293,7 +284,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.160:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
-      - SEQ_URL=https://seq.eelkhair.net
     networks:
       - ai-job-board-net
 
@@ -325,7 +315,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.160:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
-      - SEQ_URL=https://seq.eelkhair.net
     networks:
       - ai-job-board-net
 
@@ -373,27 +362,27 @@ services:
     image: registry.eelkhair.net/health-check:latest
     environment:
       - HealthChecksUI__HealthChecks__0__Name=Gateway
-      - HealthChecksUI__HealthChecks__0__Uri=https://job-gateway-dev.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__0__Uri=http://192.168.1.200:5238/healthzEndpoint
       - HealthChecksUI__HealthChecks__1__Name=AI Service V2
-      - HealthChecksUI__HealthChecks__1__Uri=https://job-ai-v2-dev.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__1__Uri=http://192.168.1.200:5200/healthzEndpoint
       - HealthChecksUI__HealthChecks__2__Name=Monolith API
-      - HealthChecksUI__HealthChecks__2__Uri=https://job-monolith-dev.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__2__Uri=http://192.168.1.200:5280/healthzEndpoint
       - HealthChecksUI__HealthChecks__3__Name=Monolith MCP
-      - HealthChecksUI__HealthChecks__3__Uri=https://mono-mcp-dev.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__3__Uri=http://192.168.1.200:3333/healthzEndpoint
       - HealthChecksUI__HealthChecks__4__Name=Admin API
-      - HealthChecksUI__HealthChecks__4__Uri=https://job-admin-api-dev.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__4__Uri=http://192.168.1.200:6062/healthzEndpoint
       - HealthChecksUI__HealthChecks__5__Name=Admin API MCP
-      - HealthChecksUI__HealthChecks__5__Uri=https://micro-mcp-dev.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__5__Uri=http://192.168.1.200:3334/healthzEndpoint
       - HealthChecksUI__HealthChecks__6__Name=Company API
-      - HealthChecksUI__HealthChecks__6__Uri=https://job-company-api-dev.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__6__Uri=http://192.168.1.200:6072/healthzEndpoint
       - HealthChecksUI__HealthChecks__7__Name=Job API
-      - HealthChecksUI__HealthChecks__7__Uri=https://job-api-dev.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__7__Uri=http://192.168.1.200:6084/healthzEndpoint
       - HealthChecksUI__HealthChecks__8__Name=User API
-      - HealthChecksUI__HealthChecks__8__Uri=https://job-users-api-dev.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__8__Uri=http://192.168.1.200:6092/healthzEndpoint
       - HealthChecksUI__HealthChecks__9__Name=Connector API
-      - HealthChecksUI__HealthChecks__9__Uri=https://job-connector-dev.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__9__Uri=http://192.168.1.200:5284/healthzEndpoint
       - HealthChecksUI__HealthChecks__10__Name=Reverse Connector API
-      - HealthChecksUI__HealthChecks__10__Uri=https://job-reverse-connector-dev.eelkhair.net/healthzEndpoint
+      - HealthChecksUI__HealthChecks__10__Uri=http://192.168.1.200:5285/healthzEndpoint
     ports:
       - "5107:8080"
 
