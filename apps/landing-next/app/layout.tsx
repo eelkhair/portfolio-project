@@ -5,6 +5,7 @@ import { ThemeProvider } from "./components/ThemeProvider";
 import { FeatureFlagsProvider } from "./components/FeatureFlags";
 import { FaroProvider } from "./components/FaroProvider";
 import { fetchFeatureFlags } from "./lib/feature-flags";
+import { resolveGeo } from "./lib/geo";
 import "./globals.css";
 
 const inter = Inter({
@@ -38,18 +39,20 @@ export default async function RootLayout({
     process.env.NODE_ENV ??
     "local";
 
-  // Cloudflare adds CF-IPCountry on every request through the tunnel.
-  // ISO 3166-1 alpha-2 (e.g. "US", "DE"), or "XX" for unknown / Tor.
-  // Falls back to "XX" when running outside Cloudflare (local dev).
+  // Resolve geo server-side so FaroProvider has country/city/lat/lon synchronously
+  // when initializing the OTel tracer. Otherwise, the page-load spans fire before
+  // an async client lookup can return, and city ends up empty in spanmetrics.
+  // Country always comes from CF-IPCountry header. City/lat/lon comes from
+  // ipapi.co with a 24h per-IP cache (free tier, ~1k req/day).
   const h = await headers();
-  const country = (h.get("cf-ipcountry") ?? "XX").toUpperCase();
+  const geo = await resolveGeo(h);
 
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider>
           <FeatureFlagsProvider flags={flags}>
-            <FaroProvider env={faroEnv} country={country}>
+            <FaroProvider env={faroEnv} geo={geo}>
               <a href="#main" className="skip-link">Skip to main content</a>
               {children}
             </FaroProvider>

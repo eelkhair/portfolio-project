@@ -1,5 +1,5 @@
 # ============================================================================
-# Observability Stack — runs on dev tools server (192.168.1.115)
+# Observability Stack — runs on dev tools server (192.168.1.160)
 # Prometheus + OTel Collector (central receiver)
 #
 # Grafana (grafana.eelkhair.net) already exists on this server —

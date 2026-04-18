@@ -68,6 +68,10 @@ connectors:
         default: ""
       - name: geo.region
         default: ""
+      - name: geo.lat
+        default: ""
+      - name: geo.lon
+        default: ""
     metrics_flush_interval: 15s
     exemplars:
       enabled: true

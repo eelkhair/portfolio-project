@@ -61,7 +61,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - McpServer__IntegrationUrl=http://monolith-mcp:3333
       - McpServer__MicroUrl=http://admin-api-mcp:3334
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.160:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=prod
     networks:
       - ai-job-board-net
@@ -95,7 +95,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - VAULT_ADDR=${VAULT_ADDR}
       - VAULT_TOKEN=${VAULT_TOKEN}
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.160:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=prod
       - Turnstile__SecretKey=${TURNSTILE_SECRET_KEY}
     networks:
@@ -110,7 +110,7 @@ services:
       - ASPNETCORE_URLS=http://+:3333
       - VAULT_ADDR=${VAULT_ADDR}
       - VAULT_TOKEN=${VAULT_TOKEN}
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.160:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=prod
     networks:
       - ai-job-board-net
@@ -124,7 +124,7 @@ services:
       - "6062:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.160:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=prod
       - Turnstile__SecretKey=${TURNSTILE_SECRET_KEY}
     networks:
@@ -156,7 +156,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:3334
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.160:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=prod
     networks:
       - ai-job-board-net
@@ -188,7 +188,7 @@ services:
       - "6072:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.160:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=prod
     networks:
       - ai-job-board-net
@@ -219,7 +219,7 @@ services:
       - "6084:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.160:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=prod
     networks:
       - ai-job-board-net
@@ -251,7 +251,7 @@ services:
       - "6092:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.160:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=prod
     networks:
       - ai-job-board-net
@@ -283,7 +283,7 @@ services:
       - "5284:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.160:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=prod
     networks:
       - ai-job-board-net
@@ -314,7 +314,7 @@ services:
       - "5285:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.160:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=prod
     networks:
       - ai-job-board-net

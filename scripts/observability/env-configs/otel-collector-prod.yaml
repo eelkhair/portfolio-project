@@ -1,6 +1,6 @@
 # ============================================================================
 # OTel Collector — runs on PROD server
-# Receives OTLP from local services, forwards to central collector on 115
+# Receives OTLP from local services, forwards to central collector on 160
 # ============================================================================
 
 receivers:
@@ -36,7 +36,7 @@ processors:
 exporters:
   # Forward everything to central collector on dev tools server
   otlphttp/central:
-    endpoint: http://192.168.1.115:4318
+    endpoint: http://192.168.1.160:4318
 
 service:
   pipelines:

@@ -16,7 +16,7 @@
           └──────────┬─────────────────┘
                      ↓
      ┌───────────────────────────────┐
-     │  Dev Tools Server (115)       │
+     │  Dev Tools Server (160)       │
      │                               │
      │  Central OTel Collector       │
      │    ↓ Prometheus exporter      │
@@ -26,10 +26,10 @@
      └───────────────────────────────┘
 ```
 
-## Step 1: Deploy observability stack on 115
+## Step 1: Deploy observability stack on 160
 
 ```bash
-# On 192.168.1.115
+# On 192.168.1.160
 cd ~/observability
 # Copy these files:
 #   docker-compose.observability.yml
@@ -45,7 +45,7 @@ In Grafana (grafana.eelkhair.net):
 1. Go to **Connections → Data sources → Add data source**
 2. Select **Prometheus**
 3. URL: `http://prometheus:9090` (if Grafana is on the same Docker network)
-   — or `http://192.168.1.115:9090` (if external)
+   — or `http://192.168.1.160:9090` (if external)
 4. Save & Test
 
 ## Step 3: Configure each environment to push OTLP
@@ -76,14 +76,14 @@ Then add this env var to ALL .NET services:
       # ... existing vars ...
 ```
 
-### Option B: Point services directly at 115 (simpler, less filtering)
+### Option B: Point services directly at 160 (simpler, less filtering)
 
 Just add to each service:
 
 ```yaml
   monolith-api:
     environment:
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.115:4317
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.1.160:4317
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
 ```
 

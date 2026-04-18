@@ -10,33 +10,23 @@ import {
 import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-web";
 import type { Context } from "@opentelemetry/api";
 import type { Span, ReadableSpan, SpanProcessor } from "@opentelemetry/sdk-trace-base";
+import type { GeoData } from "../lib/geo";
 
 let initialized = false;
 
 /**
- * Mutable holder for geo so the span processor can pick up city/region after
- * the async `/api/geo` lookup resolves. The country is seeded synchronously
- * from the SSR-rendered Cloudflare header, so first spans always have it.
- */
-const geo = {
-  country: "XX",
-  city: "",
-  region: "",
-};
-
-/**
- * Wraps Faro's default span pipeline. Stamps every span with `geo.*`
- * attributes that flow into the OTel collector's spanmetrics connector
- * (configured with matching dimensions) so the Grafana RUM dashboard
- * can chart visitors by country and city.
+ * Wraps Faro's default span pipeline so we can stamp every span with `geo.*`
+ * attributes (resolved server-side in layout.tsx). They flow into the OTel
+ * collector's spanmetrics connector via matching dimensions and end up as
+ * Prometheus labels for the RUM dashboard.
  *
- * We rebuild Faro's default chain (FaroMetaAttributesSpanProcessor wrapping
+ * Rebuilds Faro's default chain (FaroMetaAttributesSpanProcessor wrapping
  * BatchSpanProcessor + FaroTraceExporter) because the `spanProcessor` option
- * REPLACES the default. The inner chain is built lazily on first span so
- * that `faro.api` / `faro.metas` are populated (initializeFaro hasn't
- * returned yet at processor-construction time).
+ * REPLACES the default. Inner chain is built lazily on first span so that
+ * `faro.api` / `faro.metas` are populated (initializeFaro hasn't returned at
+ * processor-construction time).
  */
-function buildSpanProcessor(): SpanProcessor {
+function buildSpanProcessor(geo: GeoData): SpanProcessor {
   let inner: SpanProcessor | null = null;
   const ensure = (): SpanProcessor => {
     if (inner) return inner;
@@ -55,6 +45,8 @@ function buildSpanProcessor(): SpanProcessor {
       span.setAttribute("geo.country_code", geo.country);
       if (geo.city) span.setAttribute("geo.city", geo.city);
       if (geo.region) span.setAttribute("geo.region", geo.region);
+      if (geo.lat !== null) span.setAttribute("geo.lat", geo.lat);
+      if (geo.lon !== null) span.setAttribute("geo.lon", geo.lon);
       ensure().onStart(span, parentContext);
     },
     onEnd(span: ReadableSpan): void {
@@ -72,19 +64,17 @@ function buildSpanProcessor(): SpanProcessor {
 export function FaroProvider({
   children,
   env,
-  country,
+  geo,
 }: {
   children: ReactNode;
   env: string;
-  country: string;
+  geo: GeoData;
 }) {
   useEffect(() => {
     if (initialized) return;
 
     const url = process.env.NEXT_PUBLIC_FARO_URL;
     if (!url) return;
-
-    geo.country = country;
 
     const appName = process.env.NEXT_PUBLIC_FARO_APP_NAME ?? "landing";
 
@@ -97,29 +87,14 @@ export function FaroProvider({
       instrumentations: [
         ...getWebInstrumentations({ captureConsole: true }),
         new TracingInstrumentation({
-          spanProcessor: buildSpanProcessor(),
+          spanProcessor: buildSpanProcessor(geo),
         }),
       ],
     });
 
     initialized = true;
     faro.api.pushLog(["Faro initialized"], { level: LogLevel.INFO });
-
-    // Async city lookup; updates the holder so spans created after this
-    // resolves get richer geo. First page-load spans only have country.
-    (async () => {
-      try {
-        const r = await fetch("/api/geo", { cache: "no-store" });
-        if (!r.ok) return;
-        const data = (await r.json()) as { country?: string; city?: string; region?: string };
-        if (data.country) geo.country = data.country.toUpperCase();
-        if (data.city) geo.city = data.city;
-        if (data.region) geo.region = data.region;
-      } catch {
-        // Best-effort. Country from SSR is already on the holder.
-      }
-    })();
-  }, [env, country]);
+  }, [env, geo]);
 
   return <>{children}</>;
 }

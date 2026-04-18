@@ -340,10 +340,72 @@
       }
     },
     {
+      "id": 13,
+      "title": "Visitors by city",
+      "type": "geomap",
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 31 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "expr": "sum by (geo_city, geo_country_code, geo_lat, geo_lon) (increase(traces_span_metrics_calls_total{service_name=\"landing\", deployment_environment=~\"$environment\", geo_city!=\"\", geo_lat!=\"\"}[1h]))",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": { "Time": true },
+            "renameByName": {
+              "Value": "Hits",
+              "geo_city": "city",
+              "geo_country_code": "country",
+              "geo_lat": "lat",
+              "geo_lon": "lon"
+            }
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              { "targetField": "lat", "destinationType": "number" },
+              { "targetField": "lon", "destinationType": "number" }
+            ]
+          }
+        }
+      ],
+      "options": {
+        "view": { "id": "zero", "lat": 20, "lon": 0, "zoom": 1.5 },
+        "controls": { "showZoom": true, "mouseWheelZoom": true, "showAttribution": true },
+        "basemap": { "type": "default" },
+        "layers": [
+          {
+            "type": "markers",
+            "name": "Cities",
+            "config": {
+              "style": {
+                "color": { "fixed": "orange" },
+                "opacity": 0.7,
+                "size": { "field": "Hits", "fixed": 6, "min": 4, "max": 30 },
+                "textConfig": { "fontSize": 11, "offsetY": -14, "textAlign": "center", "textBaseline": "alphabetic" },
+                "text": { "field": "city", "fixed": "" }
+              },
+              "showLegend": true
+            },
+            "location": { "mode": "coords", "latitude": "lat", "longitude": "lon" }
+          }
+        ]
+      }
+    },
+    {
       "id": 12,
       "title": "Top cities (1h)",
       "type": "table",
-      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 31 },
+      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 43 },
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
@@ -374,7 +436,7 @@
       "id": 9,
       "title": "Recent traces (last 25)",
       "type": "table",
-      "gridPos": { "h": 11, "w": 24, "x": 0, "y": 40 },
+      "gridPos": { "h": 11, "w": 24, "x": 0, "y": 52 },
       "datasource": { "type": "jaeger", "uid": "jaeger" },
       "targets": [
         {
