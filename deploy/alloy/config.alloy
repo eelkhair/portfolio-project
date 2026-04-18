@@ -1,20 +1,20 @@
-// Grafana Alloy config for Faro RUM ingestion.
+// Grafana Alloy config — pure Faro→OTLP bridge.
 //
-// Receives Faro events (logs, errors, web vitals, traces) from browsers via
-// the Faro JSON receiver, converts to OTLP, forwards to the existing OTel
-// Collector running on the same host (port 4318).
+// Receives Faro events (errors, web vitals, traces) from browsers via the
+// Faro JSON receiver and forwards traces to the existing OTel Collector.
+// The OTel Collector handles fan-out to Jaeger, Seq, and Prometheus
+// (via its built-in spanmetrics connector + :8889 exporter).
 //
-// Run on 192.168.1.160 alongside the existing OTel Collector.
+// Faro logs (console capture) are intentionally dropped at this hop because
+// Alloy's faro.receiver emits Loki-format logs and there is no Loki backend
+// in this stack. Errors still surface as trace span events. Console capture
+// can be re-enabled later by adding loki.write or an OTel-Loki bridge.
 //
-// Docker:
-//   docker run -d --name alloy \
-//     --restart unless-stopped \
-//     -p 12347:12347 \
-//     -v $PWD/config.alloy:/etc/alloy/config.alloy \
-//     grafana/alloy:latest \
-//     run --server.http.listen-addr=0.0.0.0:12345 \
-//         --storage.path=/var/lib/alloy/data \
-//         /etc/alloy/config.alloy
+// Used in two contexts:
+//   - Aspire local dev: bind-mounted into the alloy container,
+//     OTEL_HTTP_ENDPOINT=http://otel-collector:4318
+//   - Portainer prod (192.168.1.160): file at /opt/alloy/config.alloy with
+//     host networking, OTEL_HTTP_ENDPOINT=http://localhost:4318
 
 faro.receiver "default" {
 	server {
@@ -27,32 +27,23 @@ faro.receiver "default" {
 			"https://dev.elkhair.tech",
 			"https://eelkhair.net",
 			"https://www.eelkhair.net",
+			"http://localhost:3000",
 			"http://localhost:3001",
 		]
 	}
 
 	output {
-		logs   = [otelcol.receiver.faro.default.input]
-		traces = [otelcol.receiver.faro.default.input]
-	}
-}
-
-// Faro logs/traces flow into a Faro-format OTel receiver, which converts to
-// OTLP and forwards to the existing collector.
-otelcol.receiver.faro "default" {
-	output {
-		logs   = [otelcol.exporter.otlphttp.collector.input]
+		logs   = []
 		traces = [otelcol.exporter.otlphttp.collector.input]
 	}
 }
 
-// Forward to the existing OTel Collector on the same host.
-// Collector then routes traces to Jaeger and logs to Seq via its own pipelines.
 otelcol.exporter.otlphttp "collector" {
 	client {
-		endpoint = "http://localhost:4318"
+		endpoint = sys.env("OTEL_HTTP_ENDPOINT")
 		tls {
-			insecure = true
+			insecure             = true
+			insecure_skip_verify = true
 		}
 	}
 }

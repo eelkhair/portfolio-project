@@ -103,6 +103,20 @@ var otelCollector = builder.AddContainer("otel-collector", "otel/opentelemetry-c
     .WaitFor(jaeger)
     .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
 
+var alloy = builder.AddContainer("alloy", "grafana/alloy", "latest")
+    .WithLifetime(ContainerLifetime.Persistent)
+    .WithEndpoint(12347, 12347, name: "faro", isProxied: false)
+    .WithEndpoint(12345, 12345, name: "ui", isProxied: false)
+    .WithBindMount("../../deploy/alloy/config.alloy", "/etc/alloy/config.alloy", isReadOnly: true)
+    .WithEnvironment("OTEL_HTTP_ENDPOINT", "http://otel-collector:4318")
+    .WithArgs("run",
+        "--server.http.listen-addr=0.0.0.0:12345",
+        "--storage.path=/tmp/alloy",
+        "--stability.level=experimental",
+        "/etc/alloy/config.alloy")
+    .WaitFor(otelCollector)
+    .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
+
 var mailpit = builder.AddContainer("mailpit", "axllent/mailpit")
     .WithLifetime(ContainerLifetime.Persistent)
     .WithHttpEndpoint(8025, 8025, name: "ui", isProxied: false)

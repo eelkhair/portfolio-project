@@ -31,6 +31,18 @@ processors:
         - 'attributes["user_agent.original"] != nil and attributes["user_agent.original"] == "Go-http-client/1.1"'
         - 'attributes["url.full"] != nil and IsMatch(attributes["url.full"], ".*/v1/sys/health")'
   batch:
+connectors:
+  spanmetrics:
+    histogram:
+      explicit:
+        buckets: [10ms, 50ms, 100ms, 250ms, 500ms, 1s, 2s, 5s, 10s]
+    dimensions:
+      - name: http.method
+      - name: http.route
+      - name: deployment.environment
+    metrics_flush_interval: 15s
+    exemplars:
+      enabled: true
 exporters:
   otlp/jaeger:
     endpoint: jaeger:4317
@@ -48,12 +60,12 @@ service:
     traces:
       receivers: [otlp]
       processors: [filter/dapr, batch]
-      exporters: [otlp/jaeger, otlphttp/seq]
+      exporters: [otlp/jaeger, otlphttp/seq, spanmetrics]
     logs:
       receivers: [otlp]
       processors: [batch]
       exporters: [otlphttp/seq]
     metrics:
-      receivers: [otlp]
+      receivers: [otlp, spanmetrics]
       processors: [batch]
       exporters: [prometheus]
