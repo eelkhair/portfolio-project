@@ -1,0 +1,58 @@
+// Grafana Alloy config for Faro RUM ingestion.
+//
+// Receives Faro events (logs, errors, web vitals, traces) from browsers via
+// the Faro JSON receiver, converts to OTLP, forwards to the existing OTel
+// Collector running on the same host (port 4318).
+//
+// Run on 192.168.1.160 alongside the existing OTel Collector.
+//
+// Docker:
+//   docker run -d --name alloy \
+//     --restart unless-stopped \
+//     -p 12347:12347 \
+//     -v $PWD/config.alloy:/etc/alloy/config.alloy \
+//     grafana/alloy:latest \
+//     run --server.http.listen-addr=0.0.0.0:12345 \
+//         --storage.path=/var/lib/alloy/data \
+//         /etc/alloy/config.alloy
+
+faro.receiver "default" {
+	server {
+		listen_address = "0.0.0.0"
+		listen_port    = 12347
+
+		cors_allowed_origins = [
+			"https://elkhair.tech",
+			"https://www.elkhair.tech",
+			"https://dev.elkhair.tech",
+			"https://eelkhair.net",
+			"https://www.eelkhair.net",
+			"http://localhost:3001",
+		]
+	}
+
+	output {
+		logs   = [otelcol.receiver.faro.default.input]
+		traces = [otelcol.receiver.faro.default.input]
+	}
+}
+
+// Faro logs/traces flow into a Faro-format OTel receiver, which converts to
+// OTLP and forwards to the existing collector.
+otelcol.receiver.faro "default" {
+	output {
+		logs   = [otelcol.exporter.otlphttp.collector.input]
+		traces = [otelcol.exporter.otlphttp.collector.input]
+	}
+}
+
+// Forward to the existing OTel Collector on the same host.
+// Collector then routes traces to Jaeger and logs to Seq via its own pipelines.
+otelcol.exporter.otlphttp "collector" {
+	client {
+		endpoint = "http://localhost:4318"
+		tls {
+			insecure = true
+		}
+	}
+}

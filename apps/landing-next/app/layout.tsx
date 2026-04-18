@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { FeatureFlagsProvider } from "./components/FeatureFlags";
+import { FaroProvider } from "./components/FaroProvider";
 import { fetchFeatureFlags } from "./lib/feature-flags";
 import "./globals.css";
 
@@ -28,14 +29,23 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const flags = await fetchFeatureFlags();
+  const faroEnv =
+    process.env.OTEL_RESOURCE_ATTRIBUTES?.split(",")
+      .find((p) => p.trim().startsWith("deployment.environment="))
+      ?.split("=")[1]
+      ?.trim() ??
+    process.env.NODE_ENV ??
+    "local";
 
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider>
           <FeatureFlagsProvider flags={flags}>
-            <a href="#main" className="skip-link">Skip to main content</a>
-            {children}
+            <FaroProvider env={faroEnv}>
+              <a href="#main" className="skip-link">Skip to main content</a>
+              {children}
+            </FaroProvider>
           </FeatureFlagsProvider>
         </ThemeProvider>
       </body>

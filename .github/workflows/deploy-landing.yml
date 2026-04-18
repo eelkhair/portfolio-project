@@ -39,6 +39,8 @@ jobs:
           echo "Building landing page..."
           docker build \
             --build-arg NEXT_PUBLIC_TURNSTILE_SITE_KEY=${{ secrets.TURNSTILE_SITE_KEY }} \
+            --build-arg NEXT_PUBLIC_FARO_URL=${{ vars.FARO_URL }} \
+            --build-arg NEXT_PUBLIC_FARO_APP_NAME=landing \
             -f apps/landing-next/Dockerfile -t $IMAGE apps/landing-next
           echo "Pushing $IMAGE..."
           docker push $IMAGE

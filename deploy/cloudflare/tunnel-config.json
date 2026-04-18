@@ -10,6 +10,8 @@
     { "hostname": "job-ai-v2.elkhair.tech", "service": "http://192.168.1.112:5200" },
     { "hostname": "job-monolith.elkhair.tech", "service": "http://192.168.1.112:5280" },
     { "hostname": "otel.elkhair.tech", "service": "http://192.168.1.160:4318" },
+    { "hostname": "faro.elkhair.tech", "service": "http://192.168.1.160:12347" },
+    { "hostname": "faro-dev.elkhair.tech", "service": "http://192.168.1.160:12347" },
     { "hostname": "auth.elkhair.tech", "service": "http://192.168.1.112:9090" },
     { "hostname": "grafana.elkhair.tech", "service": "http://192.168.1.115:3000" },
     { "hostname": "jaeger.elkhair.tech", "service": "http://192.168.1.160:16686" },
