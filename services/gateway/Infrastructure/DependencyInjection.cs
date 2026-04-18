@@ -25,7 +25,11 @@ public static class DependencyInjection
                     "https://swagger.eelkhair.net",
 
                     "https://job-admin.elkhair.tech",
-                    "https://jobs.elkhair.tech")
+                    "https://jobs.elkhair.tech",
+                    "https://job-admin-dev.elkhair.tech",
+                    "https://jobs-dev.elkhair.tech",
+                    "https://dev.elkhair.tech",
+                    "https://elkhair.tech")
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials()

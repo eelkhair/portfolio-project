@@ -35,6 +35,8 @@ public static class DependencyInjection
 
                         "https://job-admin-dev.eelkhair.net",
                         "https://jobs-dev.eelkhair.net",
+                        "https://jobs-dev.elkhair.tech",
+                        "https://job-admin-dev.elkhair.tech",
                         "https://job-dev.eelkhair.net",
                         "http://192.168.1.200:9000",
                         "https://swagger-dev.eelkhair.net",
