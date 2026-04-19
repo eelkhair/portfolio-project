@@ -38,6 +38,7 @@ public static class DependencyInjection
             t.SetSampler(new DaprConfigSampler())
              .AddSource(TracingFilters.Source.Name)
              .AddProcessor(new DaprInternalSpanFilter())
+             .AddProcessor(new PiiScrubbingSpanProcessor())
              .AddAspNetCoreInstrumentation(o => o.AddFilters())
              .AddEntityFrameworkCoreInstrumentation(o => o.AddFilters())
              .AddHttpClientInstrumentation(o => o.AddFilters())
