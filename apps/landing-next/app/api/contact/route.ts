@@ -37,6 +37,8 @@ function pruneRateLimit(now: number): void {
 const ALLOWED_ORIGINS = new Set([
   "https://elkhair.tech",
   "https://eelkhair.net",
+    "https://dev.elkhair.tech",
+    "https://dev.eelkhair.net",
   "https://job-admin.elkhair.tech",
   "https://job-admin-dev.elkhair.tech",
   "https://job-admin.eelkhair.net",
