@@ -10,7 +10,19 @@ import { join } from 'node:path';
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
-const angularApp = new AngularNodeAppEngine();
+// Angular 21 SSR rejects unknown hostnames as SSRF protection. Without this
+// allowlist, every render falls back to client-side and ships an empty
+// <app-root>. Both prod + dev hosts on both zones are listed here; localhost
+// is included for `ng serve` and Docker port-forward testing.
+const angularApp = new AngularNodeAppEngine({
+  allowedHosts: [
+    'jobs.elkhair.tech',
+    'jobs-dev.elkhair.tech',
+    'jobs.eelkhair.net',
+    'jobs-dev.eelkhair.net',
+    'localhost',
+  ],
+});
 
 /**
  * Example Express Rest API endpoints can be defined here.
@@ -36,7 +48,22 @@ app.use(
 );
 
 /**
- * Handle all other requests by rendering the Angular application.
+ * Guard: if a request looks like a static asset (any path with a file extension)
+ * and `express.static` above didn't serve it, the file is genuinely missing.
+ * Return a real 404 instead of falling through to Angular SSR which would
+ * render the SPA shell HTML — that triggers "MIME type 'text/html'" errors in
+ * the browser when a stale chunk hash from a previous build is requested.
+ */
+app.use((req, res, next) => {
+  if (/\.[a-z0-9]+$/i.test(req.path)) {
+    res.status(404).type('text/plain').send('Not Found');
+    return;
+  }
+  next();
+});
+
+/**
+ * Handle all other (route-shaped) requests by rendering the Angular application.
  */
 app.use((req, res, next) => {
   angularApp
