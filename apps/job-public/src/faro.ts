@@ -25,6 +25,7 @@ import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-web';
 import type { Context } from '@opentelemetry/api';
 import type { Span, ReadableSpan, SpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { environment } from './environments/environment';
+import { scrubPiiDeep } from './pii-hasher';
 
 type GeoData = {
   country: string;
@@ -109,6 +110,17 @@ export async function initFaro(): Promise<void> {
     app: {
       name: 'public-fe',
       environment: environment.envName.toLowerCase(),
+    },
+    // Hash email/phone/first/last/full/user-name values in every outgoing
+    // transport item (logs, events, measurements, exceptions) before the
+    // Alloy → OTel → ES pipeline sees them. Matches backend PiiHasher format
+    // (pii_ + 12 hex) so correlation by hash still works across FE/BE.
+    beforeSend: (item) => {
+      try {
+        return { ...item, payload: scrubPiiDeep(item.payload) };
+      } catch {
+        return item;
+      }
     },
     instrumentations: [
       ...getWebInstrumentations({ captureConsole: true }),

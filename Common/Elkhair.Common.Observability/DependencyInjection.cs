@@ -40,6 +40,7 @@ public static class DependencyInjection
 
             t.AddSource(TracingFilters.Source.Name)
                 .AddProcessor(new DaprInternalSpanFilter())
+                .AddProcessor(new PiiScrubbingSpanProcessor())
                 .AddAspNetCoreInstrumentation(o => o.AddFilters())
                 .AddEntityFrameworkCoreInstrumentation(o => o.AddFilters())
                 .AddHttpClientInstrumentation(o => o.AddFilters())
@@ -118,6 +119,9 @@ public static class DependencyInjection
             .Enrich.WithOpenTelemetrySpanId()
             .Enrich.With(new OpenTelemetryActivityEnricher())
             .Enrich.With<OtelLinkEnricher>()
+            // Run LAST so it catches both direct structured properties (e.g. {Email}) and
+            // otel.tag.* properties copied in by OpenTelemetryActivityEnricher above.
+            .Enrich.With<PiiScrubbingLogEventEnricher>()
             .ApplyStandardFilters(builder.Environment)
             .WriteTo.Console()
             .WriteTo.Elasticsearch(
