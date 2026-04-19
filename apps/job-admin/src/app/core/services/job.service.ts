@@ -9,11 +9,13 @@ import {EnhancementRequest, EnhancementResponse} from '../types/Dtos/Enhancement
 import {CreateJobDto} from '../types/Dtos/CreateJobRequest';
 import {FeatureFlagsService} from './feature-flags.service';
 import {map} from 'rxjs';
+import {ActivityLogger} from './activity-logger.service';
 
 @Injectable({ providedIn: 'root' })
 export class JobService {
   private http: HttpClient = inject(HttpClient);
   private featureFlags = inject(FeatureFlagsService);
+  private logger = inject(ActivityLogger);
 
   private get baseUrl(): string {
     return environment.gatewayUrl;
@@ -26,11 +28,15 @@ export class JobService {
   }
 
   generateDraft(uId: string, payload: JobGenRequest) {
-    return this.http.post<ApiResponse<JobGenResponse>>(`${this.baseUrl}api/jobs/${uId}/generate`, payload);
+    return this.http
+      .post<ApiResponse<JobGenResponse>>(`${this.baseUrl}api/jobs/${uId}/generate`, payload)
+      .pipe(this.logger.trace('job draft generate', () => ({ companyUId: uId })));
   }
 
   saveDraft(uId: string, payload: Draft) {
-    return this.http.put<ApiResponse<Draft>>(`${this.baseUrl}api/jobs/${uId}/save-draft`, payload);
+    return this.http
+      .put<ApiResponse<Draft>>(`${this.baseUrl}api/jobs/${uId}/save-draft`, payload)
+      .pipe(this.logger.trace('job draft save', (r) => ({ companyUId: uId, draftId: r.data?.id })));
   }
 
   loadDrafts(companyId: string) {
@@ -38,15 +44,21 @@ export class JobService {
   }
 
   rewrite(model: EnhancementRequest) {
-    return this.http.put<ApiResponse<EnhancementResponse>>(`${this.baseUrl}api/jobs/drafts/rewrite`, model);
+    return this.http
+      .put<ApiResponse<EnhancementResponse>>(`${this.baseUrl}api/jobs/drafts/rewrite`, model)
+      .pipe(this.logger.trace('job rewrite'));
   }
 
   deleteDraft(companyId: string, draftId: string) {
-    return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}api/jobs/${companyId}/drafts/${draftId}`);
+    return this.http
+      .delete<ApiResponse<boolean>>(`${this.baseUrl}api/jobs/${companyId}/drafts/${draftId}`)
+      .pipe(this.logger.trace('job draft delete', () => ({ companyUId: companyId, draftId })));
   }
 
   createJob(model: CreateJobDto) {
-    return this.http.post<ApiResponse<Job[]>>(`${this.baseUrl}api/jobs`, model);
+    return this.http
+      .post<ApiResponse<Job[]>>(`${this.baseUrl}api/jobs`, model)
+      .pipe(this.logger.trace('job create', (r) => ({ count: r.data?.length ?? 0 })));
   }
 
   private normalize(response: any): ApiResponse<Job[]> {

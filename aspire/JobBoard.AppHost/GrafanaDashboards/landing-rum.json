@@ -767,6 +767,219 @@
         }
       ],
       "type": "geomap"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "infinity-jaeger"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Trace ID"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": true,
+                    "title": "View trace in Jaeger",
+                    "url": "https://jaeger.elkhair.tech/trace/${__value.raw}"
+                  }
+                ]
+              },
+              {
+                "id": "custom.width",
+                "value": 280
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Started"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeAsIso"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Duration (ms)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "city"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": true,
+                    "title": "Search ${__value.raw} traces in Jaeger",
+                    "url": "https://jaeger.elkhair.tech/search?service=$service&tags=%7B%22geo.city%22%3A%22${__value.raw}%22%7D&lookback=custom&start=${__from}000&end=${__to}000"
+                  }
+                ]
+              },
+              {
+                "id": "custom.width",
+                "value": 140
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 14,
+        "w": 24,
+        "x": 0,
+        "y": 34
+      },
+      "id": 20,
+      "options": {
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Started"
+          }
+        ]
+      },
+      "targets": [
+        {
+          "columns": [
+            {
+              "selector": "traceID",
+              "text": "Trace ID",
+              "type": "string"
+            },
+            {
+              "selector": "operationName",
+              "text": "Span",
+              "type": "string"
+            },
+            {
+              "selector": "route",
+              "text": "Route",
+              "type": "string"
+            },
+            {
+              "selector": "startTime",
+              "text": "Start",
+              "type": "number"
+            },
+            {
+              "selector": "duration",
+              "text": "Duration",
+              "type": "number"
+            },
+            {
+              "selector": "city",
+              "text": "City",
+              "type": "string"
+            },
+            {
+              "selector": "region",
+              "text": "State",
+              "type": "string"
+            },
+            {
+              "selector": "country",
+              "text": "Country",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "infinity-jaeger"
+          },
+          "filterExpression": "'${city:raw}' == '' || city == '${city:raw}'",
+          "format": "table",
+          "parser": "backend",
+          "refId": "A",
+          "root_selector": "($m := data.spans[tags[key='geo.country_code'] and tags[key='http.url'] and $not($contains($string(tags[key='http.url'][0].value), '/cdn-cgi'))]; $exists($m) ? $m.{\"traceID\": $string(traceID),\"operationName\": $string(operationName),\"startTime\": startTime,\"duration\": duration,\"route\": $string($replace($replace($string(tags[key='http.url'][0].value), /^https?:\\/\\/[^\\/]+/, \"\"), /\\?.*$/, \"\")),\"city\": $string(tags[key='geo.city'][0].value),\"region\": $string(tags[key='geo.region'][0].value),\"country\": $string(tags[key='geo.country_code'][0].value)} : [])",
+          "source": "url",
+          "type": "json",
+          "url": "/api/traces?service=$service&tags=%7B%22deployment.environment%22%3A%22$environment%22%7D&limit=2000&start=${__from}000&end=${__to}000",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "Recent traces",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Started",
+            "binary": {
+              "left": "Start",
+              "operator": "/",
+              "right": "1000"
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Duration (ms)",
+            "binary": {
+              "left": "Duration",
+              "operator": "/",
+              "right": "1000"
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Duration": true,
+              "Method": true,
+              "Start": true
+            },
+            "indexByName": {
+              "City": 4,
+              "Country": 6,
+              "Duration (ms)": 7,
+              "Route": 2,
+              "Span": 3,
+              "Started": 0,
+              "State": 5,
+              "Trace ID": 1
+            }
+          }
+        }
+      ],
+      "type": "table"
     }
   ],
   "refresh": "30s",
@@ -809,8 +1022,8 @@
       },
       {
         "current": {
-          "text": "local",
-          "value": "local"
+          "text": "dev",
+          "value": "dev"
         },
         "hide": 0,
         "includeAll": false,
@@ -820,11 +1033,16 @@
         "options": [
           {
             "selected": true,
-            "text": "local",
-            "value": "local"
+            "text": "dev",
+            "value": "dev"
+          },
+          {
+            "selected": false,
+            "text": "prod",
+            "value": "prod"
           }
         ],
-        "query": "local",
+        "query": "dev,prod",
         "skipUrlSync": false,
         "type": "custom"
       },
@@ -853,7 +1071,7 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "JobBoard \u2014 Web App RUM",
+  "title": "JobBoard \u00e2\u20ac\u201d Web App RUM",
   "uid": "jobboard-landing-rum",
   "weekStart": ""
 }

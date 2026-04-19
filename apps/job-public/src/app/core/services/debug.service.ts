@@ -42,10 +42,6 @@ export class DebugService {
     return (environment as any).jaegerUrl + traceId;
   }
 
-  seqLink(traceId: string): string {
-    return (environment as any).seqUrl?.replace('{traceId}', traceId) ?? '';
-  }
-
   grafanaLink(traceId: string): string {
     return (environment as any).grafanaUrl + traceId;
   }

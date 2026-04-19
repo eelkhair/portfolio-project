@@ -2,10 +2,20 @@
 # `jaeger-otel-collector-1` container on 192.168.1.160.
 #
 # Diff vs prior version:
-#   - NEW: `elasticsearch/fe` exporter for frontend logs, separate index
-#   - NEW: `filter/fe_only` processor — only service.name in (landing, admin-fe, public-fe)
-#   - NEW: `logs/es-fe` pipeline — fans out FE Faro logs to Elasticsearch
-#   - `logs` pipeline (unchanged behavior) still sends everything to Seq
+#   - NEW: `filter/fe_log_only` — drops Faro `kind=measurement` / `kind=event`
+#     records (web-vitals, navigation entries, etc.) from the logs pipelines
+#     so Seq + ES only get actual `kind=log` lines (i.e. our pushLog calls).
+#   - NEW: `transform/fe_clean_log` — deletes the verbose RUM metadata Faro
+#     stamps on every log record (browser_*, sdk_*, session_id, page_url,
+#     app_release, view_*, plus the redundant `kind` attribute). Backend
+#     Serilog logs don't carry these so the processor is a no-op for them.
+#   - Both new processors apply to the `logs` (Seq) AND `logs/es-fe` (ES)
+#     pipelines. Order is filter-then-transform so the kind check runs first.
+#
+# Existing behavior preserved:
+#   - `elasticsearch/fe` exporter for frontend logs, separate index
+#   - `filter/fe_only` keeps only service.name in (landing, admin-fe, public-fe) on ES
+#   - `transform/fe_service_name` copies Faro's `app` → `service.name` for FE
 #
 # Frontend logs arrive via Alloy's Loki→OTel bridge. Backend (.NET) services
 # continue to write directly to Elasticsearch via Serilog sink — they do NOT
@@ -74,6 +84,40 @@ processors:
     logs:
       log_record:
         - 'not (resource.attributes["service.name"] == "landing" or resource.attributes["service.name"] == "admin-fe" or resource.attributes["service.name"] == "public-fe")'
+  # Faro tags every record with `kind` (log | measurement | event). Drop
+  # everything that isn't an actual log line — keeps web-vitals, navigation,
+  # and tracing-fetch records out of Seq + ES. Backend logs have no `kind`
+  # attribute so they pass through unchanged.
+  filter/fe_log_only:
+    error_mode: ignore
+    logs:
+      log_record:
+        - 'attributes["kind"] != nil and attributes["kind"] != "log"'
+  # Strip the verbose RUM metadata Faro stamps on every log record. Each Seq
+  # row currently dumps ~20 attributes (browser, sdk, session, page, view).
+  # Keep `app_*`, `service.name`, `geo.*`, and our `context_*` user fields.
+  # Backend logs don't carry these attributes so the processor is a no-op
+  # for them.
+  transform/fe_clean_log:
+    error_mode: ignore
+    log_statements:
+      - context: resource
+        statements:
+          - delete_matching_keys(attributes, "^browser_")
+          - delete_matching_keys(attributes, "^sdk_")
+          - delete_matching_keys(attributes, "^view_")
+          - delete_key(attributes, "session_id")
+          - delete_key(attributes, "page_url")
+          - delete_key(attributes, "app_release")
+          - delete_key(attributes, "app_bundle_id")
+      - context: log
+        statements:
+          - delete_matching_keys(attributes, "^browser_")
+          - delete_matching_keys(attributes, "^sdk_")
+          - delete_matching_keys(attributes, "^view_")
+          - delete_key(attributes, "session_id")
+          - delete_key(attributes, "page_url")
+          - delete_key(attributes, "kind")
   batch:
 
 connectors:
@@ -131,11 +175,11 @@ service:
       exporters: [otlp/jaeger, otlphttp/seq, spanmetrics]
     logs:
       receivers: [otlp]
-      processors: [batch]
+      processors: [filter/fe_log_only, transform/fe_clean_log, batch]
       exporters: [otlphttp/seq]
     logs/es-fe:
       receivers: [otlp]
-      processors: [transform/fe_service_name, filter/fe_only, batch]
+      processors: [transform/fe_service_name, filter/fe_only, filter/fe_log_only, transform/fe_clean_log, batch]
       exporters: [elasticsearch/fe]
     metrics:
       receivers: [otlp, spanmetrics]

@@ -4,6 +4,7 @@ import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../types/Dtos/ApiResponse';
 import { Observable } from 'rxjs';
 import { ApplicationDetail, ApplicationListItem, ApplicationStatus, PaginatedResponse } from '../types/models/Application';
+import { ActivityLogger } from './activity-logger.service';
 
 export interface ApplicationFilters {
   status?: ApplicationStatus;
@@ -17,6 +18,7 @@ export interface ApplicationFilters {
 @Injectable({ providedIn: 'root' })
 export class ApplicationService {
   private readonly http = inject(HttpClient);
+  private readonly logger = inject(ActivityLogger);
   private readonly baseUrl = `${environment.gatewayUrl}api/applications`;
 
   list(filters?: ApplicationFilters): Observable<ApiResponse<PaginatedResponse<ApplicationListItem>>> {
@@ -36,16 +38,17 @@ export class ApplicationService {
   }
 
   updateStatus(id: string, status: ApplicationStatus): Observable<ApiResponse<ApplicationListItem>> {
-    return this.http.patch<ApiResponse<ApplicationListItem>>(
-      `${this.baseUrl}/${id}/status`,
-      { status }
-    );
+    return this.http
+      .patch<ApiResponse<ApplicationListItem>>(`${this.baseUrl}/${id}/status`, { status })
+      .pipe(this.logger.trace('application status update', () => ({ id, status })));
   }
 
   batchUpdateStatus(ids: string[], status: ApplicationStatus): Observable<ApiResponse<ApplicationListItem[]>> {
-    return this.http.patch<ApiResponse<ApplicationListItem[]>>(
-      `${this.baseUrl}/batch-status`,
-      { applicationIds: ids, status }
-    );
+    return this.http
+      .patch<ApiResponse<ApplicationListItem[]>>(
+        `${this.baseUrl}/batch-status`,
+        { applicationIds: ids, status },
+      )
+      .pipe(this.logger.trace('application batch update', () => ({ count: ids.length, status })));
   }
 }

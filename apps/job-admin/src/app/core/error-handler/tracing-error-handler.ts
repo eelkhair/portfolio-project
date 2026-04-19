@@ -1,9 +1,14 @@
-import { ErrorHandler } from '@angular/core';
+import { ErrorHandler, inject } from '@angular/core';
 import { trace, SpanKind, SpanStatusCode } from '@opentelemetry/api';
+import { ActivityLogger } from '../services/activity-logger.service';
 
 export class TracingErrorHandler implements ErrorHandler {
+  private readonly logger = inject(ActivityLogger);
+
   handleError(error: unknown): void {
-    console.error(error);
+    this.logger.error('unhandled error', error, {
+      type: this.getErrorType(error),
+    });
 
     const tracer = trace.getTracer('admin-fe');
     const span = tracer.startSpan('unhandled.error', {

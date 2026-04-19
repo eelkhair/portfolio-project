@@ -4,6 +4,7 @@ import {ApiResponse} from '../types/Dtos/ApiResponse';
 import {environment} from '../../../environments/environment';
 import {map} from 'rxjs';
 import {AccountService} from './account.service';
+import {ActivityLogger} from './activity-logger.service';
 
 export interface ChatRequest {
   message: string;
@@ -27,6 +28,7 @@ export interface ChatResponse {
 export class ChatService {
   private http = inject(HttpClient);
   private accountService = inject(AccountService);
+  private logger = inject(ActivityLogger);
   private baseUrl = `${environment.gatewayUrl}ai/v2/`;
 
   private get chatEndpoint(): string {
@@ -36,8 +38,9 @@ export class ChatService {
   }
 
   chat(request: ChatRequest) {
+    const endpoint = this.chatEndpoint;
     return this.http.post<ApiResponse<ChatResponse>>(
-      `${this.baseUrl}${this.chatEndpoint}`,
+      `${this.baseUrl}${endpoint}`,
       request,
       {observe: 'response'}
     ).pipe(
@@ -47,7 +50,13 @@ export class ChatService {
           body.data.traceId = res.headers.get('x-trace-id') ?? undefined;
         }
         return body;
-      })
+      }),
+      this.logger.trace('chat send', (body) => ({
+        endpoint,
+        conversationId: body.data?.conversationId,
+        toolCount: body.data?.toolResults?.length ?? 0,
+        messageLength: request.message.length,
+      })),
     );
   }
 }

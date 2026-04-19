@@ -15,7 +15,11 @@ export const environment = {
   otelAspire: undefined as string | undefined,
   otelZipkin: `https://otel.${baseDomain}/api/v2/spans`,
   faroUrl: 'https://faro.elkhair.tech/collect',
-  geoApiUrl: `https://${baseDomain}/api/geo`,
+  // Always use the .elkhair.tech zone (Cloudflare-served) for geo lookup.
+  // The .eelkhair.net zone goes through NPM which strips cf-connecting-ip,
+  // so the upstream geo handler can't resolve country/city from a real IP
+  // and always returns XX.
+  geoApiUrl: 'https://elkhair.tech/api/geo',
   grafanaUrl: `https://grafana.${baseDomain}/d/bf5m5dwukfncwd/find-by-trace-id?orgId=1&var-TraceId=`,
   jaegerUrl: `https://jaeger.${baseDomain}/trace/`,
   seqUrl: `https://seq.${baseDomain}/#/events?filter=TraceId%3D%22{traceId}%22`,

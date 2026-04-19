@@ -1,101 +1,518 @@
 {
-  "uid": "bf5m5dwukfncwd",
-  "title": "Find By Trace Id",
-  "tags": ["jobboard"],
-  "timezone": "browser",
-  "editable": true,
-  "refresh": "",
-  "templating": {
+  "annotations": {
     "list": [
       {
-        "name": "TraceId",
-        "label": "TraceId",
-        "type": "textbox",
-        "current": { "text": "", "value": "" },
-        "options": [{ "selected": true, "text": "", "value": "" }],
-        "query": "",
-        "hide": 0
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
       }
     ]
   },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
   "panels": [
     {
+      "datasource": {
+        "type": "jaeger",
+        "uid": "ef5fo1p8d0zcwd"
+      },
+      "gridPos": {
+        "h": 13,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
       "id": 1,
-      "title": "Trace",
-      "type": "traces",
-      "gridPos": { "h": 13, "w": 24, "x": 0, "y": 0 },
-      "datasource": { "type": "jaeger", "uid": "jaeger" },
+      "pluginVersion": "10.4.0",
       "targets": [
         {
-          "datasource": { "type": "jaeger", "uid": "jaeger" },
+          "datasource": {
+            "type": "jaeger",
+            "uid": "ef5fo1p8d0zcwd"
+          },
           "query": "${TraceId}",
           "refId": "A"
         }
-      ]
+      ],
+      "title": "Panel Title",
+      "type": "traces"
     },
     {
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "cf5m4qd8jt7uod"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Message"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 726
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Sql"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 257
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 196
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 24,
+        "x": 0,
+        "y": 13
+      },
       "id": 2,
-      "title": "Logs",
-      "type": "table",
-      "gridPos": { "h": 11, "w": 24, "x": 0, "y": 13 },
-      "datasource": { "type": "elasticsearch", "uid": "elasticsearch" },
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "Time"
+          }
+        ]
+      },
+      "pluginVersion": "10.4.0",
       "targets": [
         {
-          "datasource": { "type": "elasticsearch", "uid": "elasticsearch" },
-          "metrics": [{ "id": "1", "settings": { "limit": "500" }, "type": "logs" }],
-          "query": "fields.TraceId:\"${TraceId}\"",
+          "alias": "",
+          "bucketAggs": [],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "cf5m4qd8jt7uod"
+          },
+          "metrics": [
+            {
+              "id": "1",
+              "settings": {
+                "limit": "500"
+              },
+              "type": "logs"
+            }
+          ],
+          "query": "fields.traceId: \"${TraceId}\"",
           "refId": "A",
           "timeField": "@timestamp"
         }
       ],
-      "options": {
-        "cellHeight": "sm",
-        "showHeader": true,
-        "sortBy": [{ "desc": false, "displayName": "Time" }]
-      },
-      "fieldConfig": {
-        "defaults": {
-          "custom": { "align": "auto", "cellOptions": { "type": "auto" } }
-        },
-        "overrides": [
-          {
-            "matcher": { "id": "byName", "options": "Message" },
-            "properties": [{ "id": "custom.width", "value": 726 }]
-          },
-          {
-            "matcher": { "id": "byName", "options": "Time" },
-            "properties": [{ "id": "custom.width", "value": 196 }]
-          }
-        ]
-      },
+      "timeFrom": "1w",
+      "title": "ElasticSearch",
       "transformations": [
         {
           "id": "organize",
           "options": {
             "excludeByName": {
-              "_id": true, "_index": true, "_source": true, "_type": true,
-              "fields.@timestamp": true, "fields.ActionId": true,
-              "fields.ConnectionId": true, "fields.EventId.Id": true,
-              "fields.EventId.Name": true, "fields.ParentSpanId": true,
-              "fields.RequestId": true, "fields.SpanId": true,
-              "fields.SpanKind": true, "fields.TraceId": true,
-              "fields.parentSpanId": true, "fields.spanId": true,
-              "highlight": true, "id": true, "messageTemplate": true, "sort": true,
-              "fields.parameters": true, "fields.commandTimeout": true,
-              "fields.commandType": true, "fields.newLine": true
+              "_id": true,
+              "_index": true,
+              "_source": true,
+              "_type": true,
+              "fields.@timestamp": true,
+              "fields.ActionId": true,
+              "fields.ActionName": true,
+              "fields.ApplicationName": false,
+              "fields.AuthenticationScheme": true,
+              "fields.CommandName": true,
+              "fields.ConnectionId": true,
+              "fields.EventId.Id": true,
+              "fields.EventId.Name": true,
+              "fields.ParentSpanId": true,
+              "fields.Request": true,
+              "fields.RequestId": true,
+              "fields.RequestPath": true,
+              "fields.SourceContext": true,
+              "fields.SpanId": true,
+              "fields.SpanKind": true,
+              "fields.TraceId": true,
+              "fields.commandText": false,
+              "fields.commandTimeout": true,
+              "fields.commandType": true,
+              "fields.elapsed": true,
+              "fields.newLine": true,
+              "fields.otel.tag.cqrs.request": true,
+              "fields.otel.tag.db.name": true,
+              "fields.otel.tag.db.statement": true,
+              "fields.otel.tag.db.system": true,
+              "fields.otel.tag.email": true,
+              "fields.otel.tag.http.request.method": true,
+              "fields.otel.tag.network.protocol.version": true,
+              "fields.otel.tag.peer.service": true,
+              "fields.otel.tag.server.address": true,
+              "fields.otel.tag.url.path": true,
+              "fields.otel.tag.url.scheme": true,
+              "fields.otel.tag.userId": true,
+              "fields.otel.tag.user_agent.original": true,
+              "fields.parameters": true,
+              "fields.parentSpanId": true,
+              "fields.spanId": true,
+              "highlight": true,
+              "id": true,
+              "level": true,
+              "messageTemplate": true,
+              "sort": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "@timestamp": 0,
+              "_id": 6,
+              "_index": 7,
+              "_source": 8,
+              "_type": 9,
+              "fields.@timestamp": 10,
+              "fields.ActionId": 11,
+              "fields.ActionName": 12,
+              "fields.AdminEmail": 13,
+              "fields.ApplicationName": 2,
+              "fields.ClassName": 14,
+              "fields.CommandName": 15,
+              "fields.CompanyEmail": 16,
+              "fields.CompanyName": 17,
+              "fields.CompanyUId": 18,
+              "fields.ConnectionId": 19,
+              "fields.IndustryUId": 20,
+              "fields.MessageId": 21,
+              "fields.ParentSpanId": 22,
+              "fields.ParentTrace": 23,
+              "fields.Request": 24,
+              "fields.RequestId": 25,
+              "fields.RequestPath": 26,
+              "fields.SourceContext": 27,
+              "fields.SpanId": 28,
+              "fields.SpanKind": 29,
+              "fields.TraceId": 30,
+              "fields.otel.tag.AdminEmail": 31,
+              "fields.otel.tag.CompanyEmail": 32,
+              "fields.otel.tag.CompanyName": 33,
+              "fields.otel.tag.CompanyUId": 34,
+              "fields.otel.tag.IndustryUId": 35,
+              "fields.otel.tag.UserUId": 36,
+              "fields.otel.tag.cqrs.request": 5,
+              "fields.otel.tag.email": 37,
+              "fields.otel.tag.http.request.method": 3,
+              "fields.otel.tag.network.protocol.version": 38,
+              "fields.otel.tag.outbox.message.eventType": 39,
+              "fields.otel.tag.outbox.parent.spanId": 40,
+              "fields.otel.tag.outbox.parent.traceId": 41,
+              "fields.otel.tag.processor.traceId": 54,
+              "fields.otel.tag.server.address": 42,
+              "fields.otel.tag.url.path": 43,
+              "fields.otel.tag.url.scheme": 44,
+              "fields.otel.tag.userId": 45,
+              "fields.otel.tag.user_agent.original": 46,
+              "fields.parentSpanId": 47,
+              "fields.spanId": 48,
+              "fields.traceId": 4,
+              "highlight": 49,
+              "id": 50,
+              "level": 51,
+              "message": 1,
+              "messageTemplate": 52,
+              "sort": 53
             },
             "renameByName": {
               "@timestamp": "Time",
-              "fields.ApplicationName": "App",
-              "fields.SourceContext": "Source",
-              "fields.CommandName": "Command",
-              "level": "Level",
+              "fields.ApplicationName": "Service",
+              "fields.commandText": "Sql",
+              "fields.otel.tag.cqrs.request": "Request",
+              "fields.otel.tag.email": "",
+              "fields.otel.tag.http.request.method": "Http Verb",
+              "fields.otel.tag.network.protocol.version": "",
+              "fields.traceId": "TraceId",
               "message": "Message"
             }
           }
         }
-      ]
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "seq-infinity"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "minWidth": 100
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 196
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Message"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 360
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Level"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 100
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Kind"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 80
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "TraceId"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": true,
+                    "title": "View in Jaeger",
+                    "url": "https://jaeger.elkhair.tech/trace/${__value.raw}"
+                  }
+                ]
+              },
+              {
+                "id": "custom.width",
+                "value": 280
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 14,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
+      "id": 3,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "Time"
+          }
+        ]
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "seq-infinity"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "A",
+          "root_selector": "$map($, function($e) { $merge([ {\"Time\": $e.Timestamp, \"Level\": $e.Level, \"Kind\": $e.SpanKind, \"Message\": $e.RenderedMessage}, $merge($e.Properties.($type(Value) = \"object\" ? $merge($each(Value, function($v, $k) { {(Name & \".\" & $k): $v} })) : {Name: Value} ) ) ]) })",
+          "source": "url",
+          "type": "json",
+          "url": "https://seq.eelkhair.net/api/events",
+          "url_options": {
+            "data": "",
+            "headers": [],
+            "method": "GET",
+            "params": [
+              {
+                "key": "filter",
+                "value": "TraceId = \"${TraceId}\" and (ApplicationName = \"admin-fe\" or ApplicationName = \"public-fe\" or ApplicationName = \"landing\")"
+              },
+              {
+                "key": "count",
+                "value": "500"
+              },
+              {
+                "key": "render",
+                "value": "true"
+              }
+            ]
+          }
+        }
+      ],
+      "title": "Frontend Logs",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "ParentSpanId": true,
+              "SpanId": true,
+              "ap_name": true,
+              "app_name": true,
+              "http.method": true,
+              "http.url": true,
+              "kind": true,
+              "level": true,
+              "message": true,
+              "parent_span_id": true,
+              "session.id": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "ApplicationName": 2,
+              "Kind": 4,
+              "Level": 3,
+              "Message": 1,
+              "Time": 0,
+              "TraceId": 5
+            },
+            "renameByName": {
+              "ApplicationName": "Application",
+              "app_environment": "Environment",
+              "geo.city": "City",
+              "geo.country_code": "Country",
+              "geo.lat": "Latitude",
+              "geo.lon": "Longitude",
+              "geo.region": "Region",
+              "http.duration_ns": "Duration (ns)",
+              "http.status_code": "HTTP Status"
+            }
+          }
+        }
+      ],
+      "type": "table"
     }
   ],
-  "schemaVersion": 39
+  "refresh": "",
+  "schemaVersion": 39,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "",
+          "value": ""
+        },
+        "hide": 0,
+        "label": "TraceId",
+        "name": "TraceId",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "skipUrlSync": false,
+        "type": "textbox"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Find By Trace Id",
+  "uid": "bf5m5dwukfncwd",
+  "weekStart": ""
 }

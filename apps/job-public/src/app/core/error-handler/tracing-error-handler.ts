@@ -1,13 +1,16 @@
 import { ErrorHandler, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformServer } from '@angular/common';
 import { trace, SpanKind, SpanStatusCode } from '@opentelemetry/api';
+import { ActivityLogger } from '../services/activity-logger.service';
 
 export class TracingErrorHandler implements ErrorHandler {
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly logger = inject(ActivityLogger);
 
   handleError(error: unknown): void {
-    // Always log to console
-    console.error(error);
+    this.logger.error('unhandled error', error, {
+      type: this.getErrorType(error),
+    });
 
     if (isPlatformServer(this.platformId)) {
       return;

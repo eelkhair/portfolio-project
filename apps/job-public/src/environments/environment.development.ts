@@ -14,7 +14,9 @@ export const environment = {
   otel: `https://otel.${baseDomain}/v1/traces`,
   otelZipkin: `https://otel.${baseDomain}/api/v2/spans`,
   faroUrl: 'https://faro.elkhair.tech/collect',
-  geoApiUrl: `https://${baseDomain}/api/geo`,
+  // Always use .elkhair.tech zone — .eelkhair.net goes through NPM which
+  // strips cf-connecting-ip so geo lookup falls back to XX.
+  geoApiUrl: 'https://elkhair.tech/api/geo',
   jaegerUrl: `https://jaeger.${baseDomain}/trace/`,
   seqUrl: `https://seq.${baseDomain}/#/events?filter=TraceId%3D%22{traceId}%22`,
   grafanaUrl: `https://grafana.${baseDomain}/d/bf5m5dwukfncwd/find-by-trace-id?orgId=1&var-TraceId=`,

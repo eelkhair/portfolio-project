@@ -8,10 +8,12 @@ import { Stats } from '../types/stats.type';
 import { ApiResponse, PaginatedList } from '../types/api-response.type';
 import { SubmitApplicationRequest, ApplicationResponse } from '../types/application.type';
 import { ResumeData, ResumeResponse, UserProfile, UserProfileRequest } from '../types/resume-data.type';
+import { ActivityLogger } from './activity-logger.service';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly http = inject(HttpClient);
+  private readonly logger = inject(ActivityLogger);
   private readonly baseUrl = environment.apiUrl + 'public';
   private readonly applicantUrl = environment.apiUrl + 'applicant';
   private readonly resumesUrl = environment.apiUrl + 'resumes';
@@ -32,13 +34,24 @@ export class ApiService {
 
     return this.http
       .get<ApiResponse<Job[]>>(`${this.baseUrl}/jobs/search`, { params })
-      .pipe(map((res) => res.data ?? []));
+      .pipe(
+        map((res) => res.data ?? []),
+        this.logger.trace('job search', (results) => ({
+          hasQuery: !!filters.query,
+          hasJobType: !!filters.jobType,
+          hasLocation: !!filters.location,
+          count: results.length,
+        })),
+      );
   }
 
   getJobById(id: string): Observable<Job | undefined> {
     return this.http
       .get<ApiResponse<Job>>(`${this.baseUrl}/jobs/${id}`)
-      .pipe(map((res) => res.data));
+      .pipe(
+        map((res) => res.data),
+        this.logger.trace('job view', () => ({ id })),
+      );
   }
 
   getLatestJobs(count = 6): Observable<Job[]> {
@@ -91,7 +104,10 @@ export class ApiService {
   upsertProfile(profile: UserProfileRequest): Observable<UserProfile> {
     return this.http
       .put<ApiResponse<UserProfile>>(`${this.applicantUrl}/profile`, profile)
-      .pipe(map((res) => res.data!));
+      .pipe(
+        map((res) => res.data!),
+        this.logger.trace('profile upsert'),
+      );
   }
 
   getApplications(): Observable<ApplicationResponse[]> {
@@ -103,7 +119,10 @@ export class ApiService {
   submitApplication(request: SubmitApplicationRequest): Observable<ApplicationResponse> {
     return this.http
       .post<ApiResponse<ApplicationResponse>>(`${this.applicantUrl}/applications`, request)
-      .pipe(map((res) => res.data!));
+      .pipe(
+        map((res) => res.data!),
+        this.logger.trace('application submit', (r) => ({ id: r.id })),
+      );
   }
 
   // --- Resume endpoints ---
@@ -115,7 +134,16 @@ export class ApiService {
     if (currentPage) params = params.set('currentPage', currentPage);
     return this.http
       .post<ApiResponse<ResumeResponse>>(`${this.resumesUrl}`, formData, { params })
-      .pipe(map((res) => res.data!));
+      .pipe(
+        map((res) => res.data!),
+        this.logger.trace('resume upload', (r) => ({
+          id: r.id,
+          fileName: file.name,
+          fileSize: file.size,
+          contentType: file.type,
+          currentPage,
+        })),
+      );
   }
 
   getResumes(): Observable<ResumeResponse[]> {
@@ -132,15 +160,21 @@ export class ApiService {
   }
 
   setDefaultResume(id: string): Observable<void> {
-    return this.http.patch<void>(`${this.resumesUrl}/${id}/default`, null);
+    return this.http
+      .patch<void>(`${this.resumesUrl}/${id}/default`, null)
+      .pipe(this.logger.trace('resume set default', () => ({ id })));
   }
 
   deleteResume(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.resumesUrl}/${id}`);
+    return this.http
+      .delete<void>(`${this.resumesUrl}/${id}`)
+      .pipe(this.logger.trace('resume delete', () => ({ id })));
   }
 
   reEmbedResume(id: string): Observable<void> {
-    return this.http.post<void>(`${this.resumesUrl}/${id}/re-embed`, null);
+    return this.http
+      .post<void>(`${this.resumesUrl}/${id}/re-embed`, null)
+      .pipe(this.logger.trace('resume re-embed', () => ({ id })));
   }
 
   getMatchingJobs(limit = 10, traceParent?: string): Observable<MatchingJob[]> {
@@ -152,9 +186,11 @@ export class ApiService {
   }
 
   downloadResumeBlob(id: string): Observable<Blob> {
-    return this.http.get(`${this.resumesUrl}/${id}/download`, {
-      params: { inline: 'true' },
-      responseType: 'blob',
-    });
+    return this.http
+      .get(`${this.resumesUrl}/${id}/download`, {
+        params: { inline: 'true' },
+        responseType: 'blob',
+      })
+      .pipe(this.logger.trace('resume download', (b) => ({ id, size: b.size })));
   }
 }

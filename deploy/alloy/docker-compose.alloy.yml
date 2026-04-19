@@ -1,22 +1,244 @@
-# Portainer stack for 192.168.1.160 — Alloy (Faro receiver) + Prometheus.
+# Portainer stack for 192.168.1.160 — full observability stack:
+# Jaeger, OTel Collector (inline OTEL_CONFIG), Alloy (Faro receiver +
+# Loki→OTel bridge with logfmt parsing), Prometheus (spanmetrics scrape).
 #
-# Prerequisites on the host (192.168.1.160):
-#   - Existing OTel Collector container is running and exposes 4318 on the host
-#     (your current stack does, via -p "4318:4318")
-#   - /home/eelkhair/alloy/config.alloy exists (copy from deploy/alloy/config.alloy)
-#   - /home/eelkhair/alloy/prometheus.yml exists (copy from deploy/alloy/prometheus.yml)
-#   - Your existing OTel Collector config has the `spanmetrics` connector
-#     enabled (see deploy/alloy/otel-collector-spanmetrics-patch.yaml for the
-#     diff to apply to your inlined OTEL_CONFIG env)
+# Edit here, then in Portainer: Stacks → jaeger → Editor → paste → Update.
 #
-# Host networking is used so Alloy reaches the OTel Collector via localhost,
-# and Prometheus scrapes both otel-collector:8889 and prometheus self on
-# localhost without joining the existing stack's compose network.
+# ─────────────────────────────────────────────────────────────────────────
+# Pipeline:
+#   browser → faro.receiver (Alloy) → loki.process.faro (parses logfmt body,
+#   drops kind!=log, promotes fields to labels, replaces body with message)
+#   → otelcol.receiver.loki (Alloy: labels → OTLP attrs) → otel-collector
+#   → fan-out: Seq (logs), ES (logs), Jaeger (traces), Prometheus (metrics)
+#
+# Because Alloy now emits clean OTLP records, the collector only needs:
+#   - transform/fe_service_name: copy app_name → service.name on resource
+#   - filter/fe_only: keep only landing/admin-fe/public-fe for ES exporter
+# (Previous filter/fe_log_only and transform/fe_clean_log are gone — Alloy
+#  handles those concerns at the source now.)
+# ─────────────────────────────────────────────────────────────────────────
 
+version: "3.7"
 services:
+  jaeger:
+    image: jaegertracing/all-in-one:1.64.0
+    restart: unless-stopped
+    ports:
+      - "16686:16686"
+    environment:
+      - LOG_LEVEL=debug
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    restart: unless-stopped
+    command:
+      - "--config=env:OTEL_CONFIG"
+    environment:
+      OTEL_CONFIG: |
+        receivers:
+          otlp:
+            protocols:
+              grpc:
+                endpoint: 0.0.0.0:4317
+              http:
+                endpoint: 0.0.0.0:4318
+                cors:
+                  allowed_origins:
+                    - "https://job-admin.eelkhair.net"
+                    - "https://job-admin-dev.eelkhair.net"
+                    - "https://job-admin.elkhair.tech"
+                    - "https://jobs.elkhair.tech"
+                    - "https://jobs.eelkhair.net"
+                    - "https://jobs-dev.eelkhair.net"
+                    - "https://job.eelkhair.net"
+                    - "http://localhost:*"
+                  allowed_headers:
+                    - "*"
+
+        processors:
+          filter/dapr:
+            error_mode: ignore
+            traces:
+              span:
+                - 'name == "/dapr.proto.runtime.v1.Dapr/GetConfiguration"'
+                - 'name == "/dapr.proto.runtime.v1.Dapr/SubscribeConfiguration"'
+                - 'name == "/dapr.proto.runtime.v1.Dapr/SaveState"'
+                - 'name == "/dapr.proto.runtime.v1.Dapr/GetState"'
+                - 'name == "/dapr.proto.runtime.v1.Dapr/DeleteState"'
+                - 'name == "/dapr.proto.runtime.v1.Dapr/GetBulkSecret"'
+                - 'name == "/dapr.proto.runtime.v1.Dapr/GetSecret"'
+                - 'name == "JobBoard.AI.API.Infrastructure.SignalR.AiNotificationHub/OnConnectedAsync"'
+                - 'name == "/hubs/notifications/negotiate"'
+                - 'name == "/dapr.proto.runtime.v1.Dapr/PublishEvent" and attributes["messaging.destination.name"] == "healthCheckTopic"'
+                - 'IsMatch(name, "/v1\\.0/configuration/.*")'
+                - 'IsMatch(name, "/v1\\.0/secrets/.*")'
+                - 'IsMatch(name, "/v1\\.0/state/.*")'
+                - 'IsMatch(name, "/v1\\.0/publish/.*/healthCheckTopic")'
+                - 'attributes["url.full"] != nil and attributes["url.full"] == "http://localhost:3500/v1.0/healthz"'
+                - 'attributes["user_agent.original"] != nil and IsMatch(attributes["user_agent.original"], "Uptime-Kuma.*")'
+                - 'attributes["server.port"] != nil and attributes["server.port"] == 9200'
+          # Faro logs come from Alloy's loki bridge as one logfmt blob in the
+          # body (e.g. `timestamp="..." kind=log message="[admin] X" level=info
+          # app_name=admin-fe app_environment=dev traceID=... spanID=... ...`).
+          # Extract the fields we care about into log.attributes so downstream
+          # filters/consumers see real attributes, then replace the body with
+          # just the message text. Backend logs come in clean already so we
+          # gate this on body shape via the condition.
+          transform/parse_fe_body:
+            error_mode: ignore
+            log_statements:
+              - context: log
+                conditions:
+                  - IsString(log.body) and IsMatch(log.body, "^timestamp=.*kind=")
+                statements:
+                  - merge_maps(log.attributes, ExtractPatterns(log.body, "kind=(?P<kind>[a-z]+)"), "upsert")
+                  - merge_maps(log.attributes, ExtractPatterns(log.body, "level=(?P<level>[a-z]+)"), "upsert")
+                  - merge_maps(log.attributes, ExtractPatterns(log.body, "app_name=(?P<app_name>[A-Za-z0-9_-]+)"), "upsert")
+                  - merge_maps(log.attributes, ExtractPatterns(log.body, "app_environment=(?P<app_environment>[A-Za-z0-9_-]+)"), "upsert")
+                  - merge_maps(log.attributes, ExtractPatterns(log.body, "traceID=(?P<TraceId>[a-f0-9]+)"), "upsert")
+                  - merge_maps(log.attributes, ExtractPatterns(log.body, "spanID=(?P<SpanId>[a-f0-9]+)"), "upsert")
+                  - merge_maps(log.attributes, ExtractPatterns(log.body, "message=\"(?P<message>[^\"]*)\""), "upsert")
+                  # Replace body with just the message text (clean Seq display)
+                  - set(log.body, log.attributes["message"]) where log.attributes["message"] != nil
+          # Drop FE non-log records (kind=event / kind=measurement / etc.).
+          # `kind` is now on log.attributes thanks to parse_fe_body. Backend
+          # logs don't have `kind` so they pass through unchanged.
+          filter/fe_log_only:
+            error_mode: ignore
+            logs:
+              log_record:
+                - 'attributes["kind"] != nil and attributes["kind"] != "log"'
+          # Normalize FE attributes to match backend Serilog conventions:
+          #   app_name        → service.name (resource) + ApplicationName (attr)
+          #   app_environment → deployment.environment (resource)
+          # ApplicationName is the standard Serilog enricher field, so adding
+          # it lets FE + BE share dashboard columns and search filters.
+          # Spans get ApplicationName too (sourced from resource.service.name
+          # since Faro's web tracing SDK already populates that).
+          transform/fe_service_name:
+            error_mode: ignore
+            log_statements:
+              - context: log
+                statements:
+                  - set(resource.attributes["service.name"], log.attributes["app_name"]) where log.attributes["app_name"] != nil and resource.attributes["service.name"] == nil
+                  - set(resource.attributes["deployment.environment"], log.attributes["app_environment"]) where log.attributes["app_environment"] != nil and resource.attributes["deployment.environment"] == nil
+                  - set(log.attributes["ApplicationName"], log.attributes["app_name"]) where log.attributes["app_name"] != nil
+            trace_statements:
+              - context: span
+                statements:
+                  - set(span.attributes["ApplicationName"], resource.attributes["service.name"]) where resource.attributes["service.name"] != nil
+          # Promote OTLP top-level trace_id / span_id onto attributes so they
+          # show up as queryable @Properties (TraceId / SpanId) in Seq —
+          # matching the Serilog convention backend services already emit.
+          # Applies to both LOG records and SPAN records. Use the `.string`
+          # path accessor to get the hex representation; the bare path
+          # returns a byte array which serializes as `[177,243,...]`.
+          transform/promote_trace_ids:
+            error_mode: ignore
+            log_statements:
+              - context: log
+                statements:
+                  - set(log.attributes["TraceId"], log.trace_id.string) where log.trace_id.string != "" and log.trace_id.string != "00000000000000000000000000000000"
+                  - set(log.attributes["SpanId"], log.span_id.string) where log.span_id.string != "" and log.span_id.string != "0000000000000000"
+            trace_statements:
+              - context: span
+                statements:
+                  - set(span.attributes["TraceId"], span.trace_id.string) where span.trace_id.string != "" and span.trace_id.string != "00000000000000000000000000000000"
+                  - set(span.attributes["SpanId"], span.span_id.string) where span.span_id.string != "" and span.span_id.string != "0000000000000000"
+                  - set(span.attributes["ParentSpanId"], span.parent_span_id.string) where span.parent_span_id.string != "" and span.parent_span_id.string != "0000000000000000"
+          # Route only FE services to the ES logs pipeline so we don't
+          # duplicate backend logs that Serilog already writes directly to ES.
+          # The deprecated `mapping.mode: raw` config option on the ES
+          # exporter is silently ignored in v0.150+. The new way is to set
+          # the `elastic.mapping.mode` scope attribute, which the exporter
+          # reads per-record. Without this, the default mode rejects most
+          # OTLP-shape docs with a generic HTTP 400 illegal_argument_exception
+          # (no useful caused_by in the response).
+          transform/set_es_mapping_mode:
+            error_mode: ignore
+            log_statements:
+              - context: log
+                statements:
+                  - set(instrumentation_scope.attributes["elastic.mapping.mode"], "raw")
+          filter/fe_only:
+            error_mode: ignore
+            logs:
+              log_record:
+                - 'not (resource.attributes["service.name"] == "landing" or resource.attributes["service.name"] == "admin-fe" or resource.attributes["service.name"] == "public-fe")'
+          batch:
+
+        connectors:
+          spanmetrics:
+            histogram:
+              explicit:
+                buckets: [10ms, 50ms, 100ms, 250ms, 500ms, 1s, 2s, 5s, 10s]
+            dimensions:
+              - name: http.method
+              - name: http.route
+              - name: deployment.environment
+              - name: geo.country_code
+                default: XX
+              - name: geo.city
+                default: ""
+              - name: geo.region
+                default: ""
+              - name: geo.lat
+                default: ""
+              - name: geo.lon
+                default: ""
+            metrics_flush_interval: 15s
+            exemplars:
+              enabled: true
+
+        exporters:
+          otlp/jaeger:
+            endpoint: jaeger:4317
+            tls:
+              insecure: true
+          otlphttp/seq:
+            endpoint: https://seq.eelkhair.net/ingest/otlp
+          prometheus:
+            endpoint: 0.0.0.0:8889
+            metric_expiration: 5m
+            resource_to_telemetry_conversion:
+              enabled: true
+          # Frontend Faro logs go here, remapped via ES ingest pipeline to
+          # match the Serilog field shape (`fields.traceId`) the dashboards
+          # expect. ES runs in a separate Docker network so we use host IP.
+          # Mapping mode is set per-record via the `elastic.mapping.mode`
+          # scope attribute (see transform/set_es_mapping_mode in the
+          # logs/es-fe pipeline) — `mapping.mode: raw` here is silently
+          # ignored in v0.150+.
+          elasticsearch/fe:
+            endpoints: [http://192.168.1.160:9200]
+            logs_index: fe-logs
+            pipeline: fe-otel-to-serilog
+
+        service:
+          pipelines:
+            traces:
+              receivers: [otlp]
+              processors: [filter/dapr, transform/fe_service_name, transform/promote_trace_ids, batch]
+              exporters: [otlp/jaeger, otlphttp/seq, spanmetrics]
+            logs:
+              receivers: [otlp]
+              processors: [transform/parse_fe_body, filter/fe_log_only, transform/fe_service_name, transform/promote_trace_ids, batch]
+              exporters: [otlphttp/seq]
+            logs/es-fe:
+              receivers: [otlp]
+              processors: [transform/parse_fe_body, filter/fe_log_only, transform/fe_service_name, filter/fe_only, transform/promote_trace_ids, transform/set_es_mapping_mode, batch]
+              exporters: [elasticsearch/fe]
+            metrics:
+              receivers: [otlp, spanmetrics]
+              processors: [batch]
+              exporters: [prometheus]
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+      - "8889:8889"
+
   alloy:
     image: grafana/alloy:latest
-    container_name: alloy
     restart: unless-stopped
     network_mode: host
     volumes:
@@ -33,7 +255,6 @@ services:
 
   prometheus:
     image: prom/prometheus:latest
-    container_name: prometheus
     restart: unless-stopped
     network_mode: host
     volumes:

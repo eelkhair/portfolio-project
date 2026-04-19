@@ -2,13 +2,15 @@ import {computed, inject, Injectable} from '@angular/core';
 import {OidcSecurityService, LoginResponse} from 'angular-auth-oidc-client';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {map, distinctUntilChanged, pairwise, startWith, filter, take} from 'rxjs/operators';
+import {ActivityLogger} from './activity-logger.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AccountService {
   private oidc = inject(OidcSecurityService);
+  private logger = inject(ActivityLogger);
 
   isAuthenticated = toSignal(
     this.oidc.isAuthenticated$.pipe(map(result => result.isAuthenticated)),
@@ -43,6 +45,38 @@ export class AccountService {
       .filter((uid, i, arr) => arr.indexOf(uid) === i)
   );
 
+  constructor() {
+    // Auth lifecycle logs: login = false->true transition, logout = true->false.
+    // pairwise() needs a seed value so the first emission also fires.
+    this.oidc.isAuthenticated$
+      .pipe(
+        map(r => r.isAuthenticated),
+        distinctUntilChanged(),
+        startWith(false),
+        pairwise(),
+      )
+      .subscribe(([prev, curr]) => {
+        if (!prev && curr) this.logger.info('auth login');
+        else if (prev && !curr) this.logger.info('auth logout');
+      });
+
+    // First non-empty user payload — emit claim summary (no values, just keys/counts)
+    this.oidc.userData$
+      .pipe(
+        map(r => r.userData as Record<string, unknown> | undefined | null),
+        filter((u): u is Record<string, unknown> => !!u && Object.keys(u).length > 0),
+        take(1),
+      )
+      .subscribe(u => {
+        const groups = (u['groups'] as string[] | undefined) ?? [];
+        this.logger.info('auth user data', {
+          claimKeys: Object.keys(u).length,
+          groupsCount: groups.length,
+          hasEmail: 'email' in u,
+        });
+      });
+  }
+
   checkAuth(): Observable<LoginResponse> {
     return this.oidc.checkAuth();
   }
@@ -52,6 +86,7 @@ export class AccountService {
   }
 
   logout() {
+    this.logger.info('auth logout requested');
     sessionStorage.removeItem('job-admin-getting-started-shown');
     sessionStorage.removeItem('job-admin-tour-shown');
     this.oidc.logoff().subscribe();

@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs';
 import { ApiResponse } from '../types/api-response.type';
 import { environment } from '../../../environments/environment';
+import { ActivityLogger } from './activity-logger.service';
 
 export interface ChatRequest {
   message: string;
@@ -18,6 +19,7 @@ export interface ChatResponse {
 @Injectable({ providedIn: 'root' })
 export class ChatService {
   private readonly http = inject(HttpClient);
+  private readonly logger = inject(ActivityLogger);
   private readonly baseUrl = environment.aiUrl;
 
   chat(request: ChatRequest) {
@@ -33,6 +35,10 @@ export class ChatService {
           }
           return body;
         }),
+        this.logger.trace('chat send', (body) => ({
+          conversationId: body.data?.conversationId,
+          messageLength: request.message.length,
+        })),
       );
   }
 }

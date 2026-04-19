@@ -1,5 +1,6 @@
-import {computed, Injectable, signal} from '@angular/core';
+import {computed, inject, Injectable, signal} from '@angular/core';
 import {FeatureFlagsDto} from '../types/Dtos/FeatureFlagsDto';
+import {ActivityLogger} from './activity-logger.service';
 
 const MODE_STORAGE_KEY = 'job-admin-mode-override';
 
@@ -20,6 +21,8 @@ function normalizeFlags(flags: FeatureFlagsDto | null): FeatureFlagsDto | null {
 
 @Injectable({ providedIn: 'root' })
 export class FeatureFlagsService {
+  private readonly logger = inject(ActivityLogger);
+
   private readonly _featureFlags = signal<FeatureFlagsDto|null>(null);
   private readonly _localOverride = signal<boolean | null>(this.readStoredOverride());
   private readonly _loaded = signal(false);
@@ -41,18 +44,24 @@ export class FeatureFlagsService {
   readonly contactForm = computed(() => this._featureFlags()?.['contactform'] ?? false);
 
   setFlags(flags: FeatureFlagsDto) {
-    this._featureFlags.set(normalizeFlags(flags));
+    const normalized = normalizeFlags(flags);
+    this._featureFlags.set(normalized);
     this._loaded.set(true);
+    this.logger.info('feature flags received', {
+      count: normalized ? Object.keys(normalized).length : 0,
+    });
   }
 
   setLocalOverride(isMonolith: boolean) {
     localStorage.setItem(MODE_STORAGE_KEY, JSON.stringify(isMonolith));
     this._localOverride.set(isMonolith);
+    this.logger.info('mode override set', { isMonolith });
   }
 
   clearLocalOverride() {
     localStorage.removeItem(MODE_STORAGE_KEY);
     this._localOverride.set(null);
+    this.logger.info('mode override cleared');
   }
 
   private readStoredOverride(): boolean | null {

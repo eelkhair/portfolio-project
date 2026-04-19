@@ -1,10 +1,12 @@
 // Grafana Alloy config — Faro → OTLP bridge.
 //
-// Receives Faro events (errors, web vitals, traces, captured console logs)
-// from browsers via the Faro JSON receiver, converts the Loki-style log
-// stream to OTLP, and forwards both traces and logs to the existing OTel
-// Collector. The OTel Collector handles fan-out to Jaeger + Seq + Prometheus
-// (traces) and Seq + Elasticsearch (logs).
+// Simple bridge: faro.receiver → otelcol.receiver.loki → otelcol.exporter.
+// No loki.process stages — we tried using them to parse logfmt, drop
+// non-log records, and trim noise, but log records were silently lost
+// (`otelcol_exporter_sent_log_records_total` stayed at 0 even with
+// `faro_receiver_logs_total > 0`). Whatever the root cause was, the
+// cleaner path is to do all parsing/filtering downstream in the OTel
+// Collector where we have visibility and OTTL transforms.
 //
 // Used in two contexts:
 //   - Aspire local dev: bind-mounted into the alloy container,

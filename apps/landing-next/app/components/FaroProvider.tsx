@@ -8,11 +8,49 @@ import {
   FaroMetaAttributesSpanProcessor,
 } from "@grafana/faro-web-tracing";
 import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-web";
-import type { Context } from "@opentelemetry/api";
+import { trace, type Context } from "@opentelemetry/api";
 import type { Span, ReadableSpan, SpanProcessor } from "@opentelemetry/sdk-trace-base";
 import type { GeoData } from "../lib/geo";
 
+const INVALID_TRACE_ID = "00000000000000000000000000000000";
+
 let initialized = false;
+
+/** Emit a structured log via faro.api.pushLog so context fields land as
+ *  top-level properties in Seq/ES instead of being string-joined into the
+ *  message by `captureConsole`. Attaches the active span context so the
+ *  log correlates by TraceId in the "Find by Trace Id" dashboard. */
+function pushStructured(message: string, ctx: Record<string, unknown>): void {
+  const context: Record<string, string> = {};
+  for (const [k, v] of Object.entries(ctx)) {
+    if (v === null || v === undefined) continue;
+    if (typeof v === "string") context[k] = v;
+    else if (typeof v === "number" || typeof v === "boolean") context[k] = String(v);
+    else {
+      try { context[k] = JSON.stringify(v); }
+      catch { context[k] = String(v); }
+    }
+  }
+  let spanContext: { traceId: string; spanId: string } | undefined;
+  try {
+    const span = trace.getActiveSpan();
+    const sc = span?.spanContext();
+    if (sc?.traceId && sc.spanId && sc.traceId !== INVALID_TRACE_ID) {
+      spanContext = { traceId: sc.traceId, spanId: sc.spanId };
+    }
+  } catch {
+    /* no active context */
+  }
+  try {
+    faro.api.pushLog([message], {
+      level: LogLevel.INFO,
+      context,
+      ...(spanContext ? { spanContext } : {}),
+    });
+  } catch {
+    console.info(message, ctx);
+  }
+}
 
 /**
  * Wraps Faro's default span pipeline so we can stamp every span with `geo.*`
@@ -98,15 +136,16 @@ export function FaroProvider({
     // Emit a page-view log with geo + page context. Flows through
     // Faro → Alloy → OTel Collector → Seq and (for FE services) → ES,
     // where the Find by Trace Id dashboard can correlate it with the span.
-    const pageViewCtx = {
+    // Use pushLog directly with `context` so values land as structured
+    // properties rather than `[object Object]` from console arg-joining.
+    pushStructured("[landing] page view", {
       url: typeof window !== "undefined" ? window.location.href : "",
       path: typeof window !== "undefined" ? window.location.pathname : "",
       referrer: typeof document !== "undefined" ? document.referrer : "",
       country: geo.country,
       city: geo.city || undefined,
       region: geo.region || undefined,
-    };
-    console.info("[landing] page view", pageViewCtx);
+    });
 
     // Log route changes for SPA navigation. The Next.js App Router fires
     // popstate on back/forward and updates history.pushState on link clicks.
@@ -114,14 +153,14 @@ export function FaroProvider({
       const origPush = history.pushState.bind(history);
       history.pushState = function (...args) {
         const result = origPush(...args);
-        console.info("[landing] route change", {
+        pushStructured("[landing] route change", {
           from: document.referrer || undefined,
           to: window.location.pathname,
         });
         return result;
       };
       window.addEventListener("popstate", () => {
-        console.info("[landing] route back/forward", { to: window.location.pathname });
+        pushStructured("[landing] route back/forward", { to: window.location.pathname });
       });
     }
   }, [env, geo]);

@@ -3,6 +3,7 @@ using JobBoard.Application;
 using JobBoard.Infrastructure.BlobStorage;
 using JobBoard.Infrastructure.Diagnostics;
 using JobBoard.Infrastructure.HttpClients;
+using JobBoard.Infrastructure.Keycloak;
 using JobBoard.Infrastructure.Messaging;
 using JobBoard.Infrastructure.Outbox;
 using JobBoard.Infrastructure.Persistence;
@@ -30,6 +31,7 @@ public static class DependencyInjection
             .AddAiServiceHttpClient(cfg)
             .AddHttpContextAccessor()
             .AddScoped<IUserAccessor, HttpUserAccessor>()
+            .AddKeycloakAdminClient()
             .AddDiagnosticsServices(cfg, "monolith-mcp");
 
         services.AddKeycloakJwtAuth(cfg);
