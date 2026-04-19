@@ -25,6 +25,7 @@ faro.receiver "default" {
 			"https://dev.elkhair.tech",
 			"https://eelkhair.net",
 			"https://www.eelkhair.net",
+			"https://dev.eelkhair.net",
 			"https://job-admin.elkhair.tech",
 			"https://job-admin-dev.elkhair.tech",
 			"https://job-admin.eelkhair.net",
