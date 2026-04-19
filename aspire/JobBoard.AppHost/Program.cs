@@ -148,7 +148,12 @@ var prometheus = builder.AddContainer("prometheus", "prom/prometheus", "latest")
     .WaitFor(otelCollector)
     .WithContainerRuntimeArgs("--label", $"com.docker.compose.project={stack}");
 
-var grafana = builder.AddContainer("grafana", "grafana/grafana", "latest")
+// Pinned to 11.4.0 — Grafana 12+ moved Elasticsearch, Jaeger, etc. out of the
+// core bundle to plugins downloaded from grafana.com on first run. Aspire's
+// Docker network can't reach grafana.com during cold start, so provisioning
+// of those datasources fails with "data source not found". 11.4.0 still
+// bundles them.
+var grafana = builder.AddContainer("grafana", "grafana/grafana", "11.4.0")
     .WithLifetime(ContainerLifetime.Persistent)
     .WithHttpEndpoint(3200, 3000, name: "ui", isProxied: false)
     .WithEnvironment("GF_SECURITY_ADMIN_PASSWORD", "admin")

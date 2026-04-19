@@ -32,10 +32,7 @@ datasources:
         - field: "fields.traceId"
           url: "/d/bf5m5dwukfncwd/find-by-trace-id?var-TraceId=${__value.raw}"
 
-  # NOTE: Infinity datasource (uid infinity-jaeger, used by landing-rum's
-  # "Recent traces" panel) is intentionally NOT provisioned here — the plugin
-  # has to be downloaded from grafana.com which Aspire's Docker network can't
-  # reach during cold start. That one panel will show "datasource not found"
-  # in Aspire local; for the same data, open Jaeger directly at
-  # http://localhost:16686 (more functional than the panel anyway).
-  # In prod/homelab this datasource IS provisioned (grafana has internet).
+  # NOTE: The RUM dashboard (landing-rum) is NOT provisioned in Aspire local.
+  # It requires the Infinity datasource (unsigned plugin, needs grafana.com
+  # access to install) and the spanmetrics connector needs enough FE traffic
+  # to be meaningful. Use the prod Grafana (grafana.eelkhair.net) for RUM.
