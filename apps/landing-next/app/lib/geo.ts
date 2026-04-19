@@ -45,51 +45,71 @@ function pruneCache(now: number): void {
   }
 }
 
-async function lookupViaIpapi(
-  ip: string,
-): Promise<{ city: string; region: string; lat: number | null; lon: number | null }> {
-  if (isPrivateIp(ip)) return { city: "", region: "", lat: null, lon: null };
+type IpapiData = {
+  country: string;
+  city: string;
+  region: string;
+  lat: number | null;
+  lon: number | null;
+};
+
+const EMPTY_IPAPI: IpapiData = { country: "", city: "", region: "", lat: null, lon: null };
+
+async function lookupViaIpapi(ip: string): Promise<IpapiData> {
+  if (isPrivateIp(ip)) return EMPTY_IPAPI;
   try {
     const res = await fetch(`https://ipapi.co/${encodeURIComponent(ip)}/json/`, {
       headers: { "User-Agent": "elkhair-portfolio-geo/1.0" },
       signal: AbortSignal.timeout(2000),
     });
-    if (!res.ok) return { city: "", region: "", lat: null, lon: null };
+    if (!res.ok) return EMPTY_IPAPI;
     const j = (await res.json()) as {
+      country?: string;
+      country_code?: string;
       city?: string;
       region?: string;
       latitude?: number;
       longitude?: number;
     };
+    // ipapi.co returns ISO-2 code as both `country` and `country_code`.
+    const code = (j.country_code ?? j.country ?? "").toUpperCase();
     return {
+      country: code,
       city: j.city ?? "",
       region: j.region ?? "",
       lat: typeof j.latitude === "number" ? j.latitude : null,
       lon: typeof j.longitude === "number" ? j.longitude : null,
     };
   } catch {
-    return { city: "", region: "", lat: null, lon: null };
+    return EMPTY_IPAPI;
   }
 }
 
 /**
- * Resolves geo for the given headers. Country from CF-IPCountry (always),
- * city/region/lat/lon from ipapi.co (cached per IP for 24h).
+ * Resolves geo for the given headers. Prefer ipapi.co's country (IP-based,
+ * consistent with the city/region it returns) over Cloudflare's CF-IPCountry,
+ * which can disagree when the request hits CF via a different routing path
+ * than the origin IP. CF-IPCountry is only a fallback when ipapi is unavailable.
  */
 export async function resolveGeo(headers: Headers): Promise<GeoData> {
   const ip = clientIp(headers);
-  const country = (headers.get("cf-ipcountry") ?? "XX").toUpperCase();
+  const cfCountry = (headers.get("cf-ipcountry") ?? "").toUpperCase();
   const now = Date.now();
   pruneCache(now);
 
   const cached = cache.get(ip);
   if (cached && cached.expiresAt > now) {
-    // Country can shift if CF reroutes; trust the freshest header.
-    return { ...cached.value, country };
+    return cached.value;
   }
 
-  const cityData = await lookupViaIpapi(ip);
-  const value: GeoData = { country, ...cityData };
+  const ipapi = await lookupViaIpapi(ip);
+  const value: GeoData = {
+    country: ipapi.country || cfCountry || "XX",
+    city: ipapi.city,
+    region: ipapi.region,
+    lat: ipapi.lat,
+    lon: ipapi.lon,
+  };
   cache.set(ip, { value, expiresAt: now + CACHE_TTL_MS });
   return value;
 }

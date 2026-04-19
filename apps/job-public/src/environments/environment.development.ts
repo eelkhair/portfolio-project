@@ -3,7 +3,7 @@ const baseDomain =
   host.endsWith('.elkhair.tech') ? 'elkhair.tech'
   : host.endsWith('.eelkhair.net') ? 'eelkhair.net'
   : 'elkhair.tech';
-console.log(host, baseDomain);
+console.log("HOST: '" + host + "'", "BASEDOMAIN: '" + baseDomain + "'");
 export const environment = {
   production: false,
   envName: 'DEV',

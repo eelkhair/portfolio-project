@@ -56,6 +56,7 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true,
+              "outputHashing": "all",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
