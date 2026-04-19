@@ -1022,8 +1022,9 @@
       },
       {
         "current": {
-          "text": "dev",
-          "value": "dev"
+          "text": "local",
+          "value": "local",
+          "selected": true
         },
         "hide": 0,
         "includeAll": false,
@@ -1033,16 +1034,11 @@
         "options": [
           {
             "selected": true,
-            "text": "dev",
-            "value": "dev"
-          },
-          {
-            "selected": false,
-            "text": "prod",
-            "value": "prod"
+            "text": "local",
+            "value": "local"
           }
         ],
-        "query": "dev,prod",
+        "query": "local",
         "skipUrlSync": false,
         "type": "custom"
       },
@@ -1071,7 +1067,7 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "JobBoard â€” Web App RUM",
+  "title": "JobBoard \u00e2\u20ac\u201d Web App RUM",
   "uid": "jobboard-landing-rum",
   "weekStart": ""
 }

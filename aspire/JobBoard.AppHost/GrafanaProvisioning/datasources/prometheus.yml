@@ -8,16 +8,18 @@ datasources:
     isDefault: true
     editable: false
 
+  # UIDs match prod so dashboards committed under GrafanaDashboards/ work
+  # unchanged in Aspire local (no per-env UID rewrites needed).
   - name: Jaeger
     type: jaeger
-    uid: jaeger
+    uid: ef5fo1p8d0zcwd
     access: proxy
     url: http://jaeger:16686
     editable: false
 
   - name: Elasticsearch
     type: elasticsearch
-    uid: elasticsearch
+    uid: cf5m4qd8jt7uod
     access: proxy
     url: http://elasticsearch:9200
     editable: false
@@ -28,4 +30,16 @@ datasources:
       maxConcurrentShardRequests: 5
       dataLinks:
         - field: "fields.traceId"
-          url: "http://localhost:16686/trace/${__value.raw}"
+          url: "/d/bf5m5dwukfncwd/find-by-trace-id?var-TraceId=${__value.raw}"
+
+  # Infinity — used by landing-rum's "Recent traces" panel which hits Jaeger's
+  # HTTP API via JSONata for tabular display. UID matches prod.
+  - name: Infinity (Jaeger HTTP API)
+    type: yesoreyeram-infinity-datasource
+    uid: infinity-jaeger
+    access: proxy
+    url: http://jaeger:16686
+    editable: false
+    jsonData:
+      allowed_hosts:
+        - http://jaeger:16686

@@ -30,6 +30,21 @@ processors:
         - 'attributes["url.path"] != nil and attributes["url.path"] == "/dapr/config"'
         - 'attributes["user_agent.original"] != nil and attributes["user_agent.original"] == "Go-http-client/1.1"'
         - 'attributes["url.full"] != nil and IsMatch(attributes["url.full"], ".*/v1/sys/health")'
+  # Faro stamps the app environment as `app_environment` / `app.environment` on
+  # FE spans. spanmetrics reads `deployment.environment` for its dimension, so
+  # copy the Faro value over when a span doesn't already have it set (backend
+  # services would get it from their own OTel resource, FE doesn't).
+  transform/fe_deployment_env:
+    error_mode: ignore
+    trace_statements:
+      - context: span
+        conditions:
+          - attributes["deployment.environment"] == nil
+        statements:
+          - set(attributes["deployment.environment"], attributes["app_environment"]) where attributes["app_environment"] != nil
+          - set(attributes["deployment.environment"], attributes["app.environment"]) where attributes["deployment.environment"] == nil and attributes["app.environment"] != nil
+          - set(attributes["deployment.environment"], resource.attributes["app_environment"]) where attributes["deployment.environment"] == nil and resource.attributes["app_environment"] != nil
+          - set(attributes["deployment.environment"], resource.attributes["app.environment"]) where attributes["deployment.environment"] == nil and resource.attributes["app.environment"] != nil
   batch:
 connectors:
   spanmetrics:
@@ -67,7 +82,7 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [filter/dapr, batch]
+      processors: [filter/dapr, transform/fe_deployment_env, batch]
       exporters: [otlp/jaeger, spanmetrics]
     metrics:
       receivers: [otlp, spanmetrics]

@@ -154,6 +154,9 @@ var grafana = builder.AddContainer("grafana", "grafana/grafana", "latest")
     .WithEnvironment("GF_SECURITY_ADMIN_PASSWORD", "admin")
     .WithEnvironment("GF_AUTH_ANONYMOUS_ENABLED", "true")
     .WithEnvironment("GF_AUTH_ANONYMOUS_ORG_ROLE", "Admin")
+    // Infinity datasource — used by the RUM dashboard's "Recent traces" panel
+    // (hits Jaeger's HTTP API via JSONata for tabular display).
+    .WithEnvironment("GF_INSTALL_PLUGINS", "yesoreyeram-infinity-datasource")
     .WithVolume("aspire-grafana-data", "/var/lib/grafana")
     .WithBindMount("./GrafanaProvisioning/datasources", "/etc/grafana/provisioning/datasources", isReadOnly: true)
     .WithBindMount("./GrafanaProvisioning/dashboards", "/etc/grafana/provisioning/dashboards", isReadOnly: true)
