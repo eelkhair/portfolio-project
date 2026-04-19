@@ -65,8 +65,16 @@ jobs:
           echo "Landing page deployed to dev"
 
   deploy-prod:
-    needs: build
-    if: github.event.inputs.environment == 'prod' || github.event.inputs.environment == 'both'
+    # Sequential after dev: every push promotes through dev first, then waits
+    # at the `prod` GitHub Environment approval gate before deploying prod.
+    # `!cancelled()` runs even if dev was skipped via workflow_dispatch=prod-only.
+    needs: deploy-dev
+    if: |
+      !cancelled() && (
+        github.event_name == 'push' ||
+        github.event.inputs.environment == 'prod' ||
+        github.event.inputs.environment == 'both'
+      )
     runs-on: proxmox-prod
     environment: prod
     steps:
