@@ -78,7 +78,8 @@ ADR Index: [`docs/ADRs`](./ADRs)
 - **Redis** -- state store, configuration, feature flags
 - **Keycloak** -- identity provider with group-based RBAC
 - **Dapr** -- config, secrets, pub/sub, state, service invocation (local/homelab)
-- **OpenTelemetry + Jaeger + Grafana** -- distributed tracing and diagnostics
+- **OpenTelemetry + Jaeger + Grafana + Faro RUM** -- end-to-end distributed tracing across all three frontends, gateway, microservices, and backend, with visitor geo, web vitals, and a unified Find-by-TraceId workflow
+- **Grafana Alloy** -- Faro receiver + Loki-to-OTel bridge consolidating frontend telemetry into the OTel pipeline
 - **.NET Aspire** -- local orchestration of the full distributed system
 
 Rationale:
@@ -248,13 +249,27 @@ Rationale: [ADR-007](./ADRs/ADR-007-Trace-Context-Propagation.md)
 
 ## Observability
 
-The platform is instrumented **end-to-end**:
+The platform is instrumented **end-to-end** -- from a button click in the browser through the gateway, command pipeline, database, and async workflows -- all correlated by one TraceId.
 
-- Distributed tracing across frontend --> APIs --> DB --> async workflows
-- Correlated logs with TraceId via Serilog structured logging
-- OpenTelemetry spans with custom activity tags (user ID, email, command names)
-- Practical "find by TraceId" debugging workflow in Grafana and Jaeger
-- Angular propagates trace IDs via HTTP interceptors
+**Backend**
+- Distributed tracing across APIs, DB, and async workflows
+- Serilog structured logs enriched with TraceId / SpanId / ParentSpanId
+- OpenTelemetry spans with custom activity tags (user, command, CQRS handler, AI provider/model)
+- Logs land in Elasticsearch via Serilog OTel exporter
+
+**Frontend (RUM)**
+- Grafana Faro Web SDK in all three frontends (`landing`, `admin-fe`, `public-fe`) -- captures errors, web vitals, navigation, fetch/XHR spans, and explicit activity events
+- Custom `ActivityLogger` service in both Angular apps wraps `faro.api.pushLog` with structured context (level, geo, trace/span IDs); the `trace<T>` RxJS operator creates an internal "activity X" span that becomes the parent of the downstream HTTP span -- so a `[admin] ai provider update ok` log line, the FE `HTTP PUT` span, the gateway proxy span, and the `UpdateProviderCommand` backend log all share one TraceId
+- Visitor geo (country / city / region / lat / lon) resolved server-side from `cf-ipcountry` + ipapi.co, stamped on every span via a custom `SpanProcessor`, surfaced as filterable Prometheus dimensions and dashboard columns
+
+**Pipeline**
+- Browser --> Faro endpoint (Alloy `faro.receiver`) --> OTel Collector --> fan-out:
+  - Traces --> Jaeger + Seq + spanmetrics --> Prometheus
+  - Logs --> Seq + Elasticsearch (with OTTL transforms to extract logfmt body fields, drop non-log records, normalize to Serilog field shape)
+
+**Dashboards**
+- *Web App RUM* -- page loads, p95 latency, throughput, error rate by route, top routes, **Visitors by city** (geomap), **Recent traces** with city / state / country / route columns
+- *Find by Trace Id* -- one TraceId in, three panels out: distributed trace (Jaeger), backend logs (Elasticsearch), frontend logs (Infinity --> events API with JSONata flattening so `geo`, `http`, `session` nested objects become individual columns dynamically)
 
 Rationale: [ADR-004](./ADRs/ADR-004-Observability-First.md)
 

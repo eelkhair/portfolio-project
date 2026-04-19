@@ -296,8 +296,8 @@
     },
     {
       "datasource": {
-        "type": "yesoreyeram-infinity-datasource",
-        "uid": "seq-infinity"
+        "type": "elasticsearch",
+        "uid": "cf5m4qd8jt7uod"
       },
       "fieldConfig": {
         "defaults": {
@@ -349,18 +349,6 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Kind"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 80
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
               "options": "TraceId"
             },
             "properties": [
@@ -401,77 +389,75 @@
       },
       "targets": [
         {
+          "alias": "",
+          "bucketAggs": [],
           "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "seq-infinity"
+            "type": "elasticsearch",
+            "uid": "cf5m4qd8jt7uod"
           },
-          "filters": [],
-          "format": "table",
-          "global_query_id": "",
-          "parser": "backend",
+          "metrics": [
+            {
+              "id": "1",
+              "settings": {
+                "limit": "500"
+              },
+              "type": "logs"
+            }
+          ],
+          "query": "fields.traceId: \"${TraceId}\" AND fields.ApplicationName:(\"admin-fe\" OR \"public-fe\" OR \"landing\")",
           "refId": "A",
-          "root_selector": "$map($, function($e) { $merge([ {\"Time\": $e.Timestamp, \"Level\": $e.Level, \"Kind\": $e.SpanKind, \"Message\": $e.RenderedMessage}, $merge($e.Properties.($type(Value) = \"object\" ? $merge($each(Value, function($v, $k) { {(Name & \".\" & $k): $v} })) : {Name: Value} ) ) ]) })",
-          "source": "url",
-          "type": "json",
-          "url": "https://seq.eelkhair.net/api/events",
-          "url_options": {
-            "data": "",
-            "headers": [],
-            "method": "GET",
-            "params": [
-              {
-                "key": "filter",
-                "value": "TraceId = \"${TraceId}\" and (ApplicationName = \"admin-fe\" or ApplicationName = \"public-fe\" or ApplicationName = \"landing\")"
-              },
-              {
-                "key": "count",
-                "value": "500"
-              },
-              {
-                "key": "render",
-                "value": "true"
-              }
-            ]
-          }
+          "timeField": "@timestamp"
         }
       ],
+      "timeFrom": "1w",
       "title": "Frontend Logs",
       "transformations": [
         {
           "id": "organize",
           "options": {
             "excludeByName": {
-              "ParentSpanId": true,
-              "SpanId": true,
-              "ap_name": true,
-              "app_name": true,
-              "http.method": true,
-              "http.url": true,
-              "kind": true,
+              "_id": true,
+              "_index": true,
+              "_source": true,
+              "_type": true,
+              "fields.@timestamp": true,
+              "fields.ParentSpanId": true,
+              "fields.SpanId": true,
+              "fields.TraceId": true,
+              "fields.app_name": true,
+              "fields.kind": true,
+              "fields.parentSpanId": true,
+              "fields.spanId": true,
+              "fields.http.url": true,
+              "fields.session.id": true,
+              "highlight": true,
+              "id": true,
               "level": true,
-              "message": true,
-              "parent_span_id": true,
-              "session.id": true
+              "messageTemplate": true,
+              "sort": true
             },
             "includeByName": {},
             "indexByName": {
-              "ApplicationName": 2,
-              "Kind": 4,
-              "Level": 3,
-              "Message": 1,
-              "Time": 0,
-              "TraceId": 5
+              "@timestamp": 0,
+              "message": 1,
+              "fields.ApplicationName": 2,
+              "fields.Level": 3,
+              "fields.traceId": 4
             },
             "renameByName": {
-              "ApplicationName": "Application",
-              "app_environment": "Environment",
-              "geo.city": "City",
-              "geo.country_code": "Country",
-              "geo.lat": "Latitude",
-              "geo.lon": "Longitude",
-              "geo.region": "Region",
-              "http.duration_ns": "Duration (ns)",
-              "http.status_code": "HTTP Status"
+              "@timestamp": "Time",
+              "fields.ApplicationName": "Application",
+              "fields.Level": "Level",
+              "fields.app_environment": "Environment",
+              "fields.geo.city": "City",
+              "fields.geo.country_code": "Country",
+              "fields.geo.lat": "Latitude",
+              "fields.geo.lon": "Longitude",
+              "fields.geo.region": "Region",
+              "fields.http.duration_ns": "Duration (ns)",
+              "fields.http.status_code": "HTTP Status",
+              "fields.traceId": "TraceId",
+              "message": "Message"
             }
           }
         }

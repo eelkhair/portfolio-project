@@ -121,6 +121,12 @@ export async function initFaro(): Promise<void> {
     instrumentations: [
       ...getWebInstrumentations({ captureConsole: true }),
       new TracingInstrumentation({
+        // Disable Faro's default fetch + XHR auto-instrumentations. Our
+        // Angular `tracingInterceptor` already creates HTTP spans for every
+        // HttpClient request; keeping auto-instrumentation on produced a
+        // duplicate `component=fetch` span per request that cluttered the
+        // RUM dashboard's Recent traces panel.
+        instrumentations: [],
         spanProcessor: buildGeoSpanProcessor(geo),
       }),
     ],

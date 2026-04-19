@@ -2,15 +2,16 @@
 # `jaeger-otel-collector-1` container on 192.168.1.160.
 #
 # Diff vs prior version:
-#   - NEW: `filter/fe_log_only` — drops Faro `kind=measurement` / `kind=event`
-#     records (web-vitals, navigation entries, etc.) from the logs pipelines
-#     so Seq + ES only get actual `kind=log` lines (i.e. our pushLog calls).
-#   - NEW: `transform/fe_clean_log` — deletes the verbose RUM metadata Faro
-#     stamps on every log record (browser_*, sdk_*, session_id, page_url,
-#     app_release, view_*, plus the redundant `kind` attribute). Backend
-#     Serilog logs don't carry these so the processor is a no-op for them.
-#   - Both new processors apply to the `logs` (Seq) AND `logs/es-fe` (ES)
-#     pipelines. Order is filter-then-transform so the kind check runs first.
+#   - REMOVED: Seq entirely. Traces → Jaeger + spanmetrics only. FE logs →
+#     Elasticsearch only (via `logs/es-fe` pipeline). The standalone `logs`
+#     pipeline that fanned out to Seq is gone. One logs store (ES), one trace
+#     store (Jaeger), one metrics store (Prometheus).
+#   - `filter/fe_log_only` — drops Faro `kind=measurement` / `kind=event`
+#     records (web-vitals, navigation entries, etc.) so ES only gets actual
+#     `kind=log` lines (i.e. our pushLog calls).
+#   - `transform/fe_clean_log` — deletes the verbose RUM metadata Faro stamps
+#     on every log record (browser_*, sdk_*, session_id, page_url, app_release,
+#     view_*, plus the redundant `kind` attribute).
 #
 # Existing behavior preserved:
 #   - `elasticsearch/fe` exporter for frontend logs, separate index
@@ -148,8 +149,6 @@ exporters:
     endpoint: jaeger:4317
     tls:
       insecure: true
-  otlphttp/seq:
-    endpoint: https://seq.eelkhair.net/ingest/otlp
   prometheus:
     endpoint: 0.0.0.0:8889
     metric_expiration: 5m
@@ -172,11 +171,7 @@ service:
     traces:
       receivers: [otlp]
       processors: [filter/dapr, batch]
-      exporters: [otlp/jaeger, otlphttp/seq, spanmetrics]
-    logs:
-      receivers: [otlp]
-      processors: [filter/fe_log_only, transform/fe_clean_log, batch]
-      exporters: [otlphttp/seq]
+      exporters: [otlp/jaeger, spanmetrics]
     logs/es-fe:
       receivers: [otlp]
       processors: [transform/fe_service_name, filter/fe_only, filter/fe_log_only, transform/fe_clean_log, batch]

@@ -1,0 +1,185 @@
+@startuml frontend-observability-architecture
+title Frontend Observability — End-to-End RUM Pipeline
+skinparam backgroundColor #0f172a
+skinparam defaultFontColor #e2e8f0
+skinparam defaultFontName Helvetica
+skinparam shadowing false
+skinparam roundCorner 8
+skinparam packageStyle rectangle
+skinparam ArrowColor #94a3b8
+skinparam ArrowFontColor #cbd5e1
+skinparam noteBackgroundColor #1e293b
+skinparam noteBorderColor #475569
+skinparam noteFontColor #e2e8f0
+skinparam packageBackgroundColor #1e293b
+skinparam packageBorderColor #475569
+skinparam packageFontColor #f1f5f9
+skinparam packageFontStyle bold
+skinparam component {
+  BackgroundColor #334155
+  BorderColor #64748b
+  FontColor #f8fafc
+}
+skinparam database {
+  BackgroundColor #065f46
+  BorderColor #10b981
+  FontColor #f8fafc
+}
+
+package "Browser — Angular admin/public + Next.js landing" #1e3a8a {
+  [Service method\ne.g. SettingsService.updateProvider] as SVC
+  [ActivityLogger\ninfo / warn / error / trace<T>] as ALOG
+  [trace<T> operator] as TXOP
+  [tracingInterceptor\nHTTP spans inherit\nactivity span as parent] as INTC
+  [Faro Web SDK\n+ TracingInstrumentation\n+ captureConsole: true] as FARO
+  [fetchGeo on init] as GEOFE
+
+  SVC --> TXOP : .pipe(logger.trace('event'))
+  SVC --> INTC : http.get/post
+  TXOP --> FARO : tracer.startSpan
+  ALOG --> FARO : pushLog(spanContext)
+  INTC --> FARO : HTTP span (child)
+  GEOFE ..> FARO : geo stamped on every span\nvia custom SpanProcessor
+}
+
+package "Landing /api/geo — edge runtime" #9a3412 {
+  [resolveGeo headers\n1. cf-ipcountry header\n2. ipapi.co lookup, 24h cache\n3. fallback country = XX] as GEORES
+}
+
+package "Grafana Alloy — 192.168.1.160 host network" #7c2d12 {
+  [faro.receiver :12347\nFaro JSON payload] as FARORX
+  [otelcol.receiver.loki\nLoki labels → OTLP attrs] as LOKIRX
+  [otelcol.exporter.otlphttp\n→ otel-collector :4318] as OTLPEX
+
+  FARORX --> LOKIRX : Loki log stream
+  FARORX --> OTLPEX : OTLP traces (direct)
+  LOKIRX --> OTLPEX
+}
+
+package "OTel Collector — host:4318, contrib v0.150.1" #581c87 {
+  [transform/parse_fe_body\nExtractPatterns regex →\nkind, level, message, app_name,\napp_environment, traceID, spanID\ninto log.attributes] as PARSE
+  [filter/fe_log_only\ndrop kind != log] as FILT
+  [transform/fe_service_name\napp_name → service.name\n+ ApplicationName attr] as SVCNAME
+  [transform/promote_trace_ids\nlog.trace_id.string → TraceId] as PROMOTE
+  [filter/fe_only\nES pipeline only —\nkeep landing/admin-fe/public-fe] as FEONLY
+  [transform/set_es_mapping_mode\nscope.attrs.elastic.mapping.mode\n= raw] as ESMAP
+
+  PARSE --> FILT
+  FILT --> SVCNAME
+  SVCNAME --> PROMOTE
+  PROMOTE ..> FEONLY : logs/es-fe pipeline
+  FEONLY --> ESMAP
+}
+
+package "Storage" #064e3b {
+  database "Jaeger" as JG
+  database "Elasticsearch\nfe-logs index" as ES
+  database "Prometheus\nspanmetrics +\ngeo dimensions" as PROM
+  [fe-otel-to-serilog\ningest pipeline:\nTraceId → fields.traceId\nApplicationName → fields.ApplicationName\nBody → message] as ESPL
+  ESPL --> ES
+}
+
+package "Grafana Dashboards" #374151 {
+  [JobBoard — Web App RUM\npage loads, p95, errors,\nVisitors by city geomap,\nRecent traces from Jaeger HTTP API\nvia Infinity datasource] as RUM
+  [Find by Trace Id\n1. Trace — Jaeger\n2. ElasticSearch — backend logs\n3. Frontend Logs — same ES datasource,\n     filters ApplicationName in\n     {admin-fe, public-fe, landing}] as FBT
+}
+
+GEOFE ..> GEORES : HTTPS GET\ncross-origin (CORS allowlist)
+GEORES ..> GEOFE : country/city/region/lat/lon
+
+FARO --> FARORX : HTTPS POST\nfaro.elkhair.tech/collect
+OTLPEX --> PARSE
+
+PROMOTE --> JG : otlp/jaeger exporter
+PROMOTE --> PROM : spanmetrics connector
+ESMAP --> ESPL : elasticsearch/fe exporter
+
+PROM --> RUM
+JG --> RUM
+ES --> FBT
+JG --> FBT
+
+note right of TXOP
+  1. tracer.startSpan with name "activity X"
+  2. context.with setSpan around subscribe
+  3. emit info on next, error on error
+  4. end span on complete / teardown
+  ──────────────────────────────────
+  This is the linchpin: the HTTP span
+  the interceptor creates becomes a
+  CHILD of the activity span, sharing
+  one TraceId end-to-end FE → BE.
+end note
+
+note right of GEORES
+  Hardcoded to elkhair.tech in all
+  Angular env files. The .eelkhair.net
+  zone goes through NPM which strips
+  cf-connecting-ip → ipapi rejects
+  the private IP → country falls back
+  to "XX". The .elkhair.tech zone is
+  Cloudflare-served so all CF headers
+  are intact.
+end note
+
+note bottom of PARSE
+  Faro logs arrive at the collector
+  with EVERYTHING in one logfmt body
+  string, not as OTLP attributes. We
+  tried loki.process upstream to
+  expand it but it silently dropped
+  records. ExtractPatterns regex
+  here is the reliable path.
+  ──────────────────────────────────
+  Backend logs — proper OTLP shape —
+  are skipped via condition:
+  IsMatch log.body "^timestamp=.*kind="
+end note
+
+note left of PROMOTE
+  CRITICAL: use the .string accessor
+  log.trace_id.string — NOT
+  String log.trace_id — the latter
+  serializes the 16-byte TraceID as
+  a JSON array literal "[177,243,...]"
+  instead of hex.
+end note
+
+note bottom of ESMAP
+  mapping.mode: raw on the ES exporter
+  is silently ignored in v0.150+.
+  Scope-attribute approach is the
+  documented replacement. Without
+  this, ES rejects every doc with
+  illegal_argument_exception — and
+  the caused_by field is empty, so
+  debugging is delightful.
+end note
+
+note right of ESPL
+  Field names matter: the dashboard
+  queries fields.traceId (lowercase t!)
+  not fields.TraceId. Pipeline rename
+  list:
+   • TraceId → fields.traceId
+   • SpanId → fields.spanId
+   • ApplicationName → fields.ApplicationName
+   • Body → message
+   • SeverityText → level
+   • Timestamp → @timestamp
+end note
+
+note bottom of FBT
+  Both ES panels query the SAME
+  datasource. Backend panel filters
+  by traceId only; FE panel adds
+  fields.ApplicationName in
+  (admin-fe, public-fe, landing).
+  Organize transform surfaces the
+  common FE columns (geo.*, http.*,
+  app_environment) with friendly
+  names; anything else in _source
+  appears as a dynamic column.
+end note
+
+@enduml

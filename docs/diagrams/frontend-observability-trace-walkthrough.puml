@@ -1,0 +1,88 @@
+@startuml frontend-observability-trace-walkthrough
+title Single-trace walkthrough — admin clicks "Update Provider"
+autonumber
+skinparam backgroundColor #0f172a
+skinparam defaultFontColor #e2e8f0
+skinparam shadowing false
+skinparam ArrowColor #94a3b8
+skinparam ArrowFontColor #cbd5e1
+skinparam noteBackgroundColor #1e293b
+skinparam noteBorderColor #475569
+skinparam noteFontColor #e2e8f0
+skinparam sequenceParticipantBackgroundColor #1e3a8a
+skinparam sequenceParticipantBorderColor #3b82f6
+skinparam sequenceParticipantFontColor #e2e8f0
+skinparam sequenceLifeLineBackgroundColor #1e293b
+skinparam sequenceLifeLineBorderColor #475569
+
+actor "User\n(browser)" as U
+participant "SettingsService\n(admin-fe)" as SS
+participant "ActivityLogger\ntrace<T>()" as AL
+participant "tracingInterceptor" as TI
+participant "Faro Web SDK" as Faro
+participant "Alloy\n(192.168.1.160)" as Alloy
+participant "OTel Collector" as OC
+participant "Gateway\n(YARP)" as GW
+participant "ai-service-v2" as AI
+
+note over U, Faro
+  Browser-side: one TraceId is created here
+  and flows through every component below.
+end note
+
+U -> SS : click "Save Provider"
+SS -> AL : updateProvider(req).pipe(logger.trace('ai provider update'))
+AL -> Faro : tracer.startSpan('activity ai provider update')
+note right of AL: TraceId = abc123\nSpanId = act01
+AL -> AL : context.with(setSpan, () => source.subscribe(...))
+
+note over AL, TI
+  Inside the active context:
+  tracingInterceptor creates the HTTP span
+  as a CHILD of the activity span
+  → same TraceId, parent = act01.
+end note
+
+AL -> TI : HTTP PUT /ai/v2/Settings/update-provider
+TI -> Faro : tracer.startSpan('HTTP PUT /...')
+note right of TI: parent = act01\nSpanId = http02
+TI -> GW : traceparent: 00-abc123-http02-01
+
+GW -> AI : proxy with traceparent\n(parent context propagated)
+AI -> AI : UpdateProviderCommand pipeline
+note right of AI: Serilog logs auto-enriched\nwith TraceId = abc123
+AI --> GW : 200 OK
+GW --> TI : 200
+
+TI -> Faro : HTTP span ends (duration recorded)
+AL -> Faro : pushLog('[admin] ai provider update ok',\n  level=info, elapsedMs=110, model=gpt-4.1,\n  spanContext={traceId: abc123, spanId: act01})
+AL -> Faro : span.end() (activity span)
+
+note over Faro
+  Faro batches logs + spans
+  and POSTs to Alloy.
+end note
+
+Faro -> Alloy : POST faro.elkhair.tech/collect
+Alloy -> OC : OTLP traces (direct)\nOTLP logs (via Loki bridge)
+
+note over OC
+  parse_fe_body: extract logfmt fields
+  filter/fe_log_only: drop measurements
+  fe_service_name: ApplicationName=admin-fe
+  promote_trace_ids: hex TraceId in attrs
+  set_es_mapping_mode: raw
+end note
+
+OC -> OC : fan-out → Jaeger + Seq + spanmetrics + Elasticsearch
+
+note over U, AI
+  Result in Grafana "Find by Trace Id"
+  with TraceId = abc123:
+  • 2 FE spans (activity + HTTP) from admin-fe
+  • N backend logs from gateway and ai-service-v2
+  • 1 FE log line "[admin] ai provider update ok"
+  • All correlated, all clickable to Jaeger
+end note
+
+@enduml
