@@ -264,8 +264,8 @@ The platform is instrumented **end-to-end** -- from a button click in the browse
 
 **Pipeline**
 - Browser --> Faro endpoint (Alloy `faro.receiver`) --> OTel Collector --> fan-out:
-  - Traces --> Jaeger + Seq + spanmetrics --> Prometheus
-  - Logs --> Seq + Elasticsearch (with OTTL transforms to extract logfmt body fields, drop non-log records, normalize to Serilog field shape)
+  - Traces --> Jaeger + spanmetrics --> Prometheus
+  - Logs --> Elasticsearch (backend Serilog exporter + frontend Faro via OTTL transforms that extract logfmt body fields, drop non-log records, and normalize to the Serilog field shape)
 
 **Dashboards**
 - *Web App RUM* -- page loads, p95 latency, throughput, error rate by route, top routes, **Visitors by city** (geomap), **Recent traces** with city / state / country / route columns

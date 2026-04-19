@@ -57,8 +57,8 @@ otelcol.receiver.loki "default" {
 }
 
 // Single exporter pushes both traces AND logs to the existing OTel Collector.
-// The collector's pipelines fan out: traces → Jaeger + Seq + spanmetrics;
-// logs → Seq + Elasticsearch (for Find-by-TraceId dashboard).
+// The collector's pipelines fan out: traces → Jaeger + spanmetrics;
+// logs → Elasticsearch (for Find-by-TraceId dashboard).
 otelcol.exporter.otlphttp "collector" {
 	client {
 		endpoint = sys.env("OTEL_HTTP_ENDPOINT")

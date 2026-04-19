@@ -98,7 +98,7 @@ To rebuild the image: `docker build -t ghcr.io/eelkhair/seed-runner:1.0 ./SeedRu
 - **DCP proxy layer**: Aspire's proxy can interfere with non-HTTP protocols (MCP Streamable HTTP, WebSockets). Required workarounds for MCP port management.
 - **Config surface area**: Three config sources (env vars, Dapr vault, Redis seed) instead of one. Each new service needs entries in all three.
 - **Seed runner image**: The `ghcr.io/eelkhair/seed-runner:1.0` image must be pre-built and pushed to GHCR. The `SeedRunner/Dockerfile` is in the repo for rebuilding. Using `AddDockerfile` instead of `AddContainer` is possible but may timeout on first build.
-- **URL values in Redis**: Dapr config store key parsing can mangle URLs containing `://`. Infrastructure URLs (Elasticsearch, Seq) should come from env vars or vault, not Redis config.
+- **URL values in Redis**: Dapr config store key parsing can mangle URLs containing `://`. Infrastructure URLs (Elasticsearch, Jaeger) should come from env vars or vault, not Redis config.
 
 ## Implementation Notes
 

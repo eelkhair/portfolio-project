@@ -7,15 +7,13 @@ export const environment = {
   landingUrl: 'http://localhost:3001/',
   otel: '/v1/traces',
   otelZipkin: 'api/v2/spans',
-  // Grafana Faro RUM — empty in local means initFaro no-ops. Set to
-  // 'http://localhost:12347/collect' if you have Aspire's Alloy running and
-  // want to see RUM data flowing locally.
-  faroUrl: '',
-  // Landing's /api/geo endpoint. Empty in local because the landing dev
-  // server typically isn't running; initFaro falls back to "XX" geo.
-  geoApiUrl: '',
+  // Grafana Faro RUM — Aspire runs Alloy's Faro receiver on :12347.
+  // Set to '' to disable (initFaro no-ops).
+  faroUrl: 'http://localhost:12347/collect',
+  // Landing's /api/geo endpoint — Aspire runs landing on :3001. Falls back
+  // to "XX" geo if unreachable.
+  geoApiUrl: 'http://localhost:3001/api/geo',
   jaegerUrl: 'http://localhost:16686/trace/',
-  seqUrl: 'http://localhost:5341/#/events?filter=TraceId%3D%22{traceId}%22',
   grafanaUrl: 'http://localhost:3200/d/bf5m5dwukfncwd/find-by-trace-id?orgId=1&var-TraceId=',
   oidc: {
     authority: 'http://localhost:9999/realms/job-board-local',

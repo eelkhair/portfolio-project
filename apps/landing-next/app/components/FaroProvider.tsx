@@ -17,7 +17,7 @@ const INVALID_TRACE_ID = "00000000000000000000000000000000";
 let initialized = false;
 
 /** Emit a structured log via faro.api.pushLog so context fields land as
- *  top-level properties in Seq/ES instead of being string-joined into the
+ *  top-level properties in ES instead of being string-joined into the
  *  message by `captureConsole`. Attaches the active span context so the
  *  log correlates by TraceId in the "Find by Trace Id" dashboard. */
 function pushStructured(message: string, ctx: Record<string, unknown>): void {
@@ -134,7 +134,7 @@ export function FaroProvider({
     faro.api.pushLog(["Faro initialized"], { level: LogLevel.INFO });
 
     // Emit a page-view log with geo + page context. Flows through
-    // Faro → Alloy → OTel Collector → Seq and (for FE services) → ES,
+    // Faro → Alloy → OTel Collector → ES (for FE services),
     // where the Find by Trace Id dashboard can correlate it with the span.
     // Use pushLog directly with `context` so values land as structured
     // properties rather than `[object Object]` from console arg-joining.

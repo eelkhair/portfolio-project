@@ -155,7 +155,7 @@
       <a href="/observability.html" class="card">
         <div class="card-icon" role="img" aria-hidden="true">&#x1F50D;</div>
         <h3>Observability</h3>
-        <p>Distributed tracing with Jaeger, Grafana dashboards, Seq structured logging, and OpenTelemetry instrumentation across 16 services.</p>
+        <p>Distributed tracing with Jaeger, Grafana dashboards, Elasticsearch structured logging, and OpenTelemetry instrumentation across 16 services.</p>
       </a>
     </div>
   </section>
@@ -194,7 +194,7 @@
     <p class="section-text mb-3">
       16 services across 4 architectural layers, orchestrated with Dapr sidecars and exposed via Cloudflare Tunnel.
     </p>
-    <div class="arch-diagram" role="img" aria-label="System architecture diagram: Clients (Admin App, Public App) connect through a YARP Gateway which routes to either a Monolith API or Microservices (Admin, Company, Job, User APIs) based on feature flags. Both paths connect to an AI Service with LLM chat and RAG. Infrastructure includes SQL Server, PostgreSQL with pgvector, Redis, RabbitMQ, and Keycloak. Observability via OpenTelemetry, Jaeger, Grafana, and Seq.">
+    <div class="arch-diagram" role="img" aria-label="System architecture diagram: Clients (Admin App, Public App) connect through a YARP Gateway which routes to either a Monolith API or Microservices (Admin, Company, Job, User APIs) based on feature flags. Both paths connect to an AI Service with LLM chat and RAG. Infrastructure includes SQL Server, PostgreSQL with pgvector, Redis, RabbitMQ, and Keycloak. Observability via OpenTelemetry, Jaeger, Grafana, and Elasticsearch.">
       <div class="arch-row">
         <div class="arch-label">Clients</div>
         <div class="arch-nodes">
@@ -260,7 +260,6 @@
           <div class="arch-node arch-obs">OpenTelemetry</div>
           <div class="arch-node arch-obs">Jaeger</div>
           <div class="arch-node arch-obs">Grafana</div>
-          <div class="arch-node arch-obs">Seq</div>
         </div>
       </div>
     </div>
@@ -480,14 +479,6 @@
             <div class="service-url">jaeger.eelkhair.net</div>
           </div>
           <div class="service-tooltip">Distributed trace visualization. Search traces by service, operation, or TraceId. See end-to-end request flow across all services.</div>
-        </a>
-        <a href="https://seq.eelkhair.net" target="_blank" rel="noopener noreferrer" class="service-card" aria-disabled="true" tabindex="-1">
-          <span class="service-dot" aria-hidden="true"></span>
-          <div>
-            <div class="service-name">Seq Logs</div>
-            <div class="service-url">seq.eelkhair.net</div>
-          </div>
-          <div class="service-tooltip">Structured log aggregation. Filter by TraceId, service, log level, or any property. Correlated with OpenTelemetry spans.</div>
         </a>
         <a href="https://job-dapr.eelkhair.net" target="_blank" rel="noopener noreferrer" class="service-card" aria-disabled="true" tabindex="-1">
           <span class="service-dot" aria-hidden="true"></span>

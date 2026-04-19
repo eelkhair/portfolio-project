@@ -1,0 +1,231 @@
+{
+  "description": "Remap OTel log/span fields to Serilog-style shape so the Find by Trace Id dashboard works",
+  "processors": [
+    {
+      "rename": {
+        "field": "TraceId",
+        "target_field": "fields.traceId",
+        "ignore_missing": true,
+        "if": "ctx.fields?.traceId == null"
+      }
+    },
+    {
+      "rename": {
+        "field": "SpanId",
+        "target_field": "fields.spanId",
+        "ignore_missing": true,
+        "if": "ctx.fields?.spanId == null"
+      }
+    },
+    {
+      "rename": {
+        "field": "ParentSpanId",
+        "target_field": "fields.parentSpanId",
+        "ignore_missing": true,
+        "if": "ctx.fields?.parentSpanId == null"
+      }
+    },
+    {
+      "rename": {
+        "field": "ApplicationName",
+        "target_field": "fields.ApplicationName",
+        "ignore_missing": true,
+        "if": "ctx.fields?.ApplicationName == null"
+      }
+    },
+    {
+      "rename": {
+        "field": "Body",
+        "target_field": "message",
+        "ignore_missing": true,
+        "if": "ctx.message == null"
+      }
+    },
+    {
+      "remove": {
+        "field": "Body",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "Name",
+        "target_field": "message",
+        "ignore_missing": true,
+        "if": "ctx.message == null"
+      }
+    },
+    {
+      "rename": {
+        "field": "Kind",
+        "target_field": "fields.Kind",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "SeverityText",
+        "target_field": "level",
+        "ignore_missing": true,
+        "if": "ctx.level == null"
+      }
+    },
+    {
+      "remove": {
+        "field": "SeverityText",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "Timestamp",
+        "target_field": "@timestamp",
+        "ignore_missing": true,
+        "if": "ctx['@timestamp'] == null"
+      }
+    },
+    {
+      "rename": {
+        "field": "StartTimestamp",
+        "target_field": "@timestamp",
+        "ignore_missing": true,
+        "if": "ctx['@timestamp'] == null"
+      }
+    },
+    {
+      "rename": {
+        "field": "Attributes.ApplicationName",
+        "target_field": "fields.ApplicationName",
+        "ignore_missing": true,
+        "if": "ctx.fields?.ApplicationName == null"
+      }
+    },
+    {
+      "rename": {
+        "field": "Attributes.TraceId",
+        "target_field": "fields.traceId",
+        "ignore_missing": true,
+        "if": "ctx.fields?.traceId == null"
+      }
+    },
+    {
+      "rename": {
+        "field": "Attributes.SpanId",
+        "target_field": "fields.spanId",
+        "ignore_missing": true,
+        "if": "ctx.fields?.spanId == null"
+      }
+    },
+    {
+      "rename": {
+        "field": "Attributes.level",
+        "target_field": "fields.Level",
+        "ignore_missing": true,
+        "if": "ctx.fields?.Level == null"
+      }
+    },
+    {
+      "rename": {
+        "field": "Attributes.app_environment",
+        "target_field": "fields.app_environment",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "Attributes.app_name",
+        "target_field": "fields.app_name",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "Attributes.geo.city",
+        "target_field": "fields.geo.city",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "Attributes.geo.country_code",
+        "target_field": "fields.geo.country_code",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "Attributes.geo.region",
+        "target_field": "fields.geo.region",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "Attributes.geo.lat",
+        "target_field": "fields.geo.lat",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "Attributes.geo.lon",
+        "target_field": "fields.geo.lon",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "Attributes.http.method",
+        "target_field": "fields.http.method",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "Attributes.http.url",
+        "target_field": "fields.http.url",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "Attributes.http.status_code",
+        "target_field": "fields.http.status_code",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "Attributes.http.duration_ns",
+        "target_field": "fields.http.duration_ns",
+        "ignore_missing": true
+      }
+    },
+    {
+      "script": {
+        "lang": "painless",
+        "source": "def keys = new ArrayList(ctx.keySet()); for (def k : keys) { if (k.startsWith('Resource.') || k.startsWith('Scope.')) { ctx.remove(k); } }",
+        "ignore_failure": true
+      }
+    },
+    {
+      "remove": {
+        "field": [
+          "Resource",
+          "Scope",
+          "TraceStatus",
+          "TraceStatusDescription",
+          "TraceFlags",
+          "Duration",
+          "EndTimestamp",
+          "Link",
+          "Links",
+          "Events",
+          "session.id",
+          "SeverityNumber"
+        ],
+        "ignore_missing": true
+      }
+    }
+  ]
+}

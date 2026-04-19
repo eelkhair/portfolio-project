@@ -70,7 +70,7 @@ Services are organized by architectural layer for readability and operational cl
 4. **Monolith**: `monolith-api`, `monolith-mcp`
 5. **Microservices**: `admin-api` + MCP, `company-api`, `job-api`, `user-api`
 6. **Connectors**: `connector-api`, `reverse-connector-api`
-7. **Infrastructure**: `dapr-dashboard`, `job-board-status` (health checks), `seq` (logging)
+7. **Infrastructure**: `dapr-dashboard`, `job-board-status` (health checks)
 
 This ordering mirrors the health check dashboard layout, making it easy to correlate compose file entries with monitoring.
 
@@ -111,7 +111,7 @@ All services join a single Docker bridge network (`ai-job-board-net`). Services 
 - **Operational simplicity**: A single `docker compose up -d` starts the entire platform. No Kubernetes manifests, Helm charts, or service mesh configuration.
 - **Dapr-native**: The sidecar pattern in Docker Compose mirrors how Dapr runs in Kubernetes (sidecar injection), making the architecture transferable.
 - **Environment parity**: Dev and prod are structurally identical, reducing "works on dev" surprises.
-- **Observable**: The health check dashboard, Dapr dashboard, and Seq logging provide full visibility from a single browser.
+- **Observable**: The health check dashboard, Dapr dashboard, and Elasticsearch-backed log pipeline provide full visibility from a single browser.
 - **Component hot-reload**: Dapr component YAML changes take effect on sidecar restart without rebuilding application images.
 
 ### Tradeoffs
@@ -124,7 +124,7 @@ All services join a single Docker bridge network (`ai-job-board-net`). Services 
 ## Implementation Notes
 
 - **Dapr version**: All sidecars pin `daprio/daprd:1.15.8` for consistency.
-- **Infrastructure services**: Dapr Dashboard, Seq, and the health check UI do not have Dapr sidecars — they're pure infrastructure.
+- **Infrastructure services**: Dapr Dashboard and the health check UI do not have Dapr sidecars — they're pure infrastructure.
 - **The `ai-service` (Node.js v1)** runs on port 6082 with `NODE_ENV=prod` and has a Dapr sidecar for pub/sub and config access.
 - **MCP servers** (`monolith-mcp:3333`, `admin-api-mcp:3334`) run on non-standard ports to avoid conflicts with their parent APIs.
 - **Vault integration**: The monolith and gateway inject `VAULT_ADDR` and `VAULT_TOKEN` via environment variables (sourced from `.env` files). Microservices access Vault through Dapr's secret store component.

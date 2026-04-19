@@ -18,7 +18,6 @@ export const environment = {
   // strips cf-connecting-ip so geo lookup falls back to XX.
   geoApiUrl: 'https://elkhair.tech/api/geo',
   jaegerUrl: `https://jaeger.${baseDomain}/trace/`,
-  seqUrl: `https://seq.${baseDomain}/#/events?filter=TraceId%3D%22{traceId}%22`,
   grafanaUrl: `https://grafana.${baseDomain}/d/bf5m5dwukfncwd/find-by-trace-id?orgId=1&var-TraceId=`,
   oidc: {
     authority: `https://auth.${baseDomain}/realms/job-board-dev`,

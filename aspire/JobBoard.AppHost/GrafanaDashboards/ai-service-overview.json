@@ -1,103 +1,115 @@
 {
-  "uid": "jobboard-ai-service",
-  "title": "JobBoard — AI Service Overview",
-  "tags": ["jobboard", "ai-service"],
-  "timezone": "browser",
   "editable": true,
-  "refresh": "10s",
-  "time": { "from": "now-30m", "to": "now" },
-  "templating": {
-    "list": [
-      {
-        "name": "environment",
-        "type": "query",
-        "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-        "query": "label_values(ai_chat_request_count_total, deployment_environment)",
-        "refresh": 2,
-        "includeAll": true,
-        "multi": false,
-        "current": { "text": "All", "value": "$__all" }
-      },
-      {
-        "name": "scope",
-        "type": "query",
-        "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-        "query": "label_values(ai_chat_request_count_total{deployment_environment=~\"$environment\"}, ai_chat_scope)",
-        "refresh": 2,
-        "includeAll": true,
-        "multi": true,
-        "current": { "text": "All", "value": "$__all" }
-      },
-      {
-        "name": "provider",
-        "type": "query",
-        "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-        "query": "label_values(ai_chat_request_count_total{deployment_environment=~\"$environment\"}, ai_provider)",
-        "refresh": 2,
-        "includeAll": true,
-        "multi": true,
-        "current": { "text": "All", "value": "$__all" }
-      }
-    ]
-  },
   "panels": [
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 50,
+            "stacking": {
+              "mode": "normal"
+            }
+          },
+          "unit": "short"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
       "id": 1,
-      "title": "Chat Requests Over Time",
-      "type": "timeseries",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
           "expr": "sum(increase(ai_chat_request_count_total{deployment_environment=~\"$environment\",ai_chat_scope=~\"$scope\",ai_provider=~\"$provider\"}[1m])) by (ai_chat_scope, ai_provider)",
           "legendFormat": "{{ai_chat_scope}} / {{ai_provider}}"
         }
       ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "custom": { "drawStyle": "bars", "fillOpacity": 50, "stacking": { "mode": "normal" } }
-        }
-      }
+      "title": "Chat Requests Over Time",
+      "type": "timeseries"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
       "id": 5,
-      "title": "Total Chat Requests",
-      "type": "stat",
-      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 0 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
           "expr": "sum(ai_chat_request_count_total{deployment_environment=~\"$environment\",ai_chat_scope=~\"$scope\"})",
           "legendFormat": "requests"
         }
       ],
-      "fieldConfig": {
-        "defaults": { "unit": "short" }
-      }
+      "title": "Total Chat Requests",
+      "type": "stat"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
       "id": 4,
-      "title": "Total Tokens",
-      "type": "stat",
-      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 0 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
           "expr": "sum(ai_chat_tokens_prompt_total{deployment_environment=~\"$environment\"}) + sum(ai_chat_tokens_completion_total{deployment_environment=~\"$environment\"})",
           "legendFormat": "total tokens"
         }
       ],
-      "fieldConfig": {
-        "defaults": { "unit": "short" }
-      }
+      "title": "Total Tokens",
+      "type": "stat"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 50,
+            "stacking": {
+              "mode": "normal"
+            }
+          },
+          "unit": "short"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
       "id": 3,
-      "title": "Token Usage Over Time — Prompt vs Completion",
-      "type": "timeseries",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
           "expr": "sum(increase(ai_chat_tokens_prompt_total{deployment_environment=~\"$environment\",ai_chat_scope=~\"$scope\",ai_provider=~\"$provider\"}[1m])) by (ai_provider)",
@@ -108,102 +120,221 @@
           "legendFormat": "completion — {{ai_provider}}"
         }
       ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "custom": { "drawStyle": "bars", "fillOpacity": 50, "stacking": { "mode": "normal" } }
-        }
-      }
+      "title": "Token Usage Over Time — Prompt vs Completion",
+      "type": "timeseries"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 60,
+            "stacking": {
+              "mode": "normal"
+            }
+          },
+          "unit": "short"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
       "id": 6,
-      "title": "Tool Calls Over Time",
-      "type": "timeseries",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
           "expr": "sum(increase(ai_tool_call_count_total{deployment_environment=~\"$environment\",ai_chat_scope=~\"$scope\"}[1m])) by (ai_tool_name)",
           "legendFormat": "{{ai_tool_name}}"
         }
       ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "custom": { "drawStyle": "bars", "fillOpacity": 60, "stacking": { "mode": "normal" } }
-        }
-      }
+      "title": "Tool Calls Over Time",
+      "type": "timeseries"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 16
+      },
       "id": 7,
-      "title": "Embeddings Generated (total)",
-      "type": "stat",
-      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 16 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
           "expr": "sum(ai_embeddings_generated_count_total{deployment_environment=~\"$environment\"}) or vector(0)",
           "legendFormat": "embeddings"
         }
       ],
-      "fieldConfig": {
-        "defaults": { "unit": "short" }
-      }
+      "title": "Embeddings Generated (total)",
+      "type": "stat"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 6,
+        "y": 16
+      },
       "id": 8,
-      "title": "Resumes Parsed (total)",
-      "type": "stat",
-      "gridPos": { "h": 8, "w": 6, "x": 6, "y": 16 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
           "expr": "sum(ai_resumes_parsed_count_total{deployment_environment=~\"$environment\"}) or vector(0)",
           "legendFormat": "parsed"
         }
       ],
-      "fieldConfig": {
-        "defaults": { "unit": "short" }
-      }
+      "title": "Resumes Parsed (total)",
+      "type": "stat"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "red",
+            "mode": "fixed"
+          },
+          "unit": "short"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 12,
+        "y": 16
+      },
       "id": 10,
-      "title": "Resume Parse Failures (total)",
-      "type": "stat",
-      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 16 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
           "expr": "sum(ai_resumes_parse_failed_count_total{deployment_environment=~\"$environment\"}) or vector(0)",
           "legendFormat": "failures"
         }
       ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "color": { "mode": "fixed", "fixedColor": "red" }
-        }
-      }
+      "title": "Resume Parse Failures (total)",
+      "type": "stat"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 50,
+            "stacking": {
+              "mode": "normal"
+            }
+          },
+          "unit": "short"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 18,
+        "x": 0,
+        "y": 24
+      },
       "id": 9,
-      "title": "CQRS Commands Over Time (AI Service)",
-      "type": "timeseries",
-      "gridPos": { "h": 8, "w": 18, "x": 0, "y": 24 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
           "expr": "sum(increase(cqrs_command_success_count_total{deployment_environment=~\"$environment\",service_name=\"JobBoard.AI\"}[1m])) by (command_name)",
           "legendFormat": "{{command_name}}"
         }
       ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "custom": { "drawStyle": "bars", "fillOpacity": 50, "stacking": { "mode": "normal" } }
-        }
-      }
+      "title": "CQRS Commands Over Time (AI Service)",
+      "type": "timeseries"
     }
   ],
-  "schemaVersion": 39
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "tags": [
+    "jobboard",
+    "ai-service"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
+        "includeAll": true,
+        "multi": false,
+        "name": "environment",
+        "query": "label_values(ai_chat_request_count_total, deployment_environment)",
+        "refresh": 2,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
+        "includeAll": true,
+        "multi": true,
+        "name": "scope",
+        "query": "label_values(ai_chat_request_count_total{deployment_environment=~\"$environment\"}, ai_chat_scope)",
+        "refresh": 2,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
+        "includeAll": true,
+        "multi": true,
+        "name": "provider",
+        "query": "label_values(ai_chat_request_count_total{deployment_environment=~\"$environment\"}, ai_provider)",
+        "refresh": 2,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "timezone": "browser",
+  "title": "JobBoard — AI Service Overview",
+  "uid": "jobboard-ai-service"
 }

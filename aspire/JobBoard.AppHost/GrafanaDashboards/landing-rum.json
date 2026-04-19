@@ -666,7 +666,7 @@
         "h": 12,
         "w": 24,
         "x": 0,
-        "y": 22
+        "y": 36
       },
       "id": 13,
       "options": {
@@ -794,8 +794,8 @@
                 "value": [
                   {
                     "targetBlank": true,
-                    "title": "View trace in Jaeger",
-                    "url": "https://jaeger.elkhair.tech/trace/${__value.raw}"
+                    "title": "Open in Find By Trace Id",
+                    "url": "/d/bf5m5dwukfncwd/find-by-trace-id?var-TraceId=${__value.raw}"
                   }
                 ]
               },
@@ -857,7 +857,7 @@
         "h": 14,
         "w": 24,
         "x": 0,
-        "y": 34
+        "y": 22
       },
       "id": 20,
       "options": {
@@ -1071,7 +1071,7 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "JobBoard \u00e2\u20ac\u201d Web App RUM",
+  "title": "JobBoard â€” Web App RUM",
   "uid": "jobboard-landing-rum",
   "weekStart": ""
 }

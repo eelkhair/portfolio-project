@@ -58,8 +58,6 @@ exporters:
     endpoint: jaeger:4317
     tls:
       insecure: true
-  otlphttp/seq:
-    endpoint: http://seq:80/ingest/otlp
   prometheus:
     endpoint: 0.0.0.0:8889
     metric_expiration: 5m
@@ -70,11 +68,7 @@ service:
     traces:
       receivers: [otlp]
       processors: [filter/dapr, batch]
-      exporters: [otlp/jaeger, otlphttp/seq, spanmetrics]
-    logs:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [otlphttp/seq]
+      exporters: [otlp/jaeger, spanmetrics]
     metrics:
       receivers: [otlp, spanmetrics]
       processors: [batch]

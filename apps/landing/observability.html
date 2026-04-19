@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Observability | Elkhair Elkhair</title>
-  <meta name="description" content="End-to-end distributed tracing, structured logging, and dashboards across 16 services using OpenTelemetry, Jaeger, Grafana, and Seq.">
+  <meta name="description" content="End-to-end distributed tracing, structured logging, and dashboards across 16 services using OpenTelemetry, Jaeger, Grafana, and Elasticsearch.">
   <meta property="og:title" content="Observability | Elkhair Elkhair">
   <meta property="og:description" content="End-to-end distributed tracing, structured logging, and dashboards across 16 services.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' width='48' height='48'><g transform='translate(24,24) rotate(45)'><rect x='-12' y='-12' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='-3.5' y='-12' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='5' y='-12' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='-12' y='-3.5' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='-3.5' y='-3.5' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='5' y='-3.5' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='-12' y='5' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='-3.5' y='5' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/><rect x='5' y='5' width='7' height='7' fill='%231E293B' stroke='%230ea5e9' stroke-width='1'/></g><polygon points='24,8 27,18 38,18 29,25 32,36 24,30 16,36 19,25 10,18 21,18' fill='%230ea5e9' stroke='%230ea5e9' stroke-width='1.5'/></svg>">
@@ -85,7 +85,7 @@
       Every service is instrumented with <strong>OpenTelemetry</strong>. Traces follow the <strong>W3C TraceContext</strong> standard, propagating through HTTP calls, Dapr pub/sub messages, and background processors. A single TraceId follows a request from the Angular frontend through the gateway, into whichever backend path is active, through messaging, and back.
     </p>
     <p>
-      <strong>Jaeger</strong> visualizes distributed traces. <strong>Grafana</strong> shows API latency, error rates, and throughput. <strong>Seq</strong> provides structured log search with TraceId correlation. <strong>Health checks</strong> monitor liveness and readiness for every service.
+      <strong>Jaeger</strong> visualizes distributed traces. <strong>Grafana</strong> shows API latency, error rates, and throughput. <strong>Elasticsearch</strong> provides structured log search with TraceId correlation. <strong>Health checks</strong> monitor liveness and readiness for every service.
     </p>
     <figure class="cs-figure">
       <div class="cs-placeholder">Screenshot: Full end-to-end Jaeger trace across multiple services</div>
@@ -115,7 +115,7 @@
       Click "Create Company" in the admin app. The API response includes a <code>TraceId</code> header. Click the Jaeger link in the admin toolbar. You'll see the full trace: gateway to monolith, outbox dispatch, connector saga fanning out to three microservices, reverse connector syncing back.
     </p>
     <p>
-      Open Grafana and check the API dashboard. You'll see request latency percentiles, error rates by endpoint, and throughput over time. Filter by the TraceId to correlate a specific request's metrics with its trace. Open Seq and paste the same TraceId &mdash; every structured log entry from every service involved in that request appears, correlated and searchable.
+      Open Grafana and check the API dashboard. You'll see request latency percentiles, error rates by endpoint, and throughput over time. Filter by the TraceId to correlate a specific request's metrics with its trace. Paste the same TraceId into the Grafana "Find by Trace Id" dashboard &mdash; every structured log entry from every service involved in that request appears from Elasticsearch, correlated and searchable.
     </p>
     <div class="cs-evidence-grid">
       <figure class="cs-figure">
@@ -123,8 +123,8 @@
         <figcaption>Grafana dashboard with request latency percentiles, error rates, and throughput across services</figcaption>
       </figure>
       <figure class="cs-figure">
-        <div class="cs-placeholder">Screenshot: Seq structured logs filtered by TraceId</div>
-        <figcaption>Seq log search filtered by TraceId, showing correlated entries across multiple services</figcaption>
+        <div class="cs-placeholder">Screenshot: Grafana "Find by Trace Id" dashboard with Elasticsearch logs filtered by TraceId</div>
+        <figcaption>Grafana "Find by Trace Id" panel showing Elasticsearch log entries filtered by TraceId, correlated across multiple services</figcaption>
       </figure>
     </div>
   </section>

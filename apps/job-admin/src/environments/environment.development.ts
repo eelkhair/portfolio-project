@@ -22,7 +22,6 @@ export const environment = {
   geoApiUrl: 'https://elkhair.tech/api/geo',
   grafanaUrl: `https://grafana.${baseDomain}/d/bf5m5dwukfncwd/find-by-trace-id?orgId=1&var-TraceId=`,
   jaegerUrl: `https://jaeger.${baseDomain}/trace/`,
-  seqUrl: `https://seq.${baseDomain}/#/events?filter=TraceId%3D%22{traceId}%22`,
   oidc: {
     authority: `https://auth.${baseDomain}/realms/job-board-dev`,
     redirectUrl: `https://job-admin-dev.${baseDomain}`,

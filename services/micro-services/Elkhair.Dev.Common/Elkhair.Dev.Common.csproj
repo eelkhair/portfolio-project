@@ -7,7 +7,7 @@
         <RootNamespace>Elkhair.Dev.Common</RootNamespace>
         <PackageId>Elkhair.Dev.Common</PackageId>
         <Authors>Elkhair Elkhair</Authors>
-        <Version>1.0.22</Version>
+        <Version>1.0.23</Version>
         <Description>Shared components for any project</Description>
         <IsPackable>true</IsPackable>
     </PropertyGroup>
@@ -43,7 +43,6 @@
         <PackageReference Include="Serilog.Exceptions" Version="8.4.0" />
         <PackageReference Include="Serilog.Exceptions.EntityFrameworkCore" Version="8.4.0" />
         <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="10.0.0" />
-        <PackageReference Include="Serilog.Sinks.Seq" Version="9.0.0" />
 
     </ItemGroup>
 </Project>

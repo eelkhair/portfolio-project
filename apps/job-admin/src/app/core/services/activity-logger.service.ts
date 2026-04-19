@@ -11,10 +11,10 @@ type SpanCtx = { traceId: string; spanId: string };
 
 /**
  * Lightweight activity logger. Uses `faro.api.pushLog` so context fields land
- * in Seq + ES as structured properties (instead of being string-joined into
- * the message as `[object Object]` like `captureConsole` does), and attaches
- * a `spanContext` so the resulting log lines correlate by `TraceId` in the
- * "Find by Trace Id" Grafana dashboard.
+ * in Elasticsearch as structured properties (instead of being string-joined
+ * into the message as `[object Object]` like `captureConsole` does), and
+ * attaches a `spanContext` so the resulting log lines correlate by `TraceId`
+ * in the "Find by Trace Id" Grafana dashboard.
  *
  * The `trace<T>()` operator creates its own activity span and makes it active
  * during subscribe — so the HTTP span the `tracingInterceptor` creates

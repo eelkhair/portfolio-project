@@ -74,7 +74,7 @@ note over OC
   set_es_mapping_mode: raw
 end note
 
-OC -> OC : fan-out → Jaeger + Seq + spanmetrics + Elasticsearch
+OC -> OC : fan-out → Jaeger + spanmetrics + Elasticsearch
 
 note over U, AI
   Result in Grafana "Find by Trace Id"

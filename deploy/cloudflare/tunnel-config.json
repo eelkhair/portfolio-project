@@ -15,7 +15,6 @@
     { "hostname": "auth.elkhair.tech", "service": "http://192.168.1.112:9090" },
     { "hostname": "grafana.elkhair.tech", "service": "http://192.168.1.115:3000" },
     { "hostname": "jaeger.elkhair.tech", "service": "http://192.168.1.160:16686" },
-    { "hostname": "seq.elkhair.tech", "service": "http://192.168.1.112:5341" },
     { "hostname": "inspector.elkhair.tech", "service": "http://192.168.1.115:6274" },
     { "hostname": "mail.elkhair.tech", "service": "http://192.168.1.115:8025" },
     { "hostname": "job-dapr.elkhair.tech", "service": "http://192.168.1.112:8080" },

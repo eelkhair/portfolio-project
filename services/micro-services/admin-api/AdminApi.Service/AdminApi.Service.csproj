@@ -13,9 +13,9 @@
 
         <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
 
-        <PackageReference Include="Elkhair.Common.Observability" Version="1.0.27" />
+        <PackageReference Include="Elkhair.Common.Observability" Version="1.0.29" />
 
-        <PackageReference Include="Elkhair.Dev.Common" Version="1.0.22" />
+        <PackageReference Include="Elkhair.Dev.Common" Version="1.0.23" />
 
         <PackageReference Include="FastEndpoints" Version="7.1.1" />
         <PackageReference Include="FastEndpoints.Security" Version="7.1.1" />

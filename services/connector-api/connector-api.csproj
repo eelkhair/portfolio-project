@@ -20,8 +20,8 @@
     <ItemGroup>
         <PackageReference Include="Dapr.AspNetCore" Version="1.16.1" />
         <PackageReference Include="Dapr.Extensions.Configuration" Version="1.16.1" />
-        <PackageReference Include="Elkhair.Common.Observability" Version="1.0.16" />
-        <PackageReference Include="Elkhair.Dev.Common" Version="1.0.22" />
+        <PackageReference Include="Elkhair.Common.Observability" Version="1.0.29" />
+        <PackageReference Include="Elkhair.Dev.Common" Version="1.0.23" />
         <PackageReference Include="JobBoard.HealthChecks" Version="1.0.8" />
         <PackageReference Include="JobBoard.IntegrationEvents" Version="1.0.11" />
         <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
@@ -42,7 +42,6 @@
         <PackageReference Include="Serilog.Exceptions" Version="8.4.0" />
         <PackageReference Include="Serilog.Exceptions.EntityFrameworkCore" Version="8.4.0" />
         <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="10.0.0" />
-        <PackageReference Include="Serilog.Sinks.Seq" Version="9.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.6" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
         <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="9.0.1" />

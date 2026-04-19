@@ -1,341 +1,1051 @@
 {
-  "uid": "jobboard-monolith",
-  "title": "JobBoard — Monolith Overview",
-  "tags": ["jobboard", "monolith"],
-  "timezone": "browser",
-  "editable": true,
-  "refresh": "10s",
-  "time": { "from": "now-30m", "to": "now" },
-  "templating": {
+  "annotations": {
     "list": [
       {
-        "name": "environment",
-        "type": "query",
-        "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-        "query": "label_values(cqrs_command_success_count_total, deployment_environment)",
-        "refresh": 2,
-        "includeAll": false,
-        "multi": false,
-        "current": { "text": "prod", "value": "prod" }
-      },
-      {
-        "name": "command",
-        "type": "query",
-        "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-        "query": "label_values(cqrs_command_success_count_total{deployment_environment=~\"$environment\"}, command_name)",
-        "refresh": 2,
-        "includeAll": true,
-        "multi": true,
-        "current": { "text": "All", "value": "$__all" }
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
       }
     ]
   },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
   "panels": [
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "bars",
+            "fillOpacity": 50,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
       "id": 1,
-      "title": "HTTP Requests Over Time",
-      "type": "timeseries",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
       "targets": [
         {
           "expr": "sum(increase(http_server_request_duration_seconds_count{deployment_environment=~\"$environment\",http_route!=\"/healthzEndpoint\"}[1m])) by (http_request_method)",
-          "legendFormat": "{{http_request_method}}"
+          "legendFormat": "{{http_request_method}}",
+          "refId": "A"
         }
       ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "custom": { "drawStyle": "bars", "fillOpacity": 50, "stacking": { "mode": "normal" } }
-        }
-      }
+      "title": "HTTP Requests Over Time",
+      "type": "timeseries"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
       "id": 2,
-      "title": "Total HTTP Requests",
-      "type": "stat",
-      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 0 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.4.0",
       "targets": [
         {
           "expr": "sum(http_server_request_duration_seconds_count{deployment_environment=~\"$environment\",http_route!=\"/healthzEndpoint\"})",
-          "legendFormat": "requests"
+          "legendFormat": "requests",
+          "refId": "A"
         }
       ],
-      "fieldConfig": {
-        "defaults": { "unit": "short" }
-      }
+      "title": "Total HTTP Requests",
+      "type": "stat"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 10
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 18,
+        "y": 0
+      },
       "id": 3,
-      "title": "HTTP Errors (total)",
-      "type": "stat",
-      "gridPos": { "h": 4, "w": 3, "x": 18, "y": 0 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.4.0",
       "targets": [
         {
           "expr": "sum(http_server_request_duration_seconds_count{deployment_environment=~\"$environment\",http_response_status_code=~\"4..\",http_route!=\"/healthzEndpoint\"}) or vector(0)",
-          "legendFormat": "4xx"
+          "legendFormat": "4xx",
+          "refId": "A"
         },
         {
           "expr": "sum(http_server_request_duration_seconds_count{deployment_environment=~\"$environment\",http_response_status_code=~\"5..\",http_route!=\"/healthzEndpoint\"}) or vector(0)",
-          "legendFormat": "5xx"
+          "legendFormat": "5xx",
+          "refId": "B"
         }
       ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "thresholds": {
-            "steps": [
-              { "color": "green", "value": null },
-              { "color": "orange", "value": 1 },
-              { "color": "red", "value": 10 }
-            ]
-          },
-          "color": { "mode": "thresholds" }
-        }
-      }
+      "title": "HTTP Errors (total)",
+      "type": "stat"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "bars",
+            "fillOpacity": 50,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "5xx"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "4xx"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 4
+      },
       "id": 11,
-      "title": "HTTP Errors Over Time",
-      "type": "timeseries",
-      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 4 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
       "targets": [
         {
           "expr": "sum(increase(http_server_request_duration_seconds_count{deployment_environment=~\"$environment\",http_response_status_code=~\"4..\",http_route!=\"/healthzEndpoint\"}[1m]))",
-          "legendFormat": "4xx"
+          "legendFormat": "4xx",
+          "refId": "A"
         },
         {
           "expr": "sum(increase(http_server_request_duration_seconds_count{deployment_environment=~\"$environment\",http_response_status_code=~\"5..\",http_route!=\"/healthzEndpoint\"}[1m]))",
-          "legendFormat": "5xx"
+          "legendFormat": "5xx",
+          "refId": "B"
         }
       ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "custom": { "drawStyle": "bars", "fillOpacity": 50 }
-        },
-        "overrides": [
-          {
-            "matcher": { "id": "byName", "options": "5xx" },
-            "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }]
-          },
-          {
-            "matcher": { "id": "byName", "options": "4xx" },
-            "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }]
-          }
-        ]
-      }
+      "title": "HTTP Errors Over Time",
+      "type": "timeseries"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 8
+      },
       "id": 8,
-      "title": "Outbox Messages Processed (total)",
-      "type": "stat",
-      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 8 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.4.0",
       "targets": [
         {
           "expr": "sum(outbox_messages_processed_count_total{deployment_environment=~\"$environment\"})",
-          "legendFormat": "processed"
+          "legendFormat": "processed",
+          "refId": "A"
         }
       ],
-      "fieldConfig": {
-        "defaults": { "unit": "short" }
-      }
+      "title": "Outbox Messages Processed (total)",
+      "type": "stat"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 10
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 8
+      },
       "id": 9,
-      "title": "Dead-Letter Messages (total)",
-      "type": "stat",
-      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 8 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.4.0",
       "targets": [
         {
           "expr": "sum(deadletter_messages_found_count_total{deployment_environment=~\"$environment\"}) or vector(0)",
-          "legendFormat": "dead letters"
+          "legendFormat": "dead letters",
+          "refId": "A"
         }
       ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "thresholds": {
-            "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 1 },
-              { "color": "red", "value": 10 }
-            ]
-          },
-          "color": { "mode": "thresholds" }
-        }
-      }
+      "title": "Dead-Letter Messages (total)",
+      "type": "stat"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "bars",
+            "fillOpacity": 50,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
       "id": 10,
-      "title": "Outbox Processed Over Time",
-      "type": "timeseries",
-      "gridPos": { "h": 4, "w": 12, "x": 12, "y": 8 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
       "targets": [
         {
           "expr": "sum(increase(outbox_messages_processed_count_total{deployment_environment=~\"$environment\"}[1m]))",
-          "legendFormat": "processed"
+          "legendFormat": "processed",
+          "refId": "A"
         },
         {
           "expr": "sum(increase(deadletter_messages_found_count_total{deployment_environment=~\"$environment\"}[1m]))",
-          "legendFormat": "dead-letter"
+          "legendFormat": "dead-letter",
+          "refId": "B"
         }
       ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "custom": { "drawStyle": "bars", "fillOpacity": 50 }
-        }
-      }
+      "title": "Outbox Processed Over Time",
+      "type": "timeseries"
     },
     {
-      "id": 12,
-      "title": "Recent Errors (click to open trace)",
-      "type": "table",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
-      "datasource": { "type": "jaeger", "uid": "ef5fo1p8d0zcwd" },
-      "targets": [
-        {
-          "queryType": "search",
-          "service": "monolith-api",
-          "tags": "error=true deployment.environment=$environment",
-          "limit": 10
-        }
-      ],
-      "options": {
-        "showHeader": true,
-        "sortBy": [{ "displayName": "Start time", "desc": true }]
+      "datasource": {
+        "type": "jaeger",
+        "uid": "ef5fo1p8d0zcwd"
       },
       "fieldConfig": {
-        "defaults": {},
-        "overrides": [
-          {
-            "matcher": { "id": "byName", "options": "Trace ID" },
-            "properties": [
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
               {
-                "id": "links",
-                "value": [
-                  {
-                    "title": "View in Jaeger",
-                    "url": "https://jaeger.eelkhair.net/trace/${__value.text}",
-                    "targetBlank": true
-                  }
-                ]
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
               }
             ]
           }
-        ]
-      }
-    },
-    {
-      "id": 13,
-      "title": "Recent Company Creations (click to open trace)",
-      "type": "table",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
-      "datasource": { "type": "jaeger", "uid": "ef5fo1p8d0zcwd" },
-      "targets": [
-        {
-          "queryType": "search",
-          "service": "monolith-api",
-          "operation": "CreateCompanyCommand.handle",
-          "tags": "deployment.environment=$environment",
-          "limit": 10
-        }
-      ],
-      "options": {
-        "showHeader": true,
-        "sortBy": [{ "displayName": "Start time", "desc": true }]
-      },
-      "fieldConfig": {
-        "defaults": {},
-        "overrides": [
-          {
-            "matcher": { "id": "byName", "options": "Trace ID" },
-            "properties": [
-              {
-                "id": "links",
-                "value": [
-                  {
-                    "title": "View in Jaeger",
-                    "url": "https://jaeger.eelkhair.net/trace/${__value.text}",
-                    "targetBlank": true
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "id": 4,
-      "title": "CQRS Commands Over Time",
-      "type": "timeseries",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-      "targets": [
-        {
-          "expr": "sum(increase(cqrs_command_success_count_total{deployment_environment=~\"$environment\",command_name=~\"$command\"}[1m])) by (command_name)",
-          "legendFormat": "{{command_name}}"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "custom": { "drawStyle": "bars", "fillOpacity": 50, "stacking": { "mode": "normal" } }
-        }
-      }
-    },
-    {
-      "id": 6,
-      "title": "CQRS Failures Over Time",
-      "type": "timeseries",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-      "targets": [
-        {
-          "expr": "sum(increase(cqrs_command_failure_count_total{deployment_environment=~\"$environment\",command_name=~\"$command\"}[1m])) by (command_name)",
-          "legendFormat": "{{command_name}}"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "custom": { "drawStyle": "bars", "fillOpacity": 50 }
         },
         "overrides": [
           {
-            "matcher": { "id": "byFrameRefID", "options": "A" },
-            "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }]
+            "matcher": {
+              "id": "byName",
+              "options": "Trace ID"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": true,
+                    "title": "Open in Find By Trace Id",
+                    "url": "/d/bf5m5dwukfncwd/find-by-trace-id?var-TraceId=${__value.text}"
+                  }
+                ]
+              }
+            ]
           }
         ]
-      }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 12
+      },
+      "id": 12,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Start time"
+          }
+        ]
+      },
+      "pluginVersion": "10.4.0",
+      "targets": [
+        {
+          "limit": 10,
+          "queryType": "search",
+          "refId": "A",
+          "service": "monolith-api",
+          "tags": "error=true deployment.environment=$environment"
+        }
+      ],
+      "title": "Recent Errors (click to open trace)",
+      "type": "table"
     },
     {
+      "datasource": {
+        "type": "jaeger",
+        "uid": "ef5fo1p8d0zcwd"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Trace ID"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": true,
+                    "title": "Open in Find By Trace Id",
+                    "url": "/d/bf5m5dwukfncwd/find-by-trace-id?var-TraceId=${__value.text}"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 12
+      },
+      "id": 13,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Start time"
+          }
+        ]
+      },
+      "pluginVersion": "10.4.0",
+      "targets": [
+        {
+          "limit": 10,
+          "operation": "CreateCompanyCommand.handle",
+          "queryType": "search",
+          "refId": "A",
+          "service": "monolith-api",
+          "tags": "deployment.environment=$environment"
+        }
+      ],
+      "title": "Recent Company Creations (click to open trace)",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "bars",
+            "fillOpacity": 50,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 20
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(increase(cqrs_command_success_count_total{deployment_environment=~\"$environment\",command_name=~\"$command\"}[1m])) by (command_name)",
+          "legendFormat": "{{command_name}}",
+          "refId": "A"
+        }
+      ],
+      "title": "CQRS Commands Over Time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "bars",
+            "fillOpacity": 50,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 20
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(increase(cqrs_command_failure_count_total{deployment_environment=~\"$environment\",command_name=~\"$command\"}[1m])) by (command_name)",
+          "legendFormat": "{{command_name}}",
+          "refId": "A"
+        }
+      ],
+      "title": "CQRS Failures Over Time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 50
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 28
+      },
       "id": 7,
-      "title": "Validation Failures Over Time",
-      "type": "timeseries",
-      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 28 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
           "expr": "sum(increase(cqrs_validation_failure_count_total{deployment_environment=~\"$environment\"}[1m])) by (command_name)",
-          "legendFormat": "{{command_name}}"
+          "legendFormat": "{{command_name}}",
+          "refId": "A"
         }
       ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "custom": { "drawStyle": "bars", "fillOpacity": 50 }
-        }
-      }
+      "title": "Validation Failures Over Time",
+      "type": "timeseries"
     }
   ],
-  "schemaVersion": 39
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "tags": [
+    "jobboard",
+    "monolith"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "prod",
+          "value": "prod"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
+        "definition": "",
+        "hide": 0,
+        "includeAll": false,
+        "multi": false,
+        "name": "environment",
+        "query": "label_values(cqrs_command_success_count_total, deployment_environment)",
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
+        "definition": "",
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "name": "command",
+        "query": "label_values(cqrs_command_success_count_total{deployment_environment=~\"$environment\"}, command_name)",
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "JobBoard — Monolith Overview",
+  "uid": "jobboard-monolith",
+  "weekStart": ""
 }

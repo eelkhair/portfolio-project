@@ -60,10 +60,6 @@ exporters:
     tls:
       insecure: true
 
-  # Forward traces and logs to Seq
-  otlphttp/seq:
-    endpoint: https://seq.eelkhair.net/ingest/otlp
-
 service:
   pipelines:
     metrics:
@@ -73,8 +69,4 @@ service:
     traces:
       receivers: [otlp]
       processors: [filter/dapr, batch]
-      exporters: [otlp/jaeger, otlphttp/seq]
-    logs:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [otlphttp/seq]
+      exporters: [otlp/jaeger]

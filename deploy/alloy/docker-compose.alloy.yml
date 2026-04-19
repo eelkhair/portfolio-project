@@ -9,7 +9,7 @@
 #   browser → faro.receiver (Alloy) → loki.process.faro (parses logfmt body,
 #   drops kind!=log, promotes fields to labels, replaces body with message)
 #   → otelcol.receiver.loki (Alloy: labels → OTLP attrs) → otel-collector
-#   → fan-out: Seq (logs), ES (logs), Jaeger (traces), Prometheus (metrics)
+#   → fan-out: ES (logs), Jaeger (traces), Prometheus (metrics)
 #
 # Because Alloy now emits clean OTLP records, the collector only needs:
 #   - transform/fe_service_name: copy app_name → service.name on resource
@@ -98,7 +98,7 @@ services:
                   - merge_maps(log.attributes, ExtractPatterns(log.body, "traceID=(?P<TraceId>[a-f0-9]+)"), "upsert")
                   - merge_maps(log.attributes, ExtractPatterns(log.body, "spanID=(?P<SpanId>[a-f0-9]+)"), "upsert")
                   - merge_maps(log.attributes, ExtractPatterns(log.body, "message=\"(?P<message>[^\"]*)\""), "upsert")
-                  # Replace body with just the message text (clean Seq display)
+                  # Replace body with just the message text
                   - set(log.body, log.attributes["message"]) where log.attributes["message"] != nil
           # Drop FE non-log records (kind=event / kind=measurement / etc.).
           # `kind` is now on log.attributes thanks to parse_fe_body. Backend
@@ -128,7 +128,7 @@ services:
                 statements:
                   - set(span.attributes["ApplicationName"], resource.attributes["service.name"]) where resource.attributes["service.name"] != nil
           # Promote OTLP top-level trace_id / span_id onto attributes so they
-          # show up as queryable @Properties (TraceId / SpanId) in Seq —
+          # show up as queryable @Properties (TraceId / SpanId) —
           # matching the Serilog convention backend services already emit.
           # Applies to both LOG records and SPAN records. Use the `.string`
           # path accessor to get the hex representation; the bare path
@@ -195,8 +195,6 @@ services:
             endpoint: jaeger:4317
             tls:
               insecure: true
-          otlphttp/seq:
-            endpoint: https://seq.eelkhair.net/ingest/otlp
           prometheus:
             endpoint: 0.0.0.0:8889
             metric_expiration: 5m
@@ -219,11 +217,7 @@ services:
             traces:
               receivers: [otlp]
               processors: [filter/dapr, transform/fe_service_name, transform/promote_trace_ids, batch]
-              exporters: [otlp/jaeger, otlphttp/seq, spanmetrics]
-            logs:
-              receivers: [otlp]
-              processors: [transform/parse_fe_body, filter/fe_log_only, transform/fe_service_name, transform/promote_trace_ids, batch]
-              exporters: [otlphttp/seq]
+              exporters: [otlp/jaeger, spanmetrics]
             logs/es-fe:
               receivers: [otlp]
               processors: [transform/parse_fe_body, filter/fe_log_only, transform/fe_service_name, filter/fe_only, transform/promote_trace_ids, transform/set_es_mapping_mode, batch]

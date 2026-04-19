@@ -13,7 +13,6 @@ export const environment = {
   otelZipkin: undefined as string | undefined,
   grafanaUrl: undefined as string | undefined,
   jaegerUrl: undefined as string | undefined,
-  seqUrl: undefined as string | undefined,
   oidc: {
     authority: '${KEYCLOAK_URL}/realms/job-board',
     redirectUrl: '${JOB_ADMIN_URL}',

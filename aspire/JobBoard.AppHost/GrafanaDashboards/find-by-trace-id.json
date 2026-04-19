@@ -43,7 +43,7 @@
           "refId": "A"
         }
       ],
-      "title": "Panel Title",
+      "title": "Trace",
       "type": "traces"
     },
     {
@@ -114,11 +114,33 @@
                 "value": 196
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "TraceId"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": true,
+                    "title": "View in Jaeger",
+                    "url": "https://jaeger.elkhair.tech/trace/${__value.raw}"
+                  }
+                ]
+              },
+              {
+                "id": "custom.width",
+                "value": 280
+              }
+            ]
           }
         ]
       },
       "gridPos": {
-        "h": 11,
+        "h": 22,
         "w": 24,
         "x": 0,
         "y": 13
@@ -166,7 +188,7 @@
         }
       ],
       "timeFrom": "1w",
-      "title": "ElasticSearch",
+      "title": "Logs",
       "transformations": [
         {
           "id": "organize",
@@ -176,15 +198,12 @@
               "_index": true,
               "_source": true,
               "_type": true,
+              "app_name": true,
               "fields.@timestamp": true,
               "fields.ActionId": true,
               "fields.ActionName": true,
-              "fields.ApplicationName": false,
-              "fields.AuthenticationScheme": true,
-              "fields.CommandName": true,
               "fields.ConnectionId": true,
-              "fields.EventId.Id": true,
-              "fields.EventId.Name": true,
+              "fields.Kind": true,
               "fields.ParentSpanId": true,
               "fields.Request": true,
               "fields.RequestId": true,
@@ -193,270 +212,71 @@
               "fields.SpanId": true,
               "fields.SpanKind": true,
               "fields.TraceId": true,
-              "fields.commandText": false,
-              "fields.commandTimeout": true,
-              "fields.commandType": true,
-              "fields.elapsed": true,
-              "fields.newLine": true,
-              "fields.otel.tag.cqrs.request": true,
-              "fields.otel.tag.db.name": true,
-              "fields.otel.tag.db.statement": true,
-              "fields.otel.tag.db.system": true,
-              "fields.otel.tag.email": true,
+              "fields.isStreaming": true,
               "fields.otel.tag.http.request.method": true,
-              "fields.otel.tag.network.protocol.version": true,
-              "fields.otel.tag.peer.service": true,
-              "fields.otel.tag.server.address": true,
-              "fields.otel.tag.url.path": true,
-              "fields.otel.tag.url.scheme": true,
-              "fields.otel.tag.userId": true,
-              "fields.otel.tag.user_agent.original": true,
-              "fields.parameters": true,
               "fields.parentSpanId": true,
               "fields.spanId": true,
+              "fields.statusCode": true,
+              "fields.targetUrl": true,
+              "fields.version": true,
+              "fields.versionPolicy": true,
               "highlight": true,
+              "http.duration_ms": true,
+              "http.url": true,
               "id": true,
+              "kind": true,
               "level": true,
               "messageTemplate": true,
+              "session.id": true,
               "sort": true
             },
             "includeByName": {},
             "indexByName": {
               "@timestamp": 0,
-              "_id": 6,
-              "_index": 7,
-              "_source": 8,
-              "_type": 9,
-              "fields.@timestamp": 10,
-              "fields.ActionId": 11,
-              "fields.ActionName": 12,
-              "fields.AdminEmail": 13,
-              "fields.ApplicationName": 2,
-              "fields.ClassName": 14,
-              "fields.CommandName": 15,
-              "fields.CompanyEmail": 16,
-              "fields.CompanyName": 17,
-              "fields.CompanyUId": 18,
-              "fields.ConnectionId": 19,
-              "fields.IndustryUId": 20,
-              "fields.MessageId": 21,
-              "fields.ParentSpanId": 22,
-              "fields.ParentTrace": 23,
-              "fields.Request": 24,
-              "fields.RequestId": 25,
-              "fields.RequestPath": 26,
-              "fields.SourceContext": 27,
-              "fields.SpanId": 28,
-              "fields.SpanKind": 29,
-              "fields.TraceId": 30,
-              "fields.otel.tag.AdminEmail": 31,
-              "fields.otel.tag.CompanyEmail": 32,
-              "fields.otel.tag.CompanyName": 33,
-              "fields.otel.tag.CompanyUId": 34,
-              "fields.otel.tag.IndustryUId": 35,
-              "fields.otel.tag.UserUId": 36,
-              "fields.otel.tag.cqrs.request": 5,
-              "fields.otel.tag.email": 37,
-              "fields.otel.tag.http.request.method": 3,
-              "fields.otel.tag.network.protocol.version": 38,
-              "fields.otel.tag.outbox.message.eventType": 39,
-              "fields.otel.tag.outbox.parent.spanId": 40,
-              "fields.otel.tag.outbox.parent.traceId": 41,
-              "fields.otel.tag.processor.traceId": 54,
-              "fields.otel.tag.server.address": 42,
-              "fields.otel.tag.url.path": 43,
-              "fields.otel.tag.url.scheme": 44,
-              "fields.otel.tag.userId": 45,
-              "fields.otel.tag.user_agent.original": 46,
-              "fields.parentSpanId": 47,
-              "fields.spanId": 48,
-              "fields.traceId": 4,
-              "highlight": 49,
-              "id": 50,
-              "level": 51,
-              "message": 1,
-              "messageTemplate": 52,
-              "sort": 53
+              "app_environment": 20,
+              "fields.ApplicationName": 1,
+              "fields.app_environment": 21,
+              "fields.otel.tag.ai.model": 10,
+              "fields.otel.tag.ai.provider": 11,
+              "fields.otel.tag.cqrs.request": 9,
+              "fields.otel.tag.network.protocol.version": 16,
+              "fields.otel.tag.server.address": 15,
+              "fields.otel.tag.service": 12,
+              "fields.otel.tag.url.path": 13,
+              "fields.otel.tag.url.scheme": 14,
+              "fields.otel.tag.user_agent.original": 17,
+              "fields.traceId": 8,
+              "geo.city": 3,
+              "geo.country_code": 4,
+              "geo.lat": 6,
+              "geo.lon": 7,
+              "geo.region": 5,
+              "http.method": 18,
+              "http.status_code": 19,
+              "message": 2
             },
             "renameByName": {
               "@timestamp": "Time",
+              "app_environment": "Environment",
               "fields.ApplicationName": "Service",
-              "fields.commandText": "Sql",
-              "fields.otel.tag.cqrs.request": "Request",
-              "fields.otel.tag.email": "",
-              "fields.otel.tag.http.request.method": "Http Verb",
-              "fields.otel.tag.network.protocol.version": "",
-              "fields.traceId": "TraceId",
-              "message": "Message"
-            }
-          }
-        }
-      ],
-      "type": "table"
-    },
-    {
-      "datasource": {
-        "type": "elasticsearch",
-        "uid": "cf5m4qd8jt7uod"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "minWidth": 100
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Time"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 196
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Message"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 360
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Level"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 100
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "TraceId"
-            },
-            "properties": [
-              {
-                "id": "links",
-                "value": [
-                  {
-                    "targetBlank": true,
-                    "title": "View in Jaeger",
-                    "url": "https://jaeger.elkhair.tech/trace/${__value.raw}"
-                  }
-                ]
-              },
-              {
-                "id": "custom.width",
-                "value": 280
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 14,
-        "w": 24,
-        "x": 0,
-        "y": 24
-      },
-      "id": 3,
-      "options": {
-        "cellHeight": "sm",
-        "showHeader": true,
-        "sortBy": [
-          {
-            "desc": false,
-            "displayName": "Time"
-          }
-        ]
-      },
-      "targets": [
-        {
-          "alias": "",
-          "bucketAggs": [],
-          "datasource": {
-            "type": "elasticsearch",
-            "uid": "cf5m4qd8jt7uod"
-          },
-          "metrics": [
-            {
-              "id": "1",
-              "settings": {
-                "limit": "500"
-              },
-              "type": "logs"
-            }
-          ],
-          "query": "fields.traceId: \"${TraceId}\" AND fields.ApplicationName:(\"admin-fe\" OR \"public-fe\" OR \"landing\")",
-          "refId": "A",
-          "timeField": "@timestamp"
-        }
-      ],
-      "timeFrom": "1w",
-      "title": "Frontend Logs",
-      "transformations": [
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "_id": true,
-              "_index": true,
-              "_source": true,
-              "_type": true,
-              "fields.@timestamp": true,
-              "fields.ParentSpanId": true,
-              "fields.SpanId": true,
-              "fields.TraceId": true,
-              "fields.app_name": true,
-              "fields.kind": true,
-              "fields.parentSpanId": true,
-              "fields.spanId": true,
-              "fields.http.url": true,
-              "fields.session.id": true,
-              "highlight": true,
-              "id": true,
-              "level": true,
-              "messageTemplate": true,
-              "sort": true
-            },
-            "includeByName": {},
-            "indexByName": {
-              "@timestamp": 0,
-              "message": 1,
-              "fields.ApplicationName": 2,
-              "fields.Level": 3,
-              "fields.traceId": 4
-            },
-            "renameByName": {
-              "@timestamp": "Time",
-              "fields.ApplicationName": "Application",
-              "fields.Level": "Level",
               "fields.app_environment": "Environment",
-              "fields.geo.city": "City",
-              "fields.geo.country_code": "Country",
-              "fields.geo.lat": "Latitude",
-              "fields.geo.lon": "Longitude",
-              "fields.geo.region": "Region",
-              "fields.http.duration_ns": "Duration (ns)",
-              "fields.http.status_code": "HTTP Status",
+              "fields.otel.tag.ai.model": "AI Model",
+              "fields.otel.tag.ai.provider": "AI Provider",
+              "fields.otel.tag.cqrs.request": "Request",
+              "fields.otel.tag.network.protocol.version": "Protocol",
+              "fields.otel.tag.server.address": "Server",
+              "fields.otel.tag.service": "otel Service",
+              "fields.otel.tag.url.path": "URL Path",
+              "fields.otel.tag.url.scheme": "Scheme",
+              "fields.otel.tag.user_agent.original": "User Agent",
               "fields.traceId": "TraceId",
+              "geo.city": "City",
+              "geo.country_code": "Country",
+              "geo.lat": "Lat",
+              "geo.lon": "Lon",
+              "geo.region": "Region",
+              "http.method": "HTTP",
+              "http.status_code": "Status",
               "message": "Message"
             }
           }
@@ -465,7 +285,7 @@
       "type": "table"
     }
   ],
-  "refresh": "",
+  "refresh": "30s",
   "schemaVersion": 39,
   "tags": [],
   "templating": {
@@ -493,7 +313,7 @@
     ]
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-1h",
     "to": "now"
   },
   "timepicker": {},

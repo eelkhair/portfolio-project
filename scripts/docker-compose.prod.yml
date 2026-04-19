@@ -394,16 +394,6 @@ services:
     ports:
       - "5107:8080"
 
-  seq:
-    image: datalust/seq:latest
-    ports:
-      - "5341:80"
-    environment:
-      - ACCEPT_EULA=Y
-      - SEQ_FIRSTRUN_NOAUTHENTICATION=true
-    networks:
-      - ai-job-board-net
-
 networks:
   ai-job-board-net:
     name: ai-job-board-net
