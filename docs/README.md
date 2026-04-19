@@ -251,6 +251,11 @@ Rationale: [ADR-007](./ADRs/ADR-007-Trace-Context-Propagation.md)
 
 The platform is instrumented **end-to-end** -- from a button click in the browser through the gateway, command pipeline, database, and async workflows -- all correlated by one TraceId.
 
+**One store per signal**
+- **Traces** -- Jaeger
+- **Logs** -- Elasticsearch (single `fe-logs` index also holds FE spans, see below)
+- **Metrics** -- Prometheus (spanmetrics-derived)
+
 **Backend**
 - Distributed tracing across APIs, DB, and async workflows
 - Serilog structured logs enriched with TraceId / SpanId / ParentSpanId
@@ -258,18 +263,23 @@ The platform is instrumented **end-to-end** -- from a button click in the browse
 - Logs land in Elasticsearch via Serilog OTel exporter
 
 **Frontend (RUM)**
-- Grafana Faro Web SDK in all three frontends (`landing`, `admin-fe`, `public-fe`) -- captures errors, web vitals, navigation, fetch/XHR spans, and explicit activity events
+- Grafana Faro Web SDK in all three frontends (`landing`, `admin-fe`, `public-fe`) -- captures errors, web vitals, navigation, and explicit activity events
 - Custom `ActivityLogger` service in both Angular apps wraps `faro.api.pushLog` with structured context (level, geo, trace/span IDs); the `trace<T>` RxJS operator creates an internal "activity X" span that becomes the parent of the downstream HTTP span -- so a `[admin] ai provider update ok` log line, the FE `HTTP PUT` span, the gateway proxy span, and the `UpdateProviderCommand` backend log all share one TraceId
+- Angular apps disable Faro's auto fetch/XHR instrumentation -- their `tracingInterceptor` already emits CLIENT spans per `HttpClient` call, so the built-in fetch spans were duplicates. Landing (Next.js) keeps auto-instrumentation on
 - Visitor geo (country / city / region / lat / lon) resolved server-side from `cf-ipcountry` + ipapi.co, stamped on every span via a custom `SpanProcessor`, surfaced as filterable Prometheus dimensions and dashboard columns
 
 **Pipeline**
 - Browser --> Faro endpoint (Alloy `faro.receiver`) --> OTel Collector --> fan-out:
   - Traces --> Jaeger + spanmetrics --> Prometheus
+  - FE traces --> Elasticsearch `fe-logs` (so FE spans appear alongside FE + backend logs in the unified Find by Trace Id view)
   - Logs --> Elasticsearch (backend Serilog exporter + frontend Faro via OTTL transforms that extract logfmt body fields, drop non-log records, and normalize to the Serilog field shape)
 
 **Dashboards**
-- *Web App RUM* -- page loads, p95 latency, throughput, error rate by route, top routes, **Visitors by city** (geomap), **Recent traces** with city / state / country / route columns
-- *Find by Trace Id* -- one TraceId in, three panels out: distributed trace (Jaeger), backend logs (Elasticsearch), frontend logs (Infinity --> events API with JSONata flattening so `geo`, `http`, `session` nested objects become individual columns dynamically)
+- *Web App RUM* -- page loads, p95 latency, throughput, error rate by route, top routes, **Recent traces**, **Visitors by city** (geomap)
+- *Find by Trace Id* -- one TraceId in, two panels out: distributed trace (Jaeger) + a single unified **Logs** panel (Elasticsearch) that contains backend Serilog docs, frontend `pushLog` docs, AND frontend span docs in one chronological table. A `Kind` column discriminates span rows from log rows. All other dashboards' `TraceId` fields link here via a shared datasource-level `dataLinks` entry
+
+**Access**
+- Grafana on the homelab is configured with anonymous Viewer role (no login required) so portfolio visitors can open any dashboard directly. Edit/admin functions remain gated behind real user accounts.
 
 Rationale: [ADR-004](./ADRs/ADR-004-Observability-First.md)
 

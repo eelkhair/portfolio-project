@@ -26,13 +26,13 @@ skinparam database {
   FontColor #f8fafc
 }
 
-package "Browser — Angular admin/public + Next.js landing" #1e3a8a {
+package "Browser — admin-fe / public-fe (Angular)" #1e3a8a {
   [Service method\ne.g. SettingsService.updateProvider] as SVC
   [ActivityLogger\ninfo / warn / error / trace<T>] as ALOG
   [trace<T> operator] as TXOP
   [tracingInterceptor\nHTTP spans inherit\nactivity span as parent] as INTC
-  [Faro Web SDK\n+ TracingInstrumentation\n+ captureConsole: true] as FARO
-  [fetchGeo on init] as GEOFE
+  [Faro Web SDK\nTracingInstrumentation\n  instrumentations: []\n  (auto fetch/XHR disabled)\ncaptureConsole: true] as FARO
+  [fetchGeo on init\nlanding /api/geo\ncross-origin] as GEOFE
 
   SVC --> TXOP : .pipe(logger.trace('event'))
   SVC --> INTC : http.get/post
@@ -42,12 +42,19 @@ package "Browser — Angular admin/public + Next.js landing" #1e3a8a {
   GEOFE ..> FARO : geo stamped on every span\nvia custom SpanProcessor
 }
 
+package "Browser — landing (Next.js SSR)" #1e3a8a {
+  [FaroProvider\nTracingInstrumentation\n  (default instrumentations ON:\n   fetch + xhr + doc-load)\ncaptureConsole: true] as FARO_L
+  [Server-resolved geo\nlayout.tsx → resolveGeo(headers)\npassed as prop to FaroProvider] as GEOL
+
+  GEOL ..> FARO_L : geo stamped on every span
+}
+
 package "Landing /api/geo — edge runtime" #9a3412 {
-  [resolveGeo headers\n1. cf-ipcountry header\n2. ipapi.co lookup, 24h cache\n3. fallback country = XX] as GEORES
+  [resolveGeo headers\n1. cf-connecting-ip → ipapi.co\n2. cf-ipcountry fallback\n3. fallback country = XX\n24h in-memory cache] as GEORES
 }
 
 package "Grafana Alloy — 192.168.1.160 host network" #7c2d12 {
-  [faro.receiver :12347\nFaro JSON payload] as FARORX
+  [faro.receiver :12347\nFaro JSON payload\nCORS allowlist for\nall FE hostnames] as FARORX
   [otelcol.receiver.loki\nLoki labels → OTLP attrs] as LOKIRX
   [otelcol.exporter.otlphttp\n→ otel-collector :4318] as OTLPEX
 
@@ -56,70 +63,97 @@ package "Grafana Alloy — 192.168.1.160 host network" #7c2d12 {
   LOKIRX --> OTLPEX
 }
 
-package "OTel Collector — host:4318, contrib v0.150.1" #581c87 {
+package "OTel Collector — host:4318, contrib v0.150+" #581c87 {
   [transform/parse_fe_body\nExtractPatterns regex →\nkind, level, message, app_name,\napp_environment, traceID, spanID\ninto log.attributes] as PARSE
-  [filter/fe_log_only\ndrop kind != log] as FILT
-  [transform/fe_service_name\napp_name → service.name\n+ ApplicationName attr] as SVCNAME
-  [transform/promote_trace_ids\nlog.trace_id.string → TraceId] as PROMOTE
-  [filter/fe_only\nES pipeline only —\nkeep landing/admin-fe/public-fe] as FEONLY
-  [transform/set_es_mapping_mode\nscope.attrs.elastic.mapping.mode\n= raw] as ESMAP
+  [filter/fe_log_only\ndrop kind != log\n(web-vitals, navigation, etc.)] as FILT
+  [transform/fe_service_name\napp_name → service.name\n+ ApplicationName attr\n(logs + traces contexts)] as SVCNAME
+  [transform/promote_trace_ids\nlog.trace_id.string → TraceId\nspan.trace_id.string → TraceId\nspan.parent_span_id.string] as PROMOTE
+  [filter/drop_fetch_spans\nattributes[component]=="fetch"\nand service.name in\n(admin-fe, public-fe)\n— keeps landing fetches] as DROPFETCH
+  [filter/fe_traces_only\ntraces/es-fe pipeline —\nkeep only FE service spans] as FEFILTER
+  [filter/fe_only\nlogs/es-fe pipeline —\nkeep only FE service logs] as FEONLY
+  [transform/set_es_mapping_mode\nscope.attrs.elastic.mapping.mode\n= raw (logs + traces)] as ESMAP
 
   PARSE --> FILT
   FILT --> SVCNAME
   SVCNAME --> PROMOTE
-  PROMOTE ..> FEONLY : logs/es-fe pipeline
+  PROMOTE ..> FEONLY : logs/es-fe
+  PROMOTE ..> FEFILTER : traces/es-fe
   FEONLY --> ESMAP
+  FEFILTER --> ESMAP
+  DROPFETCH ..> PROMOTE : traces (all)
 }
 
 package "Storage" #064e3b {
   database "Jaeger" as JG
-  database "Elasticsearch\nfe-logs index" as ES
+  database "Elasticsearch\nfe-logs index\n(FE logs AND FE spans)" as ES
   database "Prometheus\nspanmetrics +\ngeo dimensions" as PROM
-  [fe-otel-to-serilog\ningest pipeline:\nTraceId → fields.traceId\nApplicationName → fields.ApplicationName\nBody → message] as ESPL
+  [fe-otel-to-serilog\ningest pipeline\n(handles log + span shapes)] as ESPL
   ESPL --> ES
 }
 
 package "Grafana Dashboards" #374151 {
-  [JobBoard — Web App RUM\npage loads, p95, errors,\nVisitors by city geomap,\nRecent traces from Jaeger HTTP API\nvia Infinity datasource] as RUM
-  [Find by Trace Id\n1. Trace — Jaeger\n2. ElasticSearch — backend logs\n3. Frontend Logs — same ES datasource,\n     filters ApplicationName in\n     {admin-fe, public-fe, landing}] as FBT
+  [JobBoard — Web App RUM\npage loads, p95, errors,\nVisitors by city geomap,\nRecent traces via Infinity →\nJaeger HTTP API w/ JSONata filter\n(drops component=fetch dupes)] as RUM
+  [Find by Trace Id\nPanel 1: Trace — Jaeger\nPanel 2: Logs — unified ES query\n  (fields.traceId)\nShows backend Serilog logs +\nFE pushLog lines + FE spans\nside-by-side in one table\nTraceId → Jaeger link] as FBT
+  [Other dashboards\n(Monolith Overview,\nAI Service Overview)\nTraceId links point to\nFind by Trace Id (not Jaeger)] as OTHER
 }
 
 GEOFE ..> GEORES : HTTPS GET\ncross-origin (CORS allowlist)
 GEORES ..> GEOFE : country/city/region/lat/lon
 
 FARO --> FARORX : HTTPS POST\nfaro.elkhair.tech/collect
-OTLPEX --> PARSE
+FARO_L --> FARORX : HTTPS POST\nfaro.elkhair.tech/collect
+OTLPEX --> DROPFETCH : traces
+OTLPEX --> PARSE : logs
 
 PROMOTE --> JG : otlp/jaeger exporter
 PROMOTE --> PROM : spanmetrics connector
-ESMAP --> ESPL : elasticsearch/fe exporter
+ESMAP --> ESPL : elasticsearch/fe exporter\n(logs_index + traces_index = fe-logs)
 
 PROM --> RUM
 JG --> RUM
 ES --> FBT
 JG --> FBT
+ES ..> OTHER : backend logs
+OTHER ..> FBT : TraceId click
 
 note right of TXOP
-  1. tracer.startSpan with name "activity X"
-  2. context.with setSpan around subscribe
+  1. tracer.startSpan("activity X")
+  2. context.with(setSpan, subscribe)
   3. emit info on next, error on error
   4. end span on complete / teardown
   ──────────────────────────────────
-  This is the linchpin: the HTTP span
-  the interceptor creates becomes a
-  CHILD of the activity span, sharing
-  one TraceId end-to-end FE → BE.
+  The HTTP span that tracingInterceptor
+  creates becomes a CHILD of the
+  activity span → one TraceId end-to-end
+  FE → gateway → backend.
 end note
 
-note right of GEORES
-  Hardcoded to elkhair.tech in all
-  Angular env files. The .eelkhair.net
-  zone goes through NPM which strips
-  cf-connecting-ip → ipapi rejects
-  the private IP → country falls back
-  to "XX". The .elkhair.tech zone is
-  Cloudflare-served so all CF headers
-  are intact.
+note right of FARO
+  CRITICAL: instrumentations: [] —
+  Faro's default FetchInstrumentation
+  + XHRInstrumentation are DISABLED
+  on Angular apps. Our tracingInterceptor
+  already creates a proper CLIENT span
+  for every HttpClient request; leaving
+  auto-instrumentation on produced a
+  duplicate component=fetch span.
+  ──────────────────────────────────
+  Landing (Next.js) keeps defaults ON
+  — no interceptor equivalent, so
+  auto-fetch is the only way to get
+  browser HTTP spans there.
+end note
+
+note bottom of DROPFETCH
+  Belt-and-suspenders for admin/public
+  Faro fetch dupes: even when the code
+  change above is deployed, this filter
+  scrubs lingering component=fetch spans
+  from admin-fe/public-fe at the
+  collector. Landing's component=fetch
+  spans pass through unchanged — it's
+  the ONLY source of browser HTTP
+  spans for that app.
 end note
 
 note bottom of PARSE
@@ -129,7 +163,7 @@ note bottom of PARSE
   tried loki.process upstream to
   expand it but it silently dropped
   records. ExtractPatterns regex
-  here is the reliable path.
+  in OTTL is the reliable path.
   ──────────────────────────────────
   Backend logs — proper OTLP shape —
   are skipped via condition:
@@ -139,7 +173,7 @@ end note
 note left of PROMOTE
   CRITICAL: use the .string accessor
   log.trace_id.string — NOT
-  String log.trace_id — the latter
+  String(log.trace_id) — the latter
   serializes the 16-byte TraceID as
   a JSON array literal "[177,243,...]"
   instead of hex.
@@ -157,29 +191,71 @@ note bottom of ESMAP
 end note
 
 note right of ESPL
-  Field names matter: the dashboard
-  queries fields.traceId (lowercase t!)
-  not fields.TraceId. Pipeline rename
-  list:
-   • TraceId → fields.traceId
-   • SpanId → fields.spanId
-   • ApplicationName → fields.ApplicationName
-   • Body → message
-   • SeverityText → level
-   • Timestamp → @timestamp
+  Ingest pipeline handles BOTH shapes:
+   • Logs: Body → message, TraceId →
+     fields.traceId, SpanId → fields.spanId,
+     ApplicationName → fields.ApplicationName,
+     SeverityText → level, Timestamp → @timestamp
+   • Spans: Name → message, Kind →
+     fields.Kind, ParentSpanId →
+     fields.parentSpanId, StartTimestamp →
+     @timestamp
+   • Attributes.* flattened into fields.*
+     for geo/http/app_environment
+   • Resource.* and Scope.* stripped on spans
+     (otherwise deployment.environment.name
+     conflicts with the log shape's
+     deployment.environment string)
 end note
 
 note bottom of FBT
-  Both ES panels query the SAME
-  datasource. Backend panel filters
-  by traceId only; FE panel adds
-  fields.ApplicationName in
-  (admin-fe, public-fe, landing).
-  Organize transform surfaces the
-  common FE columns (geo.*, http.*,
-  app_environment) with friendly
-  names; anything else in _source
-  appears as a dynamic column.
+  Unified Logs panel queries ES with
+  fields.traceId: "${TraceId}" — no
+  service filter — so backend Serilog
+  logs + FE pushLogs + FE spans all
+  appear in one chronological table.
+  Kind column discriminates spans
+  (SPAN_KIND_CLIENT / INTERNAL) from
+  logs (blank Kind). Panel's TraceId
+  field overrides the datasource-level
+  Find-by-TraceId link to point to
+  Jaeger (only exception — this is
+  the dashboard you already clicked
+  to get here).
+end note
+
+note bottom of OTHER
+  ES datasource-level dataLinks point
+  TraceId fields to Find by Trace Id
+  dashboard. Panel-level overrides on
+  Monolith and RUM dashboards do the
+  same for tabular panels. One-click
+  drilldown from any TraceId column
+  anywhere in Grafana.
+end note
+
+note bottom of FARO_L
+  Landing's FaroProvider is in layout.tsx
+  via a "use client" component. Server
+  resolves geo synchronously via
+  resolveGeo(headers) and passes it down
+  as a prop, so the very first page-load
+  span has geo attributes populated —
+  no async gap where early spans would
+  lose geo.
+end note
+
+note right of GEORES
+  elkhair.tech zone: Cloudflare-served,
+  cf-connecting-ip present → ipapi
+  resolves real visitor geo.
+  eelkhair.net zone: routed via Pi-hole
+  → NPM on the LAN. No CF headers
+  survive NPM, client IP is private,
+  ipapi rejects private IPs → country
+  falls back to XX. Angular envs
+  hardcode geoApiUrl to elkhair.tech
+  specifically for this reason.
 end note
 
 @enduml

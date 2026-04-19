@@ -19,11 +19,13 @@ actor "User\n(browser)" as U
 participant "SettingsService\n(admin-fe)" as SS
 participant "ActivityLogger\ntrace<T>()" as AL
 participant "tracingInterceptor" as TI
-participant "Faro Web SDK" as Faro
+participant "Faro Web SDK\n(fetch/XHR\nauto-instrumentation\nDISABLED)" as Faro
 participant "Alloy\n(192.168.1.160)" as Alloy
 participant "OTel Collector" as OC
 participant "Gateway\n(YARP)" as GW
 participant "ai-service-v2" as AI
+database "Jaeger" as JG
+database "Elasticsearch\nfe-logs" as ES
 
 note over U, Faro
   Browser-side: one TraceId is created here
@@ -33,7 +35,7 @@ end note
 U -> SS : click "Save Provider"
 SS -> AL : updateProvider(req).pipe(logger.trace('ai provider update'))
 AL -> Faro : tracer.startSpan('activity ai provider update')
-note right of AL: TraceId = abc123\nSpanId = act01
+note right of AL: TraceId = abc123\nSpanId = act01\nkind = INTERNAL
 AL -> AL : context.with(setSpan, () => source.subscribe(...))
 
 note over AL, TI
@@ -45,12 +47,12 @@ end note
 
 AL -> TI : HTTP PUT /ai/v2/Settings/update-provider
 TI -> Faro : tracer.startSpan('HTTP PUT /...')
-note right of TI: parent = act01\nSpanId = http02
+note right of TI: parent = act01\nSpanId = http02\nkind = CLIENT\nno component=fetch tag
 TI -> GW : traceparent: 00-abc123-http02-01
 
 GW -> AI : proxy with traceparent\n(parent context propagated)
 AI -> AI : UpdateProviderCommand pipeline
-note right of AI: Serilog logs auto-enriched\nwith TraceId = abc123
+note right of AI: Serilog logs auto-enriched\nwith TraceId = abc123\n→ land directly in ES\n(serilog index, not fe-logs)
 AI --> GW : 200 OK
 GW --> TI : 200
 
@@ -67,22 +69,51 @@ Faro -> Alloy : POST faro.elkhair.tech/collect
 Alloy -> OC : OTLP traces (direct)\nOTLP logs (via Loki bridge)
 
 note over OC
-  parse_fe_body: extract logfmt fields
-  filter/fe_log_only: drop measurements
-  fe_service_name: ApplicationName=admin-fe
-  promote_trace_ids: hex TraceId in attrs
-  set_es_mapping_mode: raw
+  TRACES pipeline:
+   • filter/drop_fetch_spans (no-op here —
+     admin-fe has auto-fetch disabled, no
+     component=fetch on TI's span)
+   • filter/dapr
+   • transform/fe_service_name
+   • transform/promote_trace_ids
+   → otlp/jaeger + spanmetrics
+  ──────────────────────────────────
+  TRACES/es-fe pipeline (FE-only):
+   • filter/fe_traces_only (admin-fe ✓)
+   • transform/set_es_mapping_mode = raw
+   → elasticsearch/fe (fe-logs index)
+  ──────────────────────────────────
+  LOGS/es-fe pipeline:
+   • transform/parse_fe_body (logfmt → attrs)
+   • filter/fe_log_only (drop web-vitals)
+   • transform/fe_service_name
+   • filter/fe_only
+   • transform/promote_trace_ids
+   • transform/set_es_mapping_mode = raw
+   → elasticsearch/fe (fe-logs index)
 end note
 
-OC -> OC : fan-out → Jaeger + spanmetrics + Elasticsearch
+OC -> JG : traces (all 2 FE spans)
+OC -> ES : spans → fe-otel-to-serilog\n  ingest pipeline → shape-normalized\n  docs with fields.traceId,\n  fields.Kind, message, @timestamp
+OC -> ES : logs → same ingest pipeline\n  → message, fields.traceId,\n  fields.ApplicationName, level
+
+note over JG, ES
+  fe-otel-to-serilog ingest pipeline
+  handles BOTH span and log shapes so
+  all FE docs end up with the same
+  Serilog-style field layout.
+end note
 
 note over U, AI
   Result in Grafana "Find by Trace Id"
-  with TraceId = abc123:
+  with TraceId = abc123 — one unified
+  Logs panel query fields.traceId shows:
   • 2 FE spans (activity + HTTP) from admin-fe
-  • N backend logs from gateway and ai-service-v2
-  • 1 FE log line "[admin] ai provider update ok"
-  • All correlated, all clickable to Jaeger
+  • N backend Serilog logs from gateway + ai-service-v2
+  • 1 FE pushLog "[admin] ai provider update ok"
+  • All chronologically ordered in one table
+  • Kind column discriminates span vs log
+  • TraceId in each row data-links to Jaeger
 end note
 
 @enduml

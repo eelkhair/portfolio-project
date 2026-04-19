@@ -19,6 +19,8 @@ const angularApp = new AngularNodeAppEngine({
     'jobs.elkhair.tech',
     'jobs-dev.elkhair.tech',
     'jobs.eelkhair.net',
+    'job.eelkhair.net',
+    'job.eelkhair.net',
     'jobs-dev.eelkhair.net',
     'localhost',
   ],
