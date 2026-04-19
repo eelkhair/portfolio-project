@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { createHash } from "node:crypto";
+
+/** `pii_` + first 12 hex of SHA-256 — matches backend PiiHasher and FE
+ *  pii-hasher.ts so the same email produces the same token everywhere. */
+function hashPii(value: string | undefined | null): string {
+  if (!value) return "";
+  return "pii_" + createHash("sha256").update(value.trim().toLowerCase()).digest("hex").substring(0, 12);
+}
 
 // In-memory rate limit: one successful submit per IP per window.
 // Behind Cloudflare + tunnel, real client IP arrives as `cf-connecting-ip`;
@@ -165,7 +173,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (error) {
-      console.error("[Contact] Resend error: from=%s, to=%s, error=%j", email, contactEmail, error);
+      console.error("[Contact] Resend error: from=%s, to=%s, error=%j", hashPii(email), hashPii(contactEmail), error);
       return NextResponse.json(
         { error: "Failed to send message. Please try again later." },
         { status: 502, headers: cors },
@@ -173,10 +181,10 @@ export async function POST(req: NextRequest) {
     }
 
     rateLimit.set(ip, now);
-    console.log("[Contact] Email sent: id=%s, from=%s, subject=%s", data?.id, email, resolvedSubject);
+    console.log("[Contact] Email sent: id=%s, from=%s, subject=%s", data?.id, hashPii(email), resolvedSubject);
     return NextResponse.json({ success: true, id: data?.id }, { headers: cors });
   } catch (err) {
-    console.error("[Contact] Resend exception: from=%s, to=%s, error=%s", email, contactEmail, err);
+    console.error("[Contact] Resend exception: from=%s, to=%s, error=%s", hashPii(email), hashPii(contactEmail), err);
     return NextResponse.json(
       { error: "Failed to send message. Please try again later." },
       { status: 500, headers: cors },
