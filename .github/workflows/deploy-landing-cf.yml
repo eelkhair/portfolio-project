@@ -9,7 +9,10 @@ name: Deploy Landing to Cloudflare Pages
 
 on:
   push:
-    branches: [master]
+    # `master` → production (landing.pages.dev). Any other branch listed here
+    # gets a per-branch preview URL (<branch>.landing.pages.dev). Use the
+    # `pages` feature branch to validate the whole setup before merging.
+    branches: [master, pages]
     paths:
       - 'apps/landing-next/**'
       - '.github/workflows/deploy-landing-cf.yml'
@@ -55,7 +58,17 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_PAGES_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: apps/landing-next
-          command: pages deploy .vercel/output/static --project-name=landing --branch=master
+          # github.ref_name is the branch name (e.g. `master` or `pages`).
+          # CF Pages treats `master` as production and anything else as a
+          # preview deployment at <branch>.landing.pages.dev, so failover DNS
+          # (pointing at the apex landing.pages.dev) stays untouched while we
+          # iterate on the feature branch.
+          command: pages deploy .vercel/output/static --project-name=landing --branch=${{ github.ref_name }}
 
       - name: Report deployment URL
-        run: echo "Pages build deployed. Failover target ready at https://landing.pages.dev/"
+        run: |
+          if [ "${{ github.ref_name }}" = "master" ]; then
+            echo "Production deploy: https://landing.pages.dev/ — failover target ready"
+          else
+            echo "Preview deploy: https://${{ github.ref_name }}.landing.pages.dev/"
+          fi
