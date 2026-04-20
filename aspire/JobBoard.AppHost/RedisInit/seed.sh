@@ -9,6 +9,8 @@ $REDIS SET "jobboard:config:global:FeatureFlags:Monolith" "false" NX
 $REDIS SET "jobboard:config:global:FeatureFlags:PublicChat" "true" NX
 $REDIS SET "jobboard:config:global:FeatureFlags:DeepDives" "false" NX
 $REDIS SET "jobboard:config:global:FeatureFlags:ContactForm" "false" NX
+$REDIS SET "jobboard:config:global:FeatureFlags:AvailableBadge" "false" NX
+$REDIS SET "jobboard:config:global:FeatureFlags:ServiceStatus" "false" NX
 
 
 # SMTP (Mailpit)
