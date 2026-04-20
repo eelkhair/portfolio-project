@@ -78,16 +78,18 @@ async function getMmdbReader(): Promise<MmdbReader | null> {
     if (typeof process === "undefined" || !process.versions?.node) return null;
     try {
       const mmdbPath = process.env.MMDB_PATH ?? "/app/geo/GeoLite2-City.mmdb";
-      // String-variable module names evade webpack's static import analysis
-      // so the edge bundle doesn't try to pull `maxmind`/`node:fs`.
-      const maxmindName = "maxmind";
-      const fsName = "node:fs/promises";
-      const [{ Reader }, { readFile }] = await Promise.all([
-        import(/* webpackIgnore: true */ maxmindName),
-        import(/* webpackIgnore: true */ fsName),
+      // Use `Function` constructor to build the dynamic import at runtime —
+      // this prevents BOTH webpack AND esbuild (used by @cloudflare/next-on-pages)
+      // from statically resolving and bundling `maxmind` / `node:fs/promises`
+      // into the edge worker. On CF Pages we take the `request.cf` fast path
+      // and never reach this code.
+      const dynamicImport = new Function("mod", "return import(mod)") as (mod: string) => Promise<unknown>;
+      const [maxmindMod, fsMod] = await Promise.all([
+        dynamicImport("maxmind") as Promise<{ Reader: new (buf: Buffer) => MmdbReader }>,
+        dynamicImport("node:fs/promises") as Promise<{ readFile: (p: string) => Promise<Buffer> }>,
       ]);
-      const buffer = await readFile(mmdbPath);
-      return new Reader(buffer) as MmdbReader;
+      const buffer = await fsMod.readFile(mmdbPath);
+      return new maxmindMod.Reader(buffer);
     } catch {
       return null;
     }
