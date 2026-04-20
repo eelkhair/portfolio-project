@@ -50,7 +50,13 @@ public static class DependencyInjection
 
                         "https://job-admin.elkhair.tech",
                         "https://jobs.elkhair.tech",
-                        "https://job.elkhair.tech"
+                        "https://job.elkhair.tech",
+
+                        // Cloudflare Pages landing (cold-standby failover origin).
+                        "https://landing-backup.elkhair.tech",
+                        "https://elkhair.tech",
+                        "https://www.elkhair.tech",
+                        "https://dev.elkhair.tech"
                     )
                     .AllowAnyHeader()
                     .AllowAnyMethod()

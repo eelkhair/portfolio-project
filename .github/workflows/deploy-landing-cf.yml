@@ -39,10 +39,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: apps/landing-next
-        # Prefer `npm ci` in CI for reproducibility, but while the `pages`
-        # branch churns on the lockfile, allow npm install so mismatches
-        # self-heal. Revert to `npm ci` once the lockfile is stable on master.
-        run: npm install --no-audit --no-fund
+        run: npm ci
 
       - name: Build for Cloudflare Pages
         working-directory: apps/landing-next
