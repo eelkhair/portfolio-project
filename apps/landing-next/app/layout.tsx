@@ -5,8 +5,27 @@ import { ThemeProvider } from "./components/ThemeProvider";
 import { FeatureFlagsProvider } from "./components/FeatureFlags";
 import { FaroProvider } from "./components/FaroProvider";
 import { fetchFeatureFlags } from "./lib/feature-flags";
-import { resolveGeo } from "./lib/geo";
+import { resolveGeo, type CfProperties } from "./lib/geo";
 import "./globals.css";
+
+/**
+ * On Cloudflare Pages, pull the Workers `request.cf` object (city, region,
+ * lat/lon at zero latency) via `@cloudflare/next-on-pages` → `getRequestContext`.
+ * Dynamic import + try/catch so this is a no-op on Proxmox / local dev where the
+ * package isn't installed or the request context doesn't exist, letting
+ * `resolveGeo` fall through to ipapi.co.
+ */
+async function getCloudflareCf(): Promise<CfProperties | undefined> {
+  try {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore – package only present on CF Pages build
+    const mod: { getRequestContext?: () => { cf?: CfProperties } } =
+      await import("@cloudflare/next-on-pages");
+    return mod.getRequestContext?.()?.cf;
+  } catch {
+    return undefined;
+  }
+}
 
 const inter = Inter({
   subsets: ["latin"],
@@ -42,10 +61,14 @@ export default async function RootLayout({
   // Resolve geo server-side so FaroProvider has country/city/lat/lon synchronously
   // when initializing the OTel tracer. Otherwise, the page-load spans fire before
   // an async client lookup can return, and city ends up empty in spanmetrics.
-  // Country always comes from CF-IPCountry header. City/lat/lon comes from
-  // ipapi.co with a 24h per-IP cache (free tier, ~1k req/day).
+  //
+  // Resolution order (see resolveGeo):
+  //   1. `request.cf` from Cloudflare Pages (fast, no external call)
+  //   2. ipapi.co (Proxmox / local — country also from CF-IPCountry header)
+  //   3. `cf-ipcountry` header as last-ditch country-only fallback
   const h = await headers();
-  const geo = await resolveGeo(h);
+  const cf = await getCloudflareCf();
+  const geo = await resolveGeo(h, cf);
 
   return (
     <html lang="en" suppressHydrationWarning>
