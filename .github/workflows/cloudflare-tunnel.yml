@@ -65,6 +65,14 @@ jobs:
 
       # ──────────────────────────────────────────────────────────────────────
       # Step 2: Sync DNS CNAME records (multi-zone)
+      #
+      # ⚠ LANDING-FAILOVER CAVEAT: this step upserts every hostname in
+      # tunnel-config.json back to the tunnel CNAME. If you are currently
+      # failed-over to Cloudflare Pages (see deploy/cloudflare/failover-landing.sh),
+      # re-running THIS workflow will silently revert landing DNS to the tunnel
+      # and undo the failover. Wait until Proxmox is healthy and you have run
+      # `failover-landing.sh proxmox` before triggering the tunnel workflow
+      # again, OR manually re-run the failover script afterwards.
       # ──────────────────────────────────────────────────────────────────────
       - name: Sync DNS CNAME records
         env:

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { resolveGeo } from "../../lib/geo";
+import { resolveGeo, type CfProperties } from "../../lib/geo";
 
 // Edge Runtime keeps cold start tiny. Returns the same shape used SSR-side.
 export const runtime = "edge";
@@ -46,7 +46,11 @@ export async function OPTIONS(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  const geo = await resolveGeo(req.headers);
+  // `request.cf` is populated by Cloudflare Pages / Workers at the edge with
+  // country/city/region/lat/lon. Not present on Node/Proxmox — `resolveGeo`
+  // falls back to ipapi.co there.
+  const cf = (req as unknown as { cf?: CfProperties }).cf;
+  const geo = await resolveGeo(req.headers, cf);
   return NextResponse.json(geo, {
     headers: {
       "Cache-Control": "private, max-age=86400",

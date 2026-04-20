@@ -6,12 +6,14 @@ interface FeatureFlags {
   deepDives: boolean;
   availableBadge: boolean;
   contactForm: boolean;
+  serviceStatus: boolean;
 }
 
 const defaults: FeatureFlags = {
   deepDives: false,
-  availableBadge: true,
+  availableBadge: false,
   contactForm: false,
+  serviceStatus: false,
 };
 
 const FeatureFlagsContext = createContext<FeatureFlags>(defaults);

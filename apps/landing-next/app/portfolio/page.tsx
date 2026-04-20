@@ -5,7 +5,8 @@ import { Footer } from "../components/Footer";
 import { ScreenshotSwiper } from "../components/ScreenshotSwiper";
 import { DeepDivesSection, DeepDivesDropdown } from "../components/DeepDivesSection";
 import { ContactNavLink } from "../components/ContactGate";
-import { archHighlights, techStack, exploreCards, services } from "../data/portfolio-data";
+import { archHighlights, techStack, exploreCards } from "../data/portfolio-data";
+import { ServiceStatusGrid } from "../components/ServiceStatusGrid";
 
 export const metadata: Metadata = {
   title: "Portfolio - JobBoard Distributed Systems Platform",
@@ -75,18 +76,7 @@ export default function PortfolioPage() {
                 </div>
               </div>
             </div>
-            <div className="service-grid" aria-label="Service links">
-              {services.map((s) => (
-                <a href={s.href} target="_blank" rel="noopener noreferrer" className="service-card" key={s.name}>
-                  <span className="service-dot" aria-hidden="true"></span>
-                  <div>
-                    <div className="service-name">{s.name}</div>
-                    <div className="service-url">{s.url}</div>
-                  </div>
-                  <div className={`service-tooltip${s.tooltipClass ? ` ${s.tooltipClass}` : ""}`} dangerouslySetInnerHTML={{ __html: s.tooltip }} />
-                </a>
-              ))}
-            </div>
+            <ServiceStatusGrid />
           </div>
         </section>
 

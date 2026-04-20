@@ -86,25 +86,65 @@ async function lookupViaIpapi(ip: string): Promise<IpapiData> {
 }
 
 /**
- * Resolves geo for the given headers. Prefer ipapi.co's country (IP-based,
- * consistent with the city/region it returns) over Cloudflare's CF-IPCountry,
- * which can disagree when the request hits CF via a different routing path
- * than the origin IP. CF-IPCountry is only a fallback when ipapi is unavailable.
+ * Subset of the `request.cf` object Cloudflare attaches to every incoming
+ * request on Workers / Pages Functions runtime. Zero-latency geo (country,
+ * city, region, lat/lon) sourced directly from CF's edge. Undefined when
+ * running on Node/Proxmox.
  */
-export async function resolveGeo(headers: Headers): Promise<GeoData> {
+export type CfProperties = {
+  country?: string | null;
+  city?: string | null;
+  region?: string | null;
+  regionCode?: string | null;
+  latitude?: string | number | null;
+  longitude?: string | number | null;
+};
+
+function parseCoord(v: string | number | null | undefined): number | null {
+  if (v === null || v === undefined) return null;
+  const n = typeof v === "number" ? v : Number.parseFloat(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+/**
+ * Resolves geo for the given headers. Resolution order:
+ *   1. `request.cf` (CF Pages / Workers) — full geo at zero latency
+ *   2. ipapi.co — IP-based lookup for Node/Proxmox runtime
+ *   3. `cf-ipcountry` header — country-only fallback if ipapi fails
+ *
+ * Passing `cf` is optional; omit it when the runtime doesn't expose it
+ * (Proxmox) and the lookup transparently degrades to the ipapi path.
+ */
+export async function resolveGeo(headers: Headers, cf?: CfProperties): Promise<GeoData> {
   const ip = clientIp(headers);
-  const cfCountry = (headers.get("cf-ipcountry") ?? "").toUpperCase();
+  const cfCountryHeader = (headers.get("cf-ipcountry") ?? "").toUpperCase();
   const now = Date.now();
   pruneCache(now);
+
+  // Path 1: Cloudflare Pages / Workers — skip ipapi entirely when CF gave us
+  // enough. Country + (city OR lat/lon) is the signal we use.
+  if (cf) {
+    const country = (cf.country ?? "").toUpperCase();
+    const city = cf.city ?? "";
+    const region = cf.region ?? cf.regionCode ?? "";
+    const lat = parseCoord(cf.latitude);
+    const lon = parseCoord(cf.longitude);
+    if (country && (city || (lat !== null && lon !== null))) {
+      const value: GeoData = { country, city, region, lat, lon };
+      cache.set(ip, { value, expiresAt: now + CACHE_TTL_MS });
+      return value;
+    }
+  }
 
   const cached = cache.get(ip);
   if (cached && cached.expiresAt > now) {
     return cached.value;
   }
 
+  // Path 2 + 3: ipapi.co with cf-ipcountry as last-ditch fallback.
   const ipapi = await lookupViaIpapi(ip);
   const value: GeoData = {
-    country: ipapi.country || cfCountry || "XX",
+    country: ipapi.country || cfCountryHeader || "XX",
     city: ipapi.city,
     region: ipapi.region,
     lat: ipapi.lat,

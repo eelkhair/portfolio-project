@@ -23,14 +23,17 @@ export const exploreCards = [
   { href: "https://grafana.elkhair.tech", title: "Grafana", desc: "Dashboards for API latency, error rates, and throughput. Compare monolith vs microservices performance side-by-side." },
 ];
 
+// `healthUrl` is the URL probed server-side by /api/status. It may differ from `href`
+// (the user-facing link) for services whose root doesn't expose a cheap health check.
+// Kept here so the list stays in one place.
 export const services = [
-  { href: "https://job-admin.elkhair.tech", name: "Admin App", url: "job-admin.elkhair.tech", tooltip: "Angular 20 SPA for managing companies, jobs, and users. Per-session mode toggle to compare Monolith vs Microservices traces. AI Chat with scoped tool registries. SystemAdmin role for platform owner controls.", tooltipClass: "" },
-  { href: "https://jobs.elkhair.tech", name: "Public App", url: "jobs.elkhair.tech", tooltip: "Angular 21 SSR job-seeker app with Tailwind v4. Browse jobs, upload resumes (parsed by AI), and track applications.", tooltipClass: "" },
-  { href: "https://job-health.elkhair.tech", name: "Health Dashboard", url: "job-health.elkhair.tech", tooltip: "Centralized health checks for all 11 services plus dependencies (databases, messaging, config stores, LLM providers, Keycloak).", tooltipClass: "" },
-  { href: "https://grafana.elkhair.tech", name: "Grafana", url: "grafana.elkhair.tech", tooltip: 'Metrics dashboards for AI Service and Monolith. Includes "Find by TraceId" workflow.', tooltipClass: "" },
-  { href: "https://jaeger.elkhair.tech", name: "Jaeger Tracing", url: "jaeger.elkhair.tech", tooltip: "Distributed trace visualization. Search traces by service, operation, or TraceId. See end-to-end request flow across all services.", tooltipClass: "" },
-  { href: "https://job-dapr.elkhair.tech", name: "Dapr Dashboard", url: "job-dapr.elkhair.tech", tooltip: "Dapr service mesh overview. See all running services, their sidecars, pub/sub components, state stores, and config sources.", tooltipClass: "" },
-  { href: "https://inspector.elkhair.tech", name: "MCP Inspector", url: "inspector.elkhair.tech", tooltip: '<strong>How to connect:</strong><br>1. Transport: <strong>Streamable HTTP</strong><br>2. URL: <strong>https://mono-mcp.elkhair.tech</strong><br>3. Connection Type: <strong>Direct</strong><br>4. Click <strong>Connect</strong><br>5. Go to the <strong>Tools</strong> tab to browse AI tools', tooltipClass: "service-tooltip-xl" },
+  { href: "https://job-admin.elkhair.tech", name: "Admin App", url: "job-admin.elkhair.tech", healthUrl: "https://job-admin.elkhair.tech/", tooltip: "Angular 20 SPA for managing companies, jobs, and users. Per-session mode toggle to compare Monolith vs Microservices traces. AI Chat with scoped tool registries. SystemAdmin role for platform owner controls.", tooltipClass: "" },
+  { href: "https://jobs.elkhair.tech", name: "Public App", url: "jobs.elkhair.tech", healthUrl: "https://jobs.elkhair.tech/", tooltip: "Angular 21 SSR job-seeker app with Tailwind v4. Browse jobs, upload resumes (parsed by AI), and track applications.", tooltipClass: "" },
+  { href: "https://job-health.elkhair.tech", name: "Health Dashboard", url: "job-health.elkhair.tech", healthUrl: "https://job-health.elkhair.tech/healthz", tooltip: "Centralized health checks for all 11 services plus dependencies (databases, messaging, config stores, LLM providers, Keycloak).", tooltipClass: "" },
+  { href: "https://grafana.elkhair.tech", name: "Grafana", url: "grafana.elkhair.tech", healthUrl: "https://grafana.elkhair.tech/api/health", tooltip: 'Metrics dashboards for AI Service and Monolith. Includes "Find by TraceId" workflow.', tooltipClass: "" },
+  { href: "https://jaeger.elkhair.tech", name: "Jaeger Tracing", url: "jaeger.elkhair.tech", healthUrl: "https://jaeger.elkhair.tech/", tooltip: "Distributed trace visualization. Search traces by service, operation, or TraceId. See end-to-end request flow across all services.", tooltipClass: "" },
+  { href: "https://job-dapr.elkhair.tech", name: "Dapr Dashboard", url: "job-dapr.elkhair.tech", healthUrl: "https://job-dapr.elkhair.tech/", tooltip: "Dapr service mesh overview. See all running services, their sidecars, pub/sub components, state stores, and config sources.", tooltipClass: "" },
+  { href: "https://inspector.elkhair.tech", name: "MCP Inspector", url: "inspector.elkhair.tech", healthUrl: "https://inspector.elkhair.tech/", tooltip: '<strong>How to connect:</strong><br>1. Transport: <strong>Streamable HTTP</strong><br>2. URL: <strong>https://mono-mcp.elkhair.tech</strong><br>3. Connection Type: <strong>Direct</strong><br>4. Click <strong>Connect</strong><br>5. Go to the <strong>Tools</strong> tab to browse AI tools', tooltipClass: "service-tooltip-xl" },
 ];
 
 export const adrs = [

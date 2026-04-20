@@ -1,0 +1,23 @@
+# Cloudflare Pages configuration for the landing page.
+#
+# Deployed by .github/workflows/deploy-landing-cf.yml via `wrangler pages deploy`.
+# Acts as a cold-standby failover for the primary Proxmox-hosted landing:
+# traffic normally flows through Cloudflare Tunnel to Proxmox; when Proxmox
+# is unreachable (home ISP outage), deploy/cloudflare/failover-landing.sh
+# flips DNS to point at <project>.pages.dev so visitors still see the
+# portfolio.
+#
+# Env vars (RESEND_API_KEY, EMAIL_FROM, CONTACT_EMAIL, TURNSTILE_SECRET_KEY,
+# NEXT_PUBLIC_* vars, FEATURE_FLAGS_URL) are set in the Cloudflare dashboard
+# on the Pages project, NOT committed here. `NEXT_PUBLIC_*` build-time vars
+# should also be set as build-time env vars in the Pages project so the
+# Next.js build embeds them into the client bundle.
+
+name = "landing"
+pages_build_output_dir = ".vercel/output/static"
+compatibility_date = "2026-04-01"
+
+# nodejs_compat lets the handful of Node-style APIs we still use (mostly
+# transitive deps like resend) work on Workers runtime. Our own code was
+# switched off `node:crypto` to Web Crypto for portability.
+compatibility_flags = ["nodejs_compat"]

@@ -1,12 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
-import { createHash } from "node:crypto";
+
+// Edge runtime: runs identically on Proxmox Next.js server and Cloudflare Pages Workers.
+// Keeps the route off Node-only APIs (node:crypto swapped for Web Crypto below) so the
+// failover deploy doesn't need a separate build.
+export const runtime = "edge";
 
 /** `pii_` + first 12 hex of SHA-256 — matches backend PiiHasher and FE
- *  pii-hasher.ts so the same email produces the same token everywhere. */
-function hashPii(value: string | undefined | null): string {
+ *  pii-hasher.ts so the same email produces the same token everywhere.
+ *  Uses Web Crypto (async) for CF Workers compatibility. */
+async function hashPii(value: string | undefined | null): Promise<string> {
   if (!value) return "";
-  return "pii_" + createHash("sha256").update(value.trim().toLowerCase()).digest("hex").substring(0, 12);
+  const data = new TextEncoder().encode(value.trim().toLowerCase());
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  const hex = Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return "pii_" + hex.substring(0, 12);
 }
 
 // In-memory rate limit: one successful submit per IP per window.
@@ -173,7 +183,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (error) {
-      console.error("[Contact] Resend error: from=%s, to=%s, error=%j", hashPii(email), hashPii(contactEmail), error);
+      console.error("[Contact] Resend error: from=%s, to=%s, error=%j", await hashPii(email), await hashPii(contactEmail), error);
       return NextResponse.json(
         { error: "Failed to send message. Please try again later." },
         { status: 502, headers: cors },
@@ -181,10 +191,10 @@ export async function POST(req: NextRequest) {
     }
 
     rateLimit.set(ip, now);
-    console.log("[Contact] Email sent: id=%s, from=%s, subject=%s", data?.id, hashPii(email), resolvedSubject);
+    console.log("[Contact] Email sent: id=%s, from=%s, subject=%s", data?.id, await hashPii(email), resolvedSubject);
     return NextResponse.json({ success: true, id: data?.id }, { headers: cors });
   } catch (err) {
-    console.error("[Contact] Resend exception: from=%s, to=%s, error=%s", hashPii(email), hashPii(contactEmail), err);
+    console.error("[Contact] Resend exception: from=%s, to=%s, error=%s", await hashPii(email), await hashPii(contactEmail), err);
     return NextResponse.json(
       { error: "Failed to send message. Please try again later." },
       { status: 500, headers: cors },
