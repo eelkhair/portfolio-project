@@ -74,15 +74,15 @@ let mmdbReaderPromise: Promise<MmdbReader | null> | null = null;
 async function getMmdbReader(): Promise<MmdbReader | null> {
   if (mmdbReaderPromise) return mmdbReaderPromise;
   mmdbReaderPromise = (async (): Promise<MmdbReader | null> => {
-    // Edge runtime: no `process.versions.node`, no `node:fs`. Skip cleanly.
-    if (typeof process === "undefined" || !process.versions?.node) return null;
     try {
-      const mmdbPath = process.env.MMDB_PATH ?? "/app/geo/GeoLite2-City.mmdb";
       // Use `Function` constructor to build the dynamic import at runtime —
       // this prevents BOTH webpack AND esbuild (used by @cloudflare/next-on-pages)
       // from statically resolving and bundling `maxmind` / `node:fs/promises`
-      // into the edge worker. On CF Pages we take the `request.cf` fast path
-      // and never reach this code.
+      // into the edge worker. In a real edge runtime (CF Pages / Workers) the
+      // dynamic import throws (no `node:fs/promises`) and we fall through to
+      // the catch. On Proxmox Node this loads the mmdb once and caches the
+      // reader at module scope.
+      const mmdbPath = (typeof process !== "undefined" && process.env?.MMDB_PATH) || "/app/geo/GeoLite2-City.mmdb";
       const dynamicImport = new Function("mod", "return import(mod)") as (mod: string) => Promise<unknown>;
       const [maxmindMod, fsMod] = await Promise.all([
         dynamicImport("maxmind") as Promise<{ Reader: new (buf: Buffer) => MmdbReader }>,
