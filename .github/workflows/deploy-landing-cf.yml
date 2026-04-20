@@ -44,6 +44,19 @@ jobs:
         # catches any drift that shouldn't reach production.
         run: npm install --no-audit --no-fund
 
+      - name: Strip Node-only instrumentation before CF build
+        working-directory: apps/landing-next
+        # `instrumentation.ts` registers @vercel/otel, which relies on Node-only
+        # APIs that @cloudflare/next-on-pages can't bundle into the Worker
+        # (it fails with "duplicated identifier"). The runtime guard in the
+        # file prevents it from executing on edge, but next-on-pages still
+        # tries to BUNDLE @vercel/otel, which is what breaks. Removing the
+        # file from the CF build avoids the bundler ever seeing it. Proxmox
+        # Docker build (deploy-landing.yml) runs a vanilla `next build` and
+        # keeps the file, so server-side Next.js render spans continue to
+        # flow on the primary landing.
+        run: rm -f instrumentation.ts
+
       - name: Build for Cloudflare Pages
         working-directory: apps/landing-next
         # `NEXT_PUBLIC_*` vars must be present at build time for Next.js to
