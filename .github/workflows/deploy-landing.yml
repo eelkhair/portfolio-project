@@ -19,7 +19,7 @@ on:
         default: dev
 
 env:
-  REGISTRY: registry.eelkhair.net
+  REGISTRY: jobboard-registry.elkhair.tech:5000
 
 permissions:
   contents: read
@@ -53,15 +53,25 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Update compose and restart landing container
+      - name: Update compose and restart landing container (via docker context to .200)
         env:
+          REG_USER: ${{ secrets.REGISTRY_USERNAME }}
           REG_PASS: ${{ secrets.REGISTRY_PASSWORD }}
         run: |
-          echo "$REG_PASS" | docker login ${{ env.REGISTRY }} -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
-          cp scripts/docker-compose.dev.yml ~/docker-compose.yml
-          docker pull ${{ env.REGISTRY }}/landing:latest
-          docker compose -f ~/docker-compose.yml -p job-board up -d --no-deps landing
-          docker image prune -f || true
+          set -e
+          COMPOSE=/tmp/docker-compose.dev.yml
+          ENV_FILE=/tmp/.env.dev
+
+          cp scripts/docker-compose.dev.yml "$COMPOSE"
+          scp -o StrictHostKeyChecking=accept-new eelkhair@192.168.1.200:~/.env "$ENV_FILE"
+          chmod 600 "$ENV_FILE"
+
+          echo "$REG_PASS" | docker --context job-board-dev login ${{ env.REGISTRY }} -u "$REG_USER" --password-stdin
+          docker --context job-board-dev pull ${{ env.REGISTRY }}/landing:latest
+          docker --context job-board-dev compose -f "$COMPOSE" --env-file "$ENV_FILE" -p job-board up -d --no-deps landing
+          docker --context job-board-dev image prune -f || true
+
+          shred -u "$ENV_FILE" 2>/dev/null || rm -f "$ENV_FILE"
           echo "Landing page deployed to dev"
 
   deploy-prod:
@@ -80,13 +90,23 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Update compose and restart landing container
+      - name: Update compose and restart landing container (via docker context to .112)
         env:
+          REG_USER: ${{ secrets.REGISTRY_USERNAME }}
           REG_PASS: ${{ secrets.REGISTRY_PASSWORD }}
         run: |
-          echo "$REG_PASS" | docker login ${{ env.REGISTRY }} -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
-          cp scripts/docker-compose.prod.yml ~/docker-compose.yml
-          docker pull ${{ env.REGISTRY }}/landing:latest
-          docker compose -f ~/docker-compose.yml -p job-board up -d --no-deps landing
-          docker image prune -f || true
+          set -e
+          COMPOSE=/tmp/docker-compose.prod.yml
+          ENV_FILE=/tmp/.env.prod
+
+          cp scripts/docker-compose.prod.yml "$COMPOSE"
+          scp -o StrictHostKeyChecking=accept-new eelkhair@192.168.1.112:~/.env "$ENV_FILE"
+          chmod 600 "$ENV_FILE"
+
+          echo "$REG_PASS" | docker --context job-board-prod login ${{ env.REGISTRY }} -u "$REG_USER" --password-stdin
+          docker --context job-board-prod pull ${{ env.REGISTRY }}/landing:latest
+          docker --context job-board-prod compose -f "$COMPOSE" --env-file "$ENV_FILE" -p job-board up -d --no-deps landing
+          docker --context job-board-prod image prune -f || true
+
+          shred -u "$ENV_FILE" 2>/dev/null || rm -f "$ENV_FILE"
           echo "Landing page deployed to prod"
