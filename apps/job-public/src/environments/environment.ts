@@ -16,12 +16,11 @@ export const environment = {
   otelZipkin: `https://otel.${baseDomain}/api/v2/spans`,
   // Grafana Faro RUM — POSTs through Cloudflare to Alloy on .160.
   faroUrl: 'https://faro.elkhair.tech/collect',
-  // Landing's /api/geo endpoint (cross-origin), enriches Faro spans with
-  // visitor country/city/region/lat/lon. Hardcoded to the .elkhair.tech
-  // zone (Cloudflare-served) — the .eelkhair.net zone goes through NPM
-  // which strips cf-connecting-ip, so the upstream geo handler can't
-  // resolve a real IP and always returns XX.
-  geoApiUrl: 'https://elkhair.tech/api/geo',
+  // Gateway /api/public/geo endpoint (cross-origin), enriches Faro spans
+  // with visitor country/city/region/lat/lon. Backed by a MaxMind GeoLite2
+  // mmdb baked into the gateway image. Hardcoded to .elkhair.tech — the
+  // .eelkhair.net zone strips cf-connecting-ip at NPM, so lookups return XX.
+  geoApiUrl: 'https://job-gateway.elkhair.tech/api/public/geo',
   jaegerUrl: `https://jaeger.${baseDomain}/trace/`,
   grafanaUrl: `https://grafana.${baseDomain}/d/bf5m5dwukfncwd/find-by-trace-id?orgId=1&var-TraceId=`,
   oidc: {

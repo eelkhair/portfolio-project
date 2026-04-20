@@ -128,6 +128,8 @@ jobs:
           echo "image=$REGISTRY/${BASE_NAME}:dev" >> $GITHUB_OUTPUT
 
       - name: Build and Push
+        env:
+          MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
         run: |
           NAME="${{ matrix.name }}"
           CONTEXT="${{ matrix.context }}"
@@ -138,6 +140,11 @@ jobs:
           BUILD_CMD="docker build -f $DOCKERFILE"
           if [ -n "$BUILD_ARGS" ]; then
             BUILD_CMD="$BUILD_CMD --build-arg $BUILD_ARGS"
+          fi
+          # Gateway consumes MAXMIND_LICENSE_KEY to bake the GeoLite2 mmdb
+          # into its image. Other services declare no such ARG and silently ignore it.
+          if [ "$NAME" = "gateway" ]; then
+            BUILD_CMD="$BUILD_CMD --build-arg MAXMIND_LICENSE_KEY=${MAXMIND_LICENSE_KEY}"
           fi
           BUILD_CMD="$BUILD_CMD -t $IMAGE $CONTEXT"
 
@@ -295,6 +302,8 @@ jobs:
           echo "image=$REGISTRY/${NAME}:prod" >> $GITHUB_OUTPUT
 
       - name: Build and Push
+        env:
+          MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
         run: |
           NAME="${{ matrix.name }}"
           CONTEXT="${{ matrix.context }}"
@@ -305,6 +314,11 @@ jobs:
           BUILD_CMD="docker build -f $DOCKERFILE"
           if [ -n "$BUILD_ARGS" ]; then
             BUILD_CMD="$BUILD_CMD --build-arg $BUILD_ARGS"
+          fi
+          # Gateway consumes MAXMIND_LICENSE_KEY to bake the GeoLite2 mmdb
+          # into its image. Other services declare no such ARG and silently ignore it.
+          if [ "$NAME" = "gateway" ]; then
+            BUILD_CMD="$BUILD_CMD --build-arg MAXMIND_LICENSE_KEY=${MAXMIND_LICENSE_KEY}"
           fi
           BUILD_CMD="$BUILD_CMD -t $IMAGE $CONTEXT"
 

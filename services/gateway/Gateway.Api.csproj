@@ -16,6 +16,7 @@
         <PackageReference Include="JobBoard.HealthChecks" Version="1.0.8" />
         <PackageReference Include="JobBoard.Infrastructure.RedisConfig" Version="1.0.0" />
         <PackageReference Include="JobBoard.Infrastructure.Vault" Version="1.0.0" />
+        <PackageReference Include="MaxMind.GeoIP2" Version="5.3.0" />
         <PackageReference Include="Yarp.ReverseProxy" Version="2.3.0" />
     </ItemGroup>
 

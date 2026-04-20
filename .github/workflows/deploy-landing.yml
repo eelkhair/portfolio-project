@@ -7,10 +7,6 @@ on:
       - 'apps/landing-next/**'
       - 'scripts/docker-compose.prod.yml'
       - 'scripts/docker-compose.dev.yml'
-  # Weekly rebuild to pick up the latest MaxMind GeoLite2-City.mmdb.
-  # MaxMind publishes updates every Tuesday; run Wed 04:00 UTC to be safe.
-  schedule:
-    - cron: '0 4 * * 3'
   workflow_dispatch:
     inputs:
       environment:
@@ -45,7 +41,6 @@ jobs:
             --build-arg NEXT_PUBLIC_TURNSTILE_SITE_KEY=${{ secrets.TURNSTILE_SITE_KEY }} \
             --build-arg NEXT_PUBLIC_FARO_URL=${{ vars.FARO_URL }} \
             --build-arg NEXT_PUBLIC_FARO_APP_NAME=landing \
-            --build-arg MAXMIND_LICENSE_KEY=${{ secrets.MAXMIND_LICENSE_KEY }} \
             -f apps/landing-next/Dockerfile -t $IMAGE apps/landing-next
           echo "Pushing $IMAGE..."
           docker push $IMAGE

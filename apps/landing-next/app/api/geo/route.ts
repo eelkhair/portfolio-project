@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { resolveGeo, type CfProperties } from "../../lib/geo";
 
 // Edge Runtime keeps cold start tiny. Returns the same shape used SSR-side.
+// NOTE: mmdb-backed geo lookup lives on the gateway (`/api/public/geo`).
+// Angular frontends call the gateway directly; this landing route stays as
+// a lightweight fallback/compat shim using cf-ipcountry + ipapi.co.
 export const runtime = "edge";
 
 // Allowed origins that may GET this endpoint cross-origin. Landing calls it

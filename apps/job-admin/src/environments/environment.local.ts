@@ -13,9 +13,9 @@ export const environment = {
   // Grafana Faro RUM — Aspire runs Alloy's Faro receiver on :12347.
   // Set to '' to disable (initFaro no-ops).
   faroUrl: 'http://localhost:12347/collect',
-  // Landing's /api/geo endpoint — Aspire runs landing on :3001. Falls back
-  // to "XX" geo if unreachable.
-  geoApiUrl: 'http://localhost:3001/api/geo',
+  // Gateway /api/public/geo endpoint — Aspire runs gateway on :5238. Falls
+  // back to "XX" geo if unreachable (dev builds without mmdb).
+  geoApiUrl: 'http://localhost:5238/api/public/geo',
   grafanaUrl: 'http://localhost:3200/d/bf5m5dwukfncwd/find-by-trace-id?orgId=1&var-TraceId=',
   jaegerUrl: 'http://localhost:16686/trace/',
   oidc: {

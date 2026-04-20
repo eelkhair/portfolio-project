@@ -15,11 +15,10 @@ export const environment = {
   otelAspire: undefined as string | undefined,
   otelZipkin: `https://otel.${baseDomain}/api/v2/spans`,
   faroUrl: 'https://faro.elkhair.tech/collect',
-  // Always use the .elkhair.tech zone (Cloudflare-served) for geo lookup.
-  // The .eelkhair.net zone goes through NPM which strips cf-connecting-ip,
-  // so the upstream geo handler can't resolve country/city from a real IP
-  // and always returns XX.
-  geoApiUrl: 'https://elkhair.tech/api/geo',
+  // Gateway /api/public/geo endpoint, MaxMind mmdb baked into the gateway
+  // image. Hardcoded to .elkhair.tech — the .eelkhair.net zone goes through
+  // NPM which strips cf-connecting-ip, causing lookups to return XX.
+  geoApiUrl: 'https://job-gateway-dev.elkhair.tech/api/public/geo',
   grafanaUrl: `https://grafana.${baseDomain}/d/bf5m5dwukfncwd/find-by-trace-id?orgId=1&var-TraceId=`,
   jaegerUrl: `https://jaeger.${baseDomain}/trace/`,
   oidc: {

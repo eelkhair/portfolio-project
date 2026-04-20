@@ -14,9 +14,10 @@ export const environment = {
   otel: `https://otel.${baseDomain}/v1/traces`,
   otelZipkin: `https://otel.${baseDomain}/api/v2/spans`,
   faroUrl: 'https://faro.elkhair.tech/collect',
-  // Always use .elkhair.tech zone — .eelkhair.net goes through NPM which
-  // strips cf-connecting-ip so geo lookup falls back to XX.
-  geoApiUrl: 'https://elkhair.tech/api/geo',
+  // Gateway /api/public/geo, MaxMind mmdb in the gateway image. Hardcoded
+  // to .elkhair.tech — .eelkhair.net zone strips cf-connecting-ip at NPM,
+  // so lookups return XX there.
+  geoApiUrl: 'https://job-gateway-dev.elkhair.tech/api/public/geo',
   jaegerUrl: `https://jaeger.${baseDomain}/trace/`,
   grafanaUrl: `https://grafana.${baseDomain}/d/bf5m5dwukfncwd/find-by-trace-id?orgId=1&var-TraceId=`,
   oidc: {

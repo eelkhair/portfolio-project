@@ -13,6 +13,7 @@ if (!isAspire) builder.AddVaultSecrets("gateway");
     .Services
     .AddOpenTelemetryServices(builder.Configuration, "gateway")
     .AddApplicationServices()
+    .AddSingleton<IGeoService, GeoService>()
     .AddReverseProxy()
     .LoadFromMemory(YarpProvider.GetRoutes(),
         YarpProvider.GetClusters(builder.Configuration));
@@ -28,4 +29,5 @@ app.MapReverseProxy();
 app.SetupStartupServices();
 
 app.MapGet("/", () => "Gateway is up and running!");
+app.MapGet("/api/public/geo", GeoEndpoint.Handle).RequireCors(CorsPolicy);
 app.Run();
