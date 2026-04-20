@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { CaseStudyLayout, CsSection } from "../components/CaseStudyLayout";
 import { adrs } from "../data/portfolio-data";
 
+// Required by @cloudflare/next-on-pages: every SSR route must opt into edge runtime.
+export const runtime = "edge";
+
 export const metadata: Metadata = {
   title: "Architecture Decision Records",
   description: "20 ADRs documenting every significant architectural decision with context, alternatives, and rationale.",

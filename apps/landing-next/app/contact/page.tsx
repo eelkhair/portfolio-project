@@ -3,6 +3,9 @@ import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { ContactGate } from "../components/ContactGate";
 
+// Required by @cloudflare/next-on-pages: every SSR route must opt into edge runtime.
+export const runtime = "edge";
+
 export const metadata: Metadata = {
   title: "Contact",
   description: "Get in touch with Elkhair Elkhair — Staff Software Engineer & Solutions Architect.",
