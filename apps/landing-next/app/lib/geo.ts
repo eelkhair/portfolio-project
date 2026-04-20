@@ -1,7 +1,9 @@
 // Shared geo lookup used by both the SSR layout (initial render) and the
-// /api/geo edge route (client-side refresh). Country always comes from
-// Cloudflare's CF-IPCountry header (sync, no network). City/region/lat/lon
-// come from ipapi.co with a 24h in-memory cache per IP.
+// /api/geo route (client-side refresh). Resolution order:
+//   1. Cloudflare's `request.cf` (on CF Pages / Workers) — zero network
+//   2. MaxMind GeoLite2 mmdb baked into the container at `/app/geo/GeoLite2-City.mmdb` — local, no external calls
+//   3. ipapi.co — last-ditch fallback when neither is available (e.g. during first-boot before the mmdb is present)
+// 24h in-memory cache per IP on top of all three.
 
 export type GeoData = {
   country: string;
@@ -54,6 +56,63 @@ type IpapiData = {
 };
 
 const EMPTY_IPAPI: IpapiData = { country: "", city: "", region: "", lat: null, lon: null };
+
+// MaxMind mmdb reader is lazy-loaded and cached at module scope. `maxmind`
+// uses Node fs APIs — guard by runtime check so edge bundles can still
+// evaluate this file. When the reader can't be initialized (edge runtime,
+// mmdb file missing, bad license key at build time) we silently fall
+// through to ipapi.
+type MmdbReader = { get(ip: string): MmdbCityRecord | null };
+type MmdbCityRecord = {
+  country?: { iso_code?: string };
+  city?: { names?: { en?: string } };
+  subdivisions?: Array<{ names?: { en?: string } }>;
+  location?: { latitude?: number; longitude?: number };
+};
+let mmdbReaderPromise: Promise<MmdbReader | null> | null = null;
+
+async function getMmdbReader(): Promise<MmdbReader | null> {
+  if (mmdbReaderPromise) return mmdbReaderPromise;
+  mmdbReaderPromise = (async (): Promise<MmdbReader | null> => {
+    // Edge runtime: no `process.versions.node`, no `node:fs`. Skip cleanly.
+    if (typeof process === "undefined" || !process.versions?.node) return null;
+    try {
+      const mmdbPath = process.env.MMDB_PATH ?? "/app/geo/GeoLite2-City.mmdb";
+      // String-variable module names evade webpack's static import analysis
+      // so the edge bundle doesn't try to pull `maxmind`/`node:fs`.
+      const maxmindName = "maxmind";
+      const fsName = "node:fs/promises";
+      const [{ Reader }, { readFile }] = await Promise.all([
+        import(/* webpackIgnore: true */ maxmindName),
+        import(/* webpackIgnore: true */ fsName),
+      ]);
+      const buffer = await readFile(mmdbPath);
+      return new Reader(buffer) as MmdbReader;
+    } catch {
+      return null;
+    }
+  })();
+  return mmdbReaderPromise;
+}
+
+async function lookupViaMmdb(ip: string): Promise<IpapiData> {
+  if (isPrivateIp(ip)) return EMPTY_IPAPI;
+  const reader = await getMmdbReader();
+  if (!reader) return EMPTY_IPAPI;
+  try {
+    const r = reader.get(ip);
+    if (!r) return EMPTY_IPAPI;
+    return {
+      country: (r.country?.iso_code ?? "").toUpperCase(),
+      city: r.city?.names?.en ?? "",
+      region: r.subdivisions?.[0]?.names?.en ?? "",
+      lat: typeof r.location?.latitude === "number" ? r.location.latitude : null,
+      lon: typeof r.location?.longitude === "number" ? r.location.longitude : null,
+    };
+  } catch {
+    return EMPTY_IPAPI;
+  }
+}
 
 async function lookupViaIpapi(ip: string): Promise<IpapiData> {
   if (isPrivateIp(ip)) return EMPTY_IPAPI;
@@ -141,7 +200,21 @@ export async function resolveGeo(headers: Headers, cf?: CfProperties): Promise<G
     return cached.value;
   }
 
-  // Path 2 + 3: ipapi.co with cf-ipcountry as last-ditch fallback.
+  // Path 2: MaxMind mmdb (Node runtime only). Local file, no network, no rate limit.
+  const mmdb = await lookupViaMmdb(ip);
+  if (mmdb.city || mmdb.lat !== null) {
+    const value: GeoData = {
+      country: mmdb.country || cfCountryHeader || "XX",
+      city: mmdb.city,
+      region: mmdb.region,
+      lat: mmdb.lat,
+      lon: mmdb.lon,
+    };
+    cache.set(ip, { value, expiresAt: now + CACHE_TTL_MS });
+    return value;
+  }
+
+  // Path 3 + 4: ipapi.co with cf-ipcountry as last-ditch fallback.
   const ipapi = await lookupViaIpapi(ip);
   const value: GeoData = {
     country: ipapi.country || cfCountryHeader || "XX",
