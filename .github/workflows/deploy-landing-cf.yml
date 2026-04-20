@@ -54,10 +54,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: apps/landing-next
-        # `npm install` tolerates lockfile drift during iteration on non-master
-        # branches. ⚠ Flip this to `npm ci` before merging to master so CI
-        # catches any drift that shouldn't reach production.
-        run: npm install --no-audit --no-fund
+        run: npm ci
 
       - name: Strip Node-only instrumentation before CF build
         working-directory: apps/landing-next

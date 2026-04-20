@@ -1,11 +1,7 @@
 FROM node:20-alpine AS deps
 WORKDIR /app
 COPY package*.json ./
-# Temporarily `npm install` instead of `npm ci` while iterating on the
-# `pages` branch — the lockfile churns with @cloudflare/next-on-pages tree
-# changes. ⚠ Flip back to `npm ci` before merging to master so prod catches
-# drift.
-RUN npm install --no-audit --no-fund
+RUN npm ci
 
 FROM node:20-alpine AS builder
 WORKDIR /app
