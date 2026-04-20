@@ -21,7 +21,8 @@
     { "hostname": "mono-mcp.elkhair.tech", "service": "http://192.168.1.112:3333" },
     { "hostname": "job-admin-api.elkhair.tech", "service": "http://192.168.1.112:6062" },
     { "hostname": "micro-mcp.elkhair.tech", "service": "http://192.168.1.112:3334" },
-    { "hostname": "registry.elkhair.tech", "service": "http://192.168.1.150:5000" },
+    { "hostname": "registry.elkhair.tech", "service": "http://192.168.1.151:5000" },
+    { "hostname": "jobboard-registry.elkhair.tech", "service": "http://192.168.1.151:5000" },
 
     { "hostname": "dev.elkhair.tech", "service": "http://192.168.1.200:6090" },
     { "hostname": "job-admin-dev.elkhair.tech", "service": "http://192.168.1.200:6080" },

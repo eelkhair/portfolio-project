@@ -26,7 +26,7 @@ export default function ObservabilityPage() {
       summary="End-to-end distributed tracing, structured logging, and dashboards across 16 services &mdash; so every request is debuggable from browser to database."
       toc={toc}
       prevLink={{ href: "/ai-orchestration", label: "Previous: AI Orchestration" }}
-      nextLink={{ href: "/adrs", label: "Next: ADRs" }}
+      nextLink={{ href: "/homelab", label: "Next: Homelab Infrastructure" }}
     >
       <CsSection id="problem">
         <h2>The Problem</h2>

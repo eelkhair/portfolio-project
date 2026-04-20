@@ -17,7 +17,7 @@ on:
         default: dev
 
 env:
-  REGISTRY: registry.eelkhair.net
+  REGISTRY: jobboard-registry.elkhair.tech:5000
 
 permissions:
   contents: read
@@ -123,12 +123,9 @@ jobs:
         id: tag
         run: |
           NAME="${{ matrix.name }}"
-          if [[ "$NAME" == *"-dev" ]]; then
-            BASE_NAME="${NAME%-dev}"
-            echo "image=$REGISTRY/${BASE_NAME}:dev" >> $GITHUB_OUTPUT
-          else
-            echo "image=$REGISTRY/${NAME}:latest" >> $GITHUB_OUTPUT
-          fi
+          # Strip optional -dev suffix from Angular app matrix entries so their tag is :dev too
+          BASE_NAME="${NAME%-dev}"
+          echo "image=$REGISTRY/${BASE_NAME}:dev" >> $GITHUB_OUTPUT
 
       - name: Build and Push
         run: |
@@ -158,31 +155,39 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Deploy dev
+      - name: Deploy dev (via docker context to .200)
         env:
           REG_USER: ${{ secrets.REGISTRY_USERNAME }}
           REG_PASS: ${{ secrets.REGISTRY_PASSWORD }}
         run: |
-          echo "Copying compose file..."
-          cp scripts/docker-compose.dev.yml ~/docker-compose.yml
+          set -e
+          COMPOSE=/tmp/docker-compose.dev.yml
+          ENV_FILE=/tmp/.env.dev
 
-          echo "Docker login..."
-          echo "$REG_PASS" | docker login $REGISTRY -u $REG_USER --password-stdin
+          echo "Staging compose file on runner..."
+          cp scripts/docker-compose.dev.yml "$COMPOSE"
 
-          echo "Pulling and starting stack..."
-          docker compose -f ~/docker-compose.yml -p job-board pull
-          docker compose -f ~/docker-compose.yml -p job-board up -d --remove-orphans
+          echo "Fetching .env from dev host for compose variable substitution..."
+          scp -o StrictHostKeyChecking=accept-new eelkhair@192.168.1.200:~/.env "$ENV_FILE"
+          chmod 600 "$ENV_FILE"
 
-          echo "Cleanup..."
-          echo "Cleanup..."
-          # Remove dangling (untagged) images only
-          docker image prune -f || true
-          # Remove stopped containers and unused networks
-          docker container prune -f || true
-          docker network prune -f || true
-          # Keep build cache for layer reuse — only trim if over 20GB
+          echo "Docker login on remote dev dockerd via context..."
+          echo "$REG_PASS" | docker --context job-board-dev login $REGISTRY -u $REG_USER --password-stdin
+
+          echo "Pulling and starting stack on dev..."
+          docker --context job-board-dev compose -f "$COMPOSE" --env-file "$ENV_FILE" -p job-board pull
+          docker --context job-board-dev compose -f "$COMPOSE" --env-file "$ENV_FILE" -p job-board up -d --remove-orphans
+
+          echo "Cleanup on dev..."
+          docker --context job-board-dev image prune -f || true
+          docker --context job-board-dev container prune -f || true
+          docker --context job-board-dev network prune -f || true
+
+          echo "Cleanup local runner build cache (keep 20GB for layer reuse)..."
           docker builder prune --keep-storage 20gb -f || true
 
+          # Scrub staged .env — runner is shared with prod runner binary on same VM
+          shred -u "$ENV_FILE" 2>/dev/null || rm -f "$ENV_FILE"
 
           echo "dev deploy complete!"
 
@@ -287,11 +292,7 @@ jobs:
         id: tag
         run: |
           NAME="${{ matrix.name }}"
-          if [[ "$NAME" == "job-admin" || "$NAME" == "job-public" ]]; then
-            echo "image=$REGISTRY/${NAME}:prod" >> $GITHUB_OUTPUT
-          else
-            echo "image=$REGISTRY/${NAME}:latest" >> $GITHUB_OUTPUT
-          fi
+          echo "image=$REGISTRY/${NAME}:prod" >> $GITHUB_OUTPUT
 
       - name: Build and Push
         run: |
@@ -322,28 +323,38 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Deploy prod
+      - name: Deploy prod (via docker context to .112)
         env:
           REG_USER: ${{ secrets.REGISTRY_USERNAME }}
           REG_PASS: ${{ secrets.REGISTRY_PASSWORD }}
         run: |
-          echo "Copying compose file..."
-          cp scripts/docker-compose.prod.yml ~/docker-compose.yml
+          set -e
+          COMPOSE=/tmp/docker-compose.prod.yml
+          ENV_FILE=/tmp/.env.prod
 
-          echo "Docker login..."
-          echo "$REG_PASS" | docker login $REGISTRY -u $REG_USER --password-stdin
+          echo "Staging compose file on runner..."
+          cp scripts/docker-compose.prod.yml "$COMPOSE"
 
-          echo "Pulling and starting stack..."
-          docker compose -f ~/docker-compose.yml -p job-board pull
-          docker compose -f ~/docker-compose.yml -p job-board up -d --remove-orphans
+          echo "Fetching .env from prod host for compose variable substitution..."
+          scp -o StrictHostKeyChecking=accept-new eelkhair@192.168.1.112:~/.env "$ENV_FILE"
+          chmod 600 "$ENV_FILE"
 
-          echo "Cleanup..."
-          # Remove dangling (untagged) images only
-          docker image prune -f || true
-          # Remove stopped containers and unused networks
-          docker container prune -f || true
-          docker network prune -f || true
-          # Keep build cache for layer reuse — only trim if over 20GB
+          echo "Docker login on remote prod dockerd via context..."
+          echo "$REG_PASS" | docker --context job-board-prod login $REGISTRY -u $REG_USER --password-stdin
+
+          echo "Pulling and starting stack on prod..."
+          docker --context job-board-prod compose -f "$COMPOSE" --env-file "$ENV_FILE" -p job-board pull
+          docker --context job-board-prod compose -f "$COMPOSE" --env-file "$ENV_FILE" -p job-board up -d --remove-orphans
+
+          echo "Cleanup on prod..."
+          docker --context job-board-prod image prune -f || true
+          docker --context job-board-prod container prune -f || true
+          docker --context job-board-prod network prune -f || true
+
+          echo "Cleanup local runner build cache (keep 20GB for layer reuse)..."
           docker builder prune --keep-storage 20gb -f || true
+
+          # Scrub staged .env
+          shred -u "$ENV_FILE" 2>/dev/null || rm -f "$ENV_FILE"
 
           echo "prod deploy complete!"

@@ -1,7 +1,7 @@
 services:
   # -- Landing Page (Next.js) ---------------------------------
   landing:
-    image: registry.eelkhair.net/landing:latest
+    image: jobboard-registry.elkhair.tech:5000/landing:latest
     ports:
       - "6090:3000"
     environment:
@@ -21,7 +21,7 @@ services:
       - ai-job-board-net
   # -- Frontend ----------------------------------------------
   job-admin:
-    image: registry.eelkhair.net/job-admin:dev
+    image: jobboard-registry.elkhair.tech:5000/job-admin:dev
     ports:
       - "6080:80"
     restart: unless-stopped
@@ -29,7 +29,7 @@ services:
       - ai-job-board-net
 
   job-public:
-    image: registry.eelkhair.net/job-public:dev
+    image: jobboard-registry.elkhair.tech:5000/job-public:dev
     ports:
       - "6081:3000"
     restart: unless-stopped
@@ -38,7 +38,7 @@ services:
 
   # -- Gateway -----------------------------------------------
   gateway:
-    image: registry.eelkhair.net/gateway:latest
+    image: jobboard-registry.elkhair.tech:5000/gateway:dev
     ports:
       - "5238:8080"
     environment:
@@ -53,7 +53,7 @@ services:
 
   # -- AI Services ------------------------------------------
   ai-service-v2:
-    image: registry.eelkhair.net/ai-service-v2:latest
+    image: jobboard-registry.elkhair.tech:5000/ai-service-v2:dev
     ports:
       - "5200:8080"
     environment:
@@ -87,7 +87,7 @@ services:
 
   # -- Monolith ---------------------------------------------
   monolith-api:
-    image: registry.eelkhair.net/monolith-api:latest
+    image: jobboard-registry.elkhair.tech:5000/monolith-api:dev
     ports:
       - "5280:8080"
     environment:
@@ -101,7 +101,7 @@ services:
       - ai-job-board-net
 
   monolith-mcp:
-    image: registry.eelkhair.net/monolith-mcp:latest
+    image: jobboard-registry.elkhair.tech:5000/monolith-mcp:dev
     ports:
       - "3333:3333"
     environment:
@@ -116,9 +116,7 @@ services:
 
   # -- Microservices ----------------------------------------
   admin-api:
-    build:
-      context: ../services/admin-api/
-    image: registry.eelkhair.net/admin-api:latest
+    image: jobboard-registry.elkhair.tech:5000/admin-api:dev
     ports:
       - "6062:8080"
     environment:
@@ -149,7 +147,7 @@ services:
     ]
 
   admin-api-mcp:
-    image: registry.eelkhair.net/admin-api-mcp:latest
+    image: jobboard-registry.elkhair.tech:5000/admin-api-mcp:dev
     ports:
       - "3334:3334"
     environment:
@@ -180,9 +178,7 @@ services:
     ]
 
   company-api:
-    build:
-      context: ../services/company-api/
-    image: registry.eelkhair.net/company-api:latest
+    image: jobboard-registry.elkhair.tech:5000/company-api:dev
     ports:
       - "6072:8080"
     environment:
@@ -211,9 +207,7 @@ services:
     ]
 
   job-api:
-    build:
-      context: ../services/job-api/
-    image: registry.eelkhair.net/job-api:latest
+    image: jobboard-registry.elkhair.tech:5000/job-api:dev
     ports:
       - "6084:8080"
     environment:
@@ -243,9 +237,7 @@ services:
     ]
 
   user-api:
-    build:
-      context: ../services/user-api/
-    image: registry.eelkhair.net/user-api:latest
+    image: jobboard-registry.elkhair.tech:5000/user-api:dev
     ports:
       - "6092:8080"
     environment:
@@ -277,7 +269,7 @@ services:
 
   # -- Connectors -------------------------------------------
   connector-api:
-    image: registry.eelkhair.net/connector-api:latest
+    image: jobboard-registry.elkhair.tech:5000/connector-api:dev
     ports:
       - "5284:8080"
     environment:
@@ -308,7 +300,7 @@ services:
     ]
 
   reverse-connector-api:
-    image: registry.eelkhair.net/reverse-connector-api:latest
+    image: jobboard-registry.elkhair.tech:5000/reverse-connector-api:dev
     ports:
       - "5285:8080"
     environment:
@@ -357,9 +349,7 @@ services:
       - ai-job-board-net
 
   job-board-status:
-    build:
-      context: ../services/HealthChecks
-    image: registry.eelkhair.net/health-check:latest
+    image: jobboard-registry.elkhair.tech:5000/health-check:dev
     environment:
       - HealthChecksUI__HealthChecks__0__Name=Gateway
       - HealthChecksUI__HealthChecks__0__Uri=http://192.168.1.200:5238/healthzEndpoint
