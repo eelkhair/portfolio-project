@@ -8,6 +8,9 @@ import { ContactNavLink } from "../components/ContactGate";
 import { archHighlights, techStack, exploreCards } from "../data/portfolio-data";
 import { ServiceStatusGrid } from "../components/ServiceStatusGrid";
 
+// Required by @cloudflare/next-on-pages: every SSR route must opt into edge runtime.
+export const runtime = "edge";
+
 export const metadata: Metadata = {
   title: "Portfolio - JobBoard Distributed Systems Platform",
 };

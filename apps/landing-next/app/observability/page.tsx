@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { CaseStudyLayout, CsSection, CsDecisionGrid, CsTradeoffList, CsScreenshot } from "../components/CaseStudyLayout";
 
+// Required by @cloudflare/next-on-pages: every SSR route must opt into edge runtime.
+export const runtime = "edge";
+
 export const metadata: Metadata = {
   title: "Observability",
   description: "End-to-end distributed tracing, structured logging, and dashboards across 16 services using OpenTelemetry, Jaeger, and Grafana.",

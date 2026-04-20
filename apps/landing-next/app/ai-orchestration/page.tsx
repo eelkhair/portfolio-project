@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { CaseStudyLayout, CsSection, CsDecisionGrid, CsTradeoffList, CsScreenshot } from "../components/CaseStudyLayout";
 
+// Required by @cloudflare/next-on-pages: every SSR route must opt into edge runtime.
+export const runtime = "edge";
+
 export const metadata: Metadata = {
   title: "AI Orchestration",
   description: "Multi-provider LLM chat with scoped tool registries, MCP server integration, and an event-driven resume RAG pipeline.",

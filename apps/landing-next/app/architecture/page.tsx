@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { CaseStudyLayout, CsSection, CsDecisionGrid, CsTradeoffList, CsScreenshot } from "../components/CaseStudyLayout";
 
+// Required by @cloudflare/next-on-pages: every SSR route must opt into edge runtime.
+export const runtime = "edge";
+
 export const metadata: Metadata = {
   title: "Architecture Overview",
   description: "How a monolith, microservices, and a strangler-fig migration run side-by-side in one codebase with YARP gateway routing.",

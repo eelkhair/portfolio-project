@@ -7,6 +7,9 @@ import { aboutCards, experienceItems, skillCategories } from "./data/home-data";
 import { AvailableBadge } from "./components/AvailableBadge";
 import { ContactNavLink } from "./components/ContactGate";
 
+// Required by @cloudflare/next-on-pages: every SSR route must opt into edge runtime.
+export const runtime = "edge";
+
 const homeNavLinks = [
   { href: "#about", label: "About" },
   { href: "#experience", label: "Experience" },
