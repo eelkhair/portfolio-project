@@ -16,6 +16,8 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT=https://otel.eelkhair.net
       - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
       - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=prod
+      # Landing SSR calls gateway for mmdb-backed geo enrichment.
+      - GATEWAY_GEO_URL=http://gateway:8080/api/public/geo
     restart: unless-stopped
     networks:
       - ai-job-board-net

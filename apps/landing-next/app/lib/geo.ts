@@ -1,12 +1,11 @@
 // Shared geo lookup used by both the SSR layout (initial render) and the
-// /api/geo edge route (client-side refresh). Country always comes from
-// Cloudflare's CF-IPCountry header (sync, no network). City/region/lat/lon
-// come from ipapi.co with a 24h in-memory cache per IP.
-//
-// NOTE: The MaxMind mmdb path lives on the gateway service (/api/public/geo)
-// because Next.js's edge transformer strips runtime import tricks, making it
-// impossible to load mmdb from within the landing app. Angular frontends
-// call the gateway directly; this landing route is kept as a compat shim.
+// /api/geo edge route (client-side refresh). Resolution order:
+//   1. `request.cf` (CF Pages / Workers) — full geo at zero latency
+//   2. Gateway `/api/public/geo` — MaxMind mmdb lookup, served by the
+//      gateway service on Proxmox. Requires GATEWAY_GEO_URL env var.
+//   3. ipapi.co — last-ditch fallback for country+city+region+lat/lon
+//   4. `cf-ipcountry` header — country-only final fallback
+// 24h in-memory cache per IP on top of all paths.
 
 export type GeoData = {
   country: string;
@@ -59,6 +58,47 @@ type IpapiData = {
 };
 
 const EMPTY_IPAPI: IpapiData = { country: "", city: "", region: "", lat: null, lon: null };
+
+/**
+ * Calls the gateway's `/api/public/geo` endpoint, which looks up the caller's
+ * IP in a local MaxMind GeoLite2 database. Landing SSR runs server-to-server,
+ * so we forward the real client IP via X-Forwarded-For; the gateway's
+ * GeoEndpoint already prefers CF-Connecting-IP → X-Forwarded-For → X-Real-IP.
+ *
+ * Returns empty when `GATEWAY_GEO_URL` is unset (CF Pages / local dev without
+ * the gateway running) — caller falls through to ipapi.
+ */
+async function lookupViaGateway(ip: string): Promise<IpapiData> {
+  if (isPrivateIp(ip)) return EMPTY_IPAPI;
+  const url = typeof process !== "undefined" ? process.env?.GATEWAY_GEO_URL : undefined;
+  if (!url) return EMPTY_IPAPI;
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "x-forwarded-for": ip,
+        "User-Agent": "elkhair-portfolio-landing/1.0",
+      },
+      signal: AbortSignal.timeout(1500),
+    });
+    if (!res.ok) return EMPTY_IPAPI;
+    const j = (await res.json()) as {
+      country?: string;
+      city?: string;
+      region?: string;
+      lat?: number | null;
+      lon?: number | null;
+    };
+    return {
+      country: (j.country ?? "").toUpperCase(),
+      city: j.city ?? "",
+      region: j.region ?? "",
+      lat: typeof j.lat === "number" ? j.lat : null,
+      lon: typeof j.lon === "number" ? j.lon : null,
+    };
+  } catch {
+    return EMPTY_IPAPI;
+  }
+}
 
 async function lookupViaIpapi(ip: string): Promise<IpapiData> {
   if (isPrivateIp(ip)) return EMPTY_IPAPI;
@@ -114,11 +154,12 @@ function parseCoord(v: string | number | null | undefined): number | null {
 /**
  * Resolves geo for the given headers. Resolution order:
  *   1. `request.cf` (CF Pages / Workers) — full geo at zero latency
- *   2. ipapi.co — IP-based lookup for Node/Proxmox runtime
- *   3. `cf-ipcountry` header — country-only fallback if ipapi fails
+ *   2. Gateway `/api/public/geo` (MaxMind mmdb) — when GATEWAY_GEO_URL is set
+ *   3. ipapi.co — IP-based lookup, last resort (rate-limited free tier)
+ *   4. `cf-ipcountry` header — country-only final fallback
  *
  * Passing `cf` is optional; omit it when the runtime doesn't expose it
- * (Proxmox) and the lookup transparently degrades to the ipapi path.
+ * (Proxmox) and the lookup transparently degrades through the remaining paths.
  */
 export async function resolveGeo(headers: Headers, cf?: CfProperties): Promise<GeoData> {
   const ip = clientIp(headers);
@@ -146,7 +187,22 @@ export async function resolveGeo(headers: Headers, cf?: CfProperties): Promise<G
     return cached.value;
   }
 
-  // Path 2 + 3: ipapi.co with cf-ipcountry as last-ditch fallback.
+  // Path 2: Gateway (mmdb-backed). Node runtime only — edge runtimes won't
+  // have GATEWAY_GEO_URL inlined and this returns empty.
+  const gw = await lookupViaGateway(ip);
+  if (gw.city || gw.lat !== null) {
+    const value: GeoData = {
+      country: gw.country || cfCountryHeader || "XX",
+      city: gw.city,
+      region: gw.region,
+      lat: gw.lat,
+      lon: gw.lon,
+    };
+    cache.set(ip, { value, expiresAt: now + CACHE_TTL_MS });
+    return value;
+  }
+
+  // Path 3 + 4: ipapi.co with cf-ipcountry as last-ditch fallback.
   const ipapi = await lookupViaIpapi(ip);
   const value: GeoData = {
     country: ipapi.country || cfCountryHeader || "XX",
