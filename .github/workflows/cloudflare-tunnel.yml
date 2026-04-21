@@ -66,13 +66,12 @@ jobs:
       # ──────────────────────────────────────────────────────────────────────
       # Step 2: Sync DNS CNAME records (multi-zone)
       #
-      # ⚠ LANDING-FAILOVER CAVEAT: this step upserts every hostname in
-      # tunnel-config.json back to the tunnel CNAME. If you are currently
-      # failed-over to Cloudflare Pages (see deploy/cloudflare/failover-landing.sh),
-      # re-running THIS workflow will silently revert landing DNS to the tunnel
-      # and undo the failover. Wait until Proxmox is healthy and you have run
-      # `failover-landing.sh proxmox` before triggering the tunnel workflow
-      # again, OR manually re-run the failover script afterwards.
+      # Landing-failover guard: .github/watchdog-state.json tracks whether the
+      # landing DNS is currently failed over to Cloudflare Pages (managed by
+      # .github/workflows/watchdog-dns.yml). When mode == "pages", the landing
+      # hostnames (elkhair.tech / www / dev) are skipped in this sync so we
+      # don't silently revert an active failover to the (still-dead) tunnel.
+      # Everything else in tunnel-config.json syncs normally.
       # ──────────────────────────────────────────────────────────────────────
       - name: Sync DNS CNAME records
         env:
@@ -82,12 +81,31 @@ jobs:
         run: |
           TUNNEL_TARGET="${CF_TUNNEL_ID}.cfargotunnel.com"
 
+          # Read the watchdog state to see if landing is currently on Pages.
+          LANDING_ON_PAGES=0
+          if [ -f .github/watchdog-state.json ]; then
+            MODE=$(jq -r '.mode // "tunnel"' .github/watchdog-state.json)
+            if [ "$MODE" = "pages" ]; then
+              LANDING_ON_PAGES=1
+              echo "::warning::Landing is failed over to Pages — skipping landing hostnames in DNS sync."
+            fi
+          fi
+          # Hostnames owned by the failover script (kept in sync with failover-landing.sh).
+          LANDING_HOSTS="elkhair.tech www.elkhair.tech dev.elkhair.tech"
+
           # Zone mapping: root domain -> zone ID
           declare -A ZONE_MAP
           ZONE_MAP["elkhair.tech"]="$CF_ZONE_ID_TECH"
 
           # Get all desired hostnames from config
           ALL_HOSTNAMES=$(echo '${{ steps.config.outputs.config }}' | jq -r '.services[].hostname')
+
+          # If landing is failed over, drop landing hostnames from the desired set.
+          if [ "$LANDING_ON_PAGES" = "1" ]; then
+            for h in $LANDING_HOSTS; do
+              ALL_HOSTNAMES=$(echo "$ALL_HOSTNAMES" | grep -vxF "$h" || true)
+            done
+          fi
 
           for ROOT_DOMAIN in "${!ZONE_MAP[@]}"; do
             ZONE_ID="${ZONE_MAP[$ROOT_DOMAIN]}"

@@ -1,0 +1,15 @@
+[Unit]
+Description=Portfolio watchdog — probe prod and auto-recover
+Documentation=https://github.com/Elkhair/portfolio-project/tree/master/deploy/watchdog
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/watchdog/check.sh
+# Lock down a bit — script only needs network + /var/lib/watchdog
+ProtectSystem=strict
+ReadWritePaths=/var/lib/watchdog /tmp
+ProtectHome=yes
+NoNewPrivileges=yes
+PrivateTmp=yes
