@@ -27,4 +27,19 @@ public interface IKeycloakAdminClient
 
     /// <summary>Adds a user to a group by their Keycloak IDs.</summary>
     Task AddUserToGroupAsync(string userId, string groupId, CancellationToken ct);
+
+    /// <summary>
+    /// Searches Keycloak users by a single attribute key/value pair (exact match) using the
+    /// Admin API's <c>?q=key:value</c> search. Returns each matching user's id and
+    /// <c>createdTimestamp</c> (epoch milliseconds) — caller filters/deletes based on age.
+    /// Used by the anonymous-user cleanup background service.
+    /// </summary>
+    Task<IReadOnlyList<KeycloakUserSummary>> FindUsersByAttributeAsync(
+        string key, string value, CancellationToken ct);
+
+    /// <summary>Deletes a user by Keycloak id. No-op (200) if already gone.</summary>
+    Task DeleteUserAsync(string userId, CancellationToken ct);
 }
+
+/// <summary>Minimal projection of a Keycloak user — id + creation time for cleanup.</summary>
+public sealed record KeycloakUserSummary(string Id, long CreatedTimestamp);

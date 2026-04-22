@@ -134,11 +134,11 @@ export default function Home() {
               <div>
                 <div className="coming-soon-title">The demo is live — no signup required</div>
                 <div className="coming-soon-desc">
-                  Click <strong>Continue as Guest</strong> on the sign-in page of the{" "}
+                  Click <strong>Try Demo Instantly</strong> on the sign-in page of the{" "}
                   <a href="https://job-admin.elkhair.tech" target="_blank" rel="noopener noreferrer" className="service-register-link">Admin app</a>
                   {" "}to post jobs and explore the admin experience, or the{" "}
                   <a href="https://jobs.elkhair.tech" target="_blank" rel="noopener noreferrer" className="service-register-link">Public app</a>
-                  {" "}to apply as a candidate. Instant throwaway account — no email needed.
+                  {" "}to apply as a candidate. Throwaway account — no email needed.
                 </div>
               </div>
             </div>

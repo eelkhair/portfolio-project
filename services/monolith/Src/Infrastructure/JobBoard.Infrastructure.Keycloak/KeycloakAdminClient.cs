@@ -111,6 +111,40 @@ public class KeycloakAdminClient(
         }
     }
 
+    public async Task<IReadOnlyList<KeycloakUserSummary>> FindUsersByAttributeAsync(
+        string key, string value, CancellationToken ct)
+    {
+        var http = await CreateAuthorizedClientAsync(ct);
+        // Keycloak 15+ supports attribute search via ?q=key:value. Pagination: max defaults to 100;
+        // bump to 1000 since the cleanup job is tolerant of batching — if more than 1000 accumulate,
+        // successive cleanup cycles will drain them over time.
+        var query = Uri.EscapeDataString($"{key}:{value}");
+        var url = $"{GetAdminBaseUrl()}/users?q={query}&max=1000";
+        var users = await http.GetFromJsonAsync<List<KeycloakUserDto>>(url, ct);
+        if (users is null || users.Count == 0) return [];
+
+        return users
+            .Where(u => !string.IsNullOrEmpty(u.Id))
+            .Select(u => new KeycloakUserSummary(u.Id!, u.CreatedTimestamp ?? 0))
+            .ToList();
+    }
+
+    public async Task DeleteUserAsync(string userId, CancellationToken ct)
+    {
+        var http = await CreateAuthorizedClientAsync(ct);
+        using var res = await http.DeleteAsync($"{GetAdminBaseUrl()}/users/{userId}", ct);
+
+        if (res.StatusCode == HttpStatusCode.NotFound) return; // already gone — fine
+        if (!res.IsSuccessStatusCode)
+        {
+            var body = await res.Content.ReadAsStringAsync(ct);
+            logger.LogError("Keycloak delete-user failed: {Status} {Body} (userId={UserId})",
+                res.StatusCode, body, userId);
+            throw new KeycloakOperationException(
+                $"Keycloak delete-user failed: {res.StatusCode}", res.StatusCode);
+        }
+    }
+
     private async Task<HttpClient> CreateAuthorizedClientAsync(CancellationToken ct)
     {
         var token = await tokenProvider.GetAccessTokenAsync(ct);

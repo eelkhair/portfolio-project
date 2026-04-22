@@ -88,13 +88,13 @@
       ev.preventDefault();
       var endpoint = getAnonymousEndpoint();
       if (!endpoint) {
-        showError(container, 'Guest login is not available for this app.');
+        showError(container, 'Demo is not available for this app.');
         return;
       }
 
       button.disabled = true;
       var originalLabel = button.textContent;
-      button.textContent = 'Creating guest session...';
+      button.textContent = 'Setting up demo...';
 
       fetch(endpoint, {
         method: 'POST',
@@ -110,11 +110,11 @@
         .then(function (res) {
           if (res.status === 429) {
             throw new Error(
-              'Too many guest sessions from your network. Try again in an hour, or sign in above.'
+              'Too many demo sessions from your network. Try again in an hour, or sign in above.'
             );
           }
           if (!res.ok) {
-            throw new Error('Guest session could not be created. Please try again.');
+            throw new Error('Demo session could not be started. Please try again.');
           }
           return res.json();
         })
@@ -123,7 +123,7 @@
           // { username, password } directly.
           var payload = (envelope && envelope.data) ? envelope.data : envelope;
           if (!payload || !payload.username || !payload.password) {
-            throw new Error('Guest session response was malformed.');
+            throw new Error('Demo session response was malformed.');
           }
 
           var form = document.querySelector('form#kc-form-login');
@@ -187,12 +187,12 @@
       guestBtn.type = 'button';
       guestBtn.id = 'jobboard-guest-button';
       guestBtn.className = 'jobboard-guest-button';
-      guestBtn.textContent = 'Continue as Guest';
+      guestBtn.textContent = 'Try Demo Instantly';
       guestBtn.addEventListener('click', handleGuestClick(guestBtn, container));
       container.appendChild(guestBtn);
 
       var hint = document.createElement('div');
-      hint.textContent = 'Instant access with a throwaway account.';
+      hint.textContent = 'Throwaway account, no email required.';
       hint.style.cssText = 'margin-top:0.4rem;color:#6b7280;font-size:0.75rem;';
       container.appendChild(hint);
     }

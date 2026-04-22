@@ -14,6 +14,7 @@ internal record KeycloakUserDto
     [JsonPropertyName("emailVerified")] public bool EmailVerified { get; init; }
     [JsonPropertyName("credentials")] public List<KeycloakCredentialDto>? Credentials { get; init; }
     [JsonPropertyName("attributes")] public Dictionary<string, List<string>>? Attributes { get; init; }
+    [JsonPropertyName("createdTimestamp")] public long? CreatedTimestamp { get; init; }
 }
 
 internal record KeycloakCredentialDto

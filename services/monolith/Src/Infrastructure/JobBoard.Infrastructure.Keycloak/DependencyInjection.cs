@@ -17,4 +17,15 @@ public static class DependencyInjection
         services.AddScoped<IKeycloakAdminClient, KeycloakAdminClient>();
         return services;
     }
+
+    /// <summary>
+    /// Registers the background service that periodically deletes expired anonymous (guest)
+    /// Keycloak users. Safe to register on services that run multiple replicas — the sweep is
+    /// idempotent (delete 404 is a no-op) and wasted work is bounded by the 6h interval.
+    /// </summary>
+    public static IServiceCollection AddAnonymousUserCleanup(this IServiceCollection services)
+    {
+        services.AddHostedService<AnonymousUserCleanupService>();
+        return services;
+    }
 }

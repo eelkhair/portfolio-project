@@ -65,6 +65,7 @@ builder.Services
     .AddSmtpServices(builder.Configuration)
     .AddBlobStorageServices(builder.Configuration)
     .AddKeycloakAdminClient()
+    .AddAnonymousUserCleanup()
     .AddTurnstileVerifier()
     .AddConfiguredSwagger(builder.Configuration)
     .AddDiagnosticsServices(builder.Configuration, "monolith-api")
