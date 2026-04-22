@@ -6,6 +6,7 @@ import {
   OnDestroy,
   afterNextRender,
   computed,
+  effect,
   inject,
   signal,
   viewChild,
@@ -53,6 +54,14 @@ export class Contact implements AfterViewInit, OnDestroy {
   private turnstileWidgetId: string | null = null;
 
   protected readonly form = new FormGroup({
+    name: new FormControl<string>({ value: '', disabled: true }, {
+      nonNullable: true,
+      validators: [Validators.required, Validators.maxLength(100)],
+    }),
+    email: new FormControl<string>({ value: '', disabled: true }, {
+      nonNullable: true,
+      validators: [Validators.required, Validators.email, Validators.maxLength(200)],
+    }),
     subject: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required, Validators.maxLength(200)],
@@ -90,7 +99,39 @@ export class Contact implements AfterViewInit, OnDestroy {
     return (u?.['email'] as string | undefined) ?? '';
   });
 
+  /**
+   * Guest users created by the "Try Demo Instantly" flow get synthetic identity
+   * (username `guest_*`, email `@guest.jobboard.local`). They can't legitimately
+   * reach out under those fake claims, so we unlock the name + email fields
+   * only for them and keep them read-only for everyone else.
+   */
+  protected readonly isGuest = computed(() => {
+    const u = this.account.user();
+    const username = u?.['preferred_username'] as string | undefined;
+    const email = u?.['email'] as string | undefined;
+    return !!(
+      (username && username.startsWith('guest_')) ||
+      (email && email.endsWith('@guest.jobboard.local'))
+    );
+  });
+
   constructor() {
+    // Sync OIDC claims into the form controls when the user becomes available,
+    // and enable them for guests so they can supply real contact info.
+    effect(() => {
+      const u = this.account.user();
+      if (!u) return;
+      this.form.controls.name.setValue(this.fromName());
+      this.form.controls.email.setValue(this.isGuest() ? '' : this.fromEmail());
+      if (this.isGuest()) {
+        this.form.controls.name.enable();
+        this.form.controls.email.enable();
+      } else {
+        this.form.controls.name.disable();
+        this.form.controls.email.disable();
+      }
+    });
+
     // Focus the subject input after initial render. Belt-and-suspenders
     // mirrors the signup pattern to beat SPA-navigation focus resets.
     afterNextRender(() => {
@@ -125,18 +166,16 @@ export class Contact implements AfterViewInit, OnDestroy {
       return;
     }
 
-    const name = this.fromName();
-    const email = this.fromEmail();
+    // Guests type their own; everyone else takes OIDC claims. getRawValue includes
+    // disabled fields so this works whether the controls were enabled or not.
+    const { name, email, subject, message } = this.form.getRawValue();
     if (!email) {
-      this.topError.set(
-        'Your account has no email on file. Please update your profile first.',
-      );
+      this.topError.set('Please provide an email so I can reply.');
       return;
     }
 
     this.submitting.set(true);
 
-    const { subject, message } = this.form.getRawValue();
     const body = { name, email, subject, message, token };
     const url = `${environment.landingUrl}api/contact`;
 

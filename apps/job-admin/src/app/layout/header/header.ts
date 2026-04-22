@@ -5,7 +5,6 @@ import {Tooltip} from 'primeng/tooltip';
 import {AccountService} from '../../core/services/account.service';
 import {TitleCasePipe} from '@angular/common';
 import {MenuItem} from 'primeng/api';
-import {Router} from '@angular/router';
 import {ThemeService} from '../../core/services/theme.service';
 import {environment} from '../../../environments/environment';
 import {ModeToggle} from './mode-toggle';
@@ -24,7 +23,6 @@ import {ModeToggle} from './mode-toggle';
 })
 export class Header implements OnInit {
   accountService = inject(AccountService);
-  router = inject(Router);
   themeService = inject(ThemeService);
   menuItems = signal<MenuItem[]>([]);
   displayName = signal('');
@@ -44,14 +42,6 @@ export class Header implements OnInit {
     else if (groups.includes('Applicants')) this.roleName.set('Applicant');
     else this.roleName.set('User');
     this.menuItems.set([
-      {
-        label: 'Profile',
-        icon: 'pi pi-id-card',
-        command: () => this.router.navigateByUrl('/settings/profile')
-      },
-      {
-        separator: true
-      },
       {
         label: 'Logout',
         icon: 'pi pi-sign-out',

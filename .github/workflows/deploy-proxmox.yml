@@ -428,6 +428,7 @@ jobs:
 
       - name: Purge Cloudflare edge cache for theme resources
         if: steps.theme.outputs.changed == 'true'
+        continue-on-error: true
         env:
           CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CF_ZONE_ID_TECH: ${{ secrets.CLOUDFLARE_ZONE_ID_TECH }}
@@ -435,14 +436,26 @@ jobs:
           # Keycloak's resource URL hash rarely changes, and CF caches static JS/CSS
           # under auth.elkhair.tech/resources/* for 30 days. Purge by hostname so the
           # next visitor gets the fresh file from origin.
+          # NOTE: the API token must include "Zone.Cache Purge" scope on the
+          # elkhair.tech zone. If it doesn't, CF returns code 10000
+          # "Authentication error". This step is non-fatal — the theme was already
+          # rsynced and gzip cache cleared; CF will just serve stale for up to
+          # 30 days for cached URLs.
           if [ -z "$CF_API_TOKEN" ] || [ -z "$CF_ZONE_ID_TECH" ]; then
             echo "⚠️  CF_API_TOKEN or CF_ZONE_ID_TECH not set — skipping Cloudflare purge"
             exit 0
           fi
-          curl -sS -X POST \
+          RESP=$(curl -sS -X POST \
             "https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID_TECH}/purge_cache" \
             -H "Authorization: Bearer ${CF_API_TOKEN}" \
             -H "Content-Type: application/json" \
-            --data '{"hosts":["auth.elkhair.tech"]}' \
-            | tee /tmp/cf.json
-          jq -e '.success == true' /tmp/cf.json >/dev/null && echo "✅ Cloudflare cache purged"
+            --data '{"hosts":["auth.elkhair.tech"]}')
+          echo "$RESP"
+          if echo "$RESP" | jq -e '.success == true' >/dev/null; then
+            echo "✅ Cloudflare cache purged"
+          else
+            echo "⚠️  Cloudflare purge failed — token likely missing 'Zone.Cache Purge' scope."
+            echo "    Fix: CF Dashboard → My Profile → API Tokens → edit token, add 'Zone > Cache Purge > Purge' for elkhair.tech."
+            echo "    Theme files are already synced and Keycloak gzip cache cleared, so origin serves the new file;"
+            echo "    CF edge will catch up as its cached entries expire or on manual Dashboard purge."
+          fi
