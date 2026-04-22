@@ -69,13 +69,13 @@ export default function PortfolioPage() {
             <div className="coming-soon-banner" role="status">
               <span className="coming-soon-icon" aria-hidden="true">{"\u2728"}</span>
               <div>
-                <div className="coming-soon-title">The demo is live — register and try it out</div>
+                <div className="coming-soon-title">The demo is live — no signup required</div>
                 <div className="coming-soon-desc">
-                  Create an account on the{" "}
-                  <a href="https://job-admin.elkhair.tech/signup" target="_blank" rel="noopener noreferrer" className="service-register-link">Admin app</a>
-                  {" "}to post jobs and explore the admin experience, or on the{" "}
-                  <a href="https://jobs.elkhair.tech/signup" target="_blank" rel="noopener noreferrer" className="service-register-link">Public app</a>
-                  {" "}to apply as a candidate. Feel free to poke around.
+                  Click <strong>Continue as Guest</strong> on the sign-in page of the{" "}
+                  <a href="https://job-admin.elkhair.tech" target="_blank" rel="noopener noreferrer" className="service-register-link">Admin app</a>
+                  {" "}to post jobs and explore the admin experience, or the{" "}
+                  <a href="https://jobs.elkhair.tech" target="_blank" rel="noopener noreferrer" className="service-register-link">Public app</a>
+                  {" "}to apply as a candidate. Instant throwaway account — no email needed.
                 </div>
               </div>
             </div>
