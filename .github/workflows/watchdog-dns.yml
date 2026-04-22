@@ -1,10 +1,13 @@
-name: Watchdog — DNS failover
+name: Watchdog — DNS failover (legacy, manual only)
+
+# DEPRECATED: the scheduled probe has moved to a Cloudflare Worker
+# (deploy/cloudflare/watchdog-worker/) because GitHub's scheduled workflows
+# drifted to ~30 min cadence in practice. This workflow is retained for
+# break-glass manual dispatch only — it still works, shares the same state
+# file, and can flip DNS if you can't reach the Worker for some reason.
+# Safe to delete once the Worker has been live and reliable for a few weeks.
 
 on:
-  schedule:
-    # GitHub's effective minimum; scheduled runs drift under load so don't
-    # assume sub-5-minute precision.
-    - cron: '*/5 * * * *'
   workflow_dispatch:
 
 concurrency:

@@ -66,11 +66,12 @@ jobs:
       # ──────────────────────────────────────────────────────────────────────
       # Step 2: Sync DNS CNAME records (multi-zone)
       #
-      # Landing-failover guard: .github/watchdog-state.json tracks whether the
-      # landing DNS is currently failed over to Cloudflare Pages (managed by
-      # .github/workflows/watchdog-dns.yml). When mode == "pages", the landing
-      # hostnames (elkhair.tech / www / dev) are skipped in this sync so we
-      # don't silently revert an active failover to the (still-dead) tunnel.
+      # Landing-failover guard: the watchdog-dns Worker
+      # (deploy/cloudflare/watchdog-worker/) flips landing CNAMEs between
+      # <tunnel>.cfargotunnel.com and <project>.pages.dev. We detect an active
+      # failover by querying the CURRENT CNAME target: if elkhair.tech points
+      # at *.pages.dev, skip landing hostnames in this sync so we don't
+      # silently revert an active failover to the (still-dead) tunnel.
       # Everything else in tunnel-config.json syncs normally.
       # ──────────────────────────────────────────────────────────────────────
       - name: Sync DNS CNAME records
@@ -81,14 +82,16 @@ jobs:
         run: |
           TUNNEL_TARGET="${CF_TUNNEL_ID}.cfargotunnel.com"
 
-          # Read the watchdog state to see if landing is currently on Pages.
+          # Ask Cloudflare where elkhair.tech currently points. If it's *.pages.dev,
+          # the watchdog Worker has failed over and we must not touch landing DNS.
           LANDING_ON_PAGES=0
-          if [ -f .github/watchdog-state.json ]; then
-            MODE=$(jq -r '.mode // "tunnel"' .github/watchdog-state.json)
-            if [ "$MODE" = "pages" ]; then
-              LANDING_ON_PAGES=1
-              echo "::warning::Landing is failed over to Pages — skipping landing hostnames in DNS sync."
-            fi
+          CURRENT_TARGET=$(curl -s \
+            "$CF_API_BASE/zones/$CF_ZONE_ID_TECH/dns_records?type=CNAME&name=elkhair.tech" \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            | jq -r '.result[0].content // empty')
+          if [[ "$CURRENT_TARGET" == *.pages.dev ]]; then
+            LANDING_ON_PAGES=1
+            echo "::warning::Landing CNAME currently points at $CURRENT_TARGET — skipping landing hostnames in DNS sync."
           fi
           # Hostnames owned by the failover script (kept in sync with failover-landing.sh).
           LANDING_HOSTS="elkhair.tech www.elkhair.tech dev.elkhair.tech"

@@ -1,0 +1,47 @@
+# Watchdog DNS-failover Cloudflare Worker.
+#
+# Runs on a 1-minute cron trigger at the Cloudflare edge. Probes
+# https://elkhair.tech/ externally; after sustained failure, flips the
+# landing CNAMEs to the Pages backup. After sustained recovery (and a
+# tunnel-direct health check), flips back.
+#
+# Replaces the GitHub Actions scheduled workflow .github/workflows/watchdog-dns.yml,
+# which drifted to ~30 min cadence in practice. Workers cron is reliable to
+# the minute.
+#
+# Secrets (set via `wrangler secret put <NAME>`, never committed):
+#   CLOUDFLARE_API_TOKEN   — scoped to Zone:DNS:Edit on elkhair.tech zone
+#
+# Bindings: one KV namespace for state (consecutive_failures / successes /
+# mode / last_flip). Create with:
+#   wrangler kv namespace create WATCHDOG_STATE
+# then paste the returned id into the [[kv_namespaces]] block below.
+
+name = "watchdog-dns"
+main = "src/index.ts"
+compatibility_date = "2026-04-01"
+
+# Every minute. Workers cron expressions follow standard cron syntax.
+[triggers]
+crons = ["* * * * *"]
+
+[vars]
+PROBE_URL = "https://elkhair.tech/"
+CLOUDFLARE_ZONE_ID_TECH = "817d5298206e86eb856bc2e723b7785e"
+CLOUDFLARE_TUNNEL_ID = "b7febae5-d2c4-48b5-8d60-a99318268032"
+PAGES_PROJECT = "landing"
+# Hostnames to flip between tunnel and Pages. Must stay in sync with
+# deploy/cloudflare/failover-landing.sh.
+LANDING_HOSTS = "elkhair.tech,www.elkhair.tech,dev.elkhair.tech"
+# State-machine tuning. Kept as strings so they round-trip through Wrangler.
+FAIL_THRESHOLD = "2"
+SUCCESS_THRESHOLD = "6"
+HYSTERESIS_SECS = "900"
+
+[[kv_namespaces]]
+binding = "WATCHDOG_STATE"
+id = "8a0ce78c2ffa46af9f729ebeac93e382"
+
+# Observability — Workers logs are visible under the Worker's dashboard page.
+[observability]
+enabled = true
