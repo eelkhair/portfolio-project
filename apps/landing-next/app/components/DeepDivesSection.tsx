@@ -1,12 +1,6 @@
-"use client";
-
 import Link from "next/link";
-import { useFeatureFlags } from "./FeatureFlags";
 
 export function DeepDivesSection() {
-  const { deepDives } = useFeatureFlags();
-  if (!deepDives) return null;
-
   return (
     <section id="deep-dives" aria-labelledby="deep-dives-heading">
       <p className="section-title">Deep Dives</p>
@@ -46,9 +40,6 @@ export function DeepDivesSection() {
 }
 
 export function DeepDivesDropdown() {
-  const { deepDives } = useFeatureFlags();
-  if (!deepDives) return null;
-
   return (
     <li className="nav-dropdown">
       <a href="#deep-dives" aria-haspopup="true">Deep Dives</a>

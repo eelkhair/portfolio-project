@@ -83,7 +83,6 @@ export default function PortfolioPage() {
           </div>
         </section>
 
-        {/* Deep Dives (feature-flagged) */}
         <DeepDivesSection />
 
         {/* How to Explore */}

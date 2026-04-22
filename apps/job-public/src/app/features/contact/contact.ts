@@ -32,9 +32,6 @@ interface ContactResponse {
  * handles Turnstile verification, rate limiting, and SMTP delivery via
  * Exchange to the operations inbox — avoiding coupling app mail to the
  * monolith's SMTP (which points to Mailpit in dev/prod).
- *
- * Feature-flag gated: route is only reachable when `featureFlags.contactForm()`
- * is true (see `contactEnabledGuard`).
  */
 @Component({
   selector: 'app-contact',

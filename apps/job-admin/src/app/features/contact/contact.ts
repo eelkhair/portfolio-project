@@ -34,9 +34,6 @@ interface ContactResponse {
  * `/api/contact` route cross-origin (CORS-allowed for job-admin.* hostnames).
  * That route handles Turnstile verification, rate limiting, and SMTP delivery
  * to the operations inbox.
- *
- * Feature-flag gated: the route is only reachable when `featureFlags.contactForm()`
- * is true (see `contactEnabledGuard`).
  */
 @Component({
   selector: 'app-contact',

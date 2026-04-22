@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
-import { contactEnabledGuard } from './core/guards/contact-enabled.guard';
 import { AuthCallbackComponent } from './shared/auth-callback/auth-callback';
 
 export const routes: Routes = [
@@ -46,7 +45,7 @@ export const routes: Routes = [
   {
     path: 'contact',
     title: 'Contact',
-    canActivate: [authGuard, contactEnabledGuard],
+    canActivate: [authGuard],
     loadComponent: () => import('./features/contact/contact').then((m) => m.Contact),
   },
   { path: '**', redirectTo: '' },
