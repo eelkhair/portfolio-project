@@ -78,8 +78,11 @@ public static class DependencyInjection
         // Rate limiting — "anonymous-signup" policy protects the guest signup
         // endpoints that create real Keycloak users without captcha. Partitioned
         // by client IP (X-Forwarded-For first hop, falling back to the direct
-        // connection IP). 3 requests / IP / hour, shared budget across the
-        // public and admin anonymous endpoints.
+        // connection IP). Two layers per IP:
+        //   • 10 requests / 1-hour fixed window   (burst cap)
+        //   • 50 requests / 24-hour sliding window (daily cap, 6 × 4h segments)
+        // Both layers must admit the request; either rejection → 429.
+        // Shared budget across the public and admin anonymous endpoints.
         // ---------------------------------------------------------------------
         services.AddRateLimiter(options =>
         {
@@ -94,14 +97,7 @@ public static class DependencyInjection
             options.AddPolicy("anonymous-signup", httpContext =>
             {
                 var partitionKey = ResolveClientIp(httpContext) ?? "unknown";
-                return RateLimitPartition.GetFixedWindowLimiter(partitionKey, _ => new FixedWindowRateLimiterOptions
-                {
-                    PermitLimit = 3,
-                    Window = TimeSpan.FromHours(1),
-                    QueueLimit = 0,
-                    QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                    AutoReplenishment = true
-                });
+                return RateLimitPartition.Get(partitionKey, _ => new AnonymousSignupLimiter());
             });
         });
 
@@ -195,6 +191,117 @@ public static class DependencyInjection
         }
 
         return httpContext.Connection.RemoteIpAddress?.ToString();
+    }
+
+    // -------------------------------------------------------------------------
+    // Two-layer rate limiter: fixed 1h burst cap + rolling 24h daily cap.
+    // A request is admitted only if both underlying limiters admit it. If the
+    // hour accepts but the day rejects, the hour permit is already consumed —
+    // acceptable trade-off since the IP is already over its daily budget.
+    // -------------------------------------------------------------------------
+    private sealed class AnonymousSignupLimiter : RateLimiter
+    {
+        private readonly FixedWindowRateLimiter _hour;
+        private readonly SlidingWindowRateLimiter _day;
+
+        public AnonymousSignupLimiter()
+        {
+            _hour = new FixedWindowRateLimiter(new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromHours(1),
+                QueueLimit = 0,
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                AutoReplenishment = true
+            });
+            _day = new SlidingWindowRateLimiter(new SlidingWindowRateLimiterOptions
+            {
+                PermitLimit = 50,
+                Window = TimeSpan.FromHours(24),
+                SegmentsPerWindow = 6,
+                QueueLimit = 0,
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                AutoReplenishment = true
+            });
+        }
+
+        public override TimeSpan? IdleDuration
+        {
+            get
+            {
+                var h = _hour.IdleDuration;
+                var d = _day.IdleDuration;
+                if (h is null || d is null) return null;
+                return h.Value < d.Value ? h : d;
+            }
+        }
+
+        public override RateLimiterStatistics? GetStatistics()
+        {
+            var h = _hour.GetStatistics();
+            var d = _day.GetStatistics();
+            if (h is null) return d;
+            if (d is null) return h;
+            return h.CurrentAvailablePermits < d.CurrentAvailablePermits ? h : d;
+        }
+
+        protected override RateLimitLease AttemptAcquireCore(int permitCount)
+        {
+            var hourLease = _hour.AttemptAcquire(permitCount);
+            if (!hourLease.IsAcquired) return hourLease;
+
+            var dayLease = _day.AttemptAcquire(permitCount);
+            if (!dayLease.IsAcquired)
+            {
+                hourLease.Dispose();
+                return dayLease;
+            }
+
+            return new CompositeLease(hourLease, dayLease);
+        }
+
+        protected override ValueTask<RateLimitLease> AcquireAsyncCore(int permitCount, CancellationToken cancellationToken)
+        {
+            // QueueLimit = 0 on both inner limiters → no actual async waiting; synchronous attempt is equivalent.
+            return ValueTask.FromResult(AttemptAcquireCore(permitCount));
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _hour.Dispose();
+                _day.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        private sealed class CompositeLease(RateLimitLease a, RateLimitLease b) : RateLimitLease
+        {
+            private bool _disposed;
+
+            public override bool IsAcquired => a.IsAcquired && b.IsAcquired;
+
+            public override IEnumerable<string> MetadataNames =>
+                a.MetadataNames.Concat(b.MetadataNames);
+
+            public override bool TryGetMetadata(string metadataName, out object? metadata)
+            {
+                if (a.TryGetMetadata(metadataName, out metadata)) return true;
+                return b.TryGetMetadata(metadataName, out metadata);
+            }
+
+            protected override void Dispose(bool disposing)
+            {
+                if (_disposed) return;
+                _disposed = true;
+                if (disposing)
+                {
+                    a.Dispose();
+                    b.Dispose();
+                }
+            }
+        }
     }
 
     // -------------------------------------------------------------------------
