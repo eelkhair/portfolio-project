@@ -86,10 +86,14 @@ now() { date +%s; }
 kuma() {
   local status="$1" msg="$2"
   [[ -z "$KUMA_PUSH_URL" ]] && return 0
-  # URL already has /api/push/<TOKEN>; append params. If URL has ? already, use &.
-  local sep='?'
-  [[ "$KUMA_PUSH_URL" == *\?* ]] && sep='&'
-  local url="${KUMA_PUSH_URL}${sep}status=${status}&msg=$(printf '%s' "$msg" | jq -sRr @uri)&ping="
+  # Kuma's pasted URL includes a default query string (?status=up&msg=OK&ping=).
+  # Strip it before appending our own — leaving it in causes duplicate query
+  # params, which Express parses as arrays; Kuma's status validator rejects the
+  # array and records the heartbeat as DOWN with "[object Object]" as the msg.
+  local base="${KUMA_PUSH_URL%%\?*}"
+  local encoded_msg
+  encoded_msg=$(printf '%s' "$msg" | jq -sRr @uri)
+  local url="${base}?status=${status}&msg=${encoded_msg}&ping="
   curl -fsS --max-time 5 "$url" >/dev/null || log "kuma push failed (non-fatal)"
 }
 
