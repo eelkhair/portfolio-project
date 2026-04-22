@@ -31,7 +31,8 @@ public class KeycloakAdminClient(
 
     public async Task<string> CreateUserWithPasswordAsync(
         string email, string firstName, string lastName, string password, CancellationToken ct,
-        string? username = null)
+        string? username = null,
+        IDictionary<string, List<string>>? attributes = null)
     {
         var http = await CreateAuthorizedClientAsync(ct);
         var resolvedUsername = string.IsNullOrWhiteSpace(username) ? email : username.Trim();
@@ -68,7 +69,10 @@ public class KeycloakAdminClient(
             Credentials =
             [
                 new KeycloakCredentialDto { Type = "password", Value = password, Temporary = false }
-            ]
+            ],
+            Attributes = attributes is { Count: > 0 }
+                ? attributes.ToDictionary(kv => kv.Key, kv => kv.Value)
+                : null
         };
 
         using var res = await http.PostAsJsonAsync($"{GetAdminBaseUrl()}/users", payload, ct);

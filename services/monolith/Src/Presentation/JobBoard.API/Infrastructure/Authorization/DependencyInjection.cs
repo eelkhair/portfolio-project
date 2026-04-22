@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Threading.RateLimiting;
 using HealthChecks.UI.Client;
 using JobBoard.API.Infrastructure.SignalR;
 using JobBoard.Domain;
@@ -56,12 +58,50 @@ public static class DependencyInjection
                         "https://landing-backup.elkhair.tech",
                         "https://elkhair.tech",
                         "https://www.elkhair.tech",
-                        "https://dev.elkhair.tech"
+                        "https://dev.elkhair.tech",
+
+                        // Keycloak origins — the login page's signup-link.js POSTs
+                        // cross-origin to /api/Account/signup/*/anonymous for guest login.
+                        "https://auth.eelkhair.net",
+                        "https://auth.elkhair.tech",
+                        "http://localhost:9999",
+                        "https://localhost:9999"
                     )
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .WithExposedHeaders("x-trace-id")
                     .AllowCredentials();
+            });
+        });
+
+        // ---------------------------------------------------------------------
+        // Rate limiting — "anonymous-signup" policy protects the guest signup
+        // endpoints that create real Keycloak users without captcha. Partitioned
+        // by client IP (X-Forwarded-For first hop, falling back to the direct
+        // connection IP). 3 requests / IP / hour, shared budget across the
+        // public and admin anonymous endpoints.
+        // ---------------------------------------------------------------------
+        services.AddRateLimiter(options =>
+        {
+            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            options.OnRejected = (ctx, _) =>
+            {
+                ctx.HttpContext.Response.Headers["Retry-After"] =
+                    TimeSpan.FromHours(1).TotalSeconds.ToString(CultureInfo.InvariantCulture);
+                return ValueTask.CompletedTask;
+            };
+
+            options.AddPolicy("anonymous-signup", httpContext =>
+            {
+                var partitionKey = ResolveClientIp(httpContext) ?? "unknown";
+                return RateLimitPartition.GetFixedWindowLimiter(partitionKey, _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 3,
+                    Window = TimeSpan.FromHours(1),
+                    QueueLimit = 0,
+                    QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                    AutoReplenishment = true
+                });
             });
         });
 
@@ -137,9 +177,24 @@ public static class DependencyInjection
         app.UseODataRouteDebug();
         app.UseRouting();
         app.UseCors("AllowMyFrontendApp");
+        app.UseRateLimiter();
         app.UseAuthorization();
         app.MapControllers();
         return app;
+    }
+
+    private static string? ResolveClientIp(HttpContext httpContext)
+    {
+        // YARP gateway and Cloudflare both set X-Forwarded-For. Take the first (leftmost) hop.
+        var forwarded = httpContext.Request.Headers["X-Forwarded-For"].ToString();
+        if (!string.IsNullOrWhiteSpace(forwarded))
+        {
+            var first = forwarded.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(first)) return first;
+        }
+
+        return httpContext.Connection.RemoteIpAddress?.ToString();
     }
 
     // -------------------------------------------------------------------------

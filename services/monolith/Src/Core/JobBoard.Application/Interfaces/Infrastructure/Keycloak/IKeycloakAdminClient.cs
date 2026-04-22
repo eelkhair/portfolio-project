@@ -15,12 +15,15 @@ public interface IKeycloakAdminClient
     /// The <paramref name="username"/> parameter is optional — when null, the email is used as the Keycloak
     /// username (admin signup behavior). When provided, it is stored as the Keycloak username while email
     /// remains the email address (public signup behavior).
+    /// The <paramref name="attributes"/> parameter is optional — when provided, the keys/values are stored
+    /// on the Keycloak user (e.g. <c>anonymous=true</c> for guest/tryout accounts).
     /// Throws <see cref="KeycloakOperationException"/> with <see cref="System.Net.HttpStatusCode.Conflict"/>
     /// if the email or username is already registered.
     /// </summary>
     Task<string> CreateUserWithPasswordAsync(
         string email, string firstName, string lastName, string password, CancellationToken ct,
-        string? username = null);
+        string? username = null,
+        IDictionary<string, List<string>>? attributes = null);
 
     /// <summary>Adds a user to a group by their Keycloak IDs.</summary>
     Task AddUserToGroupAsync(string userId, string groupId, CancellationToken ct);
