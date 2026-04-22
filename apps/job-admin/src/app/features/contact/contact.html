@@ -26,12 +26,32 @@
 
         <div class="field-row">
           <div class="field">
-            <label>From</label>
-            <div class="readonly">{{ fromName() }}</div>
+            <label [attr.for]="isGuest() ? 'from-name' : null">From<span class="req" [hidden]="!isGuest()">*</span></label>
+            @if (isGuest()) {
+              <input pInputText id="from-name" type="text" formControlName="name" maxlength="100" placeholder="Your name" />
+              @if (form.controls.name.invalid && form.controls.name.touched) {
+                @if (form.controls.name.errors?.['required']) {
+                  <small class="err">Name is required.</small>
+                }
+              }
+            } @else {
+              <div class="readonly">{{ fromName() }}</div>
+            }
           </div>
           <div class="field">
-            <label>Email</label>
-            <div class="readonly">{{ fromEmail() }}</div>
+            <label [attr.for]="isGuest() ? 'from-email' : null">Email<span class="req" [hidden]="!isGuest()">*</span></label>
+            @if (isGuest()) {
+              <input pInputText id="from-email" type="email" formControlName="email" maxlength="200" placeholder="you@example.com" autocomplete="email" />
+              @if (form.controls.email.invalid && form.controls.email.touched) {
+                @if (form.controls.email.errors?.['required']) {
+                  <small class="err">Email is required.</small>
+                } @else if (form.controls.email.errors?.['email']) {
+                  <small class="err">Please enter a valid email.</small>
+                }
+              }
+            } @else {
+              <div class="readonly">{{ fromEmail() }}</div>
+            }
           </div>
         </div>
 

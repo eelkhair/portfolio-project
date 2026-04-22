@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { AutoLoginPartialRoutesGuard } from 'angular-auth-oidc-client';
 import {AuthCallbackComponent} from './shared/auth-callback/auth-callback';
-import { contactEnabledGuard } from './core/guards/contact-enabled-guard';
 export const routes: Routes = [
   // Public (anonymous) routes — must be registered before the guarded block.
   { path: 'signup', title: 'Sign Up', loadComponent: () => import('./features/auth/signup/signup').then(m => m.Signup) },
@@ -16,7 +15,7 @@ export const routes: Routes = [
       { path: 'applications', title: 'Applications', loadChildren: () => import('./features/applications/applications.routes').then(m => m.APPLICATION_ROUTES) },
       { path: 'access', title: 'Access Control', loadChildren:()=> import('./features/access/access.routes').then(m => m.ACCESS_ROUTES) },
       { path: 'settings', title: 'Settings', loadChildren:()=> import('./features/settings/settings.routes').then(m => m.SETTINGS_ROUTES) },
-      { path: 'contact', title: 'Contact', canActivate: [contactEnabledGuard], loadComponent: () => import('./features/contact/contact').then(m => m.Contact) },
+      { path: 'contact', title: 'Contact', loadComponent: () => import('./features/contact/contact').then(m => m.Contact) },
     ],
   },
   // Fallback

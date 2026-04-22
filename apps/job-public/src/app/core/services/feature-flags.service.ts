@@ -20,8 +20,6 @@ export class FeatureFlagsService {
   private readonly _flags = signal<Record<string, boolean> | null>(null);
 
   readonly chatEnabled = computed(() => this._flags()?.['publicchat'] ?? false);
-  /** Whether the in-app contact form is enabled. Gates the nav link + route guard. */
-  readonly contactForm = computed(() => this._flags()?.['contactform'] ?? false);
 
   setFlags(flags: Record<string, boolean>) {
     this._flags.set(normalizeFlags(flags));

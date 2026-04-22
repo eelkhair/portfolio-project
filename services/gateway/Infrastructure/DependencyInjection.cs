@@ -29,7 +29,14 @@ public static class DependencyInjection
                     "https://job-admin-dev.elkhair.tech",
                     "https://jobs-dev.elkhair.tech",
                     "https://dev.elkhair.tech",
-                    "https://elkhair.tech")
+                    "https://elkhair.tech",
+
+                    // Keycloak origins — guest-login link on the Keycloak login
+                    // page POSTs to /api/Account/signup/*/anonymous via the gateway.
+                    "https://auth.eelkhair.net",
+                    "https://auth.elkhair.tech",
+                    "http://localhost:9999",
+                    "https://localhost:9999")
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials()

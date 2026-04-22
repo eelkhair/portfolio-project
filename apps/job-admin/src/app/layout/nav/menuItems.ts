@@ -1,19 +1,16 @@
 import {MenuItem} from 'primeng/api';
 import {inject} from '@angular/core';
 import {AccountService} from '../../core/services/account.service';
-import {FeatureFlagsService} from '../../core/services/feature-flags.service';
 import {GettingStartedService} from '../getting-started/getting-started.service';
 
 export class NavItems{
   accountService = inject(AccountService);
-  featureFlags = inject(FeatureFlagsService);
   gettingStarted = inject(GettingStartedService);
 
   getNavItems(){
     const groups = this.accountService.groups();
     const isAdmin = groups.some(g => g.replace(/^\//, '') === 'Admins');
     const isSystemAdmin = groups.some(g => g.replace(/^\//, '') === 'SystemAdmins');
-    const contactEnabled = this.featureFlags.contactForm();
     const NAV_ITEMS: MenuItem[] = [
       {
         label: 'Dashboard', icon: 'pi pi-chart-bar', routerLink: '/dashboard'
@@ -64,7 +61,7 @@ export class NavItems{
       { label: 'Audit Logs', icon: 'pi pi-history', routerLink: '/audit', visible: false },
 
       {
-        label: 'Contact', icon: 'pi pi-envelope', routerLink: '/contact', visible: contactEnabled,
+        label: 'Contact', icon: 'pi pi-envelope', routerLink: '/contact',
       },
 
       {

@@ -31,7 +31,8 @@ public class KeycloakAdminClient(
 
     public async Task<string> CreateUserWithPasswordAsync(
         string email, string firstName, string lastName, string password, CancellationToken ct,
-        string? username = null)
+        string? username = null,
+        IDictionary<string, List<string>>? attributes = null)
     {
         var http = await CreateAuthorizedClientAsync(ct);
         var resolvedUsername = string.IsNullOrWhiteSpace(username) ? email : username.Trim();
@@ -68,7 +69,10 @@ public class KeycloakAdminClient(
             Credentials =
             [
                 new KeycloakCredentialDto { Type = "password", Value = password, Temporary = false }
-            ]
+            ],
+            Attributes = attributes is { Count: > 0 }
+                ? attributes.ToDictionary(kv => kv.Key, kv => kv.Value)
+                : null
         };
 
         using var res = await http.PostAsJsonAsync($"{GetAdminBaseUrl()}/users", payload, ct);
@@ -104,6 +108,40 @@ public class KeycloakAdminClient(
             logger.LogError("Keycloak add-to-group failed: {Status} {Body}", res.StatusCode, body);
             throw new KeycloakOperationException(
                 $"Keycloak add-to-group failed: {res.StatusCode}", res.StatusCode);
+        }
+    }
+
+    public async Task<IReadOnlyList<KeycloakUserSummary>> FindUsersByAttributeAsync(
+        string key, string value, CancellationToken ct)
+    {
+        var http = await CreateAuthorizedClientAsync(ct);
+        // Keycloak 15+ supports attribute search via ?q=key:value. Pagination: max defaults to 100;
+        // bump to 1000 since the cleanup job is tolerant of batching — if more than 1000 accumulate,
+        // successive cleanup cycles will drain them over time.
+        var query = Uri.EscapeDataString($"{key}:{value}");
+        var url = $"{GetAdminBaseUrl()}/users?q={query}&max=1000";
+        var users = await http.GetFromJsonAsync<List<KeycloakUserDto>>(url, ct);
+        if (users is null || users.Count == 0) return [];
+
+        return users
+            .Where(u => !string.IsNullOrEmpty(u.Id))
+            .Select(u => new KeycloakUserSummary(u.Id!, u.CreatedTimestamp ?? 0))
+            .ToList();
+    }
+
+    public async Task DeleteUserAsync(string userId, CancellationToken ct)
+    {
+        var http = await CreateAuthorizedClientAsync(ct);
+        using var res = await http.DeleteAsync($"{GetAdminBaseUrl()}/users/{userId}", ct);
+
+        if (res.StatusCode == HttpStatusCode.NotFound) return; // already gone — fine
+        if (!res.IsSuccessStatusCode)
+        {
+            var body = await res.Content.ReadAsStringAsync(ct);
+            logger.LogError("Keycloak delete-user failed: {Status} {Body} (userId={UserId})",
+                res.StatusCode, body, userId);
+            throw new KeycloakOperationException(
+                $"Keycloak delete-user failed: {res.StatusCode}", res.StatusCode);
         }
     }
 

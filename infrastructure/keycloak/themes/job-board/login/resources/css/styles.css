@@ -367,3 +367,40 @@ a:hover, a:focus {
 .alert.alert-error .kc-feedback-text {
   color: var(--jb-danger-text) !important;
 }
+
+/* ---------- Guest (anonymous) login button ---------- */
+/* Secondary, outlined treatment so the primary Sign In CTA stays dominant.
+   Injected by signup-link.js below the standard form + "Create account" link. */
+.jobboard-guest-button {
+  display: inline-block;
+  width: 100%;
+  padding: 0.65rem 1rem;
+  margin-top: 0.25rem;
+  background: transparent;
+  color: var(--jb-accent);
+  border: 1px solid var(--jb-accent);
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.jobboard-guest-button:hover:not([disabled]) {
+  background: var(--jb-accent);
+  color: var(--jb-accent-contrast);
+}
+.jobboard-guest-button:focus-visible {
+  outline: 2px solid var(--jb-accent-soft);
+  outline-offset: 2px;
+}
+.jobboard-guest-button[disabled] {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.jobboard-guest-divider {
+  color: var(--jb-text-muted);
+}
+.jobboard-guest-error {
+  color: var(--jb-danger-text);
+}

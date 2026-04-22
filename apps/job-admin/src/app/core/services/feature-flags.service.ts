@@ -6,7 +6,7 @@ const MODE_STORAGE_KEY = 'job-admin-mode-override';
 
 /**
  * Lowercase every key in a flags dict so downstream lookups are case-insensitive.
- * Redis stores flags with mixed casing (e.g. `Monolith`, `ContactForm`, `deepDives`);
+ * Redis stores flags with mixed casing (e.g. `Monolith`, `publicChat`);
  * the monolith's JSON serializer applies camelCase by default, but this lets the
  * admin app stay correct regardless of how the server ever shapes the payload.
  */
@@ -39,9 +39,6 @@ export class FeatureFlagsService {
     if (!this._loaded()) return false;
     return this._featureFlags()?.['monolith'] ?? false;
   });
-
-  /** Whether the in-app contact form is enabled. Gates the nav link + route guard. */
-  readonly contactForm = computed(() => this._featureFlags()?.['contactform'] ?? false);
 
   setFlags(flags: FeatureFlagsDto) {
     const normalized = normalizeFlags(flags);

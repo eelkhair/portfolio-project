@@ -2,7 +2,6 @@ import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { ThemeService } from '../../core/services/theme.service';
 import { AccountService } from '../../core/services/account.service';
-import { FeatureFlagsService } from '../../core/services/feature-flags.service';
 import { HelpPanelService } from '../../shared/help-panel/help-panel.service';
 import { environment } from '../../../environments/environment';
 
@@ -38,7 +37,17 @@ import { environment } from '../../../environments/environment';
           >
             Companies
           </a>
-          @if (account.isAuthenticated() && featureFlags.contactForm()) {
+          @if (account.isAuthenticated()) {
+            <a
+              routerLink="/profile"
+              routerLinkActive="text-white"
+              [routerLinkActiveOptions]="{ exact: false }"
+              class="text-sm font-medium text-slate-300 transition-colors hover:text-white"
+            >
+              Profile
+            </a>
+          }
+          @if (account.isAuthenticated()) {
             <a
               routerLink="/contact"
               routerLinkActive="text-white"
@@ -98,13 +107,6 @@ import { environment } from '../../../environments/environment';
               @if (menuOpen()) {
                 <div class="absolute right-0 z-50 mt-2 w-48 rounded-lg bg-white py-1 shadow-lg ring-1 ring-black/5 dark:bg-slate-800 dark:ring-white/10">
                   <a
-                    routerLink="/profile"
-                    (click)="menuOpen.set(false)"
-                    class="block w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700"
-                  >
-                    Profile
-                  </a>
-                  <a
                     routerLink="/applications"
                     (click)="menuOpen.set(false)"
                     class="block w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700"
@@ -142,7 +144,6 @@ import { environment } from '../../../environments/environment';
 export class Header {
   protected readonly theme = inject(ThemeService);
   protected readonly account = inject(AccountService);
-  protected readonly featureFlags = inject(FeatureFlagsService);
   protected readonly help = inject(HelpPanelService);
   protected readonly menuOpen = signal(false);
   protected readonly envName = environment.envName;

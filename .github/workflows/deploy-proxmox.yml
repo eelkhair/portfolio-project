@@ -372,3 +372,90 @@ jobs:
           shred -u "$ENV_FILE" 2>/dev/null || rm -f "$ENV_FILE"
 
           echo "prod deploy complete!"
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # Keycloak theme deploy (runs on prod runner — Keycloak lives on .112 outside
+  # the job-board compose project. Theme is bind-mounted from
+  # /home/eelkhair/EmailTemplates/job-board/. Updates are an rsync + gzip-cache
+  # clear: Keycloak's /opt/keycloak/data/tmp/kc-gzip-cache lives in the
+  # container's writable layer and is NOT invalidated by `docker restart`.
+  # ════════════════════════════════════════════════════════════════════════════
+  deploy-keycloak-theme:
+    needs: deploy-prod
+    if: "!cancelled() && needs.deploy-prod.result == 'success'"
+    runs-on: proxmox-prod
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Detect theme changes
+        id: theme
+        run: |
+          # Compare HEAD against the previous commit on master. On workflow_dispatch
+          # there may be no diff (rerun) — in that case default to syncing anyway
+          # since it's idempotent and cheap.
+          if git rev-parse HEAD~1 >/dev/null 2>&1; then
+            if git diff --name-only HEAD~1 HEAD | grep -q '^infrastructure/keycloak/themes/'; then
+              echo "changed=true" >> $GITHUB_OUTPUT
+              echo "📝 Theme files changed — will sync"
+            else
+              echo "changed=false" >> $GITHUB_OUTPUT
+              echo "⏭️  No theme changes detected"
+            fi
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "📝 No prior commit to compare — syncing defensively"
+          fi
+
+      - name: Rsync theme to .112 + clear gzip cache
+        if: steps.theme.outputs.changed == 'true'
+        run: |
+          set -e
+
+          echo "Rsyncing login theme → /home/eelkhair/EmailTemplates/job-board/..."
+          rsync -az --delete \
+            -e "ssh -o StrictHostKeyChecking=accept-new" \
+            infrastructure/keycloak/themes/job-board/ \
+            eelkhair@192.168.1.112:/home/eelkhair/EmailTemplates/job-board/
+
+          echo "Clearing Keycloak gzip cache (writable-layer, survives docker restart)..."
+          ssh eelkhair@192.168.1.112 'docker exec keycloak rm -rf /opt/keycloak/data/tmp/kc-gzip-cache || true'
+
+          echo "Verifying Keycloak still responds..."
+          ssh eelkhair@192.168.1.112 \
+            'until curl -sf http://localhost:9090/realms/job-board/.well-known/openid-configuration -o /dev/null; do sleep 2; done'
+
+          echo "✅ Keycloak theme deployed"
+
+      - name: Purge Cloudflare edge cache for theme resources
+        if: steps.theme.outputs.changed == 'true'
+        continue-on-error: true
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ZONE_ID_TECH: ${{ secrets.CLOUDFLARE_ZONE_ID_TECH }}
+        run: |
+          # Keycloak's resource URL hash rarely changes, and CF caches static JS/CSS
+          # under auth.elkhair.tech/resources/* for 30 days. Purge by hostname so the
+          # next visitor gets the fresh file from origin.
+          # NOTE: the API token must include "Zone.Cache Purge" scope on the
+          # elkhair.tech zone. If it doesn't, CF returns code 10000
+          # "Authentication error". This step is non-fatal — the theme was already
+          # rsynced and gzip cache cleared; CF will just serve stale for up to
+          # 30 days for cached URLs.
+          if [ -z "$CF_API_TOKEN" ] || [ -z "$CF_ZONE_ID_TECH" ]; then
+            echo "⚠️  CF_API_TOKEN or CF_ZONE_ID_TECH not set — skipping Cloudflare purge"
+            exit 0
+          fi
+          RESP=$(curl -sS -X POST \
+            "https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID_TECH}/purge_cache" \
+            -H "Authorization: Bearer ${CF_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data '{"hosts":["auth.elkhair.tech"]}')
+          echo "$RESP"
+          if echo "$RESP" | jq -e '.success == true' >/dev/null; then
+            echo "✅ Cloudflare cache purged"
+          else
+            echo "⚠️  Cloudflare purge failed — token likely missing 'Zone.Cache Purge' scope."
+            echo "    Fix: CF Dashboard → My Profile → API Tokens → edit token, add 'Zone > Cache Purge > Purge' for elkhair.tech."
+            echo "    Theme files are already synced and Keycloak gzip cache cleared, so origin serves the new file;"
+            echo "    CF edge will catch up as its cached entries expire or on manual Dashboard purge."
+          fi

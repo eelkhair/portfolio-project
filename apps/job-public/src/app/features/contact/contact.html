@@ -41,16 +41,55 @@
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">From</label>
-            <div class="truncate rounded-lg border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-700 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200">
-              {{ fromName() }}
-            </div>
+            <label [attr.for]="isGuest() ? 'from-name' : null" class="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">
+              From@if (isGuest()) {<span class="ml-0.5 text-red-500">*</span>}
+            </label>
+            @if (isGuest()) {
+              <input
+                id="from-name"
+                type="text"
+                maxlength="100"
+                formControlName="name"
+                placeholder="Your name"
+                class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
+              />
+              @if (form.controls.name.invalid && form.controls.name.touched) {
+                @if (form.controls.name.errors?.['required']) {
+                  <p class="mt-1 text-xs text-red-600">Name is required.</p>
+                }
+              }
+            } @else {
+              <div class="truncate rounded-lg border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-700 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200">
+                {{ fromName() }}
+              </div>
+            }
           </div>
           <div>
-            <label class="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">Email</label>
-            <div class="truncate rounded-lg border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-700 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200">
-              {{ fromEmail() }}
-            </div>
+            <label [attr.for]="isGuest() ? 'from-email' : null" class="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">
+              Email@if (isGuest()) {<span class="ml-0.5 text-red-500">*</span>}
+            </label>
+            @if (isGuest()) {
+              <input
+                id="from-email"
+                type="email"
+                maxlength="200"
+                autocomplete="email"
+                formControlName="email"
+                placeholder="you@example.com"
+                class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
+              />
+              @if (form.controls.email.invalid && form.controls.email.touched) {
+                @if (form.controls.email.errors?.['required']) {
+                  <p class="mt-1 text-xs text-red-600">Email is required.</p>
+                } @else if (form.controls.email.errors?.['email']) {
+                  <p class="mt-1 text-xs text-red-600">Please enter a valid email.</p>
+                }
+              }
+            } @else {
+              <div class="truncate rounded-lg border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-700 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200">
+                {{ fromEmail() }}
+              </div>
+            }
           </div>
         </div>
 

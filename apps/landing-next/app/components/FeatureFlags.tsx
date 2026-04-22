@@ -3,16 +3,12 @@
 import { createContext, useContext, ReactNode } from "react";
 
 interface FeatureFlags {
-  deepDives: boolean;
   availableBadge: boolean;
-  contactForm: boolean;
   serviceStatus: boolean;
 }
 
 const defaults: FeatureFlags = {
-  deepDives: false,
   availableBadge: false,
-  contactForm: false,
   serviceStatus: false,
 };
 
