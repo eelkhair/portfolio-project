@@ -40,6 +40,9 @@ source "$CONFIG_FILE"
 : "${PVE_API_HOST:?PVE_API_HOST must be set (eg eelkhair2.lan:8006)}"
 : "${PVE_TOKEN_ID:?PVE_TOKEN_ID must be set}"
 : "${PVE_TOKEN_SECRET:?PVE_TOKEN_SECRET must be set}"
+# DEV_VMID is OPTIONAL — unset/empty means "don't touch dev". When set, the
+# watchdog enforces "dev stays off" by calling qm stop after any prod recovery.
+DEV_VMID="${DEV_VMID:-}"
 
 PROBE_URLS="${PROBE_URLS:-http://${PROD_HOST}:6090/ http://${PROD_HOST}:5238/healthzEndpoint http://${PROD_HOST}:5280/healthzEndpoint}"
 PROBE_TIMEOUT="${PROBE_TIMEOUT:-5}"
@@ -48,6 +51,7 @@ SSH_KEY="${SSH_KEY:-/opt/watchdog/.ssh/id_ed25519}"
 KUMA_PUSH_URL="${KUMA_PUSH_URL:-}"
 COOLDOWN_SECS="${COOLDOWN_SECS:-300}"
 COMPOSE_DIR="${COMPOSE_DIR:-/home/${SSH_USER}}"
+COMPOSE_PROJECT="${COMPOSE_PROJECT:-job-board}"
 
 mkdir -p "$STATE_DIR"
 
@@ -152,6 +156,28 @@ wait_for_ssh() {
   done
 }
 
+# Enforce "dev stays off" policy — called after any prod recovery.
+# If DEV_VMID is unset, no-op. If dev is already stopped, no-op. Otherwise
+# hard-stops dev via PVE API so it can't compete for cluster resources.
+ensure_dev_stopped() {
+  [[ -z "$DEV_VMID" ]] && return 0
+  local status
+  status=$(get_vm_status "$DEV_VMID")
+  if [[ "$status" == "stopped" ]]; then
+    log "dev VM ${DEV_VMID} already stopped — policy OK"
+    return 0
+  fi
+  log "policy: stopping dev VM ${DEV_VMID} (was ${status})"
+  kuma down "policy: stop dev VMID=${DEV_VMID} (was ${status})"
+  local code
+  code=$(pve_post "/nodes/${PROD_NODE}/qemu/${DEV_VMID}/status/stop")
+  if [[ "$code" =~ ^2 ]]; then
+    log "dev stop: PVE returned HTTP ${code}"
+  else
+    log "dev stop: PVE returned HTTP ${code} — body: $(cat /tmp/pve.out 2>/dev/null | head -c 300)"
+  fi
+}
+
 # Wait for SSH, then ensure the docker compose stack is up. Idempotent —
 # `up -d` is a no-op when everything is already running with correct state.
 post_vm_up() {
@@ -162,7 +188,7 @@ post_vm_up() {
   fi
   if wait_for_ssh "$PROD_HOST" 180; then
     log "SSH up, running docker compose up -d"
-    if ssh_exec "$PROD_HOST" "cd ${COMPOSE_DIR} && docker compose up -d"; then
+    if ssh_exec "$PROD_HOST" "cd ${COMPOSE_DIR} && docker compose -p ${COMPOSE_PROJECT} up -d"; then
       log "compose up -d: OK"
     else
       log "compose up -d: FAILED (next tick will re-evaluate)"
@@ -215,7 +241,7 @@ action_l1_restart_or_start() {
   if [[ "$status" == "running" ]]; then
     log "L1: docker compose up -d on ${PROD_HOST}"
     kuma down "L1 docker compose up -d on ${PROD_HOST}"
-    if ssh_exec "$PROD_HOST" "cd ${COMPOSE_DIR} && docker compose up -d"; then
+    if ssh_exec "$PROD_HOST" "cd ${COMPOSE_DIR} && docker compose -p ${COMPOSE_PROJECT} up -d"; then
       log "L1: compose up -d returned OK"
     else
       log "L1: compose up -d FAILED (SSH or compose error)"
@@ -227,6 +253,7 @@ action_l1_restart_or_start() {
     code=$(pve_post "/nodes/${PROD_NODE}/qemu/${PROD_VMID}/status/start")
     if [[ "$code" =~ ^2 ]]; then
       log "L1: PVE start returned HTTP ${code}"
+      ensure_dev_stopped
       post_vm_up
     else
       log "L1: PVE start returned HTTP ${code} — body: $(cat /tmp/pve.out 2>/dev/null | head -c 300)"
@@ -250,6 +277,7 @@ action_l2_vm_reboot() {
   code=$(pve_post "/nodes/${PROD_NODE}/qemu/${PROD_VMID}/status/${endpoint}")
   if [[ "$code" =~ ^2 ]]; then
     log "L2: PVE returned HTTP ${code} (task accepted)"
+    ensure_dev_stopped
     post_vm_up
   else
     log "L2: PVE returned HTTP ${code} — body: $(cat /tmp/pve.out 2>/dev/null | head -c 300)"
