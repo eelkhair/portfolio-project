@@ -130,40 +130,135 @@ ssh_exec() {
     "${SSH_USER}@${host}" "$@"
 }
 
-action_l1_docker_restart() {
-  log "L1: docker compose restart on ${PROD_HOST}"
-  kuma down "L1 docker compose restart on ${PROD_HOST}"
-  if ssh_exec "$PROD_HOST" "cd ${COMPOSE_DIR} && docker compose restart"; then
-    log "L1: restart command returned OK"
+# Poll SSH until it accepts a connection or the deadline passes.
+wait_for_ssh() {
+  local host="$1"
+  local max_secs="${2:-180}"
+  local start now_ts
+  start=$(now)
+  while :; do
+    now_ts=$(now)
+    if (( now_ts - start >= max_secs )); then
+      return 1
+    fi
+    if ssh -i "$SSH_KEY" \
+        -o StrictHostKeyChecking=accept-new \
+        -o ConnectTimeout=5 \
+        -o BatchMode=yes \
+        "${SSH_USER}@${host}" 'true' 2>/dev/null; then
+      return 0
+    fi
+    sleep 5
+  done
+}
+
+# Wait for SSH, then ensure the docker compose stack is up. Idempotent —
+# `up -d` is a no-op when everything is already running with correct state.
+post_vm_up() {
+  log "waiting up to 180s for SSH on ${PROD_HOST}..."
+  if [[ "$DRY_RUN" == "1" ]]; then
+    log "DRY-RUN: would wait for SSH and run docker compose up -d"
+    return 0
+  fi
+  if wait_for_ssh "$PROD_HOST" 180; then
+    log "SSH up, running docker compose up -d"
+    if ssh_exec "$PROD_HOST" "cd ${COMPOSE_DIR} && docker compose up -d"; then
+      log "compose up -d: OK"
+    else
+      log "compose up -d: FAILED (next tick will re-evaluate)"
+    fi
   else
-    log "L1: restart command FAILED (SSH or compose error)"
+    log "SSH did not come up within 180s — next tick will reprobe"
   fi
 }
 
-action_l2_vm_reboot() {
-  log "L2: qm reboot ${PROD_VMID} on node ${PROD_NODE}"
-  kuma down "L2 qm reboot vmid=${PROD_VMID} node=${PROD_NODE}"
-  local url="https://${PVE_API_HOST}/api2/json/nodes/${PROD_NODE}/qemu/${PROD_VMID}/status/reboot"
+# PVE API POST helper — returns HTTP code, body goes to /tmp/pve.out.
+# --insecure because Proxmox ships with a self-signed cert by default.
+pve_post() {
+  local path="$1"
+  local url="https://${PVE_API_HOST}/api2/json${path}"
   if [[ "$DRY_RUN" == "1" ]]; then
     log "DRY-RUN: POST $url"
+    echo "200"
     return 0
   fi
-  # --insecure — Proxmox installs ship with a self-signed cert by default.
-  # Operator can install a CA cert and drop --insecure later.
-  local code
-  code=$(curl -sS --insecure -o /tmp/pve-reboot.out -w '%{http_code}' \
+  curl -sS --insecure -o /tmp/pve.out -w '%{http_code}' \
     -X POST "$url" \
-    -H "Authorization: PVEAPIToken=${PVE_TOKEN_ID}=${PVE_TOKEN_SECRET}" || echo 000)
+    -H "Authorization: PVEAPIToken=${PVE_TOKEN_ID}=${PVE_TOKEN_SECRET}" \
+    2>/dev/null || echo "000"
+}
+
+pve_get() {
+  local path="$1"
+  local url="https://${PVE_API_HOST}/api2/json${path}"
+  curl -sS --insecure \
+    -H "Authorization: PVEAPIToken=${PVE_TOKEN_ID}=${PVE_TOKEN_SECRET}" \
+    "$url" 2>/dev/null
+}
+
+# Returns "running" | "stopped" | "paused" | "unknown".
+get_vm_status() {
+  local vmid="$1"
+  local json
+  json=$(pve_get "/nodes/${PROD_NODE}/qemu/${vmid}/status/current")
+  printf '%s' "$json" | jq -r '.data.qmpstatus // .data.status // "unknown"' 2>/dev/null || echo "unknown"
+}
+
+# L1: first-try recovery — state-aware.
+#   VM running & unhealthy  → docker compose up -d (containers bad, VM fine)
+#   VM stopped/paused/etc.  → qm start + wait for SSH + docker compose up -d
+action_l1_restart_or_start() {
+  local status
+  status=$(get_vm_status "$PROD_VMID")
+  log "L1: prod VM ${PROD_VMID} status=${status}"
+
+  if [[ "$status" == "running" ]]; then
+    log "L1: docker compose up -d on ${PROD_HOST}"
+    kuma down "L1 docker compose up -d on ${PROD_HOST}"
+    if ssh_exec "$PROD_HOST" "cd ${COMPOSE_DIR} && docker compose up -d"; then
+      log "L1: compose up -d returned OK"
+    else
+      log "L1: compose up -d FAILED (SSH or compose error)"
+    fi
+  else
+    log "L1: starting stopped VM via PVE API"
+    kuma down "L1 qm start vmid=${PROD_VMID} (was ${status})"
+    local code
+    code=$(pve_post "/nodes/${PROD_NODE}/qemu/${PROD_VMID}/status/start")
+    if [[ "$code" =~ ^2 ]]; then
+      log "L1: PVE start returned HTTP ${code}"
+      post_vm_up
+    else
+      log "L1: PVE start returned HTTP ${code} — body: $(cat /tmp/pve.out 2>/dev/null | head -c 300)"
+    fi
+  fi
+}
+
+# L2: harder recovery — force a VM reboot (or start if it's already stopped
+# because L1 didn't stick). In both cases, follow up with compose up -d.
+action_l2_vm_reboot() {
+  local status
+  status=$(get_vm_status "$PROD_VMID")
+  log "L2: prod VM ${PROD_VMID} status=${status}"
+
+  local endpoint="reboot"
+  [[ "$status" != "running" ]] && endpoint="start"
+
+  log "L2: qm ${endpoint} ${PROD_VMID} on node ${PROD_NODE}"
+  kuma down "L2 qm ${endpoint} vmid=${PROD_VMID} node=${PROD_NODE}"
+  local code
+  code=$(pve_post "/nodes/${PROD_NODE}/qemu/${PROD_VMID}/status/${endpoint}")
   if [[ "$code" =~ ^2 ]]; then
     log "L2: PVE returned HTTP ${code} (task accepted)"
+    post_vm_up
   else
-    log "L2: PVE returned HTTP ${code} — body: $(cat /tmp/pve-reboot.out 2>/dev/null | head -c 300)"
+    log "L2: PVE returned HTTP ${code} — body: $(cat /tmp/pve.out 2>/dev/null | head -c 300)"
   fi
 }
 
 action_l3_dev_poweroff_then_retry() {
   log "L3: poweroff ${DEV_HOST} (free cluster RAM), then retry L2"
-  kuma down "L3 poweroff dev=${DEV_HOST}, retry qm reboot prod"
+  kuma down "L3 poweroff dev=${DEV_HOST}, retry L2"
   ssh_exec "$DEV_HOST" "sudo -n poweroff" || log "L3: dev poweroff SSH failed (continuing)"
   sleep 10
   action_l2_vm_reboot
@@ -177,7 +272,7 @@ load_state
 if [[ -n "${FORCE_LEVEL:-}" ]]; then
   log "FORCE_LEVEL=${FORCE_LEVEL} (verification run)"
   case "$FORCE_LEVEL" in
-    1) action_l1_docker_restart ;;
+    1) action_l1_restart_or_start ;;
     2) action_l2_vm_reboot ;;
     3) action_l3_dev_poweroff_then_retry ;;
     *) echo "FORCE_LEVEL must be 1, 2, or 3" >&2; exit 2 ;;
@@ -214,31 +309,28 @@ if (( last_action_level > 0 && since_last_action < COOLDOWN_SECS )); then
   exit 0
 fi
 
-case "$fail_count" in
-  3)
-    action_l1_docker_restart
-    last_action_ts="$ts_now"
-    last_action_level=1
-    save_state
-    ;;
-  5)
-    action_l2_vm_reboot
-    last_action_ts="$ts_now"
-    last_action_level=2
-    save_state
-    ;;
-  8)
-    action_l3_dev_poweroff_then_retry
-    last_action_ts="$ts_now"
-    last_action_level=3
-    save_state
-    ;;
-  *)
-    if (( fail_count >= 10 )); then
-      log "max escalation reached (fail_count=${fail_count}); logging only"
-      kuma down "prod still down after all escalations; DNS failover should have triggered"
-    else
-      log "debounce (fail_count=${fail_count}, next threshold at 3/5/8)"
-    fi
-    ;;
-esac
+# Escalation: each level fires once, then cooldown blocks the next until
+# enough time has passed. Use >= with last_action_level tracking so a
+# counter that climbed past a threshold during cooldown still escalates
+# correctly (instead of getting skipped by an exact-match).
+if (( fail_count >= 8 && last_action_level < 3 )); then
+  action_l3_dev_poweroff_then_retry
+  last_action_ts="$ts_now"
+  last_action_level=3
+  save_state
+elif (( fail_count >= 5 && last_action_level < 2 )); then
+  action_l2_vm_reboot
+  last_action_ts="$ts_now"
+  last_action_level=2
+  save_state
+elif (( fail_count >= 3 && last_action_level < 1 )); then
+  action_l1_restart_or_start
+  last_action_ts="$ts_now"
+  last_action_level=1
+  save_state
+elif (( fail_count >= 10 )); then
+  log "max escalation reached (fail_count=${fail_count}); logging only"
+  kuma down "prod still down after all escalations; DNS failover should have triggered"
+else
+  log "debounce (fail_count=${fail_count}, thresholds at 3/5/8)"
+fi

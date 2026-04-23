@@ -7,6 +7,9 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 ExecStart=/opt/watchdog/check.sh
+# A recovery tick can spend ~3 min waiting for a rebooted VM's SSH to come
+# up + run `docker compose up -d`. Default 90s would kill the tick mid-wait.
+TimeoutStartSec=300
 # Lock down a bit — script only needs network + /var/lib/watchdog
 ProtectSystem=strict
 ReadWritePaths=/var/lib/watchdog /tmp
