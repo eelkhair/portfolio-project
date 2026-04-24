@@ -4,6 +4,8 @@ import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 import { BookIcon, GitHubIcon, LinkedInIcon } from "./components/Icons";
 import { aboutCards, experienceItems, skillCategories } from "./data/home-data";
+import { testimonials } from "./data/testimonials";
+import { TestimonialsCarousel } from "./components/TestimonialsCarousel";
 import { AvailableBadge } from "./components/AvailableBadge";
 import { ContactNavLink } from "./components/ContactGate";
 
@@ -14,6 +16,7 @@ const homeNavLinks = [
   { href: "#about", label: "About" },
   { href: "#experience", label: "Experience" },
   { href: "#skills", label: "Skills" },
+  { href: "#recommendations", label: "Recommendations" },
   { href: "#education", label: "Education" },
   { href: "/portfolio", label: "Portfolio" },
 ];
@@ -115,6 +118,25 @@ export default function Home() {
               </div>
             ))}
           </div>
+        </section>
+
+        {/* Recommendations */}
+        <section id="recommendations" aria-labelledby="recommendations-heading">
+          <p className="section-title">Recommendations</p>
+          <h2 id="recommendations-heading">What people I&apos;ve worked with say</h2>
+          <p className="section-text mb-5">
+            Endorsements from engineers, architects, and leaders I&apos;ve shipped with &mdash; spanning 2019 to 2025. A few highlights below.
+          </p>
+          <TestimonialsCarousel testimonials={testimonials} />
+          <p className="section-meta mt-3">
+            <a
+              href="https://www.linkedin.com/in/elkhair-elkhair/details/recommendations/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              See all recommendations on LinkedIn &rarr;
+            </a>
+          </p>
         </section>
 
         {/* Portfolio CTA */}
