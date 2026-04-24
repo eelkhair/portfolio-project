@@ -59,7 +59,7 @@ export function TestimonialsCarousel({ testimonials }: { testimonials: Testimoni
         autoplay={
           reducedMotion
             ? false
-            : { delay: 6000, disableOnInteraction: false, pauseOnMouseEnter: true }
+            : { delay: 10000, disableOnInteraction: false, pauseOnMouseEnter: true }
         }
         pagination={{ el: ".testimonials-pagination", clickable: true }}
         keyboard={{ enabled: true }}
