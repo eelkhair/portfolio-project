@@ -17,6 +17,8 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
+const PRIORITY_NAMES = new Set(["Mike Douglas", "Moe Elatta", "David Paul"]);
+
 type Testimonial = {
   quote: string;
   name: string;
@@ -31,7 +33,9 @@ export function TestimonialsCarousel({ testimonials }: { testimonials: Testimoni
   const [items, setItems] = useState(testimonials);
 
   useEffect(() => {
-    setItems(shuffle(testimonials));
+    const priority = testimonials.filter((t) => PRIORITY_NAMES.has(t.name));
+    const rest = testimonials.filter((t) => !PRIORITY_NAMES.has(t.name));
+    setItems([...shuffle(priority), ...shuffle(rest)]);
   }, [testimonials]);
 
   const reducedMotion =
