@@ -187,7 +187,10 @@ async function flipDns(env: Env, target: Mode): Promise<void> {
 // ── State machine ────────────────────────────────────────────────────────
 
 async function tick(env: Env): Promise<State> {
-  const state = await loadState(env);
+  const loaded = await loadState(env);
+  // Deep-copy so we can compare before/after and only write on real changes.
+  // KV free tier is 1000 writes/day; writing every tick (1440/day) exhausts it.
+  const state: State = { ...loaded };
   const probeOk = await probePublic(env);
   const failThreshold = parseInt(env.FAIL_THRESHOLD, 10);
   const successThreshold = parseInt(env.SUCCESS_THRESHOLD, 10);
@@ -217,6 +220,15 @@ async function tick(env: Env): Promise<State> {
     }
   }
 
+  // Persist only when counters or mode actually changed.
+  const persistIfDirty = async (): Promise<void> => {
+    if (JSON.stringify(state) !== JSON.stringify(loaded)) {
+      await saveState(env, state);
+    } else {
+      console.log("no state change — skipping KV write");
+    }
+  };
+
   // Failover: tunnel → pages.
   if (state.mode === "tunnel" && state.consecutive_failures >= failThreshold) {
     console.log("FAILOVER: flipping to pages");
@@ -225,7 +237,7 @@ async function tick(env: Env): Promise<State> {
     state.last_flip = new Date().toISOString();
     state.consecutive_failures = 0;
     state.consecutive_successes = 0;
-    await saveState(env, state);
+    await saveState(env, state); // definite state change — always write
     return state;
   }
 
@@ -241,13 +253,13 @@ async function tick(env: Env): Promise<State> {
           lastFlipSecs
         )}s < ${hysteresisSecs}s)`
       );
-      await saveState(env, state);
+      await persistIfDirty();
       return state;
     }
     const tunnelOk = await probeTunnelDirect(env);
     if (!tunnelOk) {
       console.log("recovery pending: tunnel-direct probe failed, waiting");
-      await saveState(env, state);
+      await persistIfDirty();
       return state;
     }
     console.log("RECOVERY: flipping back to tunnel");
@@ -256,11 +268,11 @@ async function tick(env: Env): Promise<State> {
     state.last_flip = new Date().toISOString();
     state.consecutive_failures = 0;
     state.consecutive_successes = 0;
-    await saveState(env, state);
+    await saveState(env, state); // definite state change — always write
     return state;
   }
 
-  await saveState(env, state);
+  await persistIfDirty();
   return state;
 }
 
