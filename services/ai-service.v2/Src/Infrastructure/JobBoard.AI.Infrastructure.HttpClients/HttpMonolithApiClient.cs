@@ -52,6 +52,38 @@ public class HttpMonolithApiClient(
         }
     }
 
+    public async Task<DemoCompanyCreatedResponse> CreateDemoCompanyAsync(CreateDemoCompanyRequest cmd, CancellationToken ct)
+    {
+        try
+        {
+            var response = await client.PostAsJsonAsync("api/demo/companies", cmd, JsonOpts, ct);
+            response.EnsureSuccessStatusCode();
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<DemoCompanyCreatedResponse>>(JsonOpts, ct);
+            return result!.Data!;
+        }
+        catch (HttpRequestException ex)
+        {
+            logger.LogError(ex, "Error creating demo company in monolith-api");
+            throw;
+        }
+    }
+
+    public async Task<List<IndustryDto>> ListDemoIndustriesAsync(CancellationToken ct)
+    {
+        try
+        {
+            var response = await client.GetAsync("api/demo/industries", ct);
+            response.EnsureSuccessStatusCode();
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<List<IndustryDto>>>(JsonOpts, ct);
+            return result?.Data ?? [];
+        }
+        catch (HttpRequestException ex)
+        {
+            logger.LogError(ex, "Error listing demo industries from monolith-api");
+            throw;
+        }
+    }
+
     public async Task<CompanyDto> UpdateCompanyAsync(Guid companyId, UpdateCompanyCommand cmd, CancellationToken ct)
     {
         try

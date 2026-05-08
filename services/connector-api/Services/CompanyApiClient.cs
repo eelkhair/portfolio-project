@@ -2,6 +2,7 @@ using System.Diagnostics;
 using ConnectorAPI.Interfaces.Clients;
 using ConnectorAPI.Models.CompanyCreated;
 using ConnectorAPI.Models.CompanyUpdated;
+using ConnectorAPI.Models.DemoCompany;
 using Dapr.Client;
 
 namespace ConnectorAPI.Services;
@@ -24,6 +25,27 @@ public class CompanyApiClient(DaprClient client, ActivitySource activitySource, 
         logger.LogInformation("Sending company updated event to company-api for {CompanyUId}", companyUId);
         var message = client.CreateInvokeMethodRequest(HttpMethod.Put, "company-api", $"api/companies/{companyUId}");
         message.Headers.Add("X-Sync-Source", "forward");
+        message.Content = JsonContent.Create(payload);
+        return client.InvokeMethodAsync(message, cancellationToken);
+    }
+
+    public Task DeleteCompanyAsync(Guid companyUId, CancellationToken cancellationToken)
+    {
+        using var activity = activitySource.StartActivity("company-api.DeleteCompanyAsync");
+        activity?.SetTag("company.uid", companyUId);
+        logger.LogInformation("Deleting demo company {CompanyUId} from company-api", companyUId);
+        var message = client.CreateInvokeMethodRequest(HttpMethod.Delete, "company-api", $"api/companies/{companyUId}");
+        message.Headers.Add("X-Sync-Source", "demo-cleanup");
+        return client.InvokeMethodAsync(message, cancellationToken);
+    }
+
+    public Task ClaimCompanyAsync(Guid companyUId, DemoCompanyClaimedPayload payload, CancellationToken cancellationToken)
+    {
+        using var activity = activitySource.StartActivity("company-api.ClaimCompanyAsync");
+        activity?.SetTag("company.uid", companyUId);
+        logger.LogInformation("Repointing demo company {CompanyUId} admin in company-api", companyUId);
+        var message = client.CreateInvokeMethodRequest(HttpMethod.Post, "company-api", $"api/companies/{companyUId}/claim");
+        message.Headers.Add("X-Sync-Source", "demo-claim");
         message.Content = JsonContent.Create(payload);
         return client.InvokeMethodAsync(message, cancellationToken);
     }

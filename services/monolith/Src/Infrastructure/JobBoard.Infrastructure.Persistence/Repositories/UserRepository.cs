@@ -39,4 +39,16 @@ public class UserRepository(IJobBoardQueryDbContext context) : BaseRepository(co
     {
         return await Context.Users.AnyAsync(x => EF.Property<DateTime>(x, "PeriodEnd") == DateTime.MaxValue && x.Email == email, ct);
     }
+
+    public Task DeleteAsync(User user, CancellationToken cancellationToken)
+    {
+        Context.Users.Remove(user);
+        return Task.CompletedTask;
+    }
+
+    public Task DeleteCompanyUser(UserCompany companyUser, CancellationToken cancellationToken)
+    {
+        Context.UserCompanies.Remove(companyUser);
+        return Task.CompletedTask;
+    }
 }

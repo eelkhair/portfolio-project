@@ -20,4 +20,7 @@ public interface IMonolithClient
         Guid companyId,
         string userId,
         CancellationToken cancellationToken);
+
+    /// <summary>Hard-delete a demo company row in the monolith after all microservices have torn down.</summary>
+    Task DeleteDemoCompanyAsync(Guid companyUId, CancellationToken cancellationToken);
 }

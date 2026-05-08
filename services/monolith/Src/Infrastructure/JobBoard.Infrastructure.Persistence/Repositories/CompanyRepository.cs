@@ -44,4 +44,10 @@ public class CompanyRepository(IJobBoardQueryDbContext context) : BaseRepository
     {
         return await Context.Companies.FirstAsync(c => c.Id == companyUId, cancellationToken);
     }
+
+    public Task DeleteAsync(Company company, CancellationToken cancellationToken)
+    {
+        Context.Companies.Remove(company);
+        return Task.CompletedTask;
+    }
 }

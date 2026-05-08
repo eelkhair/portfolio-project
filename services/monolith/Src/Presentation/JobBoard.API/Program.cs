@@ -1,5 +1,6 @@
 using Elkhair.Common.Observability;
 using Elkhair.Common.Persistence;
+using JobBoard.API.BackgroundServices;
 using JobBoard.API.Infrastructure;
 using JobBoard.API.Infrastructure.Authorization;
 using JobBoard.API.Infrastructure.OpenApi;
@@ -70,6 +71,8 @@ builder.Services
     .AddConfiguredSwagger(builder.Configuration)
     .AddDiagnosticsServices(builder.Configuration, "monolith-api")
     .AddSignalR();
+
+builder.Services.AddHostedService<DemoCompanySweeperService>();
 
 var app = builder.Build();
 

@@ -21,7 +21,12 @@ public abstract class BaseApiClient(DaprClient client, IUserAccessor accessor, I
             appId: serviceName,
             methodName: path);
 
-        request.Headers.TryAddWithoutValidation("Authorization", token);
+        // Only forward Authorization when we actually have a token. Sending an empty
+        // header makes the monolith's JWT middleware reject the request with an empty
+        // body, which the JSON deserializer downstream then chokes on with
+        // "The input does not contain any JSON tokens" — even on [AllowAnonymous] routes.
+        if (hasToken)
+            request.Headers.TryAddWithoutValidation("Authorization", token);
         return request;
     }
 }

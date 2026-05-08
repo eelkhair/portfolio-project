@@ -17,4 +17,6 @@ public sealed record CompanyInput(
     string? Size = null,
     string? ExternalId = null,
     DateTime? CreatedAt = null,
-    string? CreatedBy = null);
+    string? CreatedBy = null,
+    bool IsDemo = false,
+    DateTime? DemoExpiresAt = null);

@@ -37,6 +37,9 @@ public class Company : BaseAuditableEntity
     public int IndustryId { get; private set; }
     public Industry Industry { get; private set; } = null!;
 
+    public bool IsDemo { get; private set; }
+    public DateTime? DemoExpiresAt { get; private set; }
+
 
     private readonly List<Job> _jobs = [];
     public IReadOnlyCollection<Job> Jobs => _jobs.AsReadOnly();
@@ -103,6 +106,18 @@ public class Company : BaseAuditableEntity
         IndustryId = industryId;
     }
 
+    public void MarkAsDemo(DateTime expiresAt)
+    {
+        IsDemo = true;
+        DemoExpiresAt = expiresAt;
+    }
+
+    public void ClearDemoFlag()
+    {
+        IsDemo = false;
+        DemoExpiresAt = null;
+    }
+
 
     public static Company Create(CompanyInput input)
     {
@@ -110,6 +125,8 @@ public class Company : BaseAuditableEntity
         company.SetIndustry(input.IndustryId);
         company.InternalId = input.InternalId;
         company.Id = input.Id;
+        company.IsDemo = input.IsDemo;
+        company.DemoExpiresAt = input.DemoExpiresAt;
         EntityFactory.ApplyAudit(company, input.CreatedAt, input.CreatedBy);
         return company;
     }

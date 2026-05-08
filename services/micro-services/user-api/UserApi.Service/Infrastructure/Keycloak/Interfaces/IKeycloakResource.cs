@@ -17,4 +17,9 @@ public interface IKeycloakResource
     Task<KeycloakGroup?> FindGroupByNameAsync(string name, CancellationToken ct);
     Task<KeycloakUser?> FindUserByEmailAsync(string email, CancellationToken ct);
     Task<ApiResponse<bool>> SendVerifyEmailAsync(string userId, CancellationToken ct);
+
+    Task<ApiResponse<bool>> DeleteUserAsync(string userId, CancellationToken ct);
+    Task<ApiResponse<bool>> DeleteGroupAsync(string groupId, CancellationToken ct);
+    Task<ApiResponse<bool>> RemoveUserFromGroupAsync(string userId, string groupId, CancellationToken ct);
+    Task<List<KeycloakUser>> GetGroupMembersAsync(string groupId, CancellationToken ct);
 }

@@ -5,6 +5,7 @@ export interface FeatureFlagsDto {
 export interface FeatureFlags {
   availableBadge: boolean;
   serviceStatus: boolean;
+  demoChat: boolean;
 }
 
 const FLAG_URL = process.env.FEATURE_FLAGS_URL || "http://localhost:5280/api/public/feature-flags";
@@ -12,6 +13,7 @@ const FLAG_URL = process.env.FEATURE_FLAGS_URL || "http://localhost:5280/api/pub
 const defaults: FeatureFlags = {
   availableBadge: false,
   serviceStatus: false,
+  demoChat: true,
 };
 
 export async function fetchFeatureFlags(): Promise<FeatureFlags> {
@@ -25,6 +27,7 @@ export async function fetchFeatureFlags(): Promise<FeatureFlags> {
     const flags: FeatureFlags = {
       availableBadge: normalized["availablebadge"] ?? defaults.availableBadge,
       serviceStatus: normalized["servicestatus"] ?? defaults.serviceStatus,
+      demoChat: normalized["demochat"] ?? defaults.demoChat,
     };
     console.log("[FeatureFlags] fetched:", flags);
     return flags;

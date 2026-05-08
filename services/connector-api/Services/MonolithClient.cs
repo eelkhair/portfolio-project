@@ -89,6 +89,20 @@ public class MonolithOClient(HttpClient httpClient, ActivitySource activitySourc
         return await GetAsync<CompanyUpdateCompanyResult>(companyRoute, userId, cancellationToken);
     }
 
+    public async Task DeleteDemoCompanyAsync(Guid companyUId, CancellationToken cancellationToken)
+    {
+        using var activity = activitySource.StartActivity("monolith.DeleteDemoCompany");
+        activity?.SetTag("company.uid", companyUId.ToString());
+        logger.LogInformation("Hard-deleting demo company {CompanyUId} in the monolith", companyUId);
+
+        using var request = new HttpRequestMessage(HttpMethod.Delete, $"api/demo/companies/{companyUId}/internal");
+        var response = await httpClient.SendAsync(request, cancellationToken);
+
+        // Idempotent: a 404 means somebody else already deleted it (concurrent sweep run).
+        if (response.StatusCode is System.Net.HttpStatusCode.NotFound) return;
+        response.EnsureSuccessStatusCode();
+    }
+
     private async Task<T> GetAsync<T>(string route, string userId, CancellationToken cancellationToken)
     {
         using var request = new HttpRequestMessage(HttpMethod.Get, route);
@@ -96,8 +110,39 @@ public class MonolithOClient(HttpClient httpClient, ActivitySource activitySourc
             request.Headers.TryAddWithoutValidation("x-user-id", userId);
 
         var response = await httpClient.SendAsync(request, cancellationToken);
-        response.EnsureSuccessStatusCode();
 
-        return (await response.Content.ReadFromJsonAsync<T>(JsonOpts, cancellationToken))!;
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorBody = await response.Content.ReadAsStringAsync(cancellationToken);
+            logger.LogError(
+                "Monolith GET {Route} returned {Status}: {Body}",
+                route, (int)response.StatusCode, errorBody);
+            response.EnsureSuccessStatusCode();
+        }
+
+        // ReadFromJsonAsync on an empty body throws the unhelpful
+        // "The input does not contain any JSON tokens" exception. Read the raw body
+        // first so we can produce an error that names the failing route, and bail
+        // cleanly on 204 / empty / null payloads.
+        var body = await response.Content.ReadAsStringAsync(cancellationToken);
+        if (string.IsNullOrWhiteSpace(body) || string.Equals(body, "null", StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                $"Monolith GET {route} returned an empty body (status={(int)response.StatusCode}). " +
+                "Likely the requested entity is filtered out (e.g. demo company hidden from non-internal callers) " +
+                "or the OData query handler returned null.");
+        }
+
+        try
+        {
+            return JsonSerializer.Deserialize<T>(body, JsonOpts)!;
+        }
+        catch (JsonException ex)
+        {
+            logger.LogError(ex,
+                "Monolith GET {Route} returned non-JSON body (status={Status}): {Body}",
+                route, (int)response.StatusCode, body[..Math.Min(body.Length, 500)]);
+            throw;
+        }
     }
 }

@@ -11,6 +11,8 @@ public interface IMonolithApiClient
 {
     Task<ODataResponse<List<CompanyDto>>> ListCompaniesAsync(CancellationToken cancellationToken = default);
     Task<CompanyDto> CreateCompanyAsync(CreateCompanyCommand cmd, CancellationToken ct);
+    Task<DemoCompanyCreatedResponse> CreateDemoCompanyAsync(CreateDemoCompanyRequest cmd, CancellationToken ct);
+    Task<List<IndustryDto>> ListDemoIndustriesAsync(CancellationToken ct);
     Task<CompanyDto> UpdateCompanyAsync(Guid companyId, UpdateCompanyCommand cmd, CancellationToken ct);
     Task<ODataResponse<List<IndustryDto>>> ListIndustriesAsync(CancellationToken ct);
     Task<ApiResponse<object>> CreateJobAsync(object cmd, CancellationToken ct);
@@ -85,6 +87,23 @@ public class CreateCompanyCommand
     public string AdminFirstName { get; set; } = string.Empty;
     public string AdminLastName { get; set; } = string.Empty;
     public string AdminEmail { get; set; } = string.Empty;
+}
+
+public class CreateDemoCompanyRequest
+{
+    public string Name { get; set; } = string.Empty;
+    public Guid? IndustryUId { get; set; }
+    public string? IndustryHint { get; set; }
+    public string? AdminFirstName { get; set; }
+    public string? AdminLastName { get; set; }
+}
+
+public class DemoCompanyCreatedResponse
+{
+    public CompanyDto Company { get; set; } = null!;
+    public DateTime DemoExpiresAt { get; set; }
+    public string ClaimToken { get; set; } = string.Empty;
+    public string TraceId { get; set; } = string.Empty;
 }
 
 public class UpdateCompanyCommand

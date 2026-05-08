@@ -34,6 +34,9 @@ public class CreateCompanyCommand : BaseCommand<CompanyDto>
     [Required]
     [EmailAddress]
     public string AdminEmail { get; set; } = string.Empty;
+
+    public bool IsDemo { get; set; }
+    public DateTime? DemoExpiresAt { get; set; }
 }
 
 public class CreateCompanyCommandHandler(IHandlerContext context

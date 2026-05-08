@@ -46,4 +46,23 @@ public partial class CompanyCommandService(IJobDbContext context, ILogger<Compan
 
     [LoggerMessage(LogLevel.Information, "Company updated: {CompanyUId}")]
     static partial void LogCompanyUpdated(ILogger logger, Guid companyUId);
+
+    public async Task DeleteCompanyAsync(Guid companyUId, ClaimsPrincipal user, CancellationToken ct)
+    {
+        var company = await context.Companies.SingleOrDefaultAsync(c => c.UId == companyUId, ct);
+        if (company is null)
+        {
+            logger.LogInformation("job-api Company {CompanyUId} not found — already deleted", companyUId);
+            return;
+        }
+
+        // Delete dependent jobs first so FK constraints don't fail.
+        var jobs = await context.Jobs.Where(j => j.CompanyId == company.Id).ToListAsync(ct);
+        if (jobs.Count > 0) context.Jobs.RemoveRange(jobs);
+
+        context.Companies.Remove(company);
+        await context.SaveChangesAsync(user, ct);
+
+        logger.LogInformation("Deleted job-api company {CompanyUId} + {JobCount} job(s)", companyUId, jobs.Count);
+    }
 }

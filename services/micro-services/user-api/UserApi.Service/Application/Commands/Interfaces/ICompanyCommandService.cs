@@ -7,4 +7,7 @@ public interface ICompanyCommandService
     Task<int> CreateUser(CreateUserRequest request, string userId, CancellationToken ct);
     Task<int> CreateCompany(CreateCompanyRequest request, string userId, CancellationToken ct);
     Task AddUserToCompany(int userId, int companyId, string createdBy, Guid? userCompanyUId, CancellationToken ct);
+    Task DeleteCompanyAsync(Guid companyUId, string userId, CancellationToken ct);
+    Task RepointAdminAsync(Guid companyUId, string newAdminEmail, string newAdminFirstName,
+        string newAdminLastName, Guid newAdminUId, string userId, CancellationToken ct);
 }

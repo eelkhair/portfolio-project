@@ -55,7 +55,11 @@ public sealed class ChatOptionsFactory(
         ["find_matching_jobs"] = "public",
         ["search_jobs"] = "public",
         ["get_similar_jobs"] = "public",
-        ["get_job_detail"] = "public"
+        ["get_job_detail"] = "public",
+
+        // Demo group — landing-page chatbot
+        ["create_demo_company"] = "demo",
+        ["list_industries"] = "demo"
     };
 
     public ChatOptions Create(IServiceProvider sp, ChatScope scope, string userMessage,
@@ -201,6 +205,11 @@ public sealed class ChatOptionsFactory(
 
                     return allTools;
                 }
+
+            case ChatScope.Demo:
+                return sp.GetRequiredKeyedService<IAiTools>("demo-ai")
+                    .GetTools()
+                    .ToList();
 
             default:
                 return [];

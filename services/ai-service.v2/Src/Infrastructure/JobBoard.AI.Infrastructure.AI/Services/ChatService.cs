@@ -56,7 +56,18 @@ public class ChatService(
         "search_jobs",
         "draft_list",
         "drafts_by_company",
-        "system_info"
+        "system_info",
+        "create_demo_company"
+    };
+
+    /// <summary>
+    /// Tools that always short-circuit to <see cref="ChatResponse.ToolResults"/> regardless
+    /// of <see cref="IsListIntent"/> — used when the UI needs the structured payload to
+    /// render its own success state (e.g. demo widget surfacing claim token + trace links).
+    /// </summary>
+    private static readonly HashSet<string> AlwaysDirectReturnTools = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "create_demo_company"
     };
 
     /// <summary>
@@ -171,8 +182,11 @@ public class ChatService(
                 await SendToolNotificationsAsync(toolResults, cancellationToken);
 
                 // Check: are ALL tool calls direct-return AND does the user want a list?
-                var allDirect = IsListIntent(userMessage)
-                                && toolCalls.All(tc => DirectReturnTools.Contains(tc.Name ?? ""));
+                // Or: did any of the calls hit a tool flagged AlwaysDirectReturn?
+                var anyAlwaysDirect = toolCalls.Any(tc => AlwaysDirectReturnTools.Contains(tc.Name ?? ""));
+                var allDirect = anyAlwaysDirect
+                                || (IsListIntent(userMessage)
+                                    && toolCalls.All(tc => DirectReturnTools.Contains(tc.Name ?? "")));
 
                 if (allDirect)
                 {

@@ -7,4 +7,5 @@ public interface ICompanyCommandService
 {
     Task CreateCompanyAsync(CreateCompanyRequest request, ClaimsPrincipal user, CancellationToken ct);
     Task UpdateCompanyAsync(Guid companyUId, UpdateCompanyRequest request, ClaimsPrincipal user, CancellationToken ct);
+    Task DeleteCompanyAsync(Guid companyUId, ClaimsPrincipal user, CancellationToken ct);
 }

@@ -129,4 +129,19 @@ public partial class CompanyCommandService(ICompanyDbContext context, IMessageSe
 
     [LoggerMessage(LogLevel.Information, "Company {CompanyUId} activated")]
     static partial void LogCompanyActivated(ILogger logger, Guid companyUId);
+
+    public async Task DeleteAsync(Guid companyUId, ClaimsPrincipal user, CancellationToken ct)
+    {
+        var company = await context.Companies.Where(c => c.UId == companyUId).SingleOrDefaultAsync(ct);
+        if (company is null)
+        {
+            logger.LogInformation("company-api Company {CompanyUId} not found — already deleted", companyUId);
+            return;
+        }
+
+        context.Companies.Remove(company);
+        await context.SaveChangesAsync(user, ct);
+
+        logger.LogInformation("Deleted company-api row for {CompanyUId}", companyUId);
+    }
 }

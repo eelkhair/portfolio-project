@@ -9,6 +9,10 @@ $REDIS SET "jobboard:config:global:FeatureFlags:Monolith" "false" NX
 $REDIS SET "jobboard:config:global:FeatureFlags:PublicChat" "true" NX
 $REDIS SET "jobboard:config:global:FeatureFlags:AvailableBadge" "false" NX
 $REDIS SET "jobboard:config:global:FeatureFlags:ServiceStatus" "false" NX
+$REDIS SET "jobboard:config:global:FeatureFlags:DemoChat" "true" NX
+
+# Demo claim token signing secret (generated once; do not regenerate without a flush of in-flight tokens)
+$REDIS SET "jobboard:config:global:DemoClaim:Secret" "$(head -c 48 /dev/urandom | base64 | tr -d '/+=' | head -c 48)" NX
 
 
 # SMTP (Mailpit)

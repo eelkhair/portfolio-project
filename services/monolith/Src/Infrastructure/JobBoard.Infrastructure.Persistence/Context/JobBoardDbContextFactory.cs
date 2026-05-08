@@ -21,12 +21,16 @@ public class JobBoardDbContextFactory : IDesignTimeDbContextFactory<JobBoardDbCo
             .SetBasePath(apiProjectPath)
             .AddJsonFile("appsettings.json", optional: false)
             .AddJsonFile("appsettings.Development.json", optional: true)
+            .AddEnvironmentVariables()
             .Build();
 
-        var connectionString = configuration.GetConnectionString("Monolith");
+        var connectionString = configuration.GetConnectionString("Monolith")
+                               ?? Environment.GetEnvironmentVariable("ConnectionStrings__Monolith");
         if (string.IsNullOrEmpty(connectionString))
         {
-            throw new InvalidOperationException("The 'Monolith' was not found in the API project's appsettings for design-time use.");
+            throw new InvalidOperationException(
+                "The 'Monolith' connection string was not found. Set ConnectionStrings:Monolith in appsettings.json or " +
+                "the ConnectionStrings__Monolith environment variable for design-time use.");
         }
 
         var optionsBuilder = new DbContextOptionsBuilder<JobBoardDbContext>();

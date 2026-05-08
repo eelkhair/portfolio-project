@@ -26,8 +26,25 @@ public class InternalApiKeyAuthenticationHandler(
         if (!string.Equals(apiKeyHeader, expectedKey, StringComparison.Ordinal))
             return Task.FromResult(AuthenticateResult.Fail("Invalid API key"));
 
+        // Stamp NameIdentifier + sub so IUserAccessor.UserId resolves to a non-empty
+        // value. Without it the user-context decorator rejects internal calls (e.g.
+        // connector-api's saga reading odata/companies during demo provisioning).
+        // Also include synthetic first/last/email so UserSyncService.EnsureUserExistsAsync
+        // can create the phantom 'InternalService' user row without value-object validation
+        // failing on empty fields.
         var identity = new ClaimsIdentity(
-            new[] { new Claim(ClaimTypes.Name, "InternalService") },
+            new[]
+            {
+                new Claim(ClaimTypes.Name, "InternalService"),
+                new Claim(ClaimTypes.NameIdentifier, "InternalService"),
+                new Claim("sub", "InternalService"),
+                new Claim(ClaimTypes.GivenName, "Internal"),
+                new Claim("given_name", "Internal"),
+                new Claim(ClaimTypes.Surname, "Service"),
+                new Claim("family_name", "Service"),
+                new Claim(ClaimTypes.Email, "internal-service@elkhair.tech"),
+                new Claim("email", "internal-service@elkhair.tech")
+            },
             Scheme.Name);
 
         var principal = new ClaimsPrincipal(identity);

@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { FeatureFlagsProvider } from "./components/FeatureFlags";
 import { FaroProvider } from "./components/FaroProvider";
+import { DemoChatWidget } from "./components/DemoChatWidget";
 import { fetchFeatureFlags } from "./lib/feature-flags";
 import { resolveGeo, type CfProperties } from "./lib/geo";
 import "./globals.css";
@@ -78,6 +79,7 @@ export default async function RootLayout({
             <FaroProvider env={faroEnv} geo={geo}>
               <a href="#main" className="skip-link">Skip to main content</a>
               {children}
+              <DemoChatWidget />
             </FaroProvider>
           </FeatureFlagsProvider>
         </ThemeProvider>

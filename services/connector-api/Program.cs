@@ -20,6 +20,8 @@ var app = builder.Build();
 app.UseCors(CorsPolicy);
 app.MapCompanyCreatedEndpoint()
     .MapCompanyUpdatedEndpoint()
+    .MapDemoCompanyExpiredEndpoint()
+    .MapDemoCompanyClaimedEndpoint()
     .MapJobCreatedEndpoint()
     .MapDraftSavedEndpoint()
     .MapDraftDeletedEndpoint()

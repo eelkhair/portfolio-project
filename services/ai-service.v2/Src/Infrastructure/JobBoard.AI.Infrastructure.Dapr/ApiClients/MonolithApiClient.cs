@@ -49,6 +49,42 @@ public class MonolithApiClient(DaprClient _, IUserAccessor accessor, ILogger<Mon
         }
     }
 
+    public async Task<DemoCompanyCreatedResponse> CreateDemoCompanyAsync(CreateDemoCompanyRequest cmd, CancellationToken ct)
+    {
+        try
+        {
+            // The /api/demo/companies endpoint is [AllowAnonymous]; CreateRequest still
+            // attaches the (possibly empty) Authorization header but the endpoint ignores it.
+            var request = CreateRequest(HttpMethod.Post, "api/demo/companies", "monolith-api");
+            request.Content = JsonContent.Create(cmd);
+            var response = await Client.InvokeMethodAsync<ApiResponse<DemoCompanyCreatedResponse>>(request, ct);
+            return response.Data!;
+        }
+        catch (InvocationException ex)
+        {
+            var response = ex.Response;
+            var body = await response.Content.ReadAsStringAsync(ct);
+            logger.LogError(ex, "Error creating demo company in monolith-api: {Body}", body);
+            throw;
+        }
+    }
+
+    public async Task<List<IndustryDto>> ListDemoIndustriesAsync(CancellationToken ct)
+    {
+        try
+        {
+            var request = CreateRequest(HttpMethod.Get, "api/demo/industries", "monolith-api");
+            var response = await Client.InvokeMethodAsync<ApiResponse<List<IndustryDto>>>(request, ct);
+            return response.Data ?? [];
+        }
+        catch (InvocationException ex)
+        {
+            var body = await ex.Response.Content.ReadAsStringAsync(ct);
+            logger.LogError(ex, "Error listing demo industries from monolith-api: {Body}", body);
+            throw;
+        }
+    }
+
 
     public async Task<CompanyDto> UpdateCompanyAsync(Guid companyId, UpdateCompanyCommand cmd, CancellationToken ct)
     {

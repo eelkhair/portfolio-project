@@ -10,7 +10,8 @@ public class KeywordToolGroupSelector : IToolGroupSelector
         ["draft"] = ["draft", "drafts", "generate"],
         ["job"] = ["job", "jobs", "publish", "posting", "hire", "hiring", "vacancy", "vacancies"],
         ["system"] = ["mode", "system", "config", "provider", "model", "trace", "debug"],
-        ["public"] = ["match", "matching", "recommend", "resume", "similar", "search", "find", "apply", "application"]
+        ["public"] = ["match", "matching", "recommend", "resume", "similar", "search", "find", "apply", "application"],
+        ["demo"] = ["demo", "create", "company", "industry", "industries", "claim", "try", "show", "list", "options"]
     };
 
     public static readonly HashSet<string> AllGroups = [.. GroupKeywords.Keys.Append("core")];

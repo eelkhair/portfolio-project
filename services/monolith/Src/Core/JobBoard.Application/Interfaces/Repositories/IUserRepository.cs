@@ -12,4 +12,6 @@ public interface IUserRepository : IRepository
     Task AddCompanyUser(UserCompany companyUser, CancellationToken cancellationToken);
     Task<bool> EmailExistsAsync(string email, CancellationToken ct);
 
+    Task DeleteAsync(User user, CancellationToken cancellationToken);
+    Task DeleteCompanyUser(UserCompany companyUser, CancellationToken cancellationToken);
 }

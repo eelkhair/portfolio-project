@@ -15,7 +15,9 @@ public static class CreateCompanyMappers
             Email: command.CompanyEmail,
             Status: "Provisioning",
             InternalId: id, Id: uid,
-            IndustryId: industryId));
+            IndustryId: industryId,
+            IsDemo: command.IsDemo,
+            DemoExpiresAt: command.DemoExpiresAt));
 
         company.SetWebsite(command.CompanyWebsite);
         return company;
@@ -34,7 +36,11 @@ public static class CreateCompanyMappers
             command.IndustryUId,
             adminUId, userCompanyUId
    )
-        { UserId = command.UserId };
+        {
+            UserId = command.UserId,
+            IsDemo = command.IsDemo,
+            DemoExpiresAt = command.DemoExpiresAt
+        };
 
     public static void SetActivityTagsForCompany(this CreateCompanyCommand request, Activity? activity)
     {
@@ -42,5 +48,8 @@ public static class CreateCompanyMappers
         activity?.SetTag("CompanyEmail", request.CompanyEmail);
         activity?.SetTag("AdminEmail", request.AdminEmail);
         activity?.SetTag("IndustryUId", request.IndustryUId.ToString());
+        activity?.SetTag("company.is_demo", request.IsDemo);
+        if (request.DemoExpiresAt.HasValue)
+            activity?.SetTag("company.demo_expires_at", request.DemoExpiresAt.Value.ToString("O"));
     }
 }

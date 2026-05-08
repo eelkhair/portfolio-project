@@ -1,3 +1,4 @@
+using JobBoard.Application.Interfaces;
 using JobBoard.Application.Interfaces.Configurations;
 using JobBoard.Infrastructure.Configuration.Services;
 using Microsoft.AspNetCore.Builder;
@@ -44,6 +45,7 @@ public static class AppConfigurationExtensions
     public static IServiceCollection AddAppConfigurationServices(this IServiceCollection services)
     {
         services.AddScoped<IApplicationOrchestrator, ApplicationOrchestrator>();
+        services.AddSingleton<IDemoClaimTokenService, DemoClaimTokenService>();
         services.AddAzureAppConfiguration();
         services.AddFeatureManagement();
         return services;

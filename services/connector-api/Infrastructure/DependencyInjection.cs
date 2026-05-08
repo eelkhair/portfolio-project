@@ -73,6 +73,8 @@ public static class DependencyInjection
         services.AddScoped<UpdateCompanySaga>();
         services.AddScoped<JobProvisioningSaga>();
         services.AddScoped<DraftSyncSaga>();
+        services.AddScoped<DemoCompanyExpiredSaga>();
+        services.AddScoped<DemoCompanyClaimedSaga>();
 
         return services;
     }

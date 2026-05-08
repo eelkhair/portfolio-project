@@ -184,6 +184,60 @@ public class KeycloakResource(HttpClient http, string adminApiBaseUrl) : IKeyclo
         return users?.FirstOrDefault();
     }
 
+    public async Task<ApiResponse<bool>> DeleteUserAsync(string userId, CancellationToken ct)
+    {
+        try
+        {
+            using var response = await http.DeleteAsync($"{_baseUrl}/users/{userId}", ct);
+            // Idempotent: 404 means already gone — caller treats as success.
+            if (response.StatusCode is HttpStatusCode.NotFound) return OkResult(true);
+            response.EnsureSuccessStatusCode();
+            return OkResult(true);
+        }
+        catch (Exception e)
+        {
+            return FailedResult<bool>(e);
+        }
+    }
+
+    public async Task<ApiResponse<bool>> DeleteGroupAsync(string groupId, CancellationToken ct)
+    {
+        try
+        {
+            using var response = await http.DeleteAsync($"{_baseUrl}/groups/{groupId}", ct);
+            if (response.StatusCode is HttpStatusCode.NotFound) return OkResult(true);
+            response.EnsureSuccessStatusCode();
+            return OkResult(true);
+        }
+        catch (Exception e)
+        {
+            return FailedResult<bool>(e);
+        }
+    }
+
+    public async Task<ApiResponse<bool>> RemoveUserFromGroupAsync(string userId, string groupId, CancellationToken ct)
+    {
+        try
+        {
+            using var response = await http.DeleteAsync($"{_baseUrl}/users/{userId}/groups/{groupId}", ct);
+            if (response.StatusCode is HttpStatusCode.NotFound) return OkResult(true);
+            response.EnsureSuccessStatusCode();
+            return OkResult(true);
+        }
+        catch (Exception e)
+        {
+            return FailedResult<bool>(e);
+        }
+    }
+
+    public async Task<List<KeycloakUser>> GetGroupMembersAsync(string groupId, CancellationToken ct)
+    {
+        // Keycloak nests CompanyAdmins/Recruiters under Companies/{uid}.
+        // Caller resolves the parent group id; this returns direct members only.
+        return await http.GetFromJsonAsync<List<KeycloakUser>>(
+            $"{_baseUrl}/groups/{groupId}/members", ct) ?? [];
+    }
+
     private static string ExtractIdFromLocationHeader(HttpResponseMessage response)
     {
         var location = response.Headers.Location?.ToString();

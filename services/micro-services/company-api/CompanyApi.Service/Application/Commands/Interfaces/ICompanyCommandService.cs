@@ -9,4 +9,5 @@ public interface ICompanyCommandService
     Task<CompanyResponse> CreateAsync(CreateCompanyRequest request, ClaimsPrincipal user, CancellationToken ct);
     Task<CompanyResponse> UpdateAsync(Guid companyUId, UpdateCompanyRequest request, ClaimsPrincipal user, CancellationToken ct, bool publishEvent = true);
     Task<bool> ActivateAsync(Guid companyUId, ClaimsPrincipal user, CancellationToken ct);
+    Task DeleteAsync(Guid companyUId, ClaimsPrincipal user, CancellationToken ct);
 }

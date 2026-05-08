@@ -27,6 +27,7 @@ public sealed class ChatCommandHandler(
 {
     private static readonly PublicChatSystemPrompt PublicPrompt = new();
     private static readonly AdminSystemPrompt AdminSystemPrompt = new();
+    private static readonly DemoChatSystemPrompt DemoPrompt = new();
 
     public async Task<ChatResponse> HandleAsync(
         ChatCommand request,
@@ -42,9 +43,12 @@ public sealed class ChatCommandHandler(
         activity?.SetTag("ai.operation", "chat");
         activity?.SetTag("ai.userId", request.UserId);
 
-        var prompt = request.Scope == ChatScope.Public
-            ? PublicPrompt.Value
-            : AdminSystemPrompt.Value;
+        var prompt = request.Scope switch
+        {
+            ChatScope.Public => PublicPrompt.Value,
+            ChatScope.Demo => DemoPrompt.Value,
+            _ => AdminSystemPrompt.Value
+        };
 
         var effectiveUserMessage = request.CompanyId is not null
             ? $"Context:\n- companyId: {request.CompanyId}\n\nUser:\n{request.Message}"

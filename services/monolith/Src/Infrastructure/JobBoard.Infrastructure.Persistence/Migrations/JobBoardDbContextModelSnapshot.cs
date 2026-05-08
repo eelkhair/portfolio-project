@@ -63,6 +63,9 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<DateTime?>("DemoExpiresAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)");
@@ -88,6 +91,9 @@ namespace JobBoard.Infrastructure.Persistence.Migrations
 
                     b.Property<int>("IndustryId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsDemo")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Logo")
                         .HasMaxLength(400)

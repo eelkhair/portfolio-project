@@ -91,4 +91,95 @@ public partial class CompanyCommandService(IUserDbContext context, ILogger<Compa
 
     [LoggerMessage(LogLevel.Information, "Adding user {UserId} to company {CompanyId}")]
     static partial void LogAddingUserToCompany(ILogger logger, int userId, int companyId);
+
+    public async Task DeleteCompanyAsync(Guid companyUId, string userId, CancellationToken ct)
+    {
+        var company = await context.Companies.FirstOrDefaultAsync(c => c.UId == companyUId, ct);
+        if (company is null)
+        {
+            logger.LogInformation("user-api Company {CompanyUId} not found — already deleted", companyUId);
+            return;
+        }
+
+        // Pull dependent UserCompany rows + the synthetic user(s) bound to this company
+        // so the entire company-scoped sub-graph goes in one transaction.
+        var userCompanies = await context.UserCompanies
+            .Where(uc => uc.CompanyId == company.Id)
+            .ToListAsync(ct);
+
+        var userIds = userCompanies.Select(uc => uc.UserId).Distinct().ToList();
+        var users = await context.Users
+            .Where(u => userIds.Contains(u.Id))
+            .ToListAsync(ct);
+
+        context.UserCompanies.RemoveRange(userCompanies);
+        context.Users.RemoveRange(users);
+        context.Companies.Remove(company);
+        await context.SaveChangesAsync(userId, ct);
+
+        logger.LogInformation(
+            "Deleted user-api company {CompanyUId} + {UserCount} user(s)",
+            companyUId, users.Count);
+    }
+
+    public async Task RepointAdminAsync(Guid companyUId, string newAdminEmail, string newAdminFirstName,
+        string newAdminLastName, Guid newAdminUId, string userId, CancellationToken ct)
+    {
+        var company = await context.Companies.FirstOrDefaultAsync(c => c.UId == companyUId, ct)
+            ?? throw new InvalidOperationException(
+                $"Cannot claim user-api company {companyUId}: not found");
+
+        // Find or create the new user row pointing at the real Keycloak account.
+        var newUser = await context.Users.FirstOrDefaultAsync(u => u.Email == newAdminEmail, ct);
+        if (newUser is null)
+        {
+            newUser = new User
+            {
+                FirstName = newAdminFirstName,
+                LastName = newAdminLastName,
+                Email = newAdminEmail,
+                UId = newAdminUId
+            };
+            context.Users.Add(newUser);
+            await context.SaveChangesAsync(userId, ct);
+        }
+
+        // Drop synthetic admin (demo-{guid}@demo.elkhair.tech) UserCompany links + user rows
+        // tied to this company, then add the new user → company link.
+        var demoUserIds = await context.Users
+            .Where(u => u.Email.EndsWith("@demo.elkhair.tech"))
+            .Where(u => context.UserCompanies.Any(uc => uc.UserId == u.Id && uc.CompanyId == company.Id))
+            .Select(u => u.Id)
+            .ToListAsync(ct);
+
+        if (demoUserIds.Count > 0)
+        {
+            var demoLinks = await context.UserCompanies
+                .Where(uc => demoUserIds.Contains(uc.UserId) && uc.CompanyId == company.Id)
+                .ToListAsync(ct);
+            var demoUsers = await context.Users
+                .Where(u => demoUserIds.Contains(u.Id))
+                .ToListAsync(ct);
+
+            context.UserCompanies.RemoveRange(demoLinks);
+            context.Users.RemoveRange(demoUsers);
+        }
+
+        var alreadyLinked = await context.UserCompanies
+            .AnyAsync(uc => uc.UserId == newUser.Id && uc.CompanyId == company.Id, ct);
+        if (!alreadyLinked)
+        {
+            context.UserCompanies.Add(new UserCompany
+            {
+                UserId = newUser.Id,
+                CompanyId = company.Id
+            });
+        }
+
+        await context.SaveChangesAsync(userId, ct);
+
+        logger.LogInformation(
+            "Repointed user-api company {CompanyUId} admin → {NewAdminEmail}; removed {DemoCount} synthetic admin(s)",
+            companyUId, newAdminEmail, demoUserIds.Count);
+    }
 }

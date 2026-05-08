@@ -3,6 +3,7 @@ using ConnectorAPI.Interfaces.Clients;
 using ConnectorAPI.Models;
 using ConnectorAPI.Models.CompanyCreated;
 using ConnectorAPI.Models.CompanyUpdated;
+using ConnectorAPI.Models.DemoCompany;
 using ConnectorAPI.Models.Drafts;
 using ConnectorAPI.Models.JobCreated;
 using Dapr.Client;
@@ -72,5 +73,26 @@ public class JobApiClient(DaprClient client, ActivitySource activitySource, ILog
         using var activity = activitySource.StartActivity("job-api.GetDraftAsync");
         logger.LogInformation("Getting draft {DraftUId} from job-api", draftUId);
         return await client.InvokeMethodAsync<DraftResponse>(HttpMethod.Get, "job-api", $"api/drafts/detail/{draftUId}", cancellationToken);
+    }
+
+    public Task DeleteCompanyAsync(Guid companyUId, CancellationToken cancellationToken)
+    {
+        using var activity = activitySource.StartActivity("job-api.DeleteCompanyAsync");
+        activity?.SetTag("company.uid", companyUId);
+        logger.LogInformation("Deleting demo company {CompanyUId} jobs from job-api", companyUId);
+        var message = client.CreateInvokeMethodRequest(HttpMethod.Delete, "job-api", $"api/companies/{companyUId}");
+        message.Headers.Add("X-Sync-Source", "demo-cleanup");
+        return client.InvokeMethodAsync(message, cancellationToken);
+    }
+
+    public Task ClaimCompanyAsync(Guid companyUId, DemoCompanyClaimedPayload payload, CancellationToken cancellationToken)
+    {
+        using var activity = activitySource.StartActivity("job-api.ClaimCompanyAsync");
+        activity?.SetTag("company.uid", companyUId);
+        logger.LogInformation("Clearing demo flag on job-api projection for {CompanyUId}", companyUId);
+        var message = client.CreateInvokeMethodRequest(HttpMethod.Post, "job-api", $"api/companies/{companyUId}/claim");
+        message.Headers.Add("X-Sync-Source", "demo-claim");
+        message.Content = JsonContent.Create(payload);
+        return client.InvokeMethodAsync(message, cancellationToken);
     }
 }

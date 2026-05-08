@@ -1,5 +1,6 @@
 using JobBoard.AI.API.Infrastructure.Authorization;
 using JobBoard.AI.Application.Actions.Chat;
+using JobBoard.AI.Application.Interfaces.Configurations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -60,4 +61,32 @@ public class ChatController : BaseApiController
             new ChatCommand(request.Message, companyId: null, request.ConversationId,
                 scope: ChatScope.Public),
             Ok);
+
+    /// <summary>
+    /// Anonymous demo chat for landing-page visitors. Walks the visitor through
+    /// creating a real demo company that auto-deletes after 1 hour. Single tool
+    /// only: create_demo_company.
+    /// </summary>
+    [HttpPost("demo")]
+    [AllowAnonymous]
+    [StandardApiResponses]
+    public async Task<IActionResult> DemoChat(
+        [FromBody] PublicChatRequest request,
+        [FromServices] IUserAccessor userAccessor)
+    {
+        // The UserContextCommandHandlerDecorator throws 401 when userAccessor.UserId is
+        // empty; this endpoint is anonymous so no JWT populates it. Stamp a synthetic
+        // visitor id so the decorator passes and ChatService has something to bucket
+        // conversations against.
+        userAccessor.UserId = "demo-anonymous";
+        userAccessor.FirstName = "Demo";
+        userAccessor.LastName = "Visitor";
+        userAccessor.Email = "demo-visitor@demo.elkhair.tech";
+        userAccessor.Roles = ["Demo"];
+
+        return await ExecuteCommandAsync(
+            new ChatCommand(request.Message, companyId: null, request.ConversationId,
+                scope: ChatScope.Demo),
+            Ok);
+    }
 }

@@ -1,6 +1,8 @@
 using JobBoard.API.Mcp.Tools;
 using JobBoard.Application;
+using JobBoard.Application.Interfaces;
 using JobBoard.Infrastructure.BlobStorage;
+using JobBoard.Infrastructure.Configuration.Services;
 using JobBoard.Infrastructure.Diagnostics;
 using JobBoard.Infrastructure.HttpClients;
 using JobBoard.Infrastructure.Keycloak;
@@ -32,6 +34,12 @@ public static class DependencyInjection
             .AddHttpContextAccessor()
             .AddScoped<IUserAccessor, HttpUserAccessor>()
             .AddKeycloakAdminClient()
+            // ClaimDemoCompanyCommandHandler depends on IDemoClaimTokenService — register
+            // it directly here so Scrutor's auto-handler-registration in
+            // AddApplicationServices() can validate the dependency at startup. The MCP
+            // never issues claim tokens (only the API does), but the handler is still
+            // pulled in by the assembly scan.
+            .AddSingleton<IDemoClaimTokenService, DemoClaimTokenService>()
             .AddDiagnosticsServices(cfg, "monolith-mcp");
 
         services.AddKeycloakJwtAuth(cfg);

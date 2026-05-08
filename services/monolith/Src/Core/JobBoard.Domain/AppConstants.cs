@@ -39,6 +39,8 @@ public static class MonolithTopicNames
     public const string ResumeDeletedV1 = "monolith.resume-deleted.v1";
     public const string DraftSavedV1 = "monolith.draft-saved.v1";
     public const string DraftDeletedV1 = "monolith.draft-deleted.v1";
+    public const string DemoCompanyExpiredV1 = "monolith.demo-company-expired.v1";
+    public const string DemoCompanyClaimedV1 = "monolith.demo-company-claimed.v1";
 
     private static readonly Dictionary<string, string> EventTypeToTopic = new(StringComparer.Ordinal)
     {
@@ -50,6 +52,8 @@ public static class MonolithTopicNames
         ["resume.deleted.v1"] = ResumeDeletedV1,
         ["draft.saved.v1"] = DraftSavedV1,
         ["draft.deleted.v1"] = DraftDeletedV1,
+        ["demo-company.expired.v1"] = DemoCompanyExpiredV1,
+        ["demo-company.claimed.v1"] = DemoCompanyClaimedV1,
     };
 
     public static string GetTopicForEventType(string eventType)

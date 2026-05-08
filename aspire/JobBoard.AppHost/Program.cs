@@ -296,7 +296,10 @@ var jobPublic = builder.AddNpmApp("job-public", "../../apps/job-public", "start"
 
 var landing = builder.AddNpmApp("landing", "../../apps/landing-next", "dev")
     .WithHttpEndpoint(3001, isProxied: false)
-    .WaitFor(gateway);
+    .WithEnvironment("MONOLITH_URL", "http://localhost:5280")
+    .WithEnvironment("FEATURE_FLAGS_URL", "http://localhost:5280/api/public/feature-flags")
+    .WaitFor(gateway)
+    .WaitFor(monolith);
 
 // ---------------------------------------------------------------------------
 // Dapr-dependent services
@@ -345,6 +348,12 @@ if (useDapr)
     aiService
         .WithEnvironment("McpServer__MicroUrl", adminMcp.GetEndpoint("http"))
         .WaitFor(adminMcp);
+
+    // Wire the AI service endpoint into the landing so /api/demo-chat can proxy
+    // to /chat/demo. Done after aiService is constructed because it's gated on useDapr.
+    landing
+        .WithEnvironment("AI_SERVICE_URL", aiService.GetEndpoint("http"))
+        .WaitFor(aiService);
 
     var companyApi = builder.AddProject<Projects.CompanyApi_Service>("company-api")
         .WithEnvironment("OTEL_COLLECTOR_ENDPOINT", collectorEndpoint)

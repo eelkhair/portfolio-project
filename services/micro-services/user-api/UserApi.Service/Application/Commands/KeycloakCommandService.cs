@@ -113,4 +113,106 @@ public partial class KeycloakCommandService(ActivitySource activitySource, IKeyc
 
     [LoggerMessage(LogLevel.Error, "Keycloak provisioning failed at '{Context}': {Error} (StatusCode: {StatusCode})")]
     static partial void LogProvisioningFailed(ILogger logger, string context, string error, System.Net.HttpStatusCode? statusCode);
+
+    public async Task TeardownCompanyAsync(Guid companyUId, CancellationToken ct)
+    {
+        _resource ??= await factory.GetKeycloakResourceAsync(ct);
+
+        using var activity = activitySource.StartActivity("Keycloak.TeardownCompany");
+        activity?.SetTag("company.uid", companyUId);
+
+        var companyGroup = await _resource.FindGroupByNameAsync(companyUId.ToString(), ct);
+        if (companyGroup is null)
+        {
+            logger.LogInformation("Keycloak group for {CompanyUId} not found — nothing to tear down", companyUId);
+            return;
+        }
+
+        // Collect users from CompanyAdmins + Recruiters sub-groups so they can be deleted
+        // (synthetic demo admin lives only in CompanyAdmins, but real claims may have created
+        // recruiters too; either way these accounts exist solely for this company).
+        var subGroups = await _resource.GetSubGroupsAsync(companyGroup.Id!, ct);
+        var allMembers = new Dictionary<string, KeycloakUser>(StringComparer.Ordinal);
+        foreach (var sub in subGroups)
+        {
+            if (string.IsNullOrEmpty(sub.Id)) continue;
+            foreach (var member in await _resource.GetGroupMembersAsync(sub.Id, ct))
+            {
+                if (!string.IsNullOrEmpty(member.Id))
+                    allMembers[member.Id] = member;
+            }
+        }
+
+        // Delete the parent group first — Keycloak cascades sub-group membership.
+        // Then delete each user we collected (they're company-scoped synthetic accounts,
+        // safe to remove since the company itself is gone).
+        var deleteGroup = await _resource.DeleteGroupAsync(companyGroup.Id!, ct);
+        ThrowIfFailed(deleteGroup, "Error deleting company group");
+
+        foreach (var (id, user) in allMembers)
+        {
+            var del = await _resource.DeleteUserAsync(id, ct);
+            if (!del.Success)
+                logger.LogWarning("Failed to delete Keycloak user {Email} ({Id}): {Error}",
+                    user.Email, id, del.Exceptions?.Message);
+        }
+
+        logger.LogInformation("Tore down Keycloak group {CompanyUId} + {UserCount} users",
+            companyUId, allMembers.Count);
+    }
+
+    public async Task SwapDemoAdminAsync(
+        Guid companyUId,
+        string newAdminEmail,
+        string newAdminFirstName,
+        string newAdminLastName,
+        CancellationToken ct)
+    {
+        _resource ??= await factory.GetKeycloakResourceAsync(ct);
+
+        using var activity = activitySource.StartActivity("Keycloak.SwapDemoAdmin");
+        activity?.SetTag("company.uid", companyUId);
+        activity?.SetTag("new.admin.email", newAdminEmail);
+
+        var companyGroup = await _resource.FindGroupByNameAsync(companyUId.ToString(), ct)
+            ?? throw new InvalidOperationException(
+                $"Cannot claim demo company {companyUId}: Keycloak group not found");
+
+        var subGroups = await _resource.GetSubGroupsAsync(companyGroup.Id!, ct);
+        var companyAdmins = subGroups.FirstOrDefault(g =>
+            string.Equals(g.Name, "CompanyAdmins", StringComparison.Ordinal))
+            ?? throw new InvalidOperationException(
+                $"CompanyAdmins sub-group missing under {companyUId}");
+
+        // Find or create the real user. The visitor just signed up via Keycloak so
+        // FindUserByEmailAsync should resolve them; CreateUserAsync is idempotent and
+        // returns the existing user when one matches.
+        var existingNewUser = await _resource.FindUserByEmailAsync(newAdminEmail, ct);
+        var newUserId = existingNewUser?.Id;
+        if (string.IsNullOrEmpty(newUserId))
+        {
+            var created = await _resource.CreateUserAsync(
+                newAdminEmail, newAdminFirstName, newAdminLastName, attributes: null, ct);
+            ThrowIfFailed(created, "Error creating real admin user during claim");
+            newUserId = created.Data!.Id;
+        }
+
+        // Add the real user to CompanyAdmins.
+        var addResult = await _resource.AddUserToGroupAsync(newUserId!, companyAdmins.Id!, ct);
+        ThrowIfFailed(addResult, "Error adding real admin to CompanyAdmins");
+
+        // Pluck the synthetic demo admin (email pattern: demo-{guid}@demo.elkhair.tech)
+        // out of the group, then delete the synthetic user account entirely.
+        var members = await _resource.GetGroupMembersAsync(companyAdmins.Id!, ct);
+        foreach (var m in members.Where(m =>
+            m.Email != null && m.Email.EndsWith("@demo.elkhair.tech", StringComparison.OrdinalIgnoreCase)))
+        {
+            if (string.IsNullOrEmpty(m.Id)) continue;
+            await _resource.RemoveUserFromGroupAsync(m.Id, companyAdmins.Id!, ct);
+            await _resource.DeleteUserAsync(m.Id, ct);
+        }
+
+        logger.LogInformation("Swapped synthetic demo admin → {NewAdminEmail} on company {CompanyUId}",
+            newAdminEmail, companyUId);
+    }
 }

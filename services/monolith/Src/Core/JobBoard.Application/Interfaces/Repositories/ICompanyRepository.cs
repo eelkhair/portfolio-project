@@ -12,4 +12,5 @@ public interface ICompanyRepository : IRepository
     Task<bool> IndustryExistsAsync(Guid uid, CancellationToken ct);
 
     Task<Company> GetCompanyById(Guid companyUId, CancellationToken cancellationToken);
+    Task DeleteAsync(Company company, CancellationToken cancellationToken);
 }
