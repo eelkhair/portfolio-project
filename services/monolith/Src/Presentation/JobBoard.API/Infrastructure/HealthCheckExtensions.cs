@@ -14,6 +14,13 @@ internal static class HealthCheckExtensions
         var rabbitUri = builder.Configuration["RabbitMQ:Host"]
                         ?? "amqp://guest:guest@192.168.1.160:5672/local";
 
+        // HealthChecks.RabbitMQ invokes its factory on every check and never disposes the
+        // connection, so a per-check factory leaks one AMQP connection per poll until the
+        // container runs out of ephemeral ports. Share one connection (auto-recovery on by default).
+        builder.Services.AddSingleton<IConnection>(_ =>
+            new ConnectionFactory { Uri = new Uri(rabbitUri), ClientProvidedName = "monolith-healthcheck" }
+                .CreateConnectionAsync().GetAwaiter().GetResult());
+
         builder.Services
             .AddHealthChecks()
 
@@ -45,11 +52,7 @@ internal static class HealthCheckExtensions
 
             // -- RabbitMQ (messaging) --
             .AddRabbitMQ(
-                _ =>
-                {
-                    var factory = new ConnectionFactory { Uri = new Uri(rabbitUri) };
-                    return factory.CreateConnectionAsync().GetAwaiter().GetResult();
-                },
+                sp => sp.GetRequiredService<IConnection>(),
                 name: "RabbitMQ",
                 tags: ["infrastructure"])
 

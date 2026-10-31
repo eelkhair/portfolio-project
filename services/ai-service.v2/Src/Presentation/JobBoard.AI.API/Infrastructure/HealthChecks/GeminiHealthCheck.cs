@@ -16,10 +16,6 @@ internal sealed class GeminiHealthCheck(IConfiguration configuration, IHttpClien
         var request = new HttpRequestMessage(HttpMethod.Get,
             $"https://generativelanguage.googleapis.com/v1/models?key={apiKey}");
 
-        var response = await client.SendAsync(request, cancellationToken);
-
-        return response.IsSuccessStatusCode
-            ? HealthCheckResult.Healthy("Google Gemini API is reachable and credentials are valid.")
-            : HealthCheckResult.Unhealthy($"Google Gemini returned {(int)response.StatusCode}.");
+        return await ProviderHealth.ProbeAsync("Google Gemini", client, request, cancellationToken);
     }
 }

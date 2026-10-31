@@ -16,10 +16,6 @@ internal sealed class OpenAiHealthCheck(IConfiguration configuration, IHttpClien
         var request = new HttpRequestMessage(HttpMethod.Get, "https://api.openai.com/v1/models");
         request.Headers.Authorization = new("Bearer", apiKey);
 
-        var response = await client.SendAsync(request, cancellationToken);
-
-        return response.IsSuccessStatusCode
-            ? HealthCheckResult.Healthy("OpenAI API is reachable and credentials are valid.")
-            : HealthCheckResult.Unhealthy($"OpenAI returned {(int)response.StatusCode}.");
+        return await ProviderHealth.ProbeAsync("OpenAI", client, request, cancellationToken);
     }
 }

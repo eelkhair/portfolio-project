@@ -19,10 +19,6 @@ internal sealed class AzureOpenAiHealthCheck(IConfiguration configuration, IHttp
             $"{endpoint.TrimEnd('/')}/openai/models?api-version=2024-10-21");
         request.Headers.Add("api-key", apiKey);
 
-        var response = await client.SendAsync(request, cancellationToken);
-
-        return response.IsSuccessStatusCode
-            ? HealthCheckResult.Healthy("Azure OpenAI is reachable and credentials are valid.")
-            : HealthCheckResult.Unhealthy($"Azure OpenAI returned {(int)response.StatusCode}.");
+        return await ProviderHealth.ProbeAsync("Azure OpenAI", client, request, cancellationToken);
     }
 }
