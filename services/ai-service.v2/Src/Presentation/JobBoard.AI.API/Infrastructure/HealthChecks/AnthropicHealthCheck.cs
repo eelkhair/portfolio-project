@@ -17,10 +17,6 @@ internal sealed class AnthropicHealthCheck(IConfiguration configuration, IHttpCl
         request.Headers.Add("x-api-key", apiKey);
         request.Headers.Add("anthropic-version", "2023-06-01");
 
-        var response = await client.SendAsync(request, cancellationToken);
-
-        return response.IsSuccessStatusCode
-            ? HealthCheckResult.Healthy("Anthropic API is reachable and credentials are valid.")
-            : HealthCheckResult.Unhealthy($"Anthropic returned {(int)response.StatusCode}.");
+        return await ProviderHealth.ProbeAsync("Anthropic", client, request, cancellationToken);
     }
 }
